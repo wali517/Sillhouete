@@ -36,7 +36,7 @@ export default function OrderConfirmationPage() {
 
   // Clear cart whenever an order confirmation page is reached
   useEffect(() => {
-    clearCart();
+    clearCart()
   }, [clearCart]);
 
   const syncPaymentStatus = async (oid: string, piId?: string) => {
