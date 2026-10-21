@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-halant), serif;
+  --color-ink: #111111;
+  --color-sale: #c20000;
+  --color-line: #e8e8e1;
+  --color-announce: #0f0f0f;
+  --color-soft: #f9f9f9;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: #fff;
+  color: #000;
+  font-family: var(--font-halant), serif;
+  font-size: 15px;
+  line-height: 1.4;
+  letter-spacing: 0.025em;
+}
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid #111; outline-offset: 2px; }
+
+.heading { text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; line-height: 1; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #000000 !important; color: #ffffff !important; border: 1px solid #000000;
+  padding: 12px 20px; text-transform: uppercase; font-weight: 800; font-size: 13px;
+  letter-spacing: 0.3em; transition: background-color .2s;
+}
+.btn:hover { background: #222222 !important; color: #ffffff !important; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-outline { background: #000000 !important; color: #ffffff !important; border: 1px solid #000000; }
+.btn-outline:hover { background: #222222 !important; color: #ffffff !important; }
+
+/* Global default for action buttons: solid black background with crisp white text */
+button[type="submit"],
+.btn-solid,
+.btn-primary,
+.action-button {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+@keyframes blinks { 0% { opacity: 0 } 49% { opacity: .4 } 50% { opacity: .7 } 100% { opacity: 1 } }
+.blink, .animate-blinks { animation: blinks 1s linear infinite; }
+.sale-blinks,
+span.sale-menu,
+.site-nav__item a[href*="/collections/sale-1"],
+li.mobile-nav__item a[href*="/collections/sale-1"] {
+  color: #ff0000 !important;
+  animation: blinks 1s linear infinite !important;
+  font-weight: 700;
+}
+@media (prefers-reduced-motion: reduce) { .blink, .animate-blinks, .sale-blinks { animation: none !important; } }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes shine {
+  100% { left: -150%; }
+}
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 150%;
+  width: 200%;
+  height: 100%;
+  transform: skewX(-20deg);
+  background-image: linear-gradient(to right, transparent, rgba(255,255,255,.25), transparent);
+}
+.btn-shine:hover:after {
+  animation: shine 0.75s cubic-bezier(0.01, 0.56, 1, 1);
+}
+
+.product-single__sku {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 900;
+  padding-top: 0px;
+  line-height: 14px;
+  margin-bottom: 5px;
+  color: rgba(0, 0, 0, 0.5);
+  text-transform: inherit;
+  letter-spacing: 0.2em;
+}

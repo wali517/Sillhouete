@@ -1,0 +1,1357 @@
+<USER_REQUEST>
+How would i explain you see the header anouncement bar hero section everthing not same with the refrence website and remove extra view all button only make where it need and add images at every page as add in the real website so see the real website frame by frame to frame and make it as whole no thing left behind and and see in real website sale button blink with red colour make it as in the real website and also see the where red colour use in the real website in headrer use it and in header make login icon only remove admin icon and fron login icon the user log in as log in the real website i will share the real website data also so you see the data and make them as it is and also on homepage when mouse on the image the new tag will show at the right top corner and favrourite icon remove from bottom left corner when mouse on the image and make instagram gallery as in the real website or show in the video and also correct the footer also match homepage frame to frame with the real the website or the video and add description correct with every product and remove if have any extra material and also make where blog add with the products add the blogs also and at every page add images as add in the video or in the real website and also make animation when in view then images will show as show in the video or the real website so if have any question ask before write the code and work at homepage properly and match it frame to frame with the video or the real website make it first correct then we go next
+<head>
+<script type="text/javascript" async="" src="https://cdn.nfcube.com/instafeed-78b499a474b91d6d47f827e2329066ea.js?shop=451793-84.myshopify.com"></script><script type="text/javascript" async="" src="https://app.sweethelp.io/js/sweet-help.js?var=2.0&amp;shop=451793-84.myshopify.com"></script><script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=GT-5TGJDFM5&amp;cx=c&amp;gtm=4e6ag1"></script><script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=AW-16690809962&amp;cx=c&amp;gtm=4e6ag1"></script><script src="https://connect.facebook.net/signals/config/448306608355615?v=2.9.425&amp;r=canary&amp;domain=sillhouete.com&amp;hme=766752a074f0cb0756dd3275a46fdecbcfe3de1ab8f573546734b619e44d384f&amp;ex_m=118%2C241%2C171%2C27%2C82%2C83%2C162%2C78%2C77%2C11%2C181%2C102%2C20%2C153%2C141%2C46%2C85%2C90%2C149%2C176%2C183%2C8%2C4%2C5%2C7%2C6%2C3%2C103%2C115%2C32%2C17%2C31%2C18%2C33%2C34%2C35%2C37%2C55%2C163%2C87%2C126%2C22%2C24%2C51%2C47%2C49%2C48%2C95%2C104%2C108%2C124%2C160%2C164%2C53%2C125%2C29%2C26%2C133%2C79%2C43%2C166%2C165%2C167%2C157%2C155%2C30%2C42%2C66%2C123%2C178%2C80%2C21%2C128%2C93%2C76%2C23%2C97%2C98%2C130%2C96%2C151%2C150%2C154%2C109%2C177%2C180%2C41%2C56%2C127%2C54%2C161%2C72%2C185%2C110%2C184%2C210%2C255%2C84%2C274%2C273%2C272%2C14%2C25%2C28%2C40%2C62%2C117%2C68%2C10%2C73%2C111%2C112%2C113%2C119%2C144%2C38%2C36%2C146%2C147%2C148%2C143%2C142%2C172%2C86%2C175%2C173%2C174%2C57%2C69%2C67%2C137%2C19%2C179%2C52%2C324%2C325%2C326%2C323%2C74%2C91%2C331%2C330%2C340%2C362%2C248%2C237%2C70%2C238%2C236%2C365%2C356%2C59%2C249%2C121%2C145%2C92%2C135%2C61%2C134%2C140%2C139%2C65%2C168%2C88%2C89%2C129%2C44%2C39%2C60%2C63%2C114%2C182%2C1%2C138%2C16%2C136%2C12%2C2%2C64%2C105%2C15%2C75%2C71%2C132%2C101%2C100%2C187%2C188%2C106%2C107%2C9%2C116%2C186%2C58%2C158%2C99%2C81%2C131%2C120%2C169%2C50%2C159%2C0%2C94%2C152%2C156%2C170%2C45%2C122%2C13%2C189" async=""></script><script async="true" src="https://connect.facebook.net/en_US/fbevents.js"></script><script type="text/javascript" async="" src="//sillhouete.com/cdn/s/trekkie.storefront.6efba1340ec6769622eb0d10b5cb070d43fb8d55.min.js"></script><script src="//d1liekpayvooaz.cloudfront.net/apps/customizery/customizery.js?shop=451793-84.myshopify.com"></script>
+ 
+<meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#111111">
+  <link rel="canonical" href="https://sillhouete.com/collections/sale-1">
+  <link rel="preconnect" href="https://cdn.shopify.com" crossorigin="">
+  <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin="">
+  <link rel="dns-prefetch" href="https://productreviews.shopifycdn.com">
+  <link rel="dns-prefetch" href="https://ajax.googleapis.com">
+  <link rel="dns-prefetch" href="https://maps.googleapis.com">
+  <link rel="dns-prefetch" href="https://maps.gstatic.com"><link rel="shortcut icon" href="//sillhouete.com/cdn/shop/files/sillhouete_logo_1_32x32.png?v=1744702089" type="image/png">
+<title>Sillhouete Sale
+</title>
+<script type="application/ld+json">
+{
+"@context": "https://schema.org",
+"@graph": [
+
+/* ================= ORGANIZATION ================= */
+{
+"@type": "Organization",
+"name": "Sillhouete",
+"url": "https://sillhouete.com",
+"logo": "https://sillhouete.com/cdn/shop/files/sillhouete_logo_1.png",
+"sameAs": [
+"https://www.instagram.com/sillhouete.official",
+"https://www.facebook.com/sillhouete.official"
+]
+},
+
+/* ================= LOCAL BUSINESS ================= */
+{
+"@type": "LocalBusiness",
+"name": "Sillhouete Boutique",
+"image": "https://sillhouete.com/cdn/shop/files/sillhouete_logo_1.png",
+"address": {
+"@type": "PostalAddress",
+"streetAddress": "327-B, Street 7, Lane 15",
+"addressLocality": "Lahore",
+"addressRegion": "Punjab",
+"postalCode": "54000",
+"addressCountry": "PK"
+},
+"telephone": "+92 331 0397865",
+"openingHours": "Mo-Su 10:00-20:00",
+"priceRange": "$$$"
+}
+
+,
+
+/* ================= COLLECTION PAGE ================= */
+{
+"@type": "CollectionPage",
+"name": "Sillhouete Sale",
+"url": "https://sillhouete.com/collections/sale-1",
+"description": "Sales items will not be return , exchange or refunded."
+},
+
+{
+"@type": "ItemList",
+"itemListElement": [
+
+{
+"@type": "ListItem",
+"position": 1,
+"url": "https://sillhouete.com/products/shg2-red"
+},
+
+{
+"@type": "ListItem",
+"position": 2,
+"url": "https://sillhouete.com/products/sbbo1-rang-mehal"
+},
+
+{
+"@type": "ListItem",
+"position": 3,
+"url": "https://sillhouete.com/products/sbm4-gul-e-rana"
+},
+
+{
+"@type": "ListItem",
+"position": 4,
+"url": "https://sillhouete.com/products/shahnaz-s-3"
+},
+
+{
+"@type": "ListItem",
+"position": 5,
+"url": "https://sillhouete.com/products/zaafrani-s-9"
+},
+
+{
+"@type": "ListItem",
+"position": 6,
+"url": "https://sillhouete.com/products/red-bridal-farshi-sharara-sbm-7"
+},
+
+{
+"@type": "ListItem",
+"position": 7,
+"url": "https://sillhouete.com/products/galaxy-sbm-6"
+},
+
+{
+"@type": "ListItem",
+"position": 8,
+"url": "https://sillhouete.com/products/phool-sbnp-1"
+},
+
+{
+"@type": "ListItem",
+"position": 9,
+"url": "https://sillhouete.com/products/noor"
+},
+
+{
+"@type": "ListItem",
+"position": 10,
+"url": "https://sillhouete.com/products/sohni-s-6"
+},
+
+{
+"@type": "ListItem",
+"position": 11,
+"url": "https://sillhouete.com/products/anarkali-s-4"
+},
+
+{
+"@type": "ListItem",
+"position": 12,
+"url": "https://sillhouete.com/products/aaina-s-2"
+},
+
+{
+"@type": "ListItem",
+"position": 13,
+"url": "https://sillhouete.com/products/chandi-sbgry-1"
+},
+
+{
+"@type": "ListItem",
+"position": 14,
+"url": "https://sillhouete.com/products/damni-sby-1"
+},
+
+{
+"@type": "ListItem",
+"position": 15,
+"url": "https://sillhouete.com/products/resham-sbm-5"
+},
+
+{
+"@type": "ListItem",
+"position": 16,
+"url": "https://sillhouete.com/products/pista-sbpst-2"
+},
+
+{
+"@type": "ListItem",
+"position": 17,
+"url": "https://sillhouete.com/products/sfg4-jalaibi"
+},
+
+{
+"@type": "ListItem",
+"position": 18,
+"url": "https://sillhouete.com/products/shg3-namak-pari"
+},
+
+{
+"@type": "ListItem",
+"position": 19,
+"url": "https://sillhouete.com/products/sfr-1"
+},
+
+{
+"@type": "ListItem",
+"position": 20,
+"url": "https://sillhouete.com/products/noor-jahan-d-9"
+},
+
+{
+"@type": "ListItem",
+"position": 21,
+"url": "https://sillhouete.com/products/moti-sfb-1"
+},
+
+{
+"@type": "ListItem",
+"position": 22,
+"url": "https://sillhouete.com/products/crysral-koyal"
+},
+
+{
+"@type": "ListItem",
+"position": 23,
+"url": "https://sillhouete.com/products/jacket-1-sj-3"
+},
+
+{
+"@type": "ListItem",
+"position": 24,
+"url": "https://sillhouete.com/products/pink-shaded-lehnga-choli-s-7"
+},
+
+{
+"@type": "ListItem",
+"position": 25,
+"url": "https://sillhouete.com/products/shg3-green"
+},
+
+{
+"@type": "ListItem",
+"position": 26,
+"url": "https://sillhouete.com/products/shg1-patasa"
+},
+
+{
+"@type": "ListItem",
+"position": 27,
+"url": "https://sillhouete.com/products/shg1-red"
+},
+
+{
+"@type": "ListItem",
+"position": 28,
+"url": "https://sillhouete.com/products/shg2-maysoo"
+},
+
+{
+"@type": "ListItem",
+"position": 29,
+"url": "https://sillhouete.com/products/sfp4-mahi"
+},
+
+{
+"@type": "ListItem",
+"position": 30,
+"url": "https://sillhouete.com/products/aatish-gown"
+},
+
+{
+"@type": "ListItem",
+"position": 31,
+"url": "https://sillhouete.com/products/noor-jahan-d-8"
+},
+
+{
+"@type": "ListItem",
+"position": 32,
+"url": "https://sillhouete.com/products/pw4"
+},
+
+{
+"@type": "ListItem",
+"position": 33,
+"url": "https://sillhouete.com/products/noor-jahan-d-7"
+},
+
+{
+"@type": "ListItem",
+"position": 34,
+"url": "https://sillhouete.com/products/noor-jahan-d-6"
+},
+
+{
+"@type": "ListItem",
+"position": 35,
+"url": "https://sillhouete.com/products/noor-jahan-d-5"
+},
+
+{
+"@type": "ListItem",
+"position": 36,
+"url": "https://sillhouete.com/products/noor-jahan-d-14"
+},
+
+{
+"@type": "ListItem",
+"position": 37,
+"url": "https://sillhouete.com/products/noor-jahan-d-13"
+},
+
+{
+"@type": "ListItem",
+"position": 38,
+"url": "https://sillhouete.com/products/noor-jahan-d-12"
+},
+
+{
+"@type": "ListItem",
+"position": 39,
+"url": "https://sillhouete.com/products/noor-jahan-d-11"
+},
+
+{
+"@type": "ListItem",
+"position": 40,
+"url": "https://sillhouete.com/products/mehfil-s-5"
+},
+
+{
+"@type": "ListItem",
+"position": 41,
+"url": "https://sillhouete.com/products/narangi-s-1"
+},
+
+{
+"@type": "ListItem",
+"position": 42,
+"url": "https://sillhouete.com/products/batkee-3"
+},
+
+{
+"@type": "ListItem",
+"position": 43,
+"url": "https://sillhouete.com/products/maroon-jamawar-shawl"
+},
+
+{
+"@type": "ListItem",
+"position": 44,
+"url": "https://sillhouete.com/products/mughlia-art-shawl"
+},
+
+{
+"@type": "ListItem",
+"position": 45,
+"url": "https://sillhouete.com/products/jacket-3-sj-5"
+},
+
+{
+"@type": "ListItem",
+"position": 46,
+"url": "https://sillhouete.com/products/mehndi-sfo-1"
+},
+
+{
+"@type": "ListItem",
+"position": 47,
+"url": "https://sillhouete.com/products/gulaabi-crystal"
+},
+
+{
+"@type": "ListItem",
+"position": 48,
+"url": "https://sillhouete.com/products/black-pishwas"
+},
+
+{
+"@type": "ListItem",
+"position": 49,
+"url": "https://sillhouete.com/products/sahiba-shawl"
+},
+
+{
+"@type": "ListItem",
+"position": 50,
+"url": "https://sillhouete.com/products/kora-dress"
+}
+
+]
+},
+
+{
+"@type": "BreadcrumbList",
+"itemListElement": [
+{
+"@type": "ListItem",
+"position": 1,
+"name": "Home",
+"item": "https://sillhouete.com"
+},
+{
+"@type": "ListItem",
+"position": 2,
+"name": "Sillhouete Sale",
+"item": "https://sillhouete.com/collections/sale-1"
+}
+]
+}
+
+
+
+
+
+]
+}
+</script>
+<meta name="description" content="Sales items will not be return , exchange or refunded."><meta property="og:site_name" content="Sillhouete">
+  <meta property="og:url" content="https://sillhouete.com/collections/sale-1">
+  <meta property="og:title" content="Sillhouete Sale">
+  <meta property="og:type" content="website">
+  <meta property="og:description" content="Sales items will not be return , exchange or refunded."><meta name="twitter:site" content="@">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sillhouete Sale">
+  <meta name="twitter:description" content="Sales items will not be return , exchange or refunded.">
+<script type="importmap">
+{
+  "imports": {
+    "element.base-media": "//sillhouete.com/cdn/shop/t/22/assets/element.base-media.js?v=61305152781971747521772095032",
+    "element.image.parallax": "//sillhouete.com/cdn/shop/t/22/assets/element.image.parallax.js?v=59188309605188605141772095033",
+    "element.model": "//sillhouete.com/cdn/shop/t/22/assets/element.model.js?v=104979259955732717291772095033",
+    "element.quantity-selector": "//sillhouete.com/cdn/shop/t/22/assets/element.quantity-selector.js?v=68208048201360514121772095033",
+    "element.text.rte": "//sillhouete.com/cdn/shop/t/22/assets/element.text.rte.js?v=28194737298593644281772095033",
+    "element.video": "//sillhouete.com/cdn/shop/t/22/assets/element.video.js?v=110560105447302630031772095034",
+    "is-land": "//sillhouete.com/cdn/shop/t/22/assets/is-land.min.js?v=92343381495565747271772095058",
+    "util.misc": "//sillhouete.com/cdn/shop/t/22/assets/util.misc.js?v=117964846174238173191772095068",
+    "util.product-loader": "//sillhouete.com/cdn/shop/t/22/assets/util.product-loader.js?v=71947287259713254281772095068",
+    "util.resource-loader": "//sillhouete.com/cdn/shop/t/22/assets/util.resource-loader.js?v=81301169148003274841772095069",
+    "vendor.in-view": "//sillhouete.com/cdn/shop/t/22/assets/vendor.in-view.js?v=126891093837844970591772095069"
+  }
+}
+</script><script type="module" src="//sillhouete.com/cdn/shop/t/22/assets/is-land.min.js?v=92343381495565747271772095058"></script>
+<style data-shopify="">@font-face {
+  font-family: Halant;
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url("//sillhouete.com/cdn/fonts/halant/halant_n6.ebdefaba0504a1f859ddaae985582901c790e659.woff2") format("woff2"),
+       url("//sillhouete.com/cdn/fonts/halant/halant_n6.aef6c70c0aa1ea1f20fa9f16587acd424b822af4.woff") format("woff");
+}
+
+  @font-face {
+  font-family: Halant;
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("//sillhouete.com/cdn/fonts/halant/halant_n4.7a3ca1dd5e401bca6e0e60419988fc6cfb4396fb.woff2") format("woff2"),
+       url("//sillhouete.com/cdn/fonts/halant/halant_n4.38c179b4994871894f8956587b45f527a9326a7a.woff") format("woff");
+}
+
+
+  @font-face {
+  font-family: Halant;
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url("//sillhouete.com/cdn/fonts/halant/halant_n6.ebdefaba0504a1f859ddaae985582901c790e659.woff2") format("woff2"),
+       url("//sillhouete.com/cdn/fonts/halant/halant_n6.aef6c70c0aa1ea1f20fa9f16587acd424b822af4.woff") format("woff");
+}
+
+  
+  
+</style><link href="//sillhouete.com/cdn/shop/t/22/assets/theme.css?v=61195654324059391101789553264" rel="stylesheet" type="text/css" media="all">
+  <link href="//sillhouete.com/cdn/shop/t/22/assets/custom.css?v=114760034255450217741785270983" rel="stylesheet" type="text/css" media="all">
+<style data-shopify="">:root {
+    --typeHeaderPrimary: Halant;
+    --typeHeaderFallback: serif;
+    --typeHeaderSize: 25px;
+    --typeHeaderWeight: 600;
+    --typeHeaderLineHeight: 1;
+    --typeHeaderSpacing: 0.05em;
+
+    --typeBasePrimary:Halant;
+    --typeBaseFallback:serif;
+    --typeBaseSize: 15px;
+    --typeBaseWeight: 400;
+    --typeBaseSpacing: 0.025em;
+    --typeBaseLineHeight: 1.4;
+    --typeBaselineHeightMinus01: 1.3;
+
+    --typeCollectionTitle: 18px;
+
+    --iconWeight: 3px;
+    --iconLinecaps: miter;
+
+    
+        --buttonRadius: 0;
+    
+
+    --colorGridOverlayOpacity: 0.0;
+    --colorAnnouncement: #0f0f0f;
+    --colorAnnouncementText: #ffffff;
+
+    --colorBody: #ffffff;
+    --colorBodyAlpha05: rgba(255, 255, 255, 0.05);
+    --colorBodyDim: #f2f2f2;
+    --colorBodyLightDim: #fafafa;
+    --colorBodyMediumDim: #f5f5f5;
+
+
+    --colorBorder: #e8e8e1;
+
+    --colorBtnPrimary: #111111;
+    --colorBtnPrimaryLight: #2b2b2b;
+    --colorBtnPrimaryDim: #040404;
+    --colorBtnPrimaryText: #ffffff;
+
+    --colorCartDot: #ff4f33;
+
+    --colorDrawers: #ffffff;
+    --colorDrawersDim: #f2f2f2;
+    --colorDrawerBorder: #e8e8e1;
+    --colorDrawerText: #000000;
+    --colorDrawerTextDark: #000000;
+    --colorDrawerButton: #111111;
+    --colorDrawerButtonText: #ffffff;
+
+    --colorFooter: #ffffff;
+    --colorFooterText: #000000;
+    --colorFooterTextAlpha01: #000000;
+
+    --colorGridOverlay: #000000;
+    --colorGridOverlayOpacity: 0.1;
+
+    --colorHeaderTextAlpha01: rgba(0, 0, 0, 0.1);
+
+    --colorHeroText: #ffffff;
+
+    --colorSmallImageBg: #ffffff;
+    --colorLargeImageBg: #0f0f0f;
+
+    --colorImageOverlay: #000000;
+    --colorImageOverlayOpacity: 0.1;
+    --colorImageOverlayTextShadow: 0.2;
+
+    --colorLink: #000000;
+
+    --colorModalBg: rgba(230, 230, 230, 0.6);
+
+    --colorNav: #ffffff;
+    --colorNavText: #000000;
+
+    --colorPrice: #1c1d1d;
+
+    --colorSaleTag: #1c1d1d;
+    --colorSaleTagText: #ffffff;
+
+    --colorTextBody: #000000;
+    --colorTextBodyAlpha015: rgba(0, 0, 0, 0.15);
+    --colorTextBodyAlpha005: rgba(0, 0, 0, 0.05);
+    --colorTextBodyAlpha008: rgba(0, 0, 0, 0.08);
+    --colorTextSavings: #c20000;
+
+    --urlIcoSelect: url(//sillhouete.com/cdn/shop/t/22/assets/ico-select.svg);
+    --urlIcoSelectFooter: url(//sillhouete.com/cdn/shop/t/22/assets/ico-select-footer.svg);
+    --urlIcoSelectWhite: url(//sillhouete.com/cdn/shop/t/22/assets/ico-select-white.svg);
+
+    --grid-gutter: 17px;
+    --drawer-gutter: 20px;
+
+    --sizeChartMargin: 25px 0;
+    --sizeChartIconMargin: 5px;
+
+    --newsletterReminderPadding: 40px;
+
+    /*Shop Pay Installments*/
+    --color-body-text: #000000;
+    --color-body: #ffffff;
+    --color-bg: #ffffff;
+    }
+
+    .placeholder-content {
+    background-image: linear-gradient(100deg, #ffffff 40%, #f7f7f7 63%, #ffffff 79%);
+    }</style><script>
+    document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+
+    window.theme = window.theme || {};
+    theme.routes = {
+      home: "/",
+      cart: "/cart.js",
+      cartPage: "/cart",
+      cartAdd: "/cart/add.js",
+      cartChange: "/cart/change.js",
+      search: "/search",
+      predictiveSearch: "/search/suggest"
+    };
+    theme.strings = {
+      soldOut: "Sold Out",
+      unavailable: "Unavailable",
+      inStockLabel: "In stock, ready to ship",
+      oneStockLabel: "Low stock - [count] item left",
+      otherStockLabel: "Low stock - [count] items left",
+      willNotShipUntil: "Ready to ship [date]",
+      willBeInStockAfter: "Back in stock [date]",
+      waitingForStock: "Backordered, shipping soon",
+      savePrice: "Save [saved_amount]",
+      cartEmpty: "Your cart is currently empty.",
+      cartTermsConfirmation: "You must agree with the terms and conditions of sales to check out",
+      searchCollections: "Collections",
+      searchPages: "Pages",
+      searchArticles: "Articles",
+      productFrom: "from ",
+      maxQuantity: "You can only have [quantity] of [title] in your cart."
+    };
+    theme.settings = {
+      cartType: "drawer",
+      isCustomerTemplate: false,
+      moneyFormat: "\u003cspan class=money\u003eRs.{{amount_no_decimals}}\u003c\/span\u003e",
+      saveType: "percent",
+      productImageSize: "natural",
+      productImageCover: true,
+      predictiveSearch: true,
+      predictiveSearchType: null,
+      predictiveSearchVendor: true,
+      predictiveSearchPrice: true,
+      quickView: false,
+      themeName: 'Impulse',
+      themeVersion: "8.1.0"
+    };
+  </script>
+
+  <script>window.performance && window.performance.mark && window.performance.mark('shopify.content_for_header.start');</script><meta name="google-site-verification" content="-3HJk2QANmJlwYgC87RdcxkqUeTvWYtyObgaEN59L0w">
+<meta id="shopify-digital-wallet" name="shopify-digital-wallet" content="/70977552627/digital_wallets/dialog">
+<link rel="ucp" href="/.well-known/ucp" version="2026-08-25"><link rel="alternate" type="application/atom+xml" title="Feed" href="/collections/sale-1.atom">
+<link rel="next" href="/collections/sale-1?page=2">
+<link rel="alternate" type="application/json+oembed" href="https://sillhouete.com/collections/sale-1.oembed">
+<script async="async" src="/checkouts/internal/preloads.js?locale=en-PK"></script>
+<script id="shopify-features" type="application/json">{"accessToken":"7b59a47bb9197f1b15b69826cf7ec02b","betas":["rich-media-storefront-analytics"],"domain":"sillhouete.com","predictiveSearch":true,"shopId":70977552627,"locale":"en"}</script>
+<script>var Shopify = Shopify || {};
+Shopify.shop = "451793-84.myshopify.com";
+Shopify.locale = "en";
+Shopify.currency = {"active":"PKR","rate":"1.0"};
+Shopify.country = "PK";
+Shopify.theme = {"name":"Updated copy of new one","id":159594283251,"schema_name":"Impulse","schema_version":"8.1.0","theme_store_id":857,"role":"main"};
+Shopify.theme.handle = "null";
+Shopify.theme.style = {"id":null,"handle":null};
+Shopify.cdnHost = "sillhouete.com/cdn";
+Shopify.routes = Shopify.routes || {};
+Shopify.routes.root = "/";
+Shopify.shopJsCdnBaseUrl = "https://cdn.shopify.com/shopifycloud/shop-js";
+Shopify.SignInWithShop = Shopify.SignInWithShop || {};
+Shopify.SignInWithShop.User = Shopify.SignInWithShop.User || {};
+Shopify.SignInWithShop.User.recognized = false;</script>
+<script type="module">!function(o){(o.Shopify=o.Shopify||{}).modules=!0}(window);</script>
+<script>!function(o){function n(){var o=[];function n(){o.push(Array.prototype.slice.apply(arguments))}return n.q=o,n}var t=o.Shopify=o.Shopify||{};t.loadFeatures=n(),t.autoloadFeatures=n()}(window);</script>
+<script>
+  window.Shopify = window.Shopify || {};
+  window.Shopify.SignInWithShop = window.Shopify.SignInWithShop || {};
+  window.Shopify.SignInWithShop.assetMetrics = { sampleRate: 0.25 };
+  window.Shopify.SignInWithShop.eligible = true;
+</script>
+<script id="shop-js-analytics" type="application/json">{"pageType":"collection"}</script>
+<script defer="defer" async="" type="module" src="https://cdn.shopify.com/shopifycloud/shop-js/modules/v2/loader.init-shop-cart-sync.en.esm.js"></script>
+<script type="module">
+  await import("https://cdn.shopify.com/shopifycloud/shop-js/modules/v2/loader.init-shop-cart-sync.en.esm.js");
+
+  window.Shopify.SignInWithShop?.initShopCartSync?.({"fedCMEnabled":true,"windoidEnabled":true});
+
+</script>
+<script>
+  window.Shopify = window.Shopify || {};
+  if (!window.Shopify.featureAssets) window.Shopify.featureAssets = {};
+  window.Shopify.featureAssets['shop-js'] = {"avatar":["modules/v2/loader.avatar.en.esm.js"],"checkout-modal":["modules/v2/loader.checkout-modal.en.esm.js"],"init-customer-accounts-sign-up":["modules/v2/loader.init-customer-accounts-sign-up.en.esm.js"],"init-customer-accounts":["modules/v2/loader.init-customer-accounts.en.esm.js"],"init-fed-cm":["modules/v2/loader.init-fed-cm.en.esm.js"],"init-shop-cart-sync":["modules/v2/loader.init-shop-cart-sync.en.esm.js"],"init-shop-email-lookup-coordinator":["modules/v2/loader.init-shop-email-lookup-coordinator.en.esm.js"],"init-shop-for-new-customer-accounts":["modules/v2/loader.init-shop-for-new-customer-accounts.en.esm.js"],"init-shop-user-recognition":["modules/v2/loader.init-shop-user-recognition.en.esm.js"],"init-windoid":["modules/v2/loader.init-windoid.en.esm.js"],"lead-capture":["modules/v2/loader.lead-capture.en.esm.js"],"listener":["modules/v2/loader.listener.en.esm.js"],"pay-button":["modules/v2/loader.pay-button.en.esm.js"],"payment-terms":["modules/v2/loader.payment-terms.en.esm.js"],"shop-button":["modules/v2/loader.shop-button.en.esm.js"],"shop-cart-sync":["modules/v2/loader.shop-cart-sync.en.esm.js"],"shop-cash-offers":["modules/v2/loader.shop-cash-offers.en.esm.js"],"shop-follow-button":["modules/v2/loader.shop-follow-button.en.esm.js"],"shop-login-button":["modules/v2/loader.shop-login-button.en.esm.js"],"shop-login":["modules/v2/loader.shop-login.en.esm.js"],"shop-toast-manager":["modules/v2/loader.shop-toast-manager.en.esm.js"],"shop-user-recognition":["modules/v2/loader.shop-user-recognition.en.esm.js"]};
+</script>
+<script>(function() {
+  var isLoaded = false;
+  function asyncLoad() {
+    if (isLoaded) return;
+    isLoaded = true;
+    var urls = ["https:\/\/app.sweethelp.io\/js\/sweet-help.js?var=2.0\u0026shop=451793-84.myshopify.com","https:\/\/cdn.nfcube.com\/instafeed-78b499a474b91d6d47f827e2329066ea.js?shop=451793-84.myshopify.com"];
+    for (var i = 0; i < urls.length; i++) {
+      var s = document.createElement('script');
+      s.type = 'text/javascript';
+      s.async = true;
+      s.src = urls[i];
+      var x = document.getElementsByTagName('script')[0];
+      x.parentNode.insertBefore(s, x);
+    }
+  };
+  if(window.attachEvent) {
+    window.attachEvent('onload', asyncLoad);
+  } else {
+    window.addEventListener('load', asyncLoad, false);
+  }
+})();</script>
+<script id="__st">var __st={"a":70977552627,"offset":18000,"reqid":"d05b373c-ed9a-48dd-b8dd-0efb2d6b9bc1-1792494389","pageurl":"sillhouete.com\/collections\/sale-1","t":"prospect","u":"18436720c1f3","p":"collection","rtyp":"collection","rid":467759628531};</script>
+<script>window.ShopifyPaypalV4VisibilityTracking = true;</script>
+<script id="captcha-bootstrap">!function(){'use strict';const t='contact',e='account',n='new_comment',o=[[t,t],['blogs',n],['comments',n],[t,'customer']],c=[[e,'customer_login'],[e,'guest_login'],[e,'recover_customer_password'],[e,'create_customer']],r=t=>t.map((([t,e])=>`form[action*='/${t}']:not([data-nocaptcha='true']) input[name='form_type'][value='${e}']`)).join(','),a=t=>()=>t?[...document.querySelectorAll(t)].map((t=>t.form)):[];function s(){const t=[...o],e=r(t);return a(e)}const i='password',u='form_key',d=['recaptcha-v3-token','g-recaptcha-response','h-captcha-response',i],f=()=>{try{return window.sessionStorage}catch{return}},m='__shopify_v',_=t=>t.elements[u];function p(t,e,n=!1){try{const o=window.sessionStorage,c=JSON.parse(o.getItem(e)),{data:r}=function(t){const{data:e,action:n}=t;return t[m]||n?{data:e,action:n}:{data:t,action:n}}(c);for(const[e,n]of Object.entries(r))t.elements[e]&&(t.elements[e].value=n);n&&o.removeItem(e)}catch(o){console.error('form repopulation failed',{error:o})}}const l='form_type',E='cptcha';function T(t){t.dataset[E]=!0}const w=window,h=w.document,L='Shopify',v='ce_forms',y='captcha';let A=!1;((t,e)=>{const n=(g='f06e6c50-85a8-45c8-87d0-21a2b65856fe',I='https://cdn.shopify.com/shopifycloud/storefront-forms-hcaptcha/ce_storefront_forms_captcha_hcaptcha.v1.5.3.iife.js',D={infoText:'Protected by hCaptcha',privacyText:'Privacy',termsText:'Terms'},(t,e,n)=>{const o=w[L][v],c=o.bindForm;if(c)return c(t,g,e,D).then(n);var r;o.q.push([[t,g,e,D],n]),r=I,A||(h.body.append(Object.assign(h.createElement('script'),{id:'captcha-provider',async:!0,src:r})),A=!0)});var g,I,D;w[L]=w[L]||{},w[L][v]=w[L][v]||{},w[L][v].q=[],w[L][y]=w[L][y]||{},w[L][y].protect=function(t,e){n(t,void 0,e),T(t)},Object.freeze(w[L][y]),function(t,e,n,w,h,L){const[v,y,A,g]=function(t,e,n){const i=e?o:[],u=t?c:[],d=[...i,...u],f=r(d),m=r(i),_=r(d.filter((([t,e])=>n.includes(e))));return[a(f),a(m),a(_),s()]}(w,h,L),I=t=>{const e=t.target;return e instanceof HTMLFormElement?e:e&&e.form},D=t=>v().includes(t);t.addEventListener('submit',(t=>{const e=I(t);if(!e)return;const n=D(e)&&!e.dataset.hcaptchaBound&&!e.dataset.recaptchaBound,o=_(e),c=g().includes(e)&&(!o||!o.value);(n||c)&&t.preventDefault(),c&&!n&&(function(t){try{if(!f())return;!function(t){const e=f();if(!e)return;const n=_(t);if(!n)return;const o=n.value;o&&e.removeItem(o)}(t);const e=Array.from(Array(32),(()=>Math.random().toString(36)[2])).join('');!function(t,e){_(t)||t.append(Object.assign(document.createElement('input'),{type:'hidden',name:u})),t.elements[u].value=e}(t,e),function(t,e){const n=f();if(!n)return;const o=[...t.querySelectorAll(`input[type='${i}']`)].map((({name:t})=>t)),c=[...d,...o],r={};for(const[a,s]of new FormData(t).entries())c.includes(a)||(r[a]=s);n.setItem(e,JSON.stringify({[m]:1,action:t.action,data:r}))}(t,e)}catch(e){console.error('failed to persist form',e)}}(e),e.submit())}));const S=(t,e)=>{t&&!t.dataset[E]&&(n(t,e.some((e=>e===t))),T(t))};for(const o of['focusin','change'])t.addEventListener(o,(t=>{const e=I(t);D(e)&&S(e,y())}));const B=e.get('form_key'),M=e.get(l),P=B&&M;t.addEventListener('DOMContentLoaded',(()=>{const t=y();if(P)for(const e of t)e.elements[l].value===M&&p(e,B);[...new Set([...A(),...v().filter((t=>'true'===t.dataset.shopifyCaptcha))])].forEach((e=>S(e,t)))}))}(h,new URLSearchParams(w.location.search),n,t,e,['guest_login'])})(!0,!0)}();</script>
+<script integrity="sha256-JjoPp5ZfB1sSAs5SQaol1x1GgvveM+BgmRzyDexInEQ=" data-source-attribution="shopify.loadfeatures" defer="defer" src="//sillhouete.com/cdn/shopifycloud/storefront/assets/storefront/load_feature-1bd60354.js" crossorigin="anonymous"></script>
+<script>(function () {var userAgent = navigator.userAgent;var platform = navigator.platform;var maxTouchPoints = navigator.maxTouchPoints || 0;var isIOS = /iPad|iPhone|iPod/.test(platform) || (platform === 'MacIntel' && maxTouchPoints > 1);var isMacSafari = platform.indexOf('Mac') === 0 && /Safari/.test(userAgent) && !/Chrome|Chromium|CriOS|FxiOS|Edg|OPR|Android/.test(userAgent);var isAppleSafari = isIOS || isMacSafari;if (isAppleSafari) {fetch('/sf_private_access_tokens' + location.search).catch(function () {});}function browserMajorVersion(pattern) {var match = userAgent.match(pattern);return match ? parseInt(match[1], 10) : null;}function shouldLoadAutosizesPolyfill() {if (!window.PerformanceObserver?.supportedEntryTypes?.includes('paint')) {return false;}var chromeVersion = browserMajorVersion(/Chrome\/(\d+)/);if (chromeVersion !== null) {return chromeVersion < 126;}var firefoxVersion = browserMajorVersion(/Firefox\/(\d+)/);if (firefoxVersion !== null) {return firefoxVersion < 150;}var safariVersion = isAppleSafari ? browserMajorVersion(/Version\/(\d+).*Safari\//) : null;if (safariVersion !== null) {return safariVersion < 27;}return true;}if (shouldLoadAutosizesPolyfill()) {var autosizesScript = document.createElement('script');autosizesScript.async = true;autosizesScript.crossOrigin = 'anonymous';autosizesScript.src = "//sillhouete.com/cdn/shopifycloud/storefront/assets/storefront/autosizes-84416378.js";(document.head || document.documentElement).appendChild(autosizesScript);}window.ShopifyAnalytics = window.ShopifyAnalytics || {};window.ShopifyAnalytics.performance = window.ShopifyAnalytics.performance || {};(function () {var LONG_FRAME_THRESHOLD = 50;var longAnimationFrames = [];var activeRafId = null;function collectLongFrames() {var previousTime = null;function rafMonitor(now) {if (activeRafId === null) {return;}var delta = now - previousTime;if (delta > LONG_FRAME_THRESHOLD) {longAnimationFrames.push({startTime: previousTime,endTime: now,});}previousTime = now;activeRafId = requestAnimationFrame(rafMonitor);}previousTime = performance.now();activeRafId = requestAnimationFrame(rafMonitor);}if (!window.PerformanceObserver?.supportedEntryTypes?.includes('long-animation-frame')) {collectLongFrames();var timeoutId = setTimeout(function () {cancelAnimationFrame(activeRafId);}, 10000);window.ShopifyAnalytics.performance.getLongAnimationFrames = function (stopCollection) {if (stopCollection === undefined) {stopCollection = false;}if (stopCollection) {clearTimeout(timeoutId);cancelAnimationFrame(activeRafId);}return longAnimationFrames;};}})();})();</script><script id="shopify-origin-trials" async="async" integrity="sha256-qJbe/jEZBHtr5W/BlA2cKAz3vkXu6vJQyLjgvgCC86g=" src="//cdn.shopify.com/shopifycloud/storefront/assets/storefront/origin_trials-318ab40a.js" crossorigin="anonymous" onload="window.__shopifyOriginTrialsDone = true" onerror="window.__shopifyOriginTrialsDone = true"></script>
+<script>
+  window.Shopify = window.Shopify || {};
+  window.Shopify.MCP = window.Shopify.MCP || {};
+  window.Shopify.MCP.enabled = true;
+  window.Shopify.MCP.shop = "451793-84.myshopify.com";
+  window.Shopify.MCP.mcpEndpoint = "https:\/\/sillhouete.com\/api\/mcp";
+  window.Shopify.MCP.tools = [{"name":"search_shop_policies_and_faqs","description":"Used to get facts about the stores policies, products, or services.\nSome examples of questions you can ask are:\n  - What is your return policy?\n  - What is your shipping policy?\n  - What is your phone number?\n  - What are your hours of operation?\"\nSet policy_types to also get the store's written policies (full text and URL).\n","inputSchema":{"$schema":"https:\/\/json-schema.org\/draft\/2020-12\/schema","type":"object","properties":{"query":{"type":"string","description":"A natural language query."},"context":{"type":"string","description":"Additional information about the request such as user demographics, mood, location, or other relevant details that could help in tailoring the response appropriately."},"policy_types":{"type":"array","items":{"type":"string","enum":["refund","shipping","privacy","terms_of_service","terms_of_sale","subscription","legal_notice","contact"]},"description":"Policy kinds to fetch, chosen from the user's question — e.g. [\"refund\"] for returns\/exchanges\/damaged items, [\"contact\"] for phone\/hours\/address. Include every kind the question touches. Omit it to get only FAQ answers."}},"required":["query"]}}];
+</script>
+<script>(()=>{var d="shopify:webmcp_adapter_loaded",n=Symbol.for("shopify.webmcp_adapter_loading");function s(c,a,{win:r=window,doc:o=document}={}){function p(){try{return r.localStorage.getItem(d)==="true"}catch{return!1}}function l(){try{r.localStorage.setItem(d,"true")}catch{}}function u(){return typeof(o.modelContext||r.navigator?.modelContext)?.registerTool=="function"}function f(){if(r[n]||!u())return;let t=o.head||o.getElementsByTagName("head")[0];if(!t)return;let e=o.createElement("script");e.type="module",e.crossOrigin="anonymous",a&&(e.integrity=a),e.src=c,e.addEventListener("load",l,{once:!0}),e.addEventListener("error",()=>{r[n]=!1},{once:!0}),t.appendChild(e),r[n]=!0}function _(t){let e=o.getElementById("shopify-origin-trials");if(!e||r.__shopifyOriginTrialsDone){t();return}e.addEventListener("load",t,{once:!0}),e.addEventListener("error",t,{once:!0})}function i(){_(()=>r.setTimeout(f,0))}function m(){o.addEventListener("DOMContentLoaded",i,{once:!0})}p()?i():m()}s("\/\/sillhouete.com\/cdn\/shopifycloud\/storefront\/assets\/storefront\/webmcp-f427de6a.js","sha256-ypGF+5vIq4Psw4WG7nsVtdd\/TCfsJWnrNuACdqLCElY=");})();
+</script>
+<script data-source-attribution="shopify.dynamic_checkout.dynamic.init">var Shopify=Shopify||{};Shopify.PaymentButton=Shopify.PaymentButton||{isStorefrontPortableWallets:!0,init:function(){window.Shopify.PaymentButton.init=function(){};var t=document.createElement("script");t.src="https://sillhouete.com/cdn/shopifycloud/portable-wallets/latest/portable-wallets.en.js",t.type="module",document.head.appendChild(t)}};
+</script>
+<script data-source-attribution="shopify.dynamic_checkout.buyer_consent">
+  function portableWalletsHideBuyerConsent(e){var t=document.getElementById("shopify-buyer-consent"),n=document.getElementById("shopify-subscription-policy-button");t&&n&&(t.classList.add("hidden"),t.setAttribute("aria-hidden","true"),n.removeEventListener("click",e))}function portableWalletsShowBuyerConsent(e){var t=document.getElementById("shopify-buyer-consent"),n=document.getElementById("shopify-subscription-policy-button");t&&n&&(t.classList.remove("hidden"),t.removeAttribute("aria-hidden"),n.addEventListener("click",e))}window.Shopify?.PaymentButton&&(window.Shopify.PaymentButton.hideBuyerConsent=portableWalletsHideBuyerConsent,window.Shopify.PaymentButton.showBuyerConsent=portableWalletsShowBuyerConsent);
+</script>
+<script data-source-attribution="shopify.dynamic_checkout.cart.bootstrap">document.addEventListener("DOMContentLoaded",(function(){function t(){return document.querySelector("shopify-accelerated-checkout-cart, shopify-accelerated-checkout")}if(t())Shopify.PaymentButton.init();else{new MutationObserver((function(e,n){t()&&(Shopify.PaymentButton.init(),n.disconnect())})).observe(document.body,{childList:!0,subtree:!0})}}));
+</script>
+
+<script id="shopify-cfh-end">window.performance && window.performance.mark && window.performance.mark('shopify.content_for_header.end');</script>
+
+  <style data-shopify="">
+    :root {
+      /* Root Variables */
+      /* ========================= */
+      --root-color-primary: #000000;
+      --color-primary: #000000;
+      --root-color-secondary: #ffffff;
+      --color-secondary: #ffffff;
+      --color-sale-tag: #1c1d1d;
+      --color-sale-tag-text: #ffffff;
+      --layout-section-padding-block: 3rem;
+      --layout-section-padding-inline--md: 40px;
+      --layout-section-max-inline-size: 1420px; 
+
+
+      /* Text */
+      /* ========================= */
+      
+      /* Body Font Styles */
+      --element-text-font-family--body: Halant;
+      --element-text-font-family-fallback--body: serif;
+      --element-text-font-weight--body: 400;
+      --element-text-letter-spacing--body: 0.025em;
+      --element-text-text-transform--body: none;
+
+      /* Body Font Sizes */
+      --element-text-font-size--body: initial;
+      --element-text-font-size--body-xs: 11px;
+      --element-text-font-size--body-sm: 13px;
+      --element-text-font-size--body-md: 15px;
+      --element-text-font-size--body-lg: 17px;
+      
+      /* Body Line Heights */
+      --element-text-line-height--body: 1.4;
+
+      /* Heading Font Styles */
+      --element-text-font-family--heading: Halant;
+      --element-text-font-family-fallback--heading: serif;
+      --element-text-font-weight--heading: 600;
+      --element-text-letter-spacing--heading: 0.05em;
+      
+      
+      --element-text-text-transform--heading: uppercase;
+       
+      
+      
+      /* Heading Font Sizes */
+      --element-text-font-size--heading-2xl: 41px;
+      --element-text-font-size--heading-xl: 25px;
+      --element-text-font-size--heading-lg: 19px;
+      --element-text-font-size--heading-md: 17px;
+      --element-text-font-size--heading-sm: 11px;
+      --element-text-font-size--heading-xs: 9px;
+      
+      /* Heading Line Heights */
+      --element-text-line-height--heading: 1;
+
+      /* Buttons */
+      /* ========================= */
+      
+          --element-button-radius: 0;
+      
+
+      --element-button-padding-block: 12px;
+      --element-button-text-transform: uppercase;
+      --element-button-font-weight: 800;
+      --element-button-font-size: max(calc(var(--typeBaseSize) - 4px), 13px);
+      --element-button-letter-spacing: .3em;
+
+      /* Base Color Variables */
+      --element-button-color-primary: #111111;
+      --element-button-color-secondary: #ffffff;
+      --element-button-shade-border: 100%;
+
+      /* Hover State Variables */
+      --element-button-shade-background--hover: 0%;
+      --element-button-shade-border--hover: 100%;
+
+      /* Focus State Variables */
+      --element-button-color-focus: var(--color-focus);
+
+      /* Inputs */
+      /* ========================= */
+      
+          --element-icon-radius: 0;
+      
+
+      --element-input-font-size: var(--element-text-font-size--body-sm);
+      --element-input-box-shadow-shade: 100%;
+
+      /* Hover State Variables */
+      --element-input-background-shade--hover: 0%;
+      --element-input-box-shadow-spread-radius--hover: 1px;
+    }
+
+    @media only screen and (max-width: 768px) {
+      :root {
+        --element-button-font-size: max(calc(var(--typeBaseSize) - 5px), 11px);
+      }
+    }
+
+    .element-radio {
+        &:has(input[type='radio']:checked) {
+          --element-button-color: var(--element-button-color-secondary);
+        }
+    }
+
+    /* ATC Button Overrides */
+    /* ========================= */
+
+    .element-button[type="submit"],
+    .element-button[type="submit"] .element-text,
+    .element-button--shopify-payment-wrapper button {
+      --element-button-padding-block: 13px;
+      --element-button-padding-inline: 20px;
+      --element-button-line-height: 1.42;
+      --_font-size--body-md: var(--element-button-font-size);
+
+      line-height: 1.42 !important;
+    }
+
+    /* When dynamic checkout is enabled */
+    product-form:has(.element-button--shopify-payment-wrapper) {
+      --element-button-color: #000000;
+
+      .element-button[type="submit"],
+      .element-button--shopify-payment-wrapper button {
+        min-height: 50px !important;
+      }
+
+      .shopify-payment-button {
+        margin: 0;
+      }
+    }
+
+    /* Hover animation for non-angled buttons */
+    body:not([data-button_style='angled']) .element-button[type="submit"] {
+      position: relative;
+      overflow: hidden;
+
+      &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 150%;
+        width: 200%;
+        height: 100%;
+        transform: skewX(-20deg);
+        background-image: linear-gradient(to right,transparent, rgba(255,255,255,.25),transparent);
+      }
+
+      &:hover:after {
+        animation: shine 0.75s cubic-bezier(0.01, 0.56, 1, 1);
+      }
+    }
+
+    /* ANGLED STYLE - ATC Button Overrides */
+    /* ========================= */
+    
+    [data-button_style='angled'] {
+      --element-button-shade-background--active: var(--element-button-shade-background);
+      --element-button-shade-border--active: var(--element-button-shade-border);
+
+      .element-button[type="submit"] {
+        --_box-shadow: none;
+
+        position: relative;
+        max-width: 94%;
+        border-top: 1px solid #111111;
+        border-bottom: 1px solid #111111;
+        
+        &:before,
+        &:after {
+          content: '';
+          position: absolute;
+          display: block;
+          top: -1px;
+          bottom: -1px;
+          width: 20px;
+          transform: skewX(-12deg);
+          background-color: #111111;
+        }
+        
+        &:before {
+          left: -6px;
+        }
+        
+        &:after {
+          right: -6px;
+        }
+      }
+
+      /* When dynamic checkout is enabled */
+      product-form:has(.element-button--shopify-payment-wrapper) {
+        .element-button[type="submit"]:before,
+        .element-button[type="submit"]:after {
+          background-color: color-mix(in srgb,var(--_color-text) var(--_shade-background),var(--_color-background));
+          border-top: 1px solid #111111;
+          border-bottom: 1px solid #111111;
+        }
+
+        .element-button[type="submit"]:before {
+          border-left: 1px solid #111111;
+        }
+        
+        .element-button[type="submit"]:after {
+          border-right: 1px solid #111111;
+        }
+      }
+
+      .element-button--shopify-payment-wrapper {
+        --_color-background: #111111;
+
+        button:hover,
+        button:before,
+        button:after {
+          background-color: color-mix(in srgb,var(--_color-text) var(--_shade-background),var(--_color-background)) !important;
+        }
+
+        button:not(button:focus-visible) {
+          box-shadow: none !important;
+        }
+      }
+    }
+  </style>
+
+  <script src="//sillhouete.com/cdn/shop/t/22/assets/vendor-scripts-v11.js" defer="defer"></script><script src="//sillhouete.com/cdn/shop/t/22/assets/theme.js?v=22325264162658116151772095068" defer="defer"></script>
+  <style>
+  .template-search .grid-product__price.search{
+  display:none!important;
+} 
+  </style>
+  <style>.grid-product__price{
+  display: block!important;
+}</style>
+  <style>
+   
+    .custom-shopify-badge {
+    position: absolute;
+    z-index: 9;
+    top: 10px;
+    right: 3px;
+}
+.new.shopify-badge {
+    display: block;
+    background: #fff;
+    width: auto;
+    text-align: center;
+    font-size: 11px;
+    line-height: 15px;
+    color: #000;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0em;
+    font-family: unset;
+    font-family: 'gotham-bold', sans-serif;
+    padding: 7px;
+    border-radius: 3px;
+}
+span.new-tag::before {
+    content: "New";
+    position: absolute;
+    top: -5px;
+    right: 35px;
+    padding: 0;
+    font-family: unset;
+    font-family: 'gotham-bold', sans-serif;
+    border-radius: 0;
+    letter-spacing: .1em;
+    font-size: 11px;
+    line-height: 15px;
+    font-weight: 700;
+    color:red;
+    animation: blinks 1.5s linear infinite;
+}
+@keyframes blinks {
+	0% {opacity: 0}
+	49%{opacity: 0.4}
+	50% {opacity: 0.7}
+  100% {opacity: 1}
+}
+@media (max-width:768px){
+  span.new-tag::before{
+  top:20px;
+  right:66px
+  }
+}
+#shopify-section-sections--18965525135603__header header {
+    padding-top: 10px !important;
+}
+span.sale-menu {
+    color: red;
+    animation: blinks 1s linear infinite;
+}
+    .site-nav__item a[href="/collections/sale-1"], 
+    li.mobile-nav__item a[href="/collections/sale-1"] {
+    color: red;
+    animation: blinks 1s linear infinite;
+}
+.template-product .product-single__sku{
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 900;
+    padding-top: 0px;
+    line-height: 14px;
+    margin-bottom: 5px;
+    color: rgba(0, 0, 0, 0.5);
+    text-transform: inherit;
+    letter-spacing: 0.2em;
+    font-family:unset;
+    font-family: 'gotham-bold', sans-serif;
+    }
+
+#shopify-section-template--19235718627571__promo-grid2 .type-sale_collection .promo-grid__content{
+  flex: 1 1 18%;
+}
+#shopify-section-template--19235718627571__promo-grid2 .type-sale_collection .rte--strong {
+  display: block;
+  font-size: 2.375em;
+}
+.template-index .hero__media video{
+width:auto;}
+.template-index .hero__media-container{
+  text-align: center;
+}    
+@media only screen and (max-width: 768px){
+  .template-product .product-single__meta{
+    text-align:left !important;
+  }
+}
+
+  </style><!-- BEGIN app block: shopify://apps/musbu-wa-chat/blocks/app-embed/267d7a73-494b-4925-ba55-49fe70b0f09e -->
+
+<meta http-equiv="origin-trial" content="A1duO9QWZ/3h+eq5jQsvYqOTVq5h5q2AoGInpwNr4FT22/JUt3BxFERXHAo5iKhs6doOavi6G5hno0oBANPzSgIAAABxeyJvcmlnaW4iOiJodHRwczovL2Nkbi5zaG9waWZ5LmNvbTo0NDMiLCJmZWF0dXJlIjoiUHJlcmVuZGVyVW50aWxTY3JpcHQiLCJleHBpcnkiOjE3ODg4MjU2MDAsImlzVGhpcmRQYXJ0eSI6dHJ1ZX0="><meta http-equiv="origin-trial" content="AwnTE1hYg9Bsa5x0wEDsbG6tOdZ3j6ebKzXxbr/2TnTilsCRK9FwndlhAyFVnnBH1qQAqpOPJxVWiKGUqBnOmAYAAAB8eyJvcmlnaW4iOiJodHRwczovL2Nkbi5zaG9waWZ5LmNvbTo0NDMiLCJmZWF0dXJlIjoiTG9uZ0FuaW1hdGlvbkZyYW1lU3R5bGVEdXJhdGlvbiIsImV4cGlyeSI6MTc5MTI0NDgwMCwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="A1cNj7yeFpBT/ETqZHRgUfM9tToLwOpBySTd4C9Eya3JtQo/BEQegM6MMV7BZESSyAjQJJXYgH/ovHY1UHmB8woAAABjeyJvcmlnaW4iOiJodHRwczovL2Nkbi5zaG9waWZ5LmNvbTo0NDMiLCJmZWF0dXJlIjoiV2ViTUNQIiwiZXhwaXJ5IjoxNzk0ODczNjAwLCJpc1RoaXJkUGFydHkiOnRydWV9"><meta http-equiv="origin-trial" content="A1XQljJxk3U4c44gueu4vlIeDofyyWFswfVKbUiNw4itZx4Yy8Uw3nIhtzBePIrv1bSXqzHGDfYymYF5W7TKKAoAAABzeyJvcmlnaW4iOiJodHRwczovL2Nkbi5zaG9waWZ5LmNvbTo0NDMiLCJmZWF0dXJlIjoiU3BlY3VsYXRpb25NZWFzdXJlbWVudCIsImV4cGlyeSI6MTc5MzY2NDAwMCwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="Ax9yX6wXQN8G5IFmAMuROwlLDFBpw1CUnFgsIGNYqJJ4H6td1fqjIYkL02d7HpmOAFMFSi3/1kym00LEfYqOdwYAAACOeyJvcmlnaW4iOiJodHRwczovL2Nkbi5zaG9waWZ5LmNvbTo0NDMiLCJmZWF0dXJlIjoiU3BlY3VsYXRpb25SdWxlc01vZGVyYXRlVmlld3BvcnRIZXVyaXN0aWNzQ29udHJvbCIsImV4cGlyeSI6MTc5NjY4ODAwMCwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><script type="speculationrules">{}</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" integrity="sha512-OdEXQYCOldjqUEsuMKsZRj93Ht23QRlhIb8E/X0sbwZhme8eUw6g8q7AdxGJKakcBbv7+/PX0Gc2btf7Ru8cZA==" crossorigin="anonymous" referrerpolicy="no-referrer"><script async="" src="https://sillhouete.com/cdn/wpm/b05c62d7ewbe538af9pdeb4fec1me339d55am.js" data-trekkie-shim="true" data-agent-context="true" data-api-client-id="580111" data-facebook-capi-enabled="true" data-theme-id="159594283251" data-theme-store-id="857" data-theme-published="true" data-event-metadata-id="9568a1dc-8379-46e1-a544-597d5223da00" data-page-type="collection" data-resource-id="467759628531" data-shop-id="70977552627" data-storefront-base-url="https://sillhouete.com" data-extension-base-url="https://extensions.shopifycdn.com/cdn/shopifycloud/web-pixels-manager" data-surface="storefront-renderer" data-enabled-beta-flags="[&quot;4c64608a&quot;, &quot;16072cab&quot;]" data-is-merchant-request="false" data-hash-version="05c62d7ewbe538af9pdeb4fec1me339d55a" data-publish="custom" data-events="[[&quot;page_viewed&quot;,{}],[&quot;collection_viewed&quot;,{&quot;collection&quot;:{&quot;id&quot;:&quot;467759628531&quot;,&quot;title&quot;:&quot;Sillhouete Sale&quot;,&quot;productVariants&quot;:[{&quot;price&quot;:{&quot;amount&quot;:37500.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;RED(SHG2)&quot;,&quot;vendor&quot;:&quot;.......&quot;,&quot;id&quot;:&quot;8843279663347&quot;,&quot;untranslatedTitle&quot;:&quot;RED(SHG2)&quot;,&quot;url&quot;:&quot;/products/shg2-red&quot;,&quot;type&quot;:&quot;• Shirt - chiffon with tissue finishing • crushed sharara – medium silk • dupatta - chiffon with tissue facing and keran on four side borders • Lining - cotton silk&quot;},&quot;id&quot;:&quot;46821419483379&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/6_c51e57e9-2cc3-4f2a-a69d-37cb7d1e4f8d.png?v=1740993787&quot;},&quot;sku&quot;:&quot;SHG2- Party Wear- Maroon-1&quot;,&quot;title&quot;:&quot;XXL&quot;,&quot;untranslatedTitle&quot;:&quot;XXL&quot;},{&quot;price&quot;:{&quot;amount&quot;:130397.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;RANG MEHAL (SBBO 1)&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;8841544728819&quot;,&quot;untranslatedTitle&quot;:&quot;RANG MEHAL (SBBO 1)&quot;,&quot;url&quot;:&quot;/products/sbbo1-rang-mehal&quot;,&quot;type&quot;:&quot;Front Open Gown net Lehenga fused jamawar with chattapatti dupatta net&quot;},&quot;id&quot;:&quot;46071768285427&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/1_225c24ca-8c8d-47d9-a81c-9a24cf5f10ac.png?v=1740993797&quot;},&quot;sku&quot;:&quot;SBBO1-Mehndi Dress- Burnt Orange&quot;,&quot;title&quot;:&quot;Gold / S&quot;,&quot;untranslatedTitle&quot;:&quot;Gold / S&quot;},{&quot;price&quot;:{&quot;amount&quot;:199999.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;GUL-E-RANA (SBM 4)&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;8841521398003&quot;,&quot;untranslatedTitle&quot;:&quot;GUL-E-RANA (SBM 4)&quot;,&quot;url&quot;:&quot;/products/sbm4-gul-e-rana&quot;,&quot;type&quot;:&quot;Choli – net Lehnga - net •Dupatta - net with tissue facing • Lining rawsilk • CanCan&quot;},&quot;id&quot;:&quot;47979861639411&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/2_bd79b4bc-174f-4691-8eb7-0c9e3b4ae961.png?v=1740993806&quot;},&quot;sku&quot;:&quot;SBM4- Baraat- Maroon-1&quot;,&quot;title&quot;:&quot;XS&quot;,&quot;untranslatedTitle&quot;:&quot;XS&quot;},{&quot;price&quot;:{&quot;amount&quot;:125000.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;Shahnaz (S-3)&quot;,&quot;vendor&quot;:&quot;Sillhouete&quot;,&quot;id&quot;:&quot;9023817122035&quot;,&quot;untranslatedTitle&quot;:&quot;Shahnaz (S-3)&quot;,&quot;url&quot;:&quot;/products/shahnaz-s-3&quot;,&quot;type&quot;:&quot;Open Gown net Lehnga - rawsilk block-print Dupatta net with golden tissue Lining rawsilk&quot;},&quot;id&quot;:&quot;47979748393203&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/3_96e35d3b-86a2-48a6-b414-26f8626b260c.png?v=1740993687&quot;},&quot;sku&quot;:&quot;S3- Barat - Maroon-1&quot;,&quot;title&quot;:&quot;S&quot;,&quot;untranslatedTitle&quot;:&quot;S&quot;},{&quot;price&quot;:{&quot;amount&quot;:64193.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;Zaafrani (S-9)&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;9023868240115&quot;,&quot;untranslatedTitle&quot;:&quot;Zaafrani (S-9)&quot;,&quot;url&quot;:&quot;/products/zaafrani-s-9&quot;,&quot;type&quot;:&quot;Front Open Shirt net Sharara block print Dupatta organza Lining cotton silk&quot;},&quot;id&quot;:&quot;47979732664563&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/7_f3ae35fc-6ec2-400e-b235-4fd421bf761f.png?v=1740993680&quot;},&quot;sku&quot;:&quot;S9- BridalHenna- Orange-1&quot;,&quot;title&quot;:&quot;S&quot;,&quot;untranslatedTitle&quot;:&quot;S&quot;},{&quot;price&quot;:{&quot;amount&quot;:272000.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;Red Bridal Farshi Sharara (SBM-7)&quot;,&quot;vendor&quot;:&quot;.......&quot;,&quot;id&quot;:&quot;9026275803379&quot;,&quot;untranslatedTitle&quot;:&quot;Red Bridal Farshi Sharara (SBM-7)&quot;,&quot;url&quot;:&quot;/products/red-bridal-farshi-sharara-sbm-7&quot;,&quot;type&quot;:&quot;Maxi - net Dupatta - net with golden tissue facing Lining - raw silk CanCan&quot;},&quot;id&quot;:&quot;48879727050995&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/005A1604.jpg?v=1771918268&quot;},&quot;sku&quot;:&quot;SBM-7&quot;,&quot;title&quot;:&quot;S&quot;,&quot;untranslatedTitle&quot;:&quot;S&quot;},{&quot;price&quot;:{&quot;amount&quot;:299000.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;GALAXY (SBM 6)&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;8879374729459&quot;,&quot;untranslatedTitle&quot;:&quot;GALAXY (SBM 6)&quot;,&quot;url&quot;:&quot;/products/galaxy-sbm-6&quot;,&quot;type&quot;:&quot;Maxi net Dupatta net with rawsilk facing Lining raw silk CanCan&quot;},&quot;id&quot;:&quot;48879728296179&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/1_5de77cb8-e311-40ee-a75b-3a1c6b7febf4.png?v=1740993774&quot;},&quot;sku&quot;:&quot;SBM6-Bridal Dress- Maroon-1&quot;,&quot;title&quot;:&quot;XL&quot;,&quot;untranslatedTitle&quot;:&quot;XL&quot;},{&quot;price&quot;:{&quot;amount&quot;:280000.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;PHOOL (SBNP 1)&quot;,&quot;vendor&quot;:&quot;Sillhouete&quot;,&quot;id&quot;:&quot;8877820018931&quot;,&quot;untranslatedTitle&quot;:&quot;PHOOL (SBNP 1)&quot;,&quot;url&quot;:&quot;/products/phool-sbnp-1&quot;,&quot;type&quot;:&quot;Long Shirt net Trouser fused jamawar Dupatta organza&quot;},&quot;id&quot;:&quot;48879507472627&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/1_27d9b398-0da4-4ab1-9229-b3da04efdfec.png?v=1740993777&quot;},&quot;sku&quot;:&quot;SBNP1-Bridalwear-LimeGreen&quot;,&quot;title&quot;:&quot;XS&quot;,&quot;untranslatedTitle&quot;:&quot;XS&quot;},{&quot;price&quot;:{&quot;amount&quot;:464165.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;NOOR (SBI 1)&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;8836780261619&quot;,&quot;untranslatedTitle&quot;:&quot;NOOR (SBI 1)&quot;,&quot;url&quot;:&quot;/products/noor&quot;,&quot;type&quot;:&quot;Anarkali gown net Dupatta net Lehnga jamavar with fusing&quot;},&quot;id&quot;:&quot;48879506882803&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/1_a5e9ea4f-26e7-4825-8d6e-1f7bd2de904d.png?v=1740993815&quot;},&quot;sku&quot;:&quot;SBI1- walima- Ivory&quot;,&quot;title&quot;:&quot;XS&quot;,&quot;untranslatedTitle&quot;:&quot;XS&quot;},{&quot;price&quot;:{&quot;amount&quot;:75814.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;Sohni (S-6)&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;9023847235827&quot;,&quot;untranslatedTitle&quot;:&quot;Sohni (S-6)&quot;,&quot;url&quot;:&quot;/products/sohni-s-6&quot;,&quot;type&quot;:&quot;• short shirt - rawsilk block print • shalwar - rawsilk • Dupatta - net with keran and lappa on four side borders&quot;},&quot;id&quot;:&quot;47979703402739&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/1_d839d4dd-ec4b-4dbf-b596-c54fd88fa15d.png?v=1740993683&quot;},&quot;sku&quot;:&quot;S6- Party Wear - Pista Green-1&quot;,&quot;title&quot;:&quot;S&quot;,&quot;untranslatedTitle&quot;:&quot;S&quot;},{&quot;price&quot;:{&quot;amount&quot;:80000.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;Anarkali (S-4)&quot;,&quot;vendor&quot;:&quot;Sillhouete&quot;,&quot;id&quot;:&quot;9023836291315&quot;,&quot;untranslatedTitle&quot;:&quot;Anarkali (S-4)&quot;,&quot;url&quot;:&quot;/products/anarkali-s-4&quot;,&quot;type&quot;:&quot;Open Gown net Lehnga - rawsilk block-print Dupatta net with golden tissue Lining rawsilk&quot;},&quot;id&quot;:&quot;47979722604787&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/5_59b563c6-518d-4dd8-82e4-0bb061179817.png?v=1740993685&quot;},&quot;sku&quot;:&quot;S4- Barat - Red-1&quot;,&quot;title&quot;:&quot;XS&quot;,&quot;untranslatedTitle&quot;:&quot;XS&quot;},{&quot;price&quot;:{&quot;amount&quot;:65000.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;Aaina (S-2)&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;9023805620467&quot;,&quot;untranslatedTitle&quot;:&quot;Aaina (S-2)&quot;,&quot;url&quot;:&quot;/products/aaina-s-2&quot;,&quot;type&quot;:&quot;• short shirt - rawsilk block print • shalwar - rawsilk • Dupatta - net with keran and lappa on four side borders&quot;},&quot;id&quot;:&quot;48879726199027&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/9_2f4cbb38-4310-4362-b2a2-6013e6479d5b.png?v=1740993688&quot;},&quot;sku&quot;:&quot;S2- Party Wear - Lylac-1&quot;,&quot;title&quot;:&quot;S&quot;,&quot;untranslatedTitle&quot;:&quot;S&quot;},{&quot;price&quot;:{&quot;amount&quot;:275000.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;CHANDI (SBGRY 1)&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;8898832924915&quot;,&quot;untranslatedTitle&quot;:&quot;CHANDI (SBGRY 1)&quot;,&quot;url&quot;:&quot;/products/chandi-sbgry-1&quot;,&quot;type&quot;:&quot;Choli net with tissue facing Lehnga net with tissue facing Dupatta net with tissue facing Lining fused tissue CanCan&quot;},&quot;id&quot;:&quot;48879526641907&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/005A1877.jpg?v=1740993754&quot;},&quot;sku&quot;:&quot;SBGRY1-Bridal Dresses- Silver-Grey-1&quot;,&quot;title&quot;:&quot;XL&quot;,&quot;untranslatedTitle&quot;:&quot;XL&quot;},{&quot;price&quot;:{&quot;amount&quot;:150000.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;DAMNI (SBY 1)&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;8898801500403&quot;,&quot;untranslatedTitle&quot;:&quot;DAMNI (SBY 1)&quot;,&quot;url&quot;:&quot;/products/damni-sby-1&quot;,&quot;type&quot;:&quot;Choli net Lehnga Dupatta net with shimmer chiffon Lining shimmer chiffon CanCan&quot;},&quot;id&quot;:&quot;48879527002355&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/2_381f7a86-1100-4713-97c6-e0651d60bf18.png?v=1740993758&quot;},&quot;sku&quot;:&quot;SBY1-Mehndi- Pineapple-Yellow-1&quot;,&quot;title&quot;:&quot;XS&quot;,&quot;untranslatedTitle&quot;:&quot;XS&quot;},{&quot;price&quot;:{&quot;amount&quot;:235000.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;RESHAM (SBM 5)&quot;,&quot;vendor&quot;:&quot;Sillhouete&quot;,&quot;id&quot;:&quot;8879380660467&quot;,&quot;untranslatedTitle&quot;:&quot;RESHAM (SBM 5)&quot;,&quot;url&quot;:&quot;/products/resham-sbm-5&quot;,&quot;type&quot;:&quot;Open Gown net Lehnga - rawsilk block-print Dupatta net with golden tissue Lining rawsilk&quot;},&quot;id&quot;:&quot;46106979500275&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/4_246d3825-2378-4204-933c-dfcee0007e7d.png?v=1740993771&quot;},&quot;sku&quot;:&quot;SBM5- Barat - Maroon&quot;,&quot;title&quot;:&quot;XL / Red&quot;,&quot;untranslatedTitle&quot;:&quot;XL / Red&quot;},{&quot;price&quot;:{&quot;amount&quot;:189543.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;PISTA (SBPST 1)&quot;,&quot;vendor&quot;:&quot;Sillhouete&quot;,&quot;id&quot;:&quot;8879351759091&quot;,&quot;untranslatedTitle&quot;:&quot;PISTA (SBPST 1)&quot;,&quot;url&quot;:&quot;/products/pista-sbpst-2&quot;,&quot;type&quot;:&quot;Choli net Lehnga net Dupatta net Lining fused tissue CanCan&quot;},&quot;id&quot;:&quot;46106764607731&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/4_3b40f4ef-10f1-4ec7-bdb1-517a73132ec9.png?v=1740993775&quot;},&quot;sku&quot;:&quot;SBPST1-Valima Day- Pista Green&quot;,&quot;title&quot;:&quot;S / Green&quot;,&quot;untranslatedTitle&quot;:&quot;S / Green&quot;},{&quot;price&quot;:{&quot;amount&quot;:37500.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;JALAIBI(SFG 4)&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;8843302994163&quot;,&quot;untranslatedTitle&quot;:&quot;JALAIBI(SFG 4)&quot;,&quot;url&quot;:&quot;/products/sfg4-jalaibi&quot;,&quot;type&quot;:&quot;Shirt chiffon with tissue finishing crushed sharara medium silk dupatta - chiffon with tissue&quot;},&quot;id&quot;:&quot;46820553162995&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/4_d8935fb0-113a-4e4f-b82c-257679c40cb9.png?v=1740993780&quot;},&quot;sku&quot;:&quot;SFG4- Party Wear- Burnt Orange-1&quot;,&quot;title&quot;:&quot;S&quot;,&quot;untranslatedTitle&quot;:&quot;S&quot;},{&quot;price&quot;:{&quot;amount&quot;:35000.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;NAMAK PARI(SHG3)&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;8842311467251&quot;,&quot;untranslatedTitle&quot;:&quot;NAMAK PARI(SHG3)&quot;,&quot;url&quot;:&quot;/products/shg3-namak-pari&quot;,&quot;type&quot;:&quot;Shirt chiffon with tissue finishing cushed sharara medium silk dupatta chiffon with tissue&quot;},&quot;id&quot;:&quot;46821426823411&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/1_552ee130-71e6-4282-88c8-9c8390f37467.png?v=1740993793&quot;},&quot;sku&quot;:&quot;SHG3- Party Wear- Blue-1&quot;,&quot;title&quot;:&quot;S&quot;,&quot;untranslatedTitle&quot;:&quot;S&quot;},{&quot;price&quot;:{&quot;amount&quot;:45000.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;SFR-1&quot;,&quot;vendor&quot;:&quot;Sillhouete&quot;,&quot;id&quot;:&quot;9033853763827&quot;,&quot;untranslatedTitle&quot;:&quot;SFR-1&quot;,&quot;url&quot;:&quot;/products/sfr-1&quot;,&quot;type&quot;:&quot;• Gown - net • straight trouser - fused self jamawar • lining - shimmer&quot;},&quot;id&quot;:&quot;46794795548915&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/DSC09027.jpg?v=1740993657&quot;},&quot;sku&quot;:&quot;SFR-1&quot;,&quot;title&quot;:&quot;S&quot;,&quot;untranslatedTitle&quot;:&quot;S&quot;},{&quot;price&quot;:{&quot;amount&quot;:6750.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;Noor Jahan D-9&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;9026292908275&quot;,&quot;untranslatedTitle&quot;:&quot;Noor Jahan D-9&quot;,&quot;url&quot;:&quot;/products/noor-jahan-d-9&quot;,&quot;type&quot;:&quot;Short shirt rawsilk block print Shalwar rawsilk Dupatta net&quot;},&quot;id&quot;:&quot;46764179292403&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/DSC07901.jpg?v=1740993665&quot;},&quot;sku&quot;:&quot;D9&quot;,&quot;title&quot;:&quot;S&quot;,&quot;untranslatedTitle&quot;:&quot;S&quot;},{&quot;price&quot;:{&quot;amount&quot;:23625.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;MOTI (SFB 1)&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;8879384953075&quot;,&quot;untranslatedTitle&quot;:&quot;MOTI (SFB 1)&quot;,&quot;url&quot;:&quot;/products/moti-sfb-1&quot;,&quot;type&quot;:&quot;long shirt net with jamawar facing Trouser raw silkDupatta net with Lining grip&quot;},&quot;id&quot;:&quot;48880335651059&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/3_ac4cfd19-bc90-40d5-bb88-ad89a43b7994.png?v=1740993768&quot;},&quot;sku&quot;:&quot;SFB1-Party Wear-Beige-1&quot;,&quot;title&quot;:&quot;S&quot;,&quot;untranslatedTitle&quot;:&quot;S&quot;},{&quot;price&quot;:{&quot;amount&quot;:147500.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;CRYSTAL KOYAL&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;9017795543283&quot;,&quot;untranslatedTitle&quot;:&quot;CRYSTAL KOYAL&quot;,&quot;url&quot;:&quot;/products/crysral-koyal&quot;,&quot;type&quot;:&quot;&quot;},&quot;id&quot;:&quot;48879527330035&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/SUK_7413.jpg?v=1737372895&quot;},&quot;sku&quot;:null,&quot;title&quot;:&quot;XS&quot;,&quot;untranslatedTitle&quot;:&quot;XS&quot;},{&quot;price&quot;:{&quot;amount&quot;:70000.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;JACKET 1 (SJ 3)&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;8950315286771&quot;,&quot;untranslatedTitle&quot;:&quot;JACKET 1 (SJ 3)&quot;,&quot;url&quot;:&quot;/products/jacket-1-sj-3&quot;,&quot;type&quot;:&quot;• jacket - rawsilk with maroon silk finishing • bootcur trouser - rawsilk • sleeveless slip - rawsilk&quot;},&quot;id&quot;:&quot;47979848892659&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/1_05ba221d-1d7b-4cab-908a-523804f27819.png?v=1740993709&quot;},&quot;sku&quot;:&quot;SJ3-FormalEvent - Black-1&quot;,&quot;title&quot;:&quot;S&quot;,&quot;untranslatedTitle&quot;:&quot;S&quot;},{&quot;price&quot;:{&quot;amount&quot;:46875.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;Pink Shaded Lehnga Choli (S-7)&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;9023854117107&quot;,&quot;untranslatedTitle&quot;:&quot;Pink Shaded Lehnga Choli (S-7)&quot;,&quot;url&quot;:&quot;/products/pink-shaded-lehnga-choli-s-7&quot;,&quot;type&quot;:&quot;• short shirt - rawsilk block print • shalwar - rawsilk • Dupatta - net with keran and lappa on four side borders&quot;},&quot;id&quot;:&quot;47979705368819&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/6_695ba43f-6b07-4262-9369-48ec3e758d57.png?v=1740993681&quot;},&quot;sku&quot;:&quot;S7- Party Wear - Pink-1&quot;,&quot;title&quot;:&quot;XXL&quot;,&quot;untranslatedTitle&quot;:&quot;XXL&quot;},{&quot;price&quot;:{&quot;amount&quot;:35000.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;GREEN (SHG3)&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;8843327799539&quot;,&quot;untranslatedTitle&quot;:&quot;GREEN (SHG3)&quot;,&quot;url&quot;:&quot;/products/shg3-green&quot;,&quot;type&quot;:&quot;Shirt chiffon with tissue finishing crushed sharara medium silk dupatta chiffon with tissue facing&quot;},&quot;id&quot;:&quot;46821409652979&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/1_649ef4d3-a106-44af-9e79-4974a118a242.png?v=1740993778&quot;},&quot;sku&quot;:&quot;SHG3- Party Wear-Blue-1&quot;,&quot;title&quot;:&quot;S&quot;,&quot;untranslatedTitle&quot;:&quot;S&quot;},{&quot;price&quot;:{&quot;amount&quot;:37500.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;PATASA (SHG1)&quot;,&quot;vendor&quot;:&quot;......&quot;,&quot;id&quot;:&quot;8843297063155&quot;,&quot;untranslatedTitle&quot;:&quot;PATASA (SHG1)&quot;,&quot;url&quot;:&quot;/products/shg1-patasa&quot;,&quot;type&quot;:&quot;Shirt chiffon with tissue finishing crushed sharara medium silk dupatta chiffon with tissue facing&quot;},&quot;id&quot;:&quot;46821413748979&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/2_9debeab0-bd23-4819-8a37-dbb97c583041.png?v=1740993782&quot;},&quot;sku&quot;:&quot;SHG1- Party Wear- Grey Silver-1&quot;,&quot;title&quot;:&quot;XXL&quot;,&quot;untranslatedTitle&quot;:&quot;XXL&quot;},{&quot;price&quot;:{&quot;amount&quot;:37500.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;RED (SHG1)&quot;,&quot;vendor&quot;:&quot;.......&quot;,&quot;id&quot;:&quot;8843286249715&quot;,&quot;untranslatedTitle&quot;:&quot;RED (SHG1)&quot;,&quot;url&quot;:&quot;/products/shg1-red&quot;,&quot;type&quot;:&quot;Shirt - chiffon with tissue finishing • crushed sharara – medium silk • dupatta - chiffon with tissue facing and keran on four side borders Lining - cotton silk&quot;},&quot;id&quot;:&quot;46821418565875&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/1_f3f73ce2-b226-4cf5-9970-091cdd066ffd.png?v=1740993785&quot;},&quot;sku&quot;:&quot;SHG1- Party Wear- Maroon-1&quot;,&quot;title&quot;:&quot;XXL&quot;,&quot;untranslatedTitle&quot;:&quot;XXL&quot;},{&quot;price&quot;:{&quot;amount&quot;:37500.0,&quot;currencyCode&quot;:&quot;PKR&quot;},&quot;product&quot;:{&quot;title&quot;:&quot;MAYSOO(SHG2 )&quot;,&quot;vendor&quot;:&quot;.&quot;,&quot;id&quot;:&quot;8843233100019&quot;,&quot;untranslatedTitle&quot;:&quot;MAYSOO(SHG2 )&quot;,&quot;url&quot;:&quot;/products/shg2-maysoo&quot;,&quot;type&quot;:&quot;Shirt chiffon with tissue finishing crushed sharara medium silk dupatta chiffon with tissue&quot;},&quot;id&quot;:&quot;46821425905907&quot;,&quot;image&quot;:{&quot;src&quot;:&quot;//sillhouete.com/cdn/shop/files/7_5870477d-9bb3-4845-a133-1d4ce386dca4.png?v=1740993791&quot;},&quot;sku&quot;:&quot;SHG2- Party Wear- Green-1&quot;,&quot;title&quot;:&quot;XXL&quot;,&quot;untranslatedTitle&quot;:&quot;XXL&quot;}]}}]]" data-browser-target="modern"></script><script type="module" crossorigin="anonymous" integrity="sha256-ypGF+5vIq4Psw4WG7nsVtdd/TCfsJWnrNuACdqLCElY=" src="//sillhouete.com/cdn/shopifycloud/storefront/assets/storefront/webmcp-f427de6a.js"></script><script src="https://sillhouete.com/web-pixels@05c62d7ewbe538af9pdeb4fec1me339d55a/app/web-pixel-564265203@a3321ca85cf5aaf6b57585fcd8d67b3a~2/pixel.modern.js" async="" data-pixel-id="564265203" data-pixel-type="APP"></script><script src="https://sillhouete.com/web-pixels@05c62d7ewbe538af9pdeb4fec1me339d55a/app/web-pixel-385351923@bd2f978c17a94bbb8a74d43de2165dc5~2/pixel.modern.js" async="" data-pixel-id="385351923" data-pixel-type="APP"></script><script async="" src="//sillhouete.com/cdn/shopifycloud/storefront/assets/shop_events_listener-4e26a9ce.js"></script><style>#AnnouncementSlider .flickity-viewport{height:14px}</style><script src="https://code.jquery.com/jquery-3.6.0.min.js"></script><script src="https://sillhouete.com/apps/buckscc/sdk.min.js" type="text/javascript"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" type="text/javascript"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.28/moment-timezone-with-data.min.js" type="text/javascript"></script><script src="https://cdn.shopify.com/s/files/1/0756/0599/9919/files/musbu-chat-support.min.js" type="text/javascript"></script><script src="https://cdn.shopify.com/s/files/1/0756/0599/9919/files/cx-constant.js" type="text/javascript"></script><style>.ess-cart-banner{--hxo-banner-bg:#cce5ff;--hxo-banner-color:#004085;--hxo-banner-border:#b8daff}.ess-cart-banner.hxoDark{--hxo-banner-bg:#313131;--hxo-banner-color:#fff;--hxo-banner-border:#222}.ess-cart-banner{background-color:var(--hxo-banner-bg);border:1px solid transparent;border-radius:.25rem;color:var(--hxo-banner-color);margin-bottom:1rem;padding:.75rem 1.25rem;position:relative;text-align:center}</style><style>.buckscc-currency-box{display:inline!important;line-height:1}.buckscc-currency-wrapper{display:inline-block!important;line-height:1}.hxo-hover-original-price{left:0;opacity:0;position:absolute;transform:translateY(20px);transition:all .2s ease}.hxo-price-hover{background:#fff;border-radius:7px;box-shadow:0 0 20px -3px #ccc,0 -7px 20px -15px #ccc;display:block;filter:alpha(opacity=0);font-size:15px;left:0;opacity:1;padding:7px 16px;position:absolute;text-align:center;text-transform:none;top:2px;transition:all .3s ease-in-out;width:-moz-max-content;width:max-content;z-index:999999}.hxo-price-hover:after{border-color:#fff transparent;border-style:solid;border-width:0 7px 7px;content:"";display:block;left:31px;position:absolute;top:-6px}.hxo-slide-up{animation:hxo-slide-up .4s ease;opacity:1;transform:translateY(0);z-index:999999}.hxo-hover-price-exists{position:relative}span.buckscc-money{color:inherit!important;cursor:pointer}@keyframes hxo-slide-up{0%{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}</style><style>.hxoSelectTheme{--hxoBackground:#fff;--hxoSelect-color:#222;--hxoSelect-width:110px;--hxoSelect-height:40px;--hxoBorder-color:hsla(0,0%,80%,.36);--hxoShadow1:#e8e8e8;--hxoShadow2:rgba(0,0,0,.15);--hxoArrow:#47494e;--hxoSroll-bar-color:#e6e6e6;--hxoHover-bg:#eceef1}.hxoSelectTheme.hxoDark{--hxoBackground:#404040;--hxoSelect-color:#fff;--hxoBorder-color:#313131;--hxoShadow1:rgba(97,97,97,.24);--hxoShadow2:rgba(97,97,97,.31);--hxoArrow:#d7d8da;--hxoSroll-bar-color:#4d4d4d;--hxoHover-bg:#595959}.hxoSelectTheme{all:unset;align-items:center;bottom:40px;direction:ltr;display:flex;left:40px;position:fixed;z-index:999999999}@keyframes folder-item-hide{0%{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-20px)}}@keyframes folder-item-show{0%{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}@keyframes folder-height-show{0%{opacity:0}to{height:0}to{height:-moz-max-content;height:max-content;opacity:1}}@keyframes folder-height-hide{0%{height:-moz-max-content;height:max-content;opacity:1}to{max-height:0;opacity:0}}.hxoSelectTheme .folder-collapse-button{opacity:0}.hxoSelectTheme .folder-collapse-button:hover:after{opacity:1}.hxoSelectTheme .bucks__folder-collapse_btn{align-items:center;display:flex;flex-shrink:0;margin-left:auto;max-height:24px;opacity:1;transform:rotate(180deg)}.hxoSelectTheme .buckscc-select-styled.active:not(.deactive) .bucks__folder-collapse_btn{margin-top:-2px;transform:rotate(0deg);transition:all .3s ease-in-out}.hxoSelectTheme .buckscc-select-styled.active:not(.deactive) .bucks__folder-collapse_btn svg{transition:all .1s ease-in-out}.hxoSelectTheme .buckscc-select-styled.active.deactive .bucks__folder-collapse_btn{opacity:1;transform:rotate(180deg);transition:all .3s ease-in-out}.hxoSelectTheme .buckscc-select-styled.active.deactive .bucks__folder-collapse_btn svg{transition:all .1s ease-in-out}.hxoSelectTheme .buckscc-select-styled.active:not(.deactive):after{opacity:0;transition:all .3s ease-in-out;width:0}.hxoSelectTheme .buckscc-select-styled.active:not(.deactive) .folder-collapse-button{opacity:1;transform:rotate(180deg);transition:all .5s ease-out;width:30px}.hxoSelectTheme .buckscc-select-styled.bucks__drop-down_close+.buckscc-select-options,.hxoSelectTheme .buckscc-select-styled.deactive.active+.buckscc-select-options{animation-delay:.2s;animation-duration:.3s;animation-fill-mode:backwards;animation-name:folder-height-hide;height:0;opacity:0}.hxoSelectTheme .buckscc-select-styled.bucks__drop-down_close+.buckscc-select-options li,.hxoSelectTheme .buckscc-select-styled.deactive.active+.buckscc-select-options li{animation-duration:.2s;animation-fill-mode:backwards;animation-name:folder-item-hide;opacity:0}.hxoSelectTheme .buckscc-select-styled.bucks__drop-down_close+.buckscc-select-options li:nth-child(2),.hxoSelectTheme .buckscc-select-styled.deactive.active+.buckscc-select-options li:nth-child(2){animation-delay:.2s}.hxoSelectTheme .buckscc-select-styled.bucks__drop-down_close+.buckscc-select-options li:nth-child(3),.hxoSelectTheme .buckscc-select-styled.deactive.active+.buckscc-select-options li:nth-child(3){animation-delay:.4s}.hxoSelectTheme .buckscc-select-styled.bucks__drop-down_close+.buckscc-select-options li:nth-child(4),.hxoSelectTheme .buckscc-select-styled.deactive.active+.buckscc-select-options li:nth-child(4){animation-delay:.6s}.hxoSelectTheme .buckscc-select-styled.bucks__drop-down_close+.buckscc-select-options li:nth-child(5),.hxoSelectTheme .buckscc-select-styled.deactive.active+.buckscc-select-options li:nth-child(5){animation-delay:.8s}.hxoSelectTheme .buckscc-select-styled.bucks__drop-down_close+.buckscc-select-options li:nth-child(6),.hxoSelectTheme .buckscc-select-styled.deactive.active+.buckscc-select-options li:nth-child(6){animation-delay:1s}.hxoSelectTheme .buckscc-select-styled.bucks__drop-down_close+.buckscc-select-options li:nth-child(n+6),.hxoSelectTheme .buckscc-select-styled.deactive.active+.buckscc-select-options li:nth-child(n+6){animation-delay:1.2s}.hxoSelectTheme .buckscc-select-styled.active+.buckscc-select-options{animation-delay:.2s;animation-duration:.3s;animation-fill-mode:forwards;animation-name:folder-height-show}.hxoSelectTheme .buckscc-select-styled.active+.buckscc-select-options li,.hxoSelectTheme .buckscc-select-styled.active:not(.deactive)+.buckscc-select-options li{animation-delay:.1s;animation-duration:.2s;animation-fill-mode:forwards;animation-name:folder-item-show}.hxoSelectTheme .buckscc-select-styled.active+.buckscc-select-options li:nth-child(2),.hxoSelectTheme .buckscc-select-styled.active:not(.deactive)+.buckscc-select-options li:nth-child(2){animation-delay:.1s}.hxoSelectTheme .buckscc-select-styled.active+.buckscc-select-options li:nth-child(3),.hxoSelectTheme .buckscc-select-styled.active:not(.deactive)+.buckscc-select-options li:nth-child(3){animation-delay:.2s}.hxoSelectTheme .buckscc-select-styled.active+.buckscc-select-options li:nth-child(4),.hxoSelectTheme .buckscc-select-styled.active:not(.deactive)+.buckscc-select-options li:nth-child(4){animation-delay:.3s}.hxoSelectTheme .buckscc-select-styled.active+.buckscc-select-options li:nth-child(5),.hxoSelectTheme .buckscc-select-styled.active:not(.deactive)+.buckscc-select-options li:nth-child(5){animation-delay:.4s}.hxoSelectTheme .buckscc-select-styled.active+.buckscc-select-options li:nth-child(6),.hxoSelectTheme .buckscc-select-styled.active:not(.deactive)+.buckscc-select-options li:nth-child(6){animation-delay:.5s}.hxoSelectTheme .buckscc-select-styled.active+.buckscc-select-options li:nth-child(n+6),.hxoSelectTheme .buckscc-select-styled.active:not(.deactive)+.buckscc-select-options li:nth-child(n+6){animation-delay:.6s}.hxoSelectTheme.bottom_right{bottom:40px;left:unset;position:fixed;right:40px}.hxoSelectTheme.top_left{bottom:unset;left:40px;top:40px}.hxoSelectTheme.top_right{bottom:unset;left:unset;right:40px;top:40px}.hxoSelectTheme.hxo-relative{bottom:auto;left:auto;margin-left:10px;position:relative}.hxoSelectTheme.hxo-relative .buckscc-select-options,.hxoSelectTheme.top_left .buckscc-select-options,.hxoSelectTheme.top_right .buckscc-select-options{bottom:unset;top:100%}.hxoSelectTheme.bottom_right .buckscc-select-options,.hxoSelectTheme.hxo-relative .buckscc-select-options,.hxoSelectTheme.top_right .buckscc-select-options{left:unset}@media screen and (max-width:1024px){.hxoSelectTheme.hideOnMobile{display:none!important}}@media(min-width:1024px){.hxoSelectTheme.hideOnDesktop{display:none!important}}.hxoSelectTheme.bucksPreviewHidden{display:none!important}.hxoSelectTheme.hxoSmallSize{transform:scale(.8)}@media(max-width:240px){.hxoSelectTheme.hxoSmallSize{transform:scale(.6)}.hxoSelectTheme.hxoSmallSize.mobile_bottom_left,.hxoSelectTheme.hxoSmallSize.mobile_top_left{left:0!important}.hxoSelectTheme.hxoSmallSize.mobile_bottom_right,.hxoSelectTheme.hxoSmallSize.mobile_top_right{right:0!important}}@media(max-width:480px){.hxoSelectTheme{bottom:20px;left:20px;position:fixed!important;right:unset;top:unset}.hxoSelectTheme.hxo-relative{bottom:auto;left:auto;margin-left:10px;position:relative!important}}.hxoSelectTheme.mobile_bottom_right{bottom:20px!important;left:unset!important;position:fixed!important;right:20px!important;top:unset!important}.hxoSelectTheme.mobile_bottom_left{bottom:20px!important;left:20px!important;right:unset!important;top:unset!important}.hxoSelectTheme.mobile_top_left{bottom:unset!important;left:20px!important;right:unset!important;top:20px!important}.hxoSelectTheme.mobile_top_right{bottom:unset!important;left:unset!important;right:20px!important;top:20px!important}.hxoSelectTheme.hxo-mobile_relative{bottom:auto!important;left:auto!important;margin-left:10px!important;position:relative!important}.hxoSelectTheme.hxo-mobile_relative .buckscc-select-options,.hxoSelectTheme.mobile_top_left .buckscc-select-options,.hxoSelectTheme.mobile_top_right .buckscc-select-options{bottom:unset!important;top:100%!important}.hxoSelectTheme.hxo-mobile_relative .buckscc-select-options,.hxoSelectTheme.mobile_bottom_right .buckscc-select-options,.hxoSelectTheme.mobile_top_right .buckscc-select-options{left:unset!important}.hxoSelectTheme.mobile_bottom_left .buckscc-select-options,.hxoSelectTheme.mobile_top_left .buckscc-select-options{left:0!important}.hxoSelectTheme.left_downwards .buckscc-select-options,.hxoSelectTheme.left_upwards .buckscc-select-options,.hxoSelectTheme.mobile_left_downwards .buckscc-select-options,.hxoSelectTheme.mobile_left_upwards .buckscc-select-options{left:unset!important}.hxoSelectTheme.mobile_right_downwards .buckscc-select-options,.hxoSelectTheme.mobile_right_upwards .buckscc-select-options,.hxoSelectTheme.right_downwards .buckscc-select-options,.hxoSelectTheme.right_upwards .buckscc-select-options{left:0!important}.hxoSelectTheme.left_upwards .buckscc-select-options,.hxoSelectTheme.mobile_left_upwards .buckscc-select-options,.hxoSelectTheme.mobile_right_upwards .buckscc-select-options,.hxoSelectTheme.right_upwards .buckscc-select-options{bottom:100%!important;top:unset!important}.hxoSelectTheme.left_downwards .buckscc-select-options,.hxoSelectTheme.mobile_left_downwards .buckscc-select-options,.hxoSelectTheme.mobile_right_downwards .buckscc-select-options,.hxoSelectTheme.right_downwards .buckscc-select-options{bottom:unset!important;top:100%!important}.hxoSelectTheme .flagWrapper{align-items:center;display:inline-flex;justify-content:flex-start;margin-right:4px;transition:width .3s ease-in;width:30px}.hxoSelectTheme .buckscc-select-hidden{display:none;padding-right:10px;visibility:hidden}.hxoSelectTheme .buckscc-select{align-items:center;color:var(--hxoSelect-color);cursor:pointer;display:flex;font-size:16px;position:relative;-webkit-text-fill-color:var(--hxoSelect-color);height:var(--hxoSelect-height);text-align:left;width:auto!important}.hxoSelectTheme .buckscc-select .hxoFlag{display:inline-block;height:19px;min-width:30px;vertical-align:middle;width:30px}.hxoSelectTheme .buckscc-select span{align-items:center;display:flex;font-size:14px;margin:0 4px;max-height:20px}@media(max-width:480px){.hxoSelectTheme .buckscc-select span{font-size:12px}}.hxoSelectTheme .buckscc-select ::-webkit-scrollbar{height:.4em;width:.4em}.hxoSelectTheme .buckscc-select ::-webkit-scrollbar-track-piece{background:var(--hxoBackground);border-radius:0 10px 10px 0;overflow:hidden}.hxoSelectTheme .buckscc-select ::-webkit-scrollbar-thumb{background:var(--hxoSroll-bar-color);border-radius:10px}@media(max-width:480px){.hxoSelectTheme:not(.buckscc-ismerchant) .buckscc-select .hxoFlag{height:16px!important;margin:0;min-width:25.5px!important;width:25.5px!important}}.hxoSelectTheme:not(.buckscc-ismerchant) .buckscc-select .hxoFlag{margin:0 auto}.hxoSelectTheme .buckscc-select-styled{background-color:var(--hxoBackground);font-size:15px;margin:0 auto;padding:8px 4px 8px 8px;position:relative;transition:all .4s ease-in-out}@media(max-width:480px){.hxoSelectTheme .buckscc-select-styled{padding:6px}}.hxoSelectTheme .buckscc-select-styled{align-items:center;border-radius:5px;box-shadow:5px 5px 10px var(--hxoShadow1),-5px -5px 10px var(--hxoShadow1);cursor:pointer;display:flex;transition:all .6s ease-in;width:-moz-max-content;width:max-content}.hxoSelectTheme .buckscc-select-styled.active:not(.deactive):after,.hxoSelectTheme .buckscc-select-styled:active:after{border-color:transparent transparent var(--hxoSelect-color) transparent;top:-3px}.hxoSelectTheme .buckscc-select-styled .hxoFlag{display:inline-block;min-width:25.5px}.hxoSelectTheme .buckscc-select-options{background-color:var(--hxoBackground);border-radius:7px;bottom:42px;box-shadow:0 0 17px -5px var(--hxoShadow2);height:0;left:0;list-style:none;margin:8px 0;max-height:265px;max-width:265px;opacity:0;overflow-x:hidden;overflow-y:hidden;padding:0;position:absolute;right:0;top:auto;transition:opacity .3s,visibility .3s,max-height .3s;width:-moz-max-content;width:max-content;z-index:999999999}.hxoSelectTheme .buckscc-select-options li{border-top:1px solid var(--hxoBorder-color);display:flex;margin:0;padding:12px 15px;transition:all .15s ease-in;white-space:nowrap;width:100%}.hxoSelectTheme .buckscc-select-options li:hover{background:var(--hxoHover-bg)}.hxoSelectTheme .buckscc-select-options li[rel=hide]{display:none}.hxoSelectTheme .buckscc-auto-scroll.buckscc-select-options{overflow-y:scroll}.hxoSelectTheme.hxo-landscape .buckscc-select-options{max-height:230px}.hxoSelectTheme.borderLine .buckscc-select-styled{border:1px solid var(--hxoBorder-color);box-shadow:none}.hxoSelectTheme.noBorder .buckscc-select-styled{border:none;box-shadow:none}.hxoSelectTheme .hxoSelected{display:none}.hxoSelectTheme.hxoFlag-circle .buckscc-select .hxoFlag{background-position-x:-7px;background-size:40px!important;border-radius:50px;height:27px;min-width:27px;width:27px}@media(max-width:480px){.hxoSelectTheme.hxoFlag-circle .buckscc-select .hxoFlag{background-position-x:-7px;height:26px!important;min-width:26px;width:26px!important}}.hxoSelectTheme.hxoFlag-flat .buckscc-select .hxoFlag{border-radius:0!important}.hxoSelectTheme.hxo-showCurrencyOnly .buckscc-select-options .flagWrapper,.hxoSelectTheme.hxo-showCurrencyOnly .buckscc-select-styled .flagWrapper{display:none!important;width:0!important}.hxoSelectTheme.hxo-showCurrencyOnly .buckscc-select-styled{width:auto!important}.hxoSelectTheme.hxo-showCurrencyOnly .bucks-selected{padding:0 4px}.hxoSelectTheme.hxo-showFlagOnly .bucks-selected{display:none!important}.hxoSelectTheme.hxo-showFlagOnly .buckscc-select-styled{width:auto!important}</style><style>.hxoModernLayeredTheme{--hxoLayer1:#eee;--hxoLayer2:#eee}.hxoModernLayeredTheme.hxoDark{--hxoLayer1:#313131;--hxoLayer2:#262626}.hxoModernLayeredTheme .buckscc-select-styled{box-shadow:-1px -1px 10px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.15),0 9px 0 -5px var(--hxoLayer1),0 9px 1px -4px rgba(0,0,0,.15),0 18px 0 -10px var(--hxoLayer2),0 18px 1px -9px rgba(0,0,0,.15)!important}.hxoModernLayeredTheme .active{box-shadow:-1px -1px 10px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.15),0 10px 0 -5px var(--hxoLayer1),0 10px 1px -4px rgba(0,0,0,.15),0 20px 0 -10px var(--hxoLayer2),0 20px 1px -9px rgba(0,0,0,.15)!important}</style><style>.hxoFlag{background-repeat:no-repeat;background-size:30px!important;border-radius:2px;display:inline-block;height:19px;vertical-align:middle;width:30px}@media(max-width:480px){.buckscc-currency-wrapper:not(.buckscc-ismerchant) .hxoFlag{background-size:25.5px!important}}.buckscc-currency-wrapper:not(.buckscc-ismerchant) .hxoFlag{height:19px;width:30px}.hxoFlag-traditional .hxoFlag{background-image:url(https://storage.googleapis.com/cdn-2.helixo.co/bucks/bucks/bucks-traditional-flag-v4.png);height:19px!important}.hxoFlag-modern .hxoFlag{background-image:url(https://cdn-2.helixo.co/bucks/bucks-modern%20-flags.png)}.hxoFlag-JEP{background-position:0 .009%}.hxoFlag-EUR{background-position:0 94.628099%}.hxoFlag-AED{background-position:0 .826446%}.hxoFlag-AFN{background-position:0 1.239669%}.hxoFlag-ALL{background-position:0 2.479339%}.hxoFlag-AMD{background-position:0 2.892562%}.hxoFlag-ANG,.hxoFlag-XCG{background-position:0 3.305785%}.hxoFlag-AOA{background-position:0 3.719008%}.hxoFlag-NULL{background-position:0 4.132231%}.hxoFlag-ARS{background-position:0 4.545455%}.hxoFlag-LVL{background-position:0 5.37%}.hxoFlag-AWG{background-position:0 6.198347%}.hxoFlag-AZN{background-position:0 6.61157%}.hxoFlag-BAM{background-position:0 7.024793%}.hxoFlag-BBD{background-position:0 7.438017%}.hxoFlag-BDT{background-position:0 7.85124%}.hxoFlag-BGN{background-position:0 9.090909%}.hxoFlag-BHD{background-position:0 9.504132%}.hxoFlag-BYN{background-position:0 14.049587%}.hxoFlag-BIF{background-position:0 9.917355%}.hxoFlag-BMD{background-position:0 10.743802%}.hxoFlag-BND{background-position:0 11.157025%}.hxoFlag-BOB{background-position:0 11.570248%}.hxoFlag-BRL{background-position:0 11.983471%}.hxoFlag-BSD{background-position:0 12.396694%}.hxoFlag-BTN{background-position:0 12.809917%}.hxoFlag-BWP{background-position:0 13.636364%}.hxoFlag-BYR{background-position:0 14.049587%}.hxoFlag-BZD{background-position:0 14.46281%}.hxoFlag-CAD{background-position:0 14.876033%}.hxoFlag-CDF{background-position:0 15.702479%}.hxoFlag-XAF{background-position:0 16.528926%}.hxoFlag-CHF{background-position:0 16.942149%}.hxoFlag-CLP{background-position:0 18.181818%}.hxoFlag-CNY{background-position:0 19.008264%}.hxoFlag-COP{background-position:0 19.421488%}.hxoFlag-CRC{background-position:0 19.834711%}.hxoFlag-CUP{background-position:0 20.247934%}.hxoFlag-CVE{background-position:0 20.661157%}.hxoFlag-CZK{background-position:0 21.900826%}.hxoFlag-DJF{background-position:0 22.727273%}.hxoFlag-DKK{background-position:0 23.140496%}.hxoFlag-DOP{background-position:0 23.966942%}.hxoFlag-DZD{background-position:0 24.380165%}.hxoFlag-EGP{background-position:0 25.619835%}.hxoFlag-ERN{background-position:0 26.446281%}.hxoFlag-ETB{background-position:0 27.272727%}.hxoFlag-FJD{background-position:0 28.099174%}.hxoFlag-FKP{background-position:0 28.512397%}.hxoFlag-GEL{background-position:0 30.991736%}.hxoFlag-GHS{background-position:0 31.818182%}.hxoFlag-GIP{background-position:0 32.231405%}.hxoFlag-GMD{background-position:0 33.057851%}.hxoFlag-GNF{background-position:0 33.471074%}.hxoFlag-GTQ{background-position:0 35.53719%}.hxoFlag-GYD{background-position:0 36.77686%}.hxoFlag-HKD{background-position:0 37.190083%}.hxoFlag-AUD{background-position:0 37.603306%}.hxoFlag-HNL{background-position:0 38.016529%}.hxoFlag-HRK{background-position:0 38.429752%}.hxoFlag-HTG{background-position:0 38.842975%}.hxoFlag-HUF{background-position:0 39.256198%}.hxoFlag-IDR{background-position:0 39.669421%}.hxoFlag-ILS{background-position:0 40.495868%}.hxoFlag-INR{background-position:0 40.909091%}.hxoFlag-IQD{background-position:0 41.735537%}.hxoFlag-IRR{background-position:0 42.14876%}.hxoFlag-ISK{background-position:0 42.561983%}.hxoFlag-JMD{background-position:0 43.38843%}.hxoFlag-JOD{background-position:0 43.801653%}.hxoFlag-JPY{background-position:0 44.214876%}.hxoFlag-KES{background-position:0 44.628099%}.hxoFlag-KGS{background-position:0 45.041322%}.hxoFlag-KHR{background-position:0 45.454545%}.hxoFlag-KMF{background-position:0 46.280992%}.hxoFlag-XCD{background-position:0 46.694215%}.hxoFlag-KPW{background-position:0 47.107438%}.hxoFlag-KRW{background-position:0 47.520661%}.hxoFlag-KWD{background-position:0 47.933884%}.hxoFlag-KYD{background-position:0 48.347107%}.hxoFlag-KZT{background-position:0 48.760331%}.hxoFlag-LAK{background-position:0 49.173554%}.hxoFlag-LBP{background-position:0 49.586777%}.hxoFlag-LKR{background-position:0 50.826446%}.hxoFlag-LRD{background-position:0 51.239669%}.hxoFlag-LSL{background-position:0 51.652893%}.hxoFlag-LTL{background-position:0 52.066116%}.hxoFlag-LYD{background-position:0 53.305785%}.hxoFlag-MAD{background-position:0 53.719008%}.hxoFlag-MDL{background-position:0 54.545455%}.hxoFlag-MGA{background-position:0 55.371901%}.hxoFlag-MKD{background-position:0 56.198347%}.hxoFlag-MMK{background-position:0 57.024793%}.hxoFlag-MNT{background-position:0 57.438017%}.hxoFlag-MOP{background-position:0 57.85124%}.hxoFlag-MRO{background-position:0 59.090909%}.hxoFlag-MUR{background-position:0 60.330579%}.hxoFlag-MVR{background-position:0 60.743802%}.hxoFlag-MWK{background-position:0 61.157025%}.hxoFlag-MXN{background-position:0 61.570248%}.hxoFlag-MYR{background-position:0 61.983471%}.hxoFlag-MZN{background-position:0 62.396694%}.hxoFlag-NAD{background-position:0 62.809917%}.hxoFlag-NGN{background-position:0 64.46281%}.hxoFlag-NIO{background-position:0 64.876033%}.hxoFlag-NPR{background-position:0 66.115702%}.hxoFlag-NZD{background-position:0 67.355372%}.hxoFlag-OMR{background-position:0 67.768595%}.hxoFlag-PAB{background-position:0 68.181818%}.hxoFlag-PEN{background-position:0 68.595041%}.hxoFlag-XPF{background-position:0 69.008264%}.hxoFlag-PGK{background-position:0 69.421488%}.hxoFlag-PHP{background-position:0 69.834711%}.hxoFlag-PKR{background-position:0 70.247934%}.hxoFlag-PLN{background-position:0 70.661157%}.hxoFlag-USD{background-position:0 93.38843%}.hxoFlag-PYG{background-position:0 73.140496%}.hxoFlag-QAR{background-position:0 73.553719%}.hxoFlag-RON{background-position:0 74.380165%}.hxoFlag-RSD{background-position:0 74.793388%}.hxoFlag-RUB{background-position:0 75.206612%}.hxoFlag-RWF{background-position:0 75.619835%}.hxoFlag-SAR{background-position:0 76.033058%}.hxoFlag-SBD{background-position:0 76.446281%}.hxoFlag-SCR{background-position:0 76.859504%}.hxoFlag-SDG{background-position:0 77.272727%}.hxoFlag-SEK{background-position:0 77.68595%}.hxoFlag-SGD{background-position:0 78.099174%}.hxoFlag-SHP{background-position:0 78.512397%}.hxoFlag-NOK{background-position:0 79.338843%}.hxoFlag-SLL{background-position:0 80.165289%}.hxoFlag-XOF{background-position:0 80.991736%}.hxoFlag-SOS{background-position:0 81.404959%}.hxoFlag-SRD{background-position:0 81.818182%}.hxoFlag-SSP{background-position:0 82.231405%}.hxoFlag-STD{background-position:0 82.644628%}.hxoFlag-SYP{background-position:0 83.471074%}.hxoFlag-SZL{background-position:0 83.884298%}.hxoFlag-THB{background-position:0 85.950413%}.hxoFlag-TJS{background-position:0 86.363636%}.hxoFlag-TMT{background-position:0 87.603306%}.hxoFlag-TND{background-position:0 88.016529%}.hxoFlag-TOP{background-position:0 88.429752%}.hxoFlag-tp{background-position:0 88.842975%}.hxoFlag-TRY{background-position:0 89.256198%}.hxoFlag-TTD{background-position:0 89.669421%}.hxoFlag-TWD{background-position:0 90.495868%}.hxoFlag-ty{background-position:0 90.909091%}.hxoFlag-TZS{background-position:0 91.322314%}.hxoFlag-UAH{background-position:0 91.735537%}.hxoFlag-UGX{background-position:0 92.14876%}.hxoFlag-GBP{background-position:0 92.561983%}.hxoFlag-UYU{background-position:0 93.801653%}.hxoFlag-UZS{background-position:0 94.214876%}.hxoFlag-VES{background-position:0 95.454545%}.hxoFlag-VND{background-position:0 96.694215%}.hxoFlag-VUV{background-position:0 97.107438%}.hxoFlag-WST{background-position:0 97.933884%}.hxoFlag-YER{background-position:0 98.347107%}.hxoFlag-ZAR{background-position:0 98.760331%}.hxoFlag-zr{background-position:0 99.586777%}.hxoFlag-ZWL{background-position:0 100%}.hxoFlag-ZMW{background-position:0 99.17%}</style><link rel="dns-prefetch preconnect" href="https://cdn.shopify.com" crossorigin=""><script></script><style></style><link rel="stylesheet" type="text/css" href="https://app.sweethelp.io/css/sweet-help.css?var=0.0.0066"><style type="text/css">
+            #cx_whatsapp_init .czm-button {
+                background: transparent !important;
+                box-shadow: none !important;
+            }
+            .czm-button-person-avatar svg {
+                width: 50px !important;
+                height: 50px !important;
+            }
+            #cx_whatsapp_init .czm-pulse {
+                display: none !important;
+            }</style><style id="cx-musbu-custom-css" type="text/css">@media (max-width: 767px) {
+    .czm-button-person-avatar {
+       
+        margin-bottom: 3px !important;  /* Force 30px margin at the bottom */
+    }
+}</style><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/polyfills.DsjDEvpF.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/app.Dk5nz0Xg.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/2c1ab0fe.BiVtzufE.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/6a2fc6d6.BeZZem8Y.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/4b4bc88f.BHbniAxV.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/bfe75f31.R92ZEHqO.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/2bac2c53.BUiEATIR.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/9dba8418.Y-azCJ7d.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/cb38e5c2.EQMan4hZ.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/3d539943.Bd5CQbHQ.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/2255f8fa.bdFEwZpL.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/d25d1b95.CdIE5mX3.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/b8733b27.MVhSY6RH.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/e39bc11c.iq77NRTt.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/08a3b809.G1dn8dew.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/164ad2e3.D7n7OMx1.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/69fae6d4.B2dzNGQO.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/f67abd2c.BodXmBsJ.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/e12db40c.CT0Am2Ly.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/60a453ce.BgWbGVih.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/fb3b4968.rhvf-ICb.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/f8706cb6.Bv_0JISL.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/dffdfb34.CSN84oba.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/3ca8ef7e.V4vgyWBF.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/1f5e7811.Cca2rjNy.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/1a6c2867.DIvU9A1-.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/2fdb3dd3.DvpRS4Xz.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/22345fd4.B_nO3k4L.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/0e67bd3b.3uTUXdy2.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/74835653.UHF3eOyU.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/a9fa9fda.CSsB4Xu6.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/ca3e798e.CzkJJ_SW.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/47b970b2.OTAfY8j6.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/064f6ac1.B8nqPS-Q.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/efa0389a.DqMr8ttX.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/4b1c22b7.ChtK2kiy.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/17425706.z-55rwrT.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/cb5cf153.DJ6VszA-.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/e3e348f2.BxWhoVyZ.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/cccd6056.CaluLySl.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/71ae3d5c.CrA5cH5P.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/89e2d30a.C0-yICFc.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/ed9f2238.w7UjuCqp.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/6fb6f9d8.B47CwtDC.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/1444e6bd.B7hbxzLx.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/0b8657b8.dM5fB3P7.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/55098bf1.BTJ6FjRE.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/a422df8c.q2aZJE3m.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/f49d4216.CllSEu4w.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/79974aab.DUIZgmKT.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/7b0c98ea._FerA5Rd.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/d22d2b80.h3vHf3mG.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/f58f39d8.BJdu75B-.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/e03065ab.KDVa7fQx.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/0e9ee714.C0-gMzIT.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/39921a74.q-YrrMwS.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/7a8217fd.CCNS-G-R.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/c6b02d73.CPHSqm5M.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/ec391382.BuLb1yPb.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/24773686.B4R4ObGN.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/2210eadb.DF0gIp_2.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/71b60e0a.DfPLdYsH.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/6bfea526.DEqa2S0f.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/ac5a19ff.BdiH8ka4.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/598fef4e.BK8SKrA1.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/e77f7fe0.C1pwymQu.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/cc6ff67d.CXvVqi7z.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/bf513f9c.CfllcDuu.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/dfca5da5.DpyVoHD_.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/dae24aab.D1sjCla8.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/ddf59287.CQ2qvw1s.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/01973ac7.Cjo359iQ.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/58314944.DYcaQdQp.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/945a08d6.8_N_vyRH.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/7bc8057b.D0BQW8EW.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/a25deb9a.B-4a5tZ0.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/2b89a178.BedTFkTM.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/b684bff6.C-kwoA49.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/910cd6e2.CyNEA0VE.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/347b440c.B8LLB7fG.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/9ce08e25.D1d72JuB.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/181d38d3.b-HQSZL2.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/5a347040.Bo9ALQCU.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/792bb671.B3OvVnSg.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/9ca7d819.CAaC1QfM.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/f51e663e.CUY8APap.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/21cc90a2.DHzOO82q.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/64de7b49.C6nUrrwa.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/ca0c3e72.BeFfPyGB.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/8e79be58.DTc91G9F.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/90e26f5f.E0iBy-ic.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/31cc568e.95lmLO5k.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/65f3d4da.Bb3QiqCm.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/ca5e9c49.BCQZwzxC.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/f3e117aa.dhWgUucJ.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/7aefefff.Cl4r3Q7_.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/b3389d5c.21AwXcJm.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/73a9b0a0.Ch9Z9xuz.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/25604ae0.56pfEpxV.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/dada7e07.C2w97jsk.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/86720dbb.DTLhUwDG.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/f692f62f.JV0hFtu3.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/9babe369.Z2ek0ooW.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/434e3b0a.oup8Ur0H.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/e0989459.X1grdgJn.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/cdfd59e6.C9jrDYMt.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/fc21c11a.CEs-92_F.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/e129c76e.CmeWy1KY.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/d93ca466.BO12QLQC.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/d4ea2faa.ThyJAVrR.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/fe885b80.C2UR7ran.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/f78726c8.BCOx2tp9.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/e477f96c.D97npmE9.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/d7065744.g--amPwQ.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/7ee73f43.Bktt-YQi.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/0c0ad074.l-K3BwDw.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/8fe56fc9.BxL5LFi3.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/87bfafec.CxwEzGHg.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/051149c8.lHD9iIAq.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/d2e6a587.nhZ5a7WX.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/c10167e6.DS-Se4Os.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/b9c0319a.Dgj-gn7m.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="script" href="/cdn/shopifycloud/checkout-web/assets/c1/17e57de1.BzjdP92z.js" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/app.CcGlIMpn.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/wallet-prefilled-guest-return.BZwmSkmD.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/hydrate.DUY3Jbo2.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/OnePage.C_uC3EPz.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/VatNumberValidationField.BDfM-MAy.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/ShopPayLogo.87JMHPUK.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/BillingAddressForm.BdwN7V1K.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/PhoneField.uZEuHncj.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/Popover.Bi1nHaU-.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/Choice.CrYuHUmO.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/useWalletsTimeout.Du9dByaI.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/useApplePayButtonStatus.BnDF3H7t.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/EmptyState.BEvzDDvy.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/TransitionHeight.CuRoM9zv.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/StickyPayButton.D-gNjNDa.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/Switch.BS8yVgoP.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/useShopPayProgressIntercepts.CIy8uDiZ.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/Tipping.BcTJoNaV.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/PaymentIcon.gzvCNwz_.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/PaymentLine.DT05kVlY.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/Section.CU18S7Ap.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/constants.xO_7ctnq.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/Middot.D7Ujmshx.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/EstimatedDeliveryContent.B_THySFF.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/ShippingMethods.DU0m5rdF.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/ShippingMethodSelector.B0hio2RO.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/SubscriptionPriceBreakdown.vTcdVGq4.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/BelowTheFoldContent.BKRoWsh4.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/RememberMeSection.JBO5WNhc.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/PaymentMethodProgressionHost.C0BOgdmL.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/RedirectionNotice.DgiInWJ-.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/PayButtonSection.CKZf5JTX.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/hooks.BgVWyw5e.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/observe-fit-scale.DpLOWYa8.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/useShopPayButtonClassName.DqjtNl7W.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/MobileOrderSummary.BlloiNDx.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="style" href="/cdn/shopifycloud/checkout-web/assets/c1/assets/PaymentOptionSelector.s-Kd_X2E.css" crossorigin=""><link rel="prefetch" fetchpriority="low" as="image" href="https://cdn.shopify.com/s/files/1/0709/7755/2627/files/Png_Logo_for_Website_5ca804ea-dc2c-4ca1-bf89-65dd735be7af_x320.png?v=1728024729" crossorigin=""></head>
+<body class="template-collection" data-center-text="true" data-button_style="square" data-type_header_capitalize="true" data-type_headers_align_text="true" data-type_product_capitalize="true" data-swatch_style="round" data-aos-easing="ease-out-quad" data-aos-duration="400" data-aos-delay="0"><div id="cx_whatsapp_init"></div>
+
+
+<script>
+console.log("--------------CX - WhatsApp Chat---------------");
+window.cxMusbuMetaData = {"id":18829,"shop_id":"451793-84.myshopify.com","button_color":"#000000","button_position":null,"button_size":60,"mobile_view":1,"where_to_show":"all","background_color":"#ffbb00s","button_shape":"circle","isBackground":false,"icon_uid":16,"whatsapp_number":null,"whatsapp_text":null,"pro_icon":"0","sendProductUrl":0,"review_enabled":"1","status":1,"channels":[{"type":"whatsapp","number":"+923310397865","message":null,"icon_uid":1,"displayOnDesktop":true,"displayOnMobile":true}],"styling":{"buttonLayout":"1","singleAccountLayout":"0","multipleAccountLayout":"1","desktopPosition":null,"customDesktopSpacing":false,"desktopSpacing1":"10","desktopSpacing2":"10","mobilePosition":"right","customMobileSpacing":true,"mobileSpacing1":"100","mobileSpacing2":"10","buttonBackgroundColor":"#10c379","popupBackgroundColor":"#10c379","hoverText":null,"popupTitle":null,"popupSubtitle":null,"buttonHeading":null,"buttonSubHeading":null,"pageLinks":[{"page":null}],"isPreset":["3"],"presetId":"29","isRounded":false,"isCustomIcon":["1"],"selectedCustomIcon":"svg1","defaultChatMessage":null,"chatInputPlaceholder":null,"chatButtonName":null,"isPulse":true,"isNotificationNumber":false,"notificationNumber":"1","customCss":"@media (max-width: 767px) {\n    .czm-button-person-avatar {\n       \n        margin-bottom: 3px !important;  /* Force 30px margin at the bottom */\n    }\n}"},"settings":null,"created_at":"2024-09-18T10:53:21.000000Z","updated_at":"2024-12-18T06:08:08.000000Z"};
+
+// Check if FontAwesome object exists
+if (typeof FontAwesome == "undefined") {
+    // FontAwesome is not loaded, add the CDN link
+    var link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css";
+    link.integrity = "sha512-OdEXQYCOldjqUEsuMKsZRj93Ht23QRlhIb8E/X0sbwZhme8eUw6g8q7AdxGJKakcBbv7+/PX0Gc2btf7Ru8cZA==";
+    link.crossOrigin = "anonymous";
+    link.referrerPolicy = "no-referrer";
+    document.head.appendChild(link);
+}
+</script>
+
+
+<!-- END app block --><!-- BEGIN app block: shopify://apps/instafeed/blocks/head-block/c447db20-095d-4a10-9725-b5977662c9d5 --><!-- BEGIN app snippet: storefront-script -->
+
+
+  
+    <script src="https://cdn.nfcube.com/instafeed-78b499a474b91d6d47f827e2329066ea.js" defer=""></script>
+  
+
+<!-- END app snippet -->
+
+
+
+
+<!-- END app block --><!-- BEGIN app block: shopify://apps/bucks/blocks/app-embed/4f0a9b06-9da4-4a49-b378-2de9d23a3af3 -->
+<script>
+  window.bucksCC = window.bucksCC || {};
+  window.bucksCC.metaConfig = {};
+  window.bucksCC.reConvert = function() {};
+  "function" != typeof Object.assign && (Object.assign = function(n) {
+    if (null == n) 
+      throw new TypeError("Cannot convert undefined or null to object");
+    
+
+
+
+    for (var r = Object(n), t = 1; t < arguments.length; t++) {
+      var e = arguments[t];
+      if (null != e) 
+        for (var o in e) 
+          e.hasOwnProperty(o) && (r[o] = e[o])
+    }
+    return r
+  });
+
+const bucks_validateJson = json => {
+    let checkedJson;
+    try {
+        checkedJson = JSON.parse(json);
+    } catch (error) { }
+    return checkedJson;
+};
+
+  const bucks_encodedData = "JTdCJTIyYWN0aXZlJTIyJTNBdHJ1ZSUyQyUyMnVzZXJDdXJyZW5jeSUyMiUzQSUyMiUyMiUyQyUyMnNlbGVjdGVkQ3VycmVuY2llcyUyMiUzQSUyMiU1QiU3QiU1QyUyMlVTRCU1QyUyMiUzQSU1QyUyMlVTJTIwRG9sbGFyJTIwKFVTRCklNUMlMjIlN0QlMkMlN0IlNUMlMjJFVVIlNUMlMjIlM0ElNUMlMjJFdXJvJTIwKEVVUiklNUMlMjIlN0QlMkMlN0IlNUMlMjJHQlAlNUMlMjIlM0ElNUMlMjJCcml0aXNoJTIwUG91bmQlMjAoR0JQKSU1QyUyMiU3RCUyQyU3QiU1QyUyMkNBRCU1QyUyMiUzQSU1QyUyMkNhbmFkaWFuJTIwRG9sbGFyJTIwKENBRCklNUMlMjIlN0QlMkMlN0IlNUMlMjJQS1IlNUMlMjIlM0ElNUMlMjJQYWtpc3RhbmklMjBSdXBlZSUyMChQS1IpJTVDJTIyJTdEJTVEJTIyJTJDJTIyYXV0b1N3aXRjaEN1cnJlbmN5TG9jYXRpb25CYXNlZCUyMiUzQXRydWUlMkMlMjJtb25leVdpdGhDdXJyZW5jeUZvcm1hdCUyMiUzQWZhbHNlJTJDJTIyYXV0b1N3aXRjaE9ubHlUb1ByZWZlcnJlZEN1cnJlbmN5JTIyJTNBZmFsc2UlMkMlMjJzaG93Q3VycmVuY3lDb2Rlc09ubHklMjIlM0FmYWxzZSUyQyUyMmRpc3BsYXlQb3NpdGlvblR5cGUlMjIlM0ElMjJmbG9hdGluZyUyMiUyQyUyMmRpc3BsYXlQb3NpdGlvbiUyMiUzQSUyMmJvdHRvbV9sZWZ0JTIyJTJDJTIyY3VzdG9tUG9zaXRpb24lMjIlM0ElMjJoZWFkZXIlMjBhJTVCaHJlZiolM0QlNUMlMjIlMkZjYXJ0JTVDJTIyJTVEJTIyJTJDJTIycG9zaXRpb25QbGFjZW1lbnQlMjIlM0ElMjJhZnRlciUyMiUyQyUyMm1vYmlsZURpc3BsYXlQb3NpdGlvblR5cGUlMjIlM0ElMjJmbG9hdGluZyUyMiUyQyUyMm1vYmlsZURpc3BsYXlQb3NpdGlvbiUyMiUzQSUyMmJvdHRvbV9sZWZ0JTIyJTJDJTIybW9iaWxlQ3VzdG9tUG9zaXRpb24lMjIlM0ElMjIlMjIlMkMlMjJtb2JpbGVQb3NpdGlvblBsYWNlbWVudCUyMiUzQSUyMmFmdGVyJTIyJTJDJTIyc2hvd0luRGVza3RvcCUyMiUzQXRydWUlMkMlMjJzaG93SW5Nb2JpbGVEZXZpY2UlMjIlM0F0cnVlJTJDJTIyc2hvd09yaWdpbmFsUHJpY2VPbk1vdXNlSG92ZXIlMjIlM0FmYWxzZSUyQyUyMmN1c3RvbU9wdGlvbnNQbGFjZW1lbnQlMjIlM0FmYWxzZSUyQyUyMm9wdGlvbnNQbGFjZW1lbnRUeXBlJTIyJTNBJTIybGVmdF91cHdhcmRzJTIyJTJDJTIyY3VzdG9tT3B0aW9uc1BsYWNlbWVudE1vYmlsZSUyMiUzQWZhbHNlJTJDJTIyb3B0aW9uc1BsYWNlbWVudFR5cGVNb2JpbGUlMjIlM0ElMjJsZWZ0X3Vwd2FyZHMlMjIlMkMlMjJjYXJ0Tm90aWZpY2F0aW9uU3RhdHVzJTIyJTNBZmFsc2UlMkMlMjJjYXJ0Tm90aWZpY2F0aW9uTWVzc2FnZSUyMiUzQSUyMldlJTIwcHJvY2VzcyUyMGFsbCUyMG9yZGVycyUyMGluJTIwJTdCU1RPUkVfQ1VSUkVOQ1klN0QlMjBhbmQlMjB5b3UlMjB3aWxsJTIwYmUlMjBjaGVja291dCUyMHVzaW5nJTIwdGhlJTIwbW9zdCUyMGN1cnJlbnQlMjBleGNoYW5nZSUyMHJhdGVzLiUyMiUyQyUyMmNhcnROb3RpZmljYXRpb25CYWNrZ3JvdW5kQ29sb3IlMjIlM0ElMjJyZ2JhKDI1MSUyQzI0NSUyQzI0NSUyQzEpJTIyJTJDJTIyY2FydE5vdGlmaWNhdGlvblRleHRDb2xvciUyMiUzQSUyMnJnYmEoMzAlMkMzMCUyQzMwJTJDMSklMjIlMkMlMjJyb3VuZGluZ0RlY2ltYWwlMjIlM0EwLjk5JTJDJTIycHJpY2VSb3VuZGluZ1R5cGUlMjIlM0ElMjJub25lJTIyJTJDJTIyZGVmYXVsdEN1cnJlbmN5Um91bmRpbmclMjIlM0FmYWxzZSUyQyUyMnRoZW1lVHlwZSUyMiUzQSUyMmRlZmF1bHQlMjIlMkMlMjJiYWNrZ3JvdW5kQ29sb3IlMjIlM0ElMjJyZ2JhKDI1NSUyQzI1NSUyQzI1NSUyQzEpJTIyJTJDJTIydGV4dENvbG9yJTIyJTNBJTIycmdiYSgzMCUyQzMwJTJDMzAlMkMxKSUyMiUyQyUyMmhvdmVyQ29sb3IlMjIlM0ElMjJyZ2JhKDI1NSUyQzI1NSUyQzI1NSUyQzEpJTIyJTJDJTIyYm9yZGVyU3R5bGUlMjIlM0ElMjJib3hTaGFkb3clMjIlMkMlMjJpbnN0YW50TG9hZGVyJTIyJTNBZmFsc2UlMkMlMjJkYXJrTW9kZSUyMiUzQWZhbHNlJTJDJTIyZmxhZ1N0eWxlJTIyJTNBJTIybW9kZXJuJTIyJTJDJTIyZmxhZ1RoZW1lJTIyJTNBJTIyY2lyY2xlJTIyJTJDJTIyZmxhZ0Rpc3BsYXlPcHRpb24lMjIlM0ElMjJzaG93RmxhZ0FuZEN1cnJlbmN5JTIyJTJDJTIydHJpZ2dlciUyMiUzQSUyMiUyMiUyQyUyMmN1c3RvbVNlbGVjdG9ycyUyMiUzQSUyMiUyMiUyQyUyMndhdGNoVXJscyUyMiUzQSUyMiUyMiUyQyUyMmV4cGVydFNldHRpbmdzJTIyJTNBJTIyJTdCJTVDJTIyY3NzJTVDJTIyJTNBJTVDJTIyJTVDJTIyJTdEJTIyJTJDJTIyc2hvcCUyMiUzQSUyMjQ1MTc5My04NC5teXNob3BpZnkuY29tJTIyJTJDJTIycm91bmRQcmljZVN0YXR1cyUyMiUzQW51bGwlMkMlMjJhcHBFbWJlZFN0YXR1cyUyMiUzQSUyMnRydWUlMjIlMkMlMjJtYXJrZXRTdGF0dXMlMjIlM0FmYWxzZSU3RA==";
+
+  const bucks_myshopifyDomain = "sillhouete.com";
+
+  const decodedURI = atob(bucks_encodedData);
+  const bucks_decodedString = decodeURIComponent(decodedURI);
+
+
+  const bucks_parsedData = bucks_validateJson(bucks_decodedString) || {};
+  Object.assign(window.bucksCC.metaConfig, {
+
+    ... bucks_parsedData,
+    money_format: "\u003cspan class=money\u003eRs.{{amount_no_decimals}}\u003c\/span\u003e",
+    money_with_currency_format: "\u003cspan class=money\u003eRs.{{amount_no_decimals}} PKR\u003c\/span\u003e",
+    userCurrency: "PKR"
+
+  });
+  window.bucksCC.reConvert = function() {};
+  window.bucksCC.themeAppExtension = true;
+  window.bucksCC.metaConfig.multiCurrencies = [];
+  window.bucksCC.localization = {};
+  
+  
+
+  window.bucksCC.localization.availableCountries = ["AF","AX","AL","DZ","AD","AO","AI","AG","AR","AM","AW","AC","AU","AT","AZ","BS","BH","BD","BB","BY","BE","BZ","BJ","BM","BT","BO","BA","BW","BR","IO","VG","BN","BG","BF","BI","KH","CM","CA","CV","BQ","KY","CF","TD","CL","CN","CX","CC","CO","KM","CG","CD","CK","CR","CI","HR","CW","CY","CZ","DK","DJ","DM","DO","EC","EG","SV","GQ","ER","EE","SZ","ET","FK","FO","FJ","FI","FR","GF","PF","TF","GA","GM","GE","DE","GH","GI","GR","GL","GD","GP","GT","GG","GN","GW","GY","HT","HN","HK","HU","IS","IN","ID","IQ","IE","IM","IL","IT","JM","JP","JE","JO","KZ","KE","KI","XK","KW","KG","LA","LV","LB","LS","LR","LY","LI","LT","LU","MO","MG","MW","MY","MV","ML","MT","MQ","MR","MU","YT","MX","MD","MC","MN","ME","MS","MA","MZ","MM","NA","NR","NP","NL","NC","NZ","NI","NE","NG","NU","NF","MK","NO","OM","PK","PS","PA","PG","PY","PE","PH","PN","PL","PT","QA","RE","RO","RU","RW","WS","SM","ST","SA","SN","RS","SC","SL","SG","SX","SK","SI","SB","SO","ZA","GS","KR","SS","ES","LK","BL","SH","KN","LC","MF","PM","VC","SD","SR","SJ","SE","CH","TW","TJ","TZ","TH","TL","TG","TK","TO","TT","TA","TN","TR","TM","TC","TV","UM","UG","UA","AE","GB","US","UY","UZ","VU","VA","VE","VN","WF","EH","YE","ZM","ZW"];
+  window.bucksCC.localization.availableLanguages = ["en"];
+
+  
+  window.bucksCC.metaConfig.multiCurrencies = "PKR".split(',') || '';
+  window.bucksCC.metaConfig.cartCurrency = "PKR" || '';
+
+  if ((((window || {}).bucksCC || {}).metaConfig || {}).instantLoader) {
+    self.fetch || (self.fetch = function(e, n) {
+      return n = n || {},
+      new Promise(function(t, s) {
+        var r = new XMLHttpRequest,
+          o = [],
+          u = [],
+          i = {},
+          a = function() {
+            return {
+              ok: 2 == (r.status / 100 | 0),
+              statusText: r.statusText,
+              status: r.status,
+              url: r.responseURL,
+              text: function() {
+                return Promise.resolve(r.responseText)
+              },
+              json: function() {
+                return Promise.resolve(JSON.parse(r.responseText))
+              },
+              blob: function() {
+                return Promise.resolve(new Blob([r.response]))
+              },
+              clone: a,
+              headers: {
+                keys: function() {
+                  return o
+                },
+                entries: function() {
+                  return u
+                },
+                get: function(e) {
+                  return i[e.toLowerCase()]
+                },
+                has: function(e) {
+                  return e.toLowerCase() in i
+                }
+              }
+            }
+          };
+        for (var c in r.open(n.method || "get", e, !0), r.onload = function() {
+          r.getAllResponseHeaders().replace(/^(.*?):[^S\n]*([sS]*?)$/gm, function(e, n, t) {
+            o.push(n = n.toLowerCase()),
+            u.push([n, t]),
+            i[n] = i[n]
+              ? i[n] + "," + t
+              : t
+          }),
+          t(a())
+        },
+        r.onerror = s,
+        r.withCredentials = "include" == n.credentials,
+        n.headers) 
+          r.setRequestHeader(c, n.headers[c]);
+        r.send(n.body || null)
+      })
+    });
+    !function() {
+      function t(t) {
+        const e = document.createElement("style");
+        e.innerText = t,
+        document.head.appendChild(e)
+      }
+      function e(t) {
+        const e = document.createElement("script");
+        e.type = "text/javascript",
+        e.text = t,
+        document.head.appendChild(e),
+        console.log("%cBUCKSCC: Instant Loader Activated ⚡️", "background: #1c64f6; color: #fff; font-size: 12px; font-weight:bold; padding: 5px 10px; border-radius: 3px")
+      }
+      let n = sessionStorage.getItem("bucksccHash");
+      (
+        n = n
+          ? JSON.parse(n)
+          : null
+      )
+        ? e(n)
+        : fetch(`https://${bucks_myshopifyDomain}/apps/buckscc/sdk.min.js`, {mode: "no-cors"}).then(function(t) {
+          return t.text()
+        }).then(function(t) {
+          if ((t || "").length > 100) {
+            const o = JSON.stringify(t);
+            sessionStorage.setItem("bucksccHash", o),
+            n = t,
+            e(t)
+          }
+        })
+    }();
+  }
+
+  const themeAppExLoadEvent = new Event("BUCKSCC_THEME-APP-EXTENSION_LOADED", { bubbles: true, cancelable: false });
+
+  // Dispatch the custom event on the window
+  window.dispatchEvent(themeAppExLoadEvent);
+
+</script><!-- END app block --><!-- BEGIN app block: shopify://apps/judge-me-reviews/blocks/judgeme_core/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8 --><!-- Start of Judge.me Core -->
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="https://cdn.judge.me">
+<link rel="dns-prefetch" href="https://cdn1.judge.me">
+<link rel="dns-prefetch" href="https://api.judge.me">
+
+
+<script data-cfasync="false" class="jdgm-settings-script">window.jdgmSettings={"pagination":5,"disable_web_reviews":false,"coupon_receiving_condition":"any_review","coupon_value_type":"percentage","coupon_value_percentage":10,"coupon_value_fixed_amount":0,"coupon_discount_type":"single","coupon_tier_text_enabled":false,"coupon_tier_text_percentage":10,"coupon_tier_text_fixed_amount":0,"coupon_tier_photo_enabled":false,"coupon_tier_photo_percentage":10,"coupon_tier_photo_fixed_amount":0,"coupon_tier_video_enabled":false,"coupon_tier_video_percentage":10,"coupon_tier_video_fixed_amount":0,"enable_coupons":false,"badge_no_review_text":"No reviews","badge_n_reviews_text":"{{ n }} review/reviews","hide_badge_preview_if_no_reviews":true,"badge_hide_text":false,"enforce_center_preview_badge":false,"widget_title":"Customer Reviews","widget_open_form_text":"Write a review","widget_close_form_text":"Cancel review","widget_refresh_page_text":"Refresh page","widget_summary_text":"Based on {{ number_of_reviews }} review/reviews","widget_no_review_text":"Be the first to write a review","widget_name_field_text":"Display name","widget_verified_name_field_text":"Verified Name (public)","widget_name_placeholder_text":"Display name","widget_required_field_error_text":"This field is required.","widget_email_field_text":"Email address","widget_verified_email_field_text":"Verified Email (private, can not be edited)","widget_email_placeholder_text":"Your email address","widget_email_field_error_text":"Please enter a valid email address.","widget_rating_field_text":"Rating","widget_review_title_field_text":"Review Title","widget_review_title_placeholder_text":"Give your review a title","widget_review_body_field_text":"Review content","widget_review_body_placeholder_text":"Start writing here...","widget_pictures_field_text":"Picture/Video (optional)","widget_submit_review_text":"Submit Review","widget_submit_verified_review_text":"Submit Verified Review","widget_submit_success_msg_with_auto_publish":"Thank you! Please refresh the page in a few moments to see your review. You can remove or edit your review by logging into \u003ca href='https://judge.me/login' target='_blank' rel='nofollow noopener'\u003eJudge.me\u003c/a\u003e","widget_submit_success_msg_no_auto_publish":"Thank you! Your review will be published as soon as it is approved by the shop admin. You can remove or edit your review by logging into \u003ca href='https://judge.me/login' target='_blank' rel='nofollow noopener'\u003eJudge.me\u003c/a\u003e","widget_show_default_reviews_out_of_total_text":"Showing {{ n_reviews_shown }} out of {{ n_reviews }} reviews.","widget_show_all_link_text":"Show all","widget_show_less_link_text":"Show less","widget_author_said_text":"{{ reviewer_name }} said:","widget_days_text":"{{ n }} days ago","widget_weeks_text":"{{ n }} week/weeks ago","widget_months_text":"{{ n }} month/months ago","widget_years_text":"{{ n }} year/years ago","widget_yesterday_text":"Yesterday","widget_today_text":"Today","widget_replied_text":"\u003e\u003e {{ shop_name }} replied:","widget_read_more_text":"Read more","widget_reviewer_name_as_initial":"","widget_rating_filter_color":"#fbcd0a","widget_rating_filter_see_all_text":"See all reviews","widget_sorting_most_recent_text":"Most Recent","widget_sorting_highest_rating_text":"Highest Rating","widget_sorting_lowest_rating_text":"Lowest Rating","widget_sorting_with_pictures_text":"Only Pictures","widget_sorting_most_helpful_text":"Most Helpful","widget_open_question_form_text":"Ask a question","widget_reviews_subtab_text":"Reviews","widget_questions_subtab_text":"Questions","widget_question_label_text":"Question","widget_answer_label_text":"Answer","widget_question_placeholder_text":"Write your question here","widget_submit_question_text":"Submit Question","widget_question_submit_success_text":"Thank you for your question! We will notify you once it gets answered.","verified_badge_text":"Verified","verified_badge_bg_color":"","verified_badge_text_color":"","verified_badge_placement":"left-of-reviewer-name","widget_review_max_height":"","widget_hide_border":false,"widget_social_share":false,"widget_thumb":false,"widget_review_location_show":false,"widget_location_format":"","all_reviews_include_out_of_store_products":true,"all_reviews_out_of_store_text":"(out of store)","all_reviews_pagination":100,"all_reviews_product_name_prefix_text":"about","enable_review_pictures":true,"enable_question_anwser":false,"widget_theme":"default","review_date_format":"mm/dd/yyyy","default_sort_method":"most-recent","enable_ai_review_visibility":true,"widget_product_reviews_subtab_text":"Product Reviews","widget_shop_reviews_subtab_text":"Shop Reviews","widget_other_products_reviews_text":"Reviews for other products","widget_store_reviews_subtab_text":"Store reviews","widget_product_variant_reference_text":"Review for","widget_no_store_reviews_text":"This store hasn't received any reviews yet","widget_web_restriction_product_reviews_text":"This product hasn't received any reviews yet","widget_no_items_text":"No items found","widget_show_more_text":"Show more","widget_write_a_store_review_text":"Write a Store Review","widget_product_and_store_reviews_text":"Product and store reviews","widget_reviews_in_collection_text":"Reviews in this collection","widget_other_languages_heading":"Reviews in Other Languages","widget_translate_review_text":"Translate review to {{ language }}","widget_translating_review_text":"Translating...","widget_show_original_translation_text":"Show original ({{ language }})","widget_translate_review_failed_text":"Review couldn't be translated.","widget_translate_review_retry_text":"Retry","widget_translate_review_try_again_later_text":"Try again later","show_product_url_for_grouped_product":false,"widget_sorting_pictures_first_text":"Pictures First","show_pictures_on_all_rev_page_mobile":false,"show_pictures_on_all_rev_page_desktop":false,"floating_tab_hide_mobile_install_preference":false,"floating_tab_button_name":"★ Reviews","floating_tab_title":"Let customers speak for us","floating_tab_button_color":"","floating_tab_button_background_color":"","floating_tab_url":"","floating_tab_url_enabled":false,"floating_tab_tab_style":"text","all_reviews_text_badge_text":"Customers rate us {{ shop.metafields.judgeme.all_reviews_rating | round: 1 }}/5 based on {{ shop.metafields.judgeme.all_reviews_count }} reviews.","all_reviews_text_badge_text_branded_style":"{{ shop.metafields.judgeme.all_reviews_rating | round: 1 }} out of 5 stars based on {{ shop.metafields.judgeme.all_reviews_count }} reviews","is_all_reviews_text_badge_a_link":false,"show_stars_for_all_reviews_text_badge":false,"all_reviews_text_badge_url":"","all_reviews_text_style":"branded","all_reviews_text_color_style":"judgeme_brand_color","all_reviews_text_color":"#108474","all_reviews_text_show_jm_brand":false,"featured_carousel_show_header":true,"featured_carousel_title":"Let customers speak for us","testimonials_carousel_title":"Customers are saying","videos_carousel_title":"Real customer stories","cards_carousel_title":"Customers are saying","featured_carousel_count_text":"from {{ n }} reviews","featured_carousel_add_link_to_all_reviews_page":false,"featured_carousel_url":"","featured_carousel_show_images":true,"featured_carousel_autoslide_interval":5,"featured_carousel_arrows_on_the_sides":false,"featured_carousel_height":250,"featured_carousel_width":80,"featured_carousel_image_size":0,"featured_carousel_image_height":250,"featured_carousel_arrow_color":"#eeeeee","verified_count_badge_style":"branded","verified_count_badge_orientation":"horizontal","verified_count_badge_color_style":"judgeme_brand_color","verified_count_badge_color":"#108474","is_verified_count_badge_a_link":false,"verified_count_badge_url":"","verified_count_badge_show_jm_brand":true,"widget_rating_preset_default":5,"widget_first_sub_tab":"product-reviews","widget_show_histogram":true,"widget_histogram_use_custom_color":false,"widget_pagination_use_custom_color":false,"widget_star_use_custom_color":false,"widget_verified_badge_use_custom_color":false,"widget_write_review_use_custom_color":false,"picture_reminder_submit_button":"Upload Pictures","enable_review_videos":false,"mute_video_by_default":false,"widget_sorting_videos_first_text":"Videos First","widget_review_pending_text":"Pending","featured_carousel_items_for_large_screen":3,"social_share_options_order":"Facebook,Twitter","remove_microdata_snippet":true,"disable_json_ld":false,"enable_json_ld_products":false,"preview_badge_show_question_text":false,"preview_badge_no_question_text":"No questions","preview_badge_n_question_text":"{{ number_of_questions }} question/questions","qa_badge_show_icon":false,"qa_badge_position":"same-row","remove_judgeme_branding":true,"widget_add_search_bar":false,"widget_search_bar_placeholder":"Search","widget_sorting_verified_only_text":"Verified only","widget_sorting_most_relevant_text":"Most Relevant","featured_carousel_theme":"default","featured_carousel_show_rating":true,"featured_carousel_show_title":true,"featured_carousel_show_body":true,"featured_carousel_show_date":false,"featured_carousel_show_reviewer":true,"featured_carousel_show_product":false,"featured_carousel_header_background_color":"#108474","featured_carousel_header_text_color":"#ffffff","featured_carousel_name_product_separator":"reviewed","featured_carousel_full_star_background":"#108474","featured_carousel_empty_star_background":"#dadada","featured_carousel_vertical_theme_background":"#f9fafb","featured_carousel_verified_badge_enable":true,"featured_carousel_verified_badge_color":"#108474","featured_carousel_border_style":"round","featured_carousel_review_line_length_limit":3,"featured_carousel_more_reviews_button_text":"Read more reviews","featured_carousel_view_product_button_text":"View product","all_reviews_page_load_reviews_on":"scroll","all_reviews_page_load_more_text":"Load More Reviews","disable_fb_tab_reviews":false,"enable_ajax_cdn_cache":false,"widget_advanced_speed_features":5,"widget_public_name_text":"displayed publicly like","default_reviewer_name":"John Smith","default_reviewer_name_has_non_latin":true,"widget_reviewer_anonymous":"Anonymous","medals_widget_title":"Judge.me Review Medals","medals_widget_background_color":"#f9fafb","medals_widget_position":"footer_all_pages","medals_widget_border_color":"#f9fafb","medals_widget_verified_text_position":"left","medals_widget_use_monochromatic_version":false,"medals_widget_elements_color":"#108474","show_reviewer_avatar":true,"widget_invalid_yt_video_url_error_text":"Not a YouTube video URL","widget_max_length_field_error_text":"Please enter no more than {0} characters.","widget_show_country_flag":false,"widget_show_collected_via_shop_app":true,"widget_verified_by_shop_badge_style":"light","widget_verified_by_shop_text":"Verified by Shop","widget_show_photo_gallery":false,"widget_load_with_code_splitting":true,"widget_ugc_install_preference":false,"widget_ugc_title":"Made by us, Shared by you","widget_ugc_subtitle":"Tag us to see your picture featured in our page","widget_ugc_arrows_color":"#ffffff","widget_ugc_primary_button_text":"Buy Now","widget_ugc_primary_button_background_color":"#108474","widget_ugc_primary_button_text_color":"#ffffff","widget_ugc_primary_button_border_width":"0","widget_ugc_primary_button_border_style":"none","widget_ugc_primary_button_border_color":"#108474","widget_ugc_primary_button_border_radius":"25","widget_ugc_secondary_button_text":"Load More","widget_ugc_secondary_button_background_color":"#ffffff","widget_ugc_secondary_button_text_color":"#108474","widget_ugc_secondary_button_border_width":"2","widget_ugc_secondary_button_border_style":"solid","widget_ugc_secondary_button_border_color":"#108474","widget_ugc_secondary_button_border_radius":"25","widget_ugc_reviews_button_text":"View Reviews","widget_ugc_reviews_button_background_color":"#ffffff","widget_ugc_reviews_button_text_color":"#108474","widget_ugc_reviews_button_border_width":"2","widget_ugc_reviews_button_border_style":"solid","widget_ugc_reviews_button_border_color":"#108474","widget_ugc_reviews_button_border_radius":"25","widget_ugc_reviews_button_link_to":"judgeme-reviews-page","widget_ugc_show_post_date":true,"widget_ugc_max_width":"800","widget_rating_metafield_value_type":true,"widget_primary_color":"#108474","widget_enable_secondary_color":false,"widget_secondary_color":"#edf5f5","widget_summary_average_rating_text":"{{ average_rating }} out of 5","widget_media_grid_title":"Customer photos \u0026 videos","widget_media_grid_see_more_text":"See more","widget_round_style":false,"widget_show_product_medals":true,"widget_verified_by_judgeme_text":"Verified by Judge.me","widget_show_store_medals":true,"widget_verified_by_judgeme_text_in_store_medals":"Verified by Judge.me","widget_media_field_exceed_quantity_message":"Sorry, we can only accept {{ max_media }} for one review.","widget_media_field_exceed_limit_message":"{{ file_name }} is too large, please select a {{ media_type }} less than {{ size_limit }}MB.","widget_review_submitted_text":"Review Submitted!","widget_question_submitted_text":"Question Submitted!","widget_close_form_text_question":"Cancel","widget_write_your_answer_here_text":"Write your answer here","widget_enabled_branded_link":true,"widget_show_collected_by_judgeme":false,"widget_reviewer_name_color":"","widget_write_review_text_color":"","widget_write_review_bg_color":"","widget_collected_by_judgeme_text":"collected by Judge.me","widget_pagination_type":"standard","widget_load_more_text":"Load More","widget_load_more_color":"#108474","widget_full_review_text":"Full Review","widget_read_more_reviews_text":"Read More Reviews","widget_read_questions_text":"Read Questions","widget_questions_and_answers_text":"Questions \u0026 Answers","widget_verified_by_text":"Verified by","widget_verified_text":"Verified","widget_number_of_reviews_text":"{{ number_of_reviews }} reviews","widget_back_button_text":"Back","widget_next_button_text":"Next","widget_custom_forms_filter_button":"Filters","custom_forms_style":"horizontal","widget_show_review_information":false,"how_reviews_are_collected":"How reviews are collected?","widget_show_review_keywords":false,"widget_gdpr_statement":"How we use your data: We'll only contact you about the review you left, and only if necessary. By submitting your review, you agree to Judge.me's \u003ca href='https://judge.me/terms' target='_blank' rel='nofollow noopener'\u003eterms\u003c/a\u003e, \u003ca href='https://judge.me/privacy' target='_blank' rel='nofollow noopener'\u003eprivacy\u003c/a\u003e and \u003ca href='https://judge.me/content-policy' target='_blank' rel='nofollow noopener'\u003econtent\u003c/a\u003e policies.","widget_multilingual_sorting_enabled":false,"widget_translate_review_content_enabled":false,"widget_translate_review_content_method":"manual","popup_widget_review_selection":"automatically_with_pictures","popup_widget_round_border_style":true,"popup_widget_show_title":true,"popup_widget_show_body":true,"popup_widget_show_reviewer":false,"popup_widget_show_product":true,"popup_widget_show_pictures":true,"popup_widget_use_review_picture":true,"popup_widget_show_on_home_page":true,"popup_widget_show_on_product_page":true,"popup_widget_show_on_collection_page":true,"popup_widget_show_on_cart_page":true,"popup_widget_position":"bottom_left","popup_widget_first_review_delay":5,"popup_widget_duration":5,"popup_widget_interval":5,"popup_widget_review_count":5,"popup_widget_hide_on_mobile":true,"popup_widget_source_mode":"auto","popup_widget_page_product":"current_product","popup_widget_page_collection":"current_collection","popup_widget_page_cart":"cart_mode","popup_widget_page_home":"all","popup_widget_star_rating":"all","popup_widget_review_type":"all","popup_widget_top_up_thin_pages":true,"popup_widget_corner_styling":"soft","review_snippet_widget_round_border_style":true,"review_snippet_widget_card_color":"#FFFFFF","review_snippet_widget_text_color":"#000000","review_snippet_widget_lighter_text_color":"#7B7B7B","review_snippet_widget_slider_arrows_background_color":"#FFFFFF","review_snippet_widget_slider_arrows_color":"#000000","review_snippet_widget_star_color":"#108474","show_product_variant":false,"all_reviews_product_variant_label_text":"Variant: ","widget_show_verified_branding":true,"widget_ai_summary_title":"Customers say","widget_ai_summary_disclaimer":"Summarized and selected by AI from recent customer reviews","widget_show_ai_summary":false,"widget_show_ai_summary_bg":false,"write_review_button_visibility":"everyone","store_summary_widget_heading":"Customers rate this store","store_summary_widget_button_text":"View customer reviews","store_summary_widget_button_theme_text":"See AI reviews summary","widget_show_review_title_input":true,"widget_autofill_review_title":true,"redirect_reviewers_invited_via_email":"external_form","request_store_review_after_product_review":false,"request_review_other_products_in_order":false,"review_form_color_scheme":"default","review_form_corner_style":"square","review_form_star_color":"#108474","review_form_text_color":"#333333","review_form_background_color":"#ffffff","review_form_field_background_color":"#fafafa","review_form_button_color":"#108474","review_form_button_text_color":"#ffffff","review_form_modal_overlay_color":"#000000","review_form_theme":"multi_step","review_form_location":"in_store_popup","review_form_external_page_background_color":"#C5F7F0","review_content_screen_title_text":"How would you rate this product?","review_content_introduction_text":"We would love it if you would share a bit about your experience.","store_review_form_title_text":"How would you rate this store?","store_review_form_introduction_text":"We would love it if you would share a bit about your experience.","show_review_guidance_text":true,"one_star_review_guidance_text":"Poor","five_star_review_guidance_text":"Great","customer_information_screen_title_text":"About you","customer_information_introduction_text":"Please tell us more about you.","custom_questions_screen_title_text":"Your experience in more detail","custom_questions_introduction_text":"Here are a few questions to help us understand more about your experience.","review_submitted_screen_title_text":"Thanks for your review!","review_submitted_screen_thank_you_text":"We are processing it and it will appear on the store soon.","review_submitted_screen_email_verification_text":"Please confirm your email by clicking the link we just sent you. This helps us keep reviews authentic.","confirm_email_screen_title_text":"Confirm your email","confirm_email_screen_message_text":"To help keep reviews authentic, we'll send you a secure link to continue writing your review. It only takes a moment.","check_email_screen_title_text":"Check your email","check_email_screen_message_text":"We sent you an email to {{ email }}. Click the button on the email to continue.","check_email_screen_resend_message_text":"Email resent!","check_email_resend_hint_text":"Didn't get the email? Check your spam folder or [resend the email].","verification_email_rate_limit_error_text":"You've reached the limit for review attempts on this product. Please check your inbox or try again later.","review_submitted_request_store_review_text":"Would you like to share your experience of shopping with us?","review_submitted_review_other_products_text":"Would you like to review these products?","store_review_screen_title_text":"Would you like to share your experience of shopping with us?","store_review_introduction_text":"We value your feedback and use it to improve. Please share any thoughts or suggestions you have.","reviewer_media_screen_title_picture_text":"Share a picture","reviewer_media_introduction_picture_text":"Upload a photo to support your review.","reviewer_media_screen_title_video_text":"Share a video","reviewer_media_introduction_video_text":"Upload a video to support your review.","reviewer_media_screen_title_picture_or_video_text":"Share a picture or video","reviewer_media_introduction_picture_or_video_text":"Upload a photo or video to support your review.","reviewer_media_youtube_url_text":"Paste your Youtube URL here","advanced_settings_next_step_button_text":"Next","advanced_settings_close_review_button_text":"Close","modal_write_review_flow":false,"write_review_flow_required_text":"Required","write_review_flow_privacy_message_text":"We respect your privacy.","write_review_flow_anonymous_text":"Post review as anonymous","write_review_flow_visibility_text":"This won't be visible to other customers.","write_review_flow_multiple_selection_help_text":"Select as many as you like","write_review_flow_single_selection_help_text":"Select one option","write_review_flow_required_field_error_text":"This field is required","write_review_flow_invalid_email_error_text":"Please enter a valid email address","write_review_flow_max_length_error_text":"Max. {{ max_length }} characters.","write_review_flow_media_upload_text":"\u003cb\u003eClick to upload\u003c/b\u003e or drag and drop","write_review_flow_gdpr_statement":"We'll only contact you about your review if necessary. By submitting your review, you agree to our \u003ca href='https://judge.me/terms' target='_blank' rel='nofollow noopener'\u003eterms and conditions\u003c/a\u003e and \u003ca href='https://judge.me/privacy' target='_blank' rel='nofollow noopener'\u003eprivacy policy\u003c/a\u003e.","rating_only_reviews_enabled":false,"show_negative_reviews_help_screen":false,"new_review_flow_help_screen_rating_threshold":3,"negative_review_resolution_screen_title_text":"Tell us more","negative_review_resolution_text":"Your experience matters to us. If there were issues with your purchase, we're here to help. Feel free to reach out to us, we'd love the opportunity to make things right.","negative_review_resolution_button_text":"Contact us","negative_review_resolution_proceed_with_review_text":"Leave a review","negative_review_resolution_subject":"Issue with purchase from {{ shop_name }}.{{ order_name }}","coupon_promo_intro_any_review_text":"Write a review and get a coupon for {{ amount }} off your next purchase","coupon_promo_intro_with_photo_text":"Write a review and add a photo or video to get a coupon for {{ amount }} off your next purchase","coupon_promo_intro_with_video_text":"Write a review and add a video to get a coupon for {{ amount }} off your next purchase","coupon_promo_intro_up_to_any_review_text":"Write a review and get a coupon for up to {{ amount }} off your next purchase","coupon_promo_intro_up_to_with_photo_text":"Write a review and add a photo or video to get a coupon for up to {{ amount }} off your next purchase","coupon_promo_intro_external_text":"Write a review and get a reward for your next purchase","coupon_promo_intro_external_with_photo_text":"Write a review and add a photo or video to get a reward for your next purchase","coupon_promo_intro_external_with_video_text":"Write a review and add a video to get a reward for your next purchase","coupon_promo_media_photo_text":"Add a photo or video and get a coupon for {{ amount }} off your next purchase","coupon_promo_media_photo_only_text":"Add a photo and get a coupon for {{ amount }} off your next purchase","coupon_promo_media_video_text":"Add a video and get a coupon for {{ amount }} off your next purchase","coupon_promo_media_external_photo_text":"Add a photo or video and get a reward for your next purchase","coupon_promo_media_external_photo_only_text":"Add a photo and get a reward for your next purchase","coupon_promo_media_external_video_text":"Add a video and get a reward for your next purchase","coupon_promo_success_text":"You've got a coupon for your next purchase at {{ shop_name }}!","coupon_promo_success_subtext":"You'll receive your coupon email within the hour.","preview_badge_collection_page_install_status":false,"widget_review_custom_css":"","preview_badge_custom_css":"","preview_badge_stars_count":"5-stars","featured_carousel_custom_css":"","floating_tab_custom_css":"","all_reviews_widget_custom_css":"","medals_widget_custom_css":"","verified_badge_custom_css":"","all_reviews_text_custom_css":"","transparency_badges_collected_via_store_invite":false,"transparency_badges_from_another_provider":false,"transparency_badges_collected_from_store_visitor":false,"transparency_badges_collected_by_verified_review_provider":true,"transparency_badges_earned_reward":false,"transparency_badges_collected_via_store_invite_text":"Review collected via store invitation","transparency_badges_from_another_provider_text":"Review collected from another provider","transparency_badges_collected_from_store_visitor_text":"Review collected from a store visitor","transparency_badges_written_in_google_text":"Review written in Google","transparency_badges_written_in_etsy_text":"Review written in Etsy","transparency_badges_written_in_shop_app_text":"Review written in Shop App","transparency_badges_earned_reward_text":"Review earned a reward for future purchase","product_review_widget_per_page":10,"widget_other_languages_reviews_per_page":3,"widget_store_review_label_text":"Review about the store","widget_cart_mode_aggregate_heading_text":"Customers rate this store","widget_sort_by_text":"Sort by","checkout_comment_extension_title_on_product_page":"Customer Comments","checkout_comment_extension_num_latest_comment_show":5,"checkout_comment_extension_format":"name_and_timestamp","checkout_comment_customer_name":"last_initial","checkout_comment_comment_notification":true,"preview_badge_collection_page_install_preference":false,"preview_badge_home_page_install_preference":false,"preview_badge_product_page_install_preference":false,"review_widget_install_preference":"","review_carousel_install_preference":false,"floating_reviews_tab_install_preference":"none","verified_reviews_count_badge_install_preference":false,"all_reviews_text_install_preference":false,"review_widget_best_location":false,"judgeme_medals_install_preference":false,"review_widget_revamp_enabled":false,"review_widget_qna_enabled":false,"review_widget_header_theme":"minimal","review_widget_widget_title_enabled":true,"review_widget_header_text_size":"medium","review_widget_header_text_weight":"regular","review_widget_average_rating_style":"compact","review_widget_bar_chart_enabled":true,"review_widget_bar_chart_type":"numbers","review_widget_bar_chart_style":"standard","review_widget_expanded_media_gallery_enabled":false,"review_widget_show_review_highlights":false,"review_widget_show_review_keywords_in_gray":false,"review_widget_reviews_section_theme":"standard","review_widget_image_style":"thumbnails","review_widget_review_image_ratio":"square","review_widget_stars_size":"medium","review_widget_verified_badge":"standard_text","review_widget_review_title_text_size":"medium","review_widget_review_text_size":"medium","review_widget_review_text_length":"medium","review_widget_number_of_columns_desktop":3,"review_widget_carousel_transition_speed":5,"review_widget_custom_questions_answers_display":"always","review_widget_card_section_size":"small","review_widget_button_text_color":"#FFFFFF","review_widget_text_color":"#000000","review_widget_lighter_text_color":"#7B7B7B","review_widget_corner_styling":"soft","review_widget_review_word_singular":"review","review_widget_review_word_plural":"reviews","review_widget_voting_label":"Helpful?","review_widget_shop_reply_label":"Reply from {{ shop_name }}:","review_widget_filters_title":"Filters","review_widget_filter_rating_title":"Rating","review_widget_filter_keyword_title":"Keyword","review_widget_clear_filters_text":"Clear filters","review_widget_expand_more_text":"More","review_widget_review_highlights_title":"Review highlights","qna_widget_question_word_singular":"Question","qna_widget_question_word_plural":"Questions","qna_widget_answer_reply_label":"Answer from {{ answerer_name }}:","qna_content_screen_title_text":"Ask a question about this product","qna_widget_question_required_field_error_text":"Please enter your question.","qna_widget_flow_gdpr_statement":"We'll only contact you about your question if necessary. By submitting your question, you agree to our \u003ca href='https://judge.me/terms' target='_blank' rel='nofollow noopener'\u003eterms and conditions\u003c/a\u003e and \u003ca href='https://judge.me/privacy' target='_blank' rel='nofollow noopener'\u003eprivacy policy\u003c/a\u003e.","qna_widget_question_submitted_text":"Thanks for your question!","qna_widget_close_form_text_question":"Close","qna_widget_question_submit_success_text":"We’ll notify you by email when your question is answered.","all_reviews_widget_v2025_enabled":false,"all_reviews_widget_v2025_header_theme":"default","all_reviews_widget_v2025_widget_title_enabled":true,"all_reviews_widget_v2025_header_text_size":"medium","all_reviews_widget_v2025_header_text_weight":"regular","all_reviews_widget_v2025_average_rating_style":"compact","all_reviews_widget_v2025_bar_chart_enabled":true,"all_reviews_widget_v2025_bar_chart_type":"numbers","all_reviews_widget_v2025_bar_chart_style":"standard","all_reviews_widget_v2025_expanded_media_gallery_enabled":false,"all_reviews_widget_v2025_show_store_medals":true,"all_reviews_widget_v2025_show_photo_gallery":true,"all_reviews_widget_v2025_show_review_keywords":false,"all_reviews_widget_v2025_show_ai_summary":false,"all_reviews_widget_v2025_show_ai_summary_bg":false,"all_reviews_widget_v2025_show_review_highlights":false,"all_reviews_widget_v2025_show_review_keywords_in_gray":false,"all_reviews_widget_v2025_add_search_bar":false,"all_reviews_widget_v2025_default_sort_method":"most-recent","all_reviews_widget_v2025_reviews_per_page":10,"all_reviews_widget_v2025_reviews_section_theme":"default","all_reviews_widget_v2025_image_style":"thumbnails","all_reviews_widget_v2025_review_image_ratio":"square","all_reviews_widget_v2025_stars_size":"medium","all_reviews_widget_v2025_verified_badge":"standard_text","all_reviews_widget_v2025_review_title_text_size":"medium","all_reviews_widget_v2025_review_text_size":"medium","all_reviews_widget_v2025_review_text_length":"medium","all_reviews_widget_v2025_number_of_columns_desktop":3,"all_reviews_widget_v2025_carousel_transition_speed":5,"all_reviews_widget_v2025_custom_questions_answers_display":"always","all_reviews_widget_v2025_review_dates":false,"all_reviews_widget_v2025_card_section_size":"small","all_reviews_widget_v2025_show_product_variant":false,"all_reviews_widget_v2025_show_reviewer_avatar":true,"all_reviews_widget_v2025_reviewer_name_as_initial":"","all_reviews_widget_v2025_review_location_show":false,"all_reviews_widget_v2025_location_format":"","all_reviews_widget_v2025_show_country_flag":false,"all_reviews_widget_v2025_widget_thumb":false,"all_reviews_widget_v2025_verified_by_shop_badge_style":"light","all_reviews_widget_v2025_social_share":false,"all_reviews_widget_v2025_social_share_options_order":"Facebook,Twitter,LinkedIn,Pinterest","all_reviews_widget_v2025_pagination_type":"standard","all_reviews_widget_v2025_button_text_color":"#FFFFFF","all_reviews_widget_v2025_text_color":"#000000","all_reviews_widget_v2025_lighter_text_color":"#7B7B7B","all_reviews_widget_v2025_corner_styling":"soft","all_reviews_widget_v2025_title":"Customer reviews","all_reviews_widget_v2025_ai_summary_title":"Customers say about this store","all_reviews_widget_v2025_no_review_text":"Be the first to write a review","all_reviews_widget_v2025_review_highlights_title":"Review highlights","reviews_grid_widget_show_sample_reviews":false,"reviews_grid_widget_review_selection":"all","reviews_grid_widget_select_products":[],"reviews_grid_widget_show_media_only":false,"reviews_grid_widget_display_order":"media_first","reviews_grid_widget_card_grouping":"per_media","reviews_grid_widget_columns_desktop":3,"reviews_grid_widget_rows_desktop":3,"reviews_grid_widget_columns_mobile":2,"reviews_grid_widget_rows_mobile":6,"reviews_grid_widget_show_stars":true,"reviews_grid_widget_show_reviewer_name":true,"reviews_grid_widget_show_review_title_on_hover_desktop":true,"reviews_grid_widget_corner_styling":"soft","reviews_grid_widget_card_spacing":"medium","reviews_grid_widget_header_text_color":"#000000","reviews_grid_widget_star_and_reviewer_name_color":"#F9F9F9","reviews_grid_widget_overlay_and_background_color":"#000000","reviews_grid_widget_content_color":"#F9F9F9","reviews_grid_widget_header_text":"From our customers","reviews_grid_widget_show_average_rating":true,"trust_badge_enabled":false,"trust_badge_structure":"outline","trust_badge_color":"black","trust_badge_star":"black","trust_badge_rating_display_default":"show_avg_text","platform":"shopify","branding_url":"https://app.judge.me/reviews","branding_text":"Powered by Judge.me","locale":"en","reply_name":"Sillhouete","shop_currency":"PKR","widget_version":"3.0","footer":true,"autopublish":true,"review_dates":true,"enable_custom_form":false,"shop_locale":"en","enable_multi_locales_translations":false,"show_review_title_input":true,"autofill_review_title":true,"review_verification_email_status":"always","require_verification_before_submit":false,"sign_in_with_shop_enabled":false,"customer_account_validation_enabled":true,"most_relevant_sort_enabled":false,"widget_events_v4_impressions_enabled":false,"widget_events_review_grain_enabled":false,"widget_events_v4_time_in_view_enabled":false,"widget_events_v4_session_key_enabled":false,"widget_events_v4_interactions_enabled":false,"widget_attribution_exposure_timestamps_enabled":false,"widget_attribution_v4_exposures_enabled":false,"coupon_promo_invited_eligible":true,"coupon_promo_web_eligible":false,"uses_coupon_integration":false,"uses_external_coupon":false,"hostname_allowlist":"","can_be_branded":false,"rtl_stars_enabled_ar":true,"rtl_stars_enabled_he":true,"reply_name_text":"Sillhouete"};</script> <style class="jdgm-settings-style">.jdgm-xx{left:0}:root{--jdgm-primary-color: #108474;--jdgm-secondary-color: rgba(16,132,116,0.1);--jdgm-star-color: #108474;--jdgm-write-review-text-color: white;--jdgm-write-review-bg-color: #108474;--jdgm-paginate-color: #108474;--jdgm-border-radius: 0;--jdgm-reviewer-name-color: #108474}.jdgm-histogram__bar-content{background-color:#108474}.jdgm-rev[data-verified-buyer=true] .jdgm-rev__icon.jdgm-rev__icon:after,.jdgm-rev__buyer-badge.jdgm-rev__buyer-badge{color:white;background-color:#108474}.jdgm-review-widget--small .jdgm-gallery.jdgm-gallery .jdgm-gallery__thumbnail-link:nth-child(8) .jdgm-gallery__thumbnail-wrapper.jdgm-gallery__thumbnail-wrapper:before{content:"See more"}@media only screen and (min-width: 768px){.jdgm-gallery.jdgm-gallery .jdgm-gallery__thumbnail-link:nth-child(8) .jdgm-gallery__thumbnail-wrapper.jdgm-gallery__thumbnail-wrapper:before{content:"See more"}}.jdgm-prev-badge[data-average-rating='0.00']{display:none !important}.jdgm-author-all-initials{display:none !important}.jdgm-author-last-initial{display:none !important}.jdgm-rev-widg__title{visibility:hidden}.jdgm-rev-widg__summary-text{visibility:hidden}.jdgm-prev-badge__text{visibility:hidden}.jdgm-rev__prod-link-prefix:before{content:'about'}.jdgm-rev__variant-label:before{content:'Variant: '}.jdgm-rev__out-of-store-text:before{content:'(out of store)'}@media only screen and (min-width: 768px){.jdgm-rev__pics .jdgm-rev_all-rev-page-picture-separator,.jdgm-rev__pics .jdgm-rev__product-picture{display:none}}@media only screen and (max-width: 768px){.jdgm-rev__pics .jdgm-rev_all-rev-page-picture-separator,.jdgm-rev__pics .jdgm-rev__product-picture{display:none}}.jdgm-preview-badge[data-template="product"]{display:none !important}.jdgm-preview-badge[data-template="collection"]{display:none !important}.jdgm-preview-badge[data-template="index"]{display:none !important}.jdgm-review-widget[data-from-snippet="true"]{display:none !important}.jdgm-verified-count-badget[data-from-snippet="true"]{display:none !important}.jdgm-carousel-wrapper[data-from-snippet="true"]{display:none !important}.jdgm-all-reviews-text[data-from-snippet="true"]{display:none !important}.jdgm-medals-section[data-from-snippet="true"]{display:none !important}.jdgm-ugc-media-wrapper[data-from-snippet="true"]{display:none !important}.jdgm-rev__transparency-badge[data-badge-type="review_collected_via_store_invitation"]{display:none !important}.jdgm-rev__transparency-badge[data-badge-type="review_collected_from_another_provider"]{display:none !important}.jdgm-rev__transparency-badge[data-badge-type="review_collected_from_store_visitor"]{display:none !important}.jdgm-rev__transparency-badge[data-badge-type="review_earned_for_future_purchase"]{display:none !important}.jdgm-review-snippet-widget{--jdgm-snippet-card-color: #fff;--jdgm-snippet-text-color: #000;--jdgm-snippet-lighter-text-color: #7B7B7B;--jdgm-snippet-star-color: #108474;--jdgm-snippet-border-radius: 8px;--jdgm-snippet-arrows-bg-color: #fff;--jdgm-snippet-arrows-color: #000}.jdgm-review-snippet-widget .jdgm-rev-snippet-widget__cards-container .jdgm-rev-snippet-card{border-radius:8px;background:#fff}.jdgm-review-snippet-widget .jdgm-rev-snippet-widget__cards-container .jdgm-rev-snippet-card__rev-rating .jdgm-star{color:#108474}.jdgm-review-snippet-widget .jdgm-rev-snippet-widget__prev-btn,.jdgm-review-snippet-widget .jdgm-rev-snippet-widget__next-btn{border-radius:50%;background:#fff}.jdgm-review-snippet-widget .jdgm-rev-snippet-widget__prev-btn>svg,.jdgm-review-snippet-widget .jdgm-rev-snippet-widget__next-btn>svg{fill:#000}.jdgm-full-rev-modal.rev-snippet-widget .jm-mfp-container .jm-mfp-content,.jdgm-full-rev-modal.rev-snippet-widget .jm-mfp-container .jdgm-full-rev__icon,.jdgm-full-rev-modal.rev-snippet-widget .jm-mfp-container .jdgm-full-rev__pic-img,.jdgm-full-rev-modal.rev-snippet-widget .jm-mfp-container .jdgm-full-rev__reply{border-radius:8px}.jdgm-full-rev-modal.rev-snippet-widget .jm-mfp-container .jdgm-full-rev[data-verified-buyer="true"] .jdgm-full-rev__icon::after{border-radius:8px}.jdgm-full-rev-modal.rev-snippet-widget .jm-mfp-container .jdgm-full-rev .jdgm-rev__buyer-badge{border-radius:calc( 8px / 2 )}.jdgm-full-rev-modal.rev-snippet-widget .jm-mfp-container .jdgm-full-rev .jdgm-full-rev__replier::before{content:'Sillhouete'}.jdgm-full-rev-modal.rev-snippet-widget .jm-mfp-container .jdgm-full-rev .jdgm-full-rev__product-button{border-radius:calc( 8px * 6 )}
+</style> <style class="jdgm-settings-style"></style>
+
+  
+  
+  
+  <style class="jdgm-miracle-styles">
+  @-webkit-keyframes jdgm-spin{0%{-webkit-transform:rotate(0deg);-ms-transform:rotate(0deg);transform:rotate(0deg)}100%{-webkit-transform:rotate(359deg);-ms-transform:rotate(359deg);transform:rotate(359deg)}}@keyframes jdgm-spin{0%{-webkit-transform:rotate(0deg);-ms-transform:rotate(0deg);transform:rotate(0deg)}100%{-webkit-transform:rotate(359deg);-ms-transform:rotate(359deg);transform:rotate(359deg)}}@font-face{font-family:'JudgemeStar';src:url("data:application/x-font-woff;charset=utf-8;base64,d09GRgABAAAAAAScAA0AAAAABrAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABGRlRNAAAEgAAAABoAAAAcbyQ+3kdERUYAAARgAAAAHgAAACAAMwAGT1MvMgAAAZgAAABGAAAAVi+vS9xjbWFwAAAB8AAAAEAAAAFKwBMjvmdhc3AAAARYAAAACAAAAAj//wADZ2x5ZgAAAkAAAAEJAAABdH33LXtoZWFkAAABMAAAAC0AAAA2BroQKWhoZWEAAAFgAAAAHAAAACQD5QHQaG10eAAAAeAAAAAPAAAAFAYAAABsb2NhAAACMAAAAA4AAAAOAO4AeG1heHAAAAF8AAAAHAAAACAASgAvbmFtZQAAA0wAAADeAAABkorWfVZwb3N0AAAELAAAACkAAABEp3ubLXgBY2BkYADhPPP4OfH8Nl8ZuJkYQODS2fRrCPr/aSYGxq1ALgcDWBoAO60LkwAAAHgBY2BkYGDc+v80gx4TAwgASaAICmABAFB+Arl4AWNgZGBgYGPQYWBiAAIwyQgWc2AAAwAHVQB6eAFjYGRiYJzAwMrAwejDmMbAwOAOpb8ySDK0MDAwMbByMsCBAAMCBKS5pjA4PGB4wMR44P8BBj3GrQymQGFGkBwAjtgK/gAAeAFjYoAAEA1jAwAAZAAHAHgB3crBCcAwDEPRZydkih567CDdf4ZskmLwFBV8xBfCaC4BXkOUmx4sU0h2ngNb9V0vQCxaRKIAevT7fGWuBrEAAAAAAAAAAAA0AHgAugAAeAF9z79Kw1AUx/FzTm7un6QmJtwmQ5Bg1abgEGr/BAqlU6Gju+Cgg1MkQ/sA7Vj7BOnmO/gUvo2Lo14NqIO6/IazfD8HEODtmQCfoANwNsyp2/GJt3WKQrd1NLiYYWx2PBqOsmJMEOznPOTzfSCrhAtbbLdmeFLJV9eKd63WLrZcIcuaEVdssWCKM6pLCfTVOYbz/0pNSMSZKLIZpvh78sAUH6PlMrreTCabP9r+Z/puPZ2ur/RqpQHgh+MIegCnXeM4MRAPjYN//5tj4ZtTjkFqEdmeMShlEJ7tVAly2TAkx6R68Fl4E/aVvn8JqHFQ4JS1434gXKcuL31dDhzs3YbsEOAd/IU88gAAAHgBfY4xTgMxEEVfkk0AgRCioKFxQYd2ZRtpixxgRU2RfhU5q5VWseQ4JdfgAJyBlmNwAM7ABRhZQ0ORwp7nr+eZAa54YwYg9zm3ynPOeFRe8MCrciXOh/KSS76UV5L/iDmrLiS5AeU519wrL3jmSbkS5115yR2fyivJv9kx0ZMZ2RLZw27q87iNQi8EBo5FSPIMw3HqBboi5lKTGAGDp8FKXWP+t9TU01Lj5His1Ba6uM9dTEMwvrFmbf5GC/q2drW3ruXUhhsCiQOjznFlCzYhHUZp4xp76vsvQh89CQAAeAFjYGJABowM6IANLMrEyMTIzMjCXpyRWJBqZshWXJJYBKOMAFHFBucAAAAAAAAB//8AAngBY2BkYGDgA2IJBhBgAvKZGViBJAuYxwAABJsAOgAAeAFjYGBgZACCk535hiD60tn0azAaAEqpB6wAAA==") format("woff");font-weight:normal;font-style:normal}.jdgm-star{font-family:'JudgemeStar';display:inline !important;text-decoration:none !important;padding:0 4px 0 0 !important;margin:0 !important;font-weight:bold;opacity:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.jdgm-star:hover{opacity:1}.jdgm-star:last-of-type{padding:0 !important}.jdgm-star.jdgm--on:before{content:"\e000"}.jdgm-star.jdgm--off:before{content:"\e001"}.jdgm-star.jdgm--half:before{content:"\e002"}.jdgm-widget *{margin:0;line-height:1.4;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;-webkit-overflow-scrolling:touch}.jdgm-hidden{display:none !important;visibility:hidden !important}.jdgm-temp-hidden{display:none}.jdgm-spinner{width:40px;height:40px;margin:auto;border-radius:50%;border-top:2px solid #eee;border-right:2px solid #eee;border-bottom:2px solid #eee;border-left:2px solid #ccc;-webkit-animation:jdgm-spin 0.8s infinite linear;animation:jdgm-spin 0.8s infinite linear}.jdgm-spinner:empty{display:block}.jdgm-prev-badge{display:block !important}
+
+</style>
+
+
+  
+  
+   
+
+
+
+<script data-cfasync="false" class="jdgm-script">
+!function(e){window.jdgm=window.jdgm||{};
+/* INF-1976 */
+var _jdgmBlocked=function(){var raw=(window.jdgmSettings||{}).hostname_allowlist;var list=(raw==null?"":""+raw).split(/[\s,]+/).map(function(h){return h.trim().toLowerCase().replace(/\.$/,"");}).filter(function(h){return h;});if(!list.length)return false;var host=(e.location.hostname||"").toLowerCase().replace(/\.$/,"");if(/(^|\.)shopifypreview\.com$/.test(host))return false;var bare=host.replace(/^www\./,"");for(var i=0;i<list.length;i++){var en=list[i];if(en.indexOf("*.")===0){var b=en.slice(2);if(host===b||host.slice(-(b.length+1))==="."+b)return false;}else if(bare===en.replace(/^www\./,""))return false;}return true;}();
+if(_jdgmBlocked){jdgm._loaderExecuted=true;jdgm._blocked=true;var _jdgmS=e.createElement("style");_jdgmS.textContent='[class^="jdgm-"],[class*=" jdgm-"]{display:none !important}';(e.head||e.documentElement).appendChild(_jdgmS);return;}
+jdgm.CDN_HOST="https://cdnwidget.judge.me/",jdgm.CDN_HOST_ALT="https://cdn2.judge.me/cdn/widget_frontend/",jdgm.API_HOST="https://api.judge.me/",jdgm.CDN_BASE_URL="https://cdn.shopify.com/extensions/01a158f9-49f7-7b53-a14d-47b9e9b81f0c/judgeme-797/assets/",jdgm.CDN_API_HOST="https://cdn.judge.me/",
+jdgm.docReady=function(d){(e.attachEvent?"complete"===e.readyState:"loading"!==e.readyState)?
+setTimeout(d,0):e.addEventListener("DOMContentLoaded",d)},jdgm.loadCSS=function(d,t,o,a){
+!o&&jdgm.loadCSS.requestedUrls.indexOf(d)>=0||(jdgm.loadCSS.requestedUrls.push(d),
+(a=e.createElement("link")).rel="stylesheet",a.class="jdgm-stylesheet",a.media="nope!",
+a.href=d,a.onload=function(){this.media="all",t&&setTimeout(t)},e.body.appendChild(a))},
+jdgm.loadCSS.requestedUrls=[],jdgm.loadJS=function(e,d){var t=new XMLHttpRequest;
+t.onreadystatechange=function(){4===t.readyState&&t.status>=200&&t.status<300&&(Function(t.response)(),d&&d(t.response))},
+t.open("GET",e),t.onerror=function(){if(e.indexOf(jdgm.CDN_HOST)===0&&jdgm.CDN_HOST_ALT!==jdgm.CDN_HOST){var f=e.replace(jdgm.CDN_HOST,jdgm.CDN_HOST_ALT);jdgm.loadJS(f,d)}},t.send()},jdgm.docReady((function(){(window.jdgmLoadCSS||e.querySelectorAll(
+".jdgm-widget, .jdgm-all-reviews-page").length>0)&&(jdgmSettings.widget_load_with_code_splitting?
+parseFloat(jdgmSettings.widget_version)>=3?jdgm.loadCSS(jdgm.CDN_BASE_URL+"widget_v3_base.css"):
+jdgm.loadCSS(jdgm.CDN_BASE_URL+"widget_base.css"):jdgm.loadCSS(jdgm.CDN_BASE_URL+"shopify_v2.css")
+)}))}(document);
+</script>
+<noscript><link rel="stylesheet" type="text/css" media="all" href="https://cdn.shopify.com/extensions/01a158f9-49f7-7b53-a14d-47b9e9b81f0c/judgeme-797/assets/shopify_v2.css"></noscript>
+
+<!-- BEGIN app snippet: theme_fix_tags -->
+<script>
+  (function() {
+    var jdgmThemeFixes = null;
+    if (!jdgmThemeFixes) return;
+
+    // "All themes" fix: CSS and JS applied on every theme. CSS is injected
+    // before the per-theme fix so the theme-specific CSS wins the cascade.
+    // HTML is never applied globally (too risky).
+    var allThemesFix = jdgmThemeFixes['all'];
+    if (allThemesFix && allThemesFix.css) {
+      var allStyleTag = document.createElement('style');
+      allStyleTag.classList.add('jdgm-theme-fix-style-all');
+      allStyleTag.innerHTML = allThemesFix.css;
+      document.head.append(allStyleTag);
+    };
+
+    if (allThemesFix && allThemesFix.js) {
+      var allScriptTag = document.createElement('script');
+      allScriptTag.classList.add('jdgm-theme-fix-script-all');
+      allScriptTag.innerHTML = allThemesFix.js;
+      document.head.append(allScriptTag);
+    };
+
+    var thisThemeFix = jdgmThemeFixes[Shopify.theme.id];
+    if (!thisThemeFix) return;
+
+    if (thisThemeFix.html) {
+      document.addEventListener("DOMContentLoaded", function() {
+        var htmlDiv = document.createElement('div');
+        htmlDiv.classList.add('jdgm-theme-fix-html');
+        htmlDiv.innerHTML = thisThemeFix.html;
+        document.body.append(htmlDiv);
+      });
+    };
+
+    if (thisThemeFix.css) {
+      var styleTag = document.createElement('style');
+      styleTag.classList.add('jdgm-theme-fix-style');
+      styleTag.innerHTML = thisThemeFix.css;
+      document.head.append(styleTag);
+    };
+
+    if (thisThemeFix.js) {
+      var scriptTag = document.createElement('script');
+      scriptTag.classList.add('jdgm-theme-fix-script');
+      scriptTag.innerHTML = thisThemeFix.js;
+      document.head.append(scriptTag);
+    };
+  })();
+</script>
+<!-- END app snippet -->
+<!-- End of Judge.me Core -->
+
+
+
+<!-- END app block --><script src="https://cdn.shopify.com/extensions/019a15d4-71d4-7279-8062-f2f76f98d8e1/musbu-49/assets/cx_whatsapp_button.js" type="text/javascript" defer="defer"></script>
+<link href="https://cdn.shopify.com/extensions/019a15d4-71d4-7279-8062-f2f76f98d8e1/musbu-49/assets/musbu-chat-support.css" rel="stylesheet" type="text/css" media="all">
+<script src="https://cdn.shopify.com/extensions/01a14367-87c7-7482-a03a-930c8d431e1c/bucks-currency-converter-33/assets/widgetLoader.js" type="text/javascript" defer="defer"></script>
+<script src="https://cdn.shopify.com/extensions/01a158f9-49f7-7b53-a14d-47b9e9b81f0c/judgeme-797/assets/loader.js" type="text/javascript" defer="defer"></script>
+<link href="https://monorail-edge.shopifysvc.com" rel="dns-prefetch">
+<script>(function(){if ("sendBeacon" in navigator && "performance" in window) {try {var session_token_from_headers = performance.getEntriesByType('navigation')[0].serverTiming.find(x => x.name == '_s').description;} catch {var session_token_from_headers = undefined;}var session_cookie_matches = document.cookie.match(/_shopify_s=([^;]*)/);var session_token_from_cookie = session_cookie_matches && session_cookie_matches.length === 2 ? session_cookie_matches[1] : "";var session_token = session_token_from_headers || session_token_from_cookie || "";function handle_abandonment_event(e) {var entries = performance.getEntries().filter(function(entry) {return /monorail-edge.shopifysvc.com/.test(entry.name);});if (!window.abandonment_tracked && entries.length === 0) {window.abandonment_tracked = true;var currentMs = Date.now();var navigation_start = performance.timing.navigationStart;var payload = {shop_id: 70977552627,url: window.location.href,navigation_start,duration: currentMs - navigation_start,session_token,page_type: "collection"};window.navigator.sendBeacon("https://monorail-edge.shopifysvc.com/v1/produce", JSON.stringify({schema_id: "online_store_buyer_site_abandonment/1.1",payload: payload,metadata: {event_created_at_ms: currentMs,event_sent_at_ms: currentMs}}));}}window.addEventListener('pagehide', handle_abandonment_event);}}());</script>
+<script>
+  window.__TREKKIE_SHIM_QUEUE = window.__TREKKIE_SHIM_QUEUE || [];
+</script>
+<script>(function(){var wpmLoader=function(){"use strict";var e=/Googlebot|Storebot-Google|bingbot|Baiduspider|YandexBot|DuckDuckBot|Slurp|facebookexternalhit|Twitterbot|LinkedInBot|Applebot|AdsBot-Google|Mediapartners-Google|APIs-Google|PetalBot|SemrushBot|AhrefsBot|MJ12bot|DotBot|Acunetix|PerplexityBot|Perplexity-User/i,t=/bytedance/i;function i(){try{var e=document.cookie;if(!e||"string"!=typeof e)return;for(var t=0,i=e.split(";");t<i.length;t++){var n=i[t],r=n.indexOf("=");if(-1!==r){var o=n.slice(0,r).trim();if(o){var a=void 0;try{a=decodeURIComponent(o)}catch(e){a=o}if("_shopify_s"===a){var d=n.slice(r+1).trim();try{return decodeURIComponent(d)}catch(e){return d}}}}}return}catch(e){return}}function n(e){try{"undefined"!=typeof console&&"function"==typeof console.warn&&console.warn(e)}catch(e){}}function r(e,t){return"string"==typeof e&&e.length>0&&e.length<=t?e:void 0}function o(e){var t;switch(null==(t=null==e?void 0:e.navigation)?void 0:t.type){case 0:return"navigate";case 1:return"reload";case 2:return"back_forward";default:return}}function a(){var e,t,i;try{var n=null==(i=null==(t=null==(e=self.ShopifyAnalytics)?void 0:e.lib)?void 0:t.trekkie)?void 0:i.state;return"awaiting-consent"===n||"initialized"===n?n:void 0}catch(e){return}}return function(d,s,u,l){var c=arguments.length>4&&void 0!==arguments[4]?arguments[4]:{};try{var p=c.trekkieShim;!0!==p&&"true"!==p||null!=window.__TREKKIE_SHIM_QUEUE||(window.__TREKKIE_SHIM_QUEUE=[])}catch(e){}var f,v,h,y,g=(v=(f={modern:/Edge?\/(1{2}[4-9]|1[2-9]\d|[2-9]\d{2}|\d{4,})\.\d+(\.\d+|)|Firefox\/(1{2}[4-9]|1[2-9]\d|[2-9]\d{2}|\d{4,})\.\d+(\.\d+|)|Chrom(ium|e)\/(9{2}|\d{3,})\.\d+(\.\d+|)|(Maci|X1{2}).+ Version\/(15\.\d+|(1[6-9]|[2-9]\d|\d{3,})\.\d+)([,.]\d+|)( \(\w+\)|)( Mobile\/\w+|) Safari\/|Chrome.+OPR\/(9{2}|\d{3,})\.\d+\.\d+|(CPU[ +]OS|iPhone[ +]OS|CPU[ +]iPhone|CPU IPhone OS|CPU iPad OS)[ +]+(15[._]\d+|(1[6-9]|[2-9]\d|\d{3,})[._]\d+)([._]\d+|)|Android:?[ /-](14[89]|1[5-9]\d|[2-9]\d{2}|\d{4,})(\.\d+|)(\.\d+|)|Android.+Firefox\/(15\d|1[6-9]\d|[2-9]\d{2}|\d{4,})\.\d+(\.\d+|)|Android.+Chrom(ium|e)\/(14[89]|1[5-9]\d|[2-9]\d{2}|\d{4,})\.\d+(\.\d+|)|SamsungBrowser\/([2-9]\d|\d{3,})\.\d+/,legacy:/Edge?\/(1[6-9]|[2-9]\d|\d{3,})\.\d+(\.\d+|)|Firefox\/(5[4-9]|[6-9]\d|\d{3,})\.\d+(\.\d+|)|Chrom(ium|e)\/(5[1-9]|[6-9]\d|\d{3,})\.\d+(\.\d+|)([\d.]+$|.*Safari\/(?![\d.]+ Edge\/[\d.]+$))|(Maci|X1{2}).+ Version\/(10\.\d+|(1[1-9]|[2-9]\d|\d{3,})\.\d+)([,.]\d+|)( \(\w+\)|)( Mobile\/\w+|) Safari\/|Chrome.+OPR\/(3[89]|[4-9]\d|\d{3,})\.\d+\.\d+|(CPU[ +]OS|iPhone[ +]OS|CPU[ +]iPhone|CPU IPhone OS|CPU iPad OS)[ +]+(10[._]\d+|(1[1-9]|[2-9]\d|\d{3,})[._]\d+)([._]\d+|)|Android:?[ /-](14[89]|1[5-9]\d|[2-9]\d{2}|\d{4,})(\.\d+|)(\.\d+|)|Mobile Safari.+OPR\/([89]\d|\d{3,})\.\d+\.\d+|Android.+Firefox\/(15\d|1[6-9]\d|[2-9]\d{2}|\d{4,})\.\d+(\.\d+|)|Android.+Chrom(ium|e)\/(14[89]|1[5-9]\d|[2-9]\d{2}|\d{4,})\.\d+(\.\d+|)|Android.+(UC? ?Browser|UCWEB|U3)[ /]?(15\.([5-9]|\d{2,})|(1[6-9]|[2-9]\d|\d{3,})\.\d+)\.\d+|SamsungBrowser\/(5\.\d+|([6-9]|\d{2,})\.\d+)|Android.+MQ{2}Browser\/(14(\.(9|\d{2,})|)|(1[5-9]|[2-9]\d|\d{3,})(\.\d+|))(\.\d+|)|K[Aa][Ii]OS\/(3\.\d+|([4-9]|\d{2,})\.\d+)(\.\d+|)/}).modern,h=f.legacy,(y=navigator.userAgent).match(e)?"bot":y.match(v)?"modern":y.match(h)?"legacy":y.match(t)?"bot":"unknown"),m=function(e){var t,i,n=r(e,128);try{var a=window.performance,d=null==(t=null==a?void 0:a.getEntriesByType)?void 0:t.call(a,"navigation")[0];if(!d)return{requestId:n,navigationType:o(a)};var s="type"in d?r(d.type,64):void 0,u="serverTiming"in d&&Array.isArray(d.serverTiming)?d.serverTiming:[];return{requestId:null!=n?n:r(null==(i=u.find(function(e){return"requestID"===e.name}))?void 0:i.description,128),navigationType:s}}catch(e){return{requestId:n}}}(c.requestId),w=function(e){var t=e.version,r=e.browserTarget,o=e.surface,a=e.shopId,d=e.monorailEndpoint,s=window.location.href;return{emit:function(e){var u=e.status,l=e.errorMsg,c=e.failureReason,p=e.useKeepaliveFallback,f=void 0!==p&&p,v=e.navigationType,h=e.pagehidePersisted,y=e.requestId,g=e.trekkieState;if(d){var m,w;try{var b=(new Date).getTime();m=JSON.stringify({metadata:{event_sent_at_ms:b},events:[{schema_id:"web_pixels_manager_load/3.3",payload:{version:t,bundle_target:r,page_url:s,status:u,surface:o,error_msg:l,failure_reason:c,navigation_type:v,pagehide_persisted:h,request_id:y,trekkie_state:g,shop_id:a,visit_token:i()},metadata:{event_created_at_ms:b}}]})}catch(e){return}try{if("function"==typeof window.navigator.sendBeacon&&-1===(w=window.navigator.userAgent).indexOf("iPhone; CPU iPhone OS 12_")&&-1===w.indexOf("iPad; CPU OS 12_")&&-1===w.indexOf("iPod touch; CPU iPhone OS 12_")&&window.navigator.sendBeacon.bind(window.navigator)(d,m))return}catch(e){}if(f)try{"function"==typeof window.fetch&&window.fetch(d,{method:"POST",headers:{"Content-Type":"text/plain"},body:m,keepalive:!0}).catch(function(){})}catch(e){}else try{var _=new XMLHttpRequest;_.open("POST",d,!0),_.setRequestHeader("Content-Type","text/plain"),_.send(m)}catch(e){n("[Web Pixels Manager] Got an unhandled error while logging to Monorail.")}}else n("[Web Pixels Manager] No Monorail endpoint provided, skipping logging.")}}}({version:u,browserTarget:g,surface:d.surface,shopId:d.shopId,monorailEndpoint:d.monorailEndpoint});if(Boolean(null==(_=null==(b=window.Shopify)?void 0:b.analytics)?void 0:_.replayQueue))w.emit({status:"setup-skipped",errorMsg:"replay queue already initialized."});else{var b,_;w.emit({status:"setup-started"}),window.Shopify=window.Shopify||{};var S=window.Shopify;S.analytics=S.analytics||{};var P=S.analytics;P.replayQueue=[],P.publish=function(e,t,i){return P.replayQueue.push([e,t,i]),!0};try{self.performance.mark("wpm:start")}catch(e){}var k,C="modern"===g?"modern":"legacy",E=(null!=l?l:{modern:"",legacy:""})[C],I=[(k={baseUrl:s,hashVersion:u,buildTarget:C}).baseUrl,"/wpm","/b",k.hashVersion,"modern"===k.buildTarget?"m":"l",".js"].join(""),O=!1,T=!1;try{c.browserTarget=g,function(){O=!0;try{window.addEventListener("pagehide",M)}catch(e){O=!1}}(),R(function(){try{R(x)}catch(e){D(e)}}),w.emit({status:"loading",requestId:m.requestId,navigationType:m.navigationType,trekkieState:a()})}catch(e){D(e)}}function U(){var e;if(q(),!function(){var e,t;return Boolean(null==(t=null==(e=window.Shopify)?void 0:e.analytics)?void 0:t.initialized)}()){var t,i,n;try{if("function"!=typeof(null==(e=window.webPixelsManager)?void 0:e.init))return void A();if(!(null!==(n=i=t=window.webPixelsManager.init(d))&&"function"!=typeof n&&Object(n)===n&&"publish"in i&&"function"==typeof i.publish&&"publishCustomEvent"in i&&"function"==typeof i.publishCustomEvent&&"visitor"in i&&"function"==typeof i.visitor))return void A()}catch(e){return void A(e)}var r=window.Shopify.analytics;r.replayQueue.forEach(function(e){var i=e[0],n=e[1],r=e[2];t.publishCustomEvent(i,n,r)}),r.replayQueue=[],r.publish=t.publishCustomEvent,r.visitor=t.visitor,r.initialized=!0}}function A(e){B("manager_api_unavailable",void 0===e?void 0:Q(e))}function x(){B("script_load_failed","".concat(I," has failed to load"))}function B(e,t){T||(T=!0,q(),w.emit({status:"failed",errorMsg:t,failureReason:e,requestId:m.requestId,navigationType:m.navigationType,trekkieState:a()}))}function M(e){O&&(q(),w.emit({status:"pagehide-while-loading",useKeepaliveFallback:!0,pagehidePersisted:e.persisted,requestId:m.requestId,navigationType:m.navigationType,trekkieState:a()}))}function q(){O=!1;try{window.removeEventListener("pagehide",M)}catch(e){}}function R(e){var t;!function(e){var t=e.src,i=e.async,n=void 0===i||i,r=e.onload,o=e.onerror,a=e.sri,d=e.scriptDataAttributes,s=void 0===d?{}:d,u=document.createElement("script"),l=document.querySelector("head"),c=document.querySelector("body");if(u.async=n,u.src=t,a&&(u.integrity=a,u.crossOrigin="anonymous"),s)for(var p in s)if(Object.prototype.hasOwnProperty.call(s,p))try{u.dataset[p]=String(s[p])}catch(e){}if(r&&u.addEventListener("load",r),o&&u.addEventListener("error",o),l)l.appendChild(u);else{if(!c)throw new Error("Did not find a head or body element to append the script");c.appendChild(u)}}({src:I,async:!0,onload:U,onerror:e,sri:(t=E,"string"==typeof t&&/^sha384-[A-Za-z0-9+/=]+$/.test(t)?E:""),scriptDataAttributes:c})}function D(e){B("script_append_failed",Q(e))}function Q(e){return e instanceof Error?e.message:"Unknown error"}}}();wpmLoader({shopId: 70977552627,storefrontBaseUrl: "https://sillhouete.com",extensionsBaseUrl: "https://extensions.shopifycdn.com/cdn/shopifycloud/web-pixels-manager",monorailEndpoint: "https://sillhouete.com/.well-known/shopify/monorail/unstable/produce_batch",surface: "storefront-renderer",enabledBetaFlags: ["4c64608a","16072cab"],webPixelsConfigList: [{"id":"1450017011","configuration":"{\"debug\":\"false\"}","eventPayloadVersion":"v1","runtimeContext":"STRICT","scriptVersion":"a9a83cf44fb282052ff936f7ab101058","type":"APP","apiClientId":4539653,"privacyPurposes":["ANALYTICS"],"dataSharingAdjustments":{"protectedCustomerApprovalScopes":["read_customer_address","read_customer_email","read_customer_name","read_customer_personal_data","read_customer_phone"],"dataSharingControls":["share_all_events"]},"dataSharingState":"unrestricted"},{"id":"891945203","configuration":"{\"webPixelName\":\"Judge.me\"}","eventPayloadVersion":"v1","runtimeContext":"STRICT","scriptVersion":"8acc938b1a30dc7624e304493ca567d7","type":"APP","apiClientId":683015,"privacyPurposes":["ANALYTICS"],"dataSharingAdjustments":{"protectedCustomerApprovalScopes":["read_customer_email","read_customer_name","read_customer_personal_data","read_customer_phone"],"dataSharingControls":["share_all_events"]},"dataSharingState":"unrestricted"},{"id":"564265203","configuration":"{\"config\":\"{\\\"google_tag_ids\\\":[\\\"G-RQNT0CFFDW\\\",\\\"AW-16690809962\\\",\\\"GT-5TGJDFM5\\\"],\\\"target_country\\\":\\\"PK\\\",\\\"gtag_events\\\":[{\\\"type\\\":\\\"begin_checkout\\\",\\\"action_label\\\":[\\\"G-RQNT0CFFDW\\\",\\\"AW-16690809962\\\/siQxCJypidEZEOqY5pY-\\\"]},{\\\"type\\\":\\\"search\\\",\\\"action_label\\\":[\\\"G-RQNT0CFFDW\\\",\\\"AW-16690809962\\\/O9x1CJapidEZEOqY5pY-\\\"]},{\\\"type\\\":\\\"remove_from_cart\\\",\\\"action_label\\\":\\\"G-RQNT0CFFDW\\\"},{\\\"type\\\":\\\"view_item\\\",\\\"action_label\\\":[\\\"G-RQNT0CFFDW\\\",\\\"AW-16690809962\\\/yAcGCJOpidEZEOqY5pY-\\\",\\\"MC-QHESC2K2MS\\\"]},{\\\"type\\\":\\\"add_shipping_info\\\",\\\"action_label\\\":\\\"G-RQNT0CFFDW\\\"},{\\\"type\\\":\\\"purchase\\\",\\\"action_label\\\":[\\\"G-RQNT0CFFDW\\\",\\\"AW-16690809962\\\/IyUHCI2pidEZEOqY5pY-\\\",\\\"MC-QHESC2K2MS\\\"]},{\\\"type\\\":\\\"page_view\\\",\\\"action_label\\\":[\\\"G-RQNT0CFFDW\\\",\\\"AW-16690809962\\\/YDMxCJCpidEZEOqY5pY-\\\",\\\"MC-QHESC2K2MS\\\"]},{\\\"type\\\":\\\"view_item_list\\\",\\\"action_label\\\":\\\"G-RQNT0CFFDW\\\"},{\\\"type\\\":\\\"add_payment_info\\\",\\\"action_label\\\":[\\\"G-RQNT0CFFDW\\\",\\\"AW-16690809962\\\/TkoyCJ-pidEZEOqY5pY-\\\"]},{\\\"type\\\":\\\"add_to_cart\\\",\\\"action_label\\\":[\\\"G-RQNT0CFFDW\\\",\\\"AW-16690809962\\\/OmSZCJmpidEZEOqY5pY-\\\"]},{\\\"type\\\":\\\"view_cart\\\",\\\"action_label\\\":\\\"G-RQNT0CFFDW\\\"}],\\\"enable_monitoring_mode\\\":false}\"}","eventPayloadVersion":"v1","runtimeContext":"OPEN","scriptVersion":"a3321ca85cf5aaf6b57585fcd8d67b3a","type":"APP","apiClientId":1780363,"privacyPurposes":[],"dataSharingAdjustments":{"protectedCustomerApprovalScopes":["read_customer_address","read_customer_email","read_customer_name","read_customer_personal_data","read_customer_phone"],"dataSharingControls":["share_all_events"]},"dataSharingState":"optimized","enabledFlags":["9a3ed68a"]},{"id":"527597811","configuration":"{\"accountID\":\"786\"}
+<truncated 295360 bytes>
+
+NOTE: The output was truncated because it was too long. Use a more targeted query or a smaller range to get the information you need.
