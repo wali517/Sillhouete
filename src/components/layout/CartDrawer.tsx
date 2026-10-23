@@ -66,9 +66,20 @@ export default function CartDrawer() {
                 type="button"
                 onClick={close}
                 aria-label="Close cart"
-                className="p-1 text-black/70 hover:text-black transition-colors"
+                className="p-1 text-black/70 hover:text-black transition-colors cursor-pointer"
               >
-                <X className="h-5 w-5 stroke-[1.5]" />
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  role="presentation"
+                  className="h-5 w-5"
+                  viewBox="0 0 64 64"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <path d="m19 17.61 27.12 27.13m0-27.12L19 44.74" />
+                </svg>
               </button>
             </div>
 

@@ -139,20 +139,20 @@ export default async function ProductPage({ params }: Props) {
       />
 
       <div className="mx-auto w-full max-w-[1440px] px-4 py-4 md:px-10 md:py-8">
-        {/* Breadcrumb Navigation matching real site: Home > Collection > [Product Title] */}
+        {/* Breadcrumb Navigation matching frame_01_3.0s.jpg: Home > FORMALS > [Product Title] */}
         <nav
           aria-label="Breadcrumb"
-          className="mb-6 flex items-center gap-2 text-[12px] text-black/70"
+          className="mb-6 flex items-center gap-2 text-[12px] text-neutral-600 font-serif"
         >
-          <Link href="/" className="hover:text-black hover:underline">
+          <Link href="/" className="hover:text-black">
             Home
           </Link>
-          <span>&gt;</span>
-          <Link href={`/collections/${collectionSlug}`} className="hover:text-black hover:underline">
-            {collectionName}
+          <span className="text-neutral-400">&gt;</span>
+          <Link href={`/collections/${collectionSlug}`} className="hover:text-black uppercase">
+            {collectionName.toUpperCase()}
           </Link>
-          <span>&gt;</span>
-          <span className="font-semibold text-black">
+          <span className="text-neutral-400">&gt;</span>
+          <span className="text-black">
             {product.title}
           </span>
         </nav>
@@ -160,42 +160,51 @@ export default async function ProductPage({ params }: Props) {
         {/* Main Product Layout:
             Left Column: Sticky Product Image Gallery
             Right Column: Product Info, Options, AddToCart, Descriptions, Size Guide
-            Behavior: Left image stays fixed as user scrolls right side, then both slide up together!
         */}
-        <div className="grid gap-10 lg:grid-cols-[1.25fr_1fr] lg:gap-14 items-start">
-          {/* Left Column: Product Image Gallery (Sticks when touching screen border until right side finishes) */}
-          <div className="lg:sticky lg:top-0 self-start">
+        <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:gap-14 items-start">
+          {/* Left Column: Product Image Gallery */}
+          <div className="lg:sticky lg:top-4 self-start">
             <ProductGallery product={product} />
           </div>
 
           {/* Right Column: Product Info, Options, Description & Size Guide */}
-          <div className="space-y-5 text-black">
+          <div className="space-y-4 text-black">
             <div>
-              {/* Title matching real site: Uppercase Serif */}
-              <h1 className="font-serif text-[26px] md:text-[32px] tracking-wide uppercase text-[#111111] font-semibold">
+              {/* Title matching frame_01_3.0s.jpg */}
+              <h1 className="font-serif text-[26px] md:text-[32px] tracking-normal text-[#111111] font-semibold leading-tight">
                 {product.title}
               </h1>
 
-              {/* SKU below title */}
-              <p className="text-[11px] uppercase tracking-wider text-black/50 mt-1 font-mono">
+              {/* SKU below title matching .product-single__sku from live site */}
+              <p className="product-single__sku text-[10px] uppercase tracking-[0.2em] text-black/50 font-black mt-1">
                 {product.sku || `${product.handle.toUpperCase()}-XS`}
               </p>
 
-              {/* Price */}
-              <div className="mt-3">
-                <ProductPriceDisplay
-                  price={product.price}
-                  originalPrice={product.originalPrice}
-                  priceFrom={product.priceFrom}
-                />
-                <p className="mt-1 text-xs text-black/60">
-                  Shipping calculated at checkout.
+              {/* Judge.me Star Rating with #108474 brand teal from live site */}
+              <div className="flex items-center gap-1.5 mt-1">
+                <div className="flex text-[#108474]">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-3.5 w-3.5 fill-[#108474] text-[#108474]" />
+                  ))}
+                </div>
+                <span className="text-[12px] text-neutral-600 font-serif">
+                  ({reviewCount} reviews)
+                </span>
+              </div>
+
+              {/* Price with Shipping note */}
+              <div className="mt-2">
+                <p className="text-[13px] text-neutral-600">
+                  <Link href="/pages/shipping-policy" className="underline hover:text-black">
+                    Shipping
+                  </Link>{" "}
+                  calculated at checkout.
                 </p>
               </div>
 
-              {/* Worldwide Shipping pill */}
-              <div className="mt-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-black/80">
-                <Globe className="h-4 w-4 text-black/70" />
+              {/* World Wide Shipping with globe icon */}
+              <div className="mt-2.5 flex items-center gap-2 text-[13px] font-serif text-[#111111]">
+                <Globe className="h-4 w-4 text-black stroke-[1.5]" />
                 <span>World Wide Shipping</span>
               </div>
             </div>
@@ -268,167 +277,198 @@ export default async function ProductPage({ params }: Props) {
               </div>
             </div>
 
-            {/* Authentic Garment Size Guide Tables (Shirt & Trouser) matching frames 24 & 25 */}
-            <div className="border-t border-black/10 pt-5 space-y-5">
-              <div>
-                <h3 className="font-bold uppercase tracking-wider text-xs mb-2.5 text-black">
-                  Shirt Size (Inches)
-                </h3>
-                <div className="overflow-x-auto border border-black/15">
-                  <table className="w-full text-center text-xs">
-                    <thead className="bg-[#f7f7f7] border-b border-black/15 font-bold uppercase text-[11px]">
-                      <tr>
-                        <th className="p-2 border-r border-black/10">Size</th>
-                        <th className="p-2 border-r border-black/10">Length</th>
-                        <th className="p-2 border-r border-black/10">Chest</th>
-                        <th className="p-2 border-r border-black/10">Waist</th>
-                        <th className="p-2 border-r border-black/10">Hip</th>
-                        <th className="p-2 border-r border-black/10">Shoulder</th>
-                        <th className="p-2">Sleeves</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-black/10 text-black/80">
-                      <tr>
-                        <td className="p-2 font-bold border-r border-black/10 bg-[#fafafa]">XS</td>
-                        <td className="p-2 border-r border-black/10">48</td>
-                        <td className="p-2 border-r border-black/10">18</td>
-                        <td className="p-2 border-r border-black/10">15.5</td>
-                        <td className="p-2 border-r border-black/10">19.5</td>
-                        <td className="p-2 border-r border-black/10">14</td>
-                        <td className="p-2">22.5</td>
-                      </tr>
-                      <tr>
-                        <td className="p-2 font-bold border-r border-black/10 bg-[#fafafa]">S</td>
-                        <td className="p-2 border-r border-black/10">48</td>
-                        <td className="p-2 border-r border-black/10">19.5</td>
-                        <td className="p-2 border-r border-black/10">17</td>
-                        <td className="p-2 border-r border-black/10">21</td>
-                        <td className="p-2 border-r border-black/10">14.5</td>
-                        <td className="p-2">23</td>
-                      </tr>
-                      <tr>
-                        <td className="p-2 font-bold border-r border-black/10 bg-[#fafafa]">M</td>
-                        <td className="p-2 border-r border-black/10">48</td>
-                        <td className="p-2 border-r border-black/10">21</td>
-                        <td className="p-2 border-r border-black/10">18.5</td>
-                        <td className="p-2 border-r border-black/10">22.5</td>
-                        <td className="p-2 border-r border-black/10">15</td>
-                        <td className="p-2">23</td>
-                      </tr>
-                      <tr>
-                        <td className="p-2 font-bold border-r border-black/10 bg-[#fafafa]">L</td>
-                        <td className="p-2 border-r border-black/10">48</td>
-                        <td className="p-2 border-r border-black/10">23</td>
-                        <td className="p-2 border-r border-black/10">20.5</td>
-                        <td className="p-2 border-r border-black/10">24.5</td>
-                        <td className="p-2 border-r border-black/10">15.5</td>
-                        <td className="p-2">23</td>
-                      </tr>
-                      <tr>
-                        <td className="p-2 font-bold border-r border-black/10 bg-[#fafafa]">XL</td>
-                        <td className="p-2 border-r border-black/10">48</td>
-                        <td className="p-2 border-r border-black/10">24.5</td>
-                        <td className="p-2 border-r border-black/10">22.5</td>
-                        <td className="p-2 border-r border-black/10">26</td>
-                        <td className="p-2 border-r border-black/10">16</td>
-                        <td className="p-2">23</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+            {/* Authentic Garment Size Guide Tables matching frame_07_21.0s.jpg and frame_08_24.0s.jpg */}
+            <div className="border-t border-black/10 pt-6 space-y-4">
+              <div className="flex flex-col items-center justify-center mb-1">
+                <span className="font-serif text-[18px] leading-none text-black select-none">سلوٹ</span>
+                <span className="font-serif text-[24px] font-bold tracking-[0.05em] text-black">
+                  Sillhouete
+                </span>
+              </div>
+              <div className="bg-black text-white text-center py-2 text-xs font-bold uppercase tracking-[0.25em]">
+                Size Chart
               </div>
 
-              <div>
-                <h3 className="font-bold uppercase tracking-wider text-xs mb-2.5 text-black">
-                  Trouser Size (Inches)
-                </h3>
-                <div className="overflow-x-auto border border-black/15">
-                  <table className="w-full text-center text-xs">
-                    <thead className="bg-[#f7f7f7] border-b border-black/15 font-bold uppercase text-[11px]">
-                      <tr>
-                        <th className="p-2 border-r border-black/10">Size</th>
-                        <th className="p-2 border-r border-black/10">Waist</th>
-                        <th className="p-2 border-r border-black/10">Thigh</th>
-                        <th className="p-2 border-r border-black/10">Bottom (Half)</th>
-                        <th className="p-2">Trouser Lengths</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-black/10 text-black/80">
-                      <tr>
-                        <td className="p-2 font-bold border-r border-black/10 bg-[#fafafa]">XS</td>
-                        <td className="p-2 border-r border-black/10">14</td>
-                        <td className="p-2 border-r border-black/10">11</td>
-                        <td className="p-2 border-r border-black/10">25</td>
-                        <td className="p-2">43</td>
-                      </tr>
-                      <tr>
-                        <td className="p-2 font-bold border-r border-black/10 bg-[#fafafa]">S</td>
-                        <td className="p-2 border-r border-black/10">15</td>
-                        <td className="p-2 border-r border-black/10">12</td>
-                        <td className="p-2 border-r border-black/10">25</td>
-                        <td className="p-2">43</td>
-                      </tr>
-                      <tr>
-                        <td className="p-2 font-bold border-r border-black/10 bg-[#fafafa]">M</td>
-                        <td className="p-2 border-r border-black/10">17</td>
-                        <td className="p-2 border-r border-black/10">13</td>
-                        <td className="p-2 border-r border-black/10">25</td>
-                        <td className="p-2">44</td>
-                      </tr>
-                      <tr>
-                        <td className="p-2 font-bold border-r border-black/10 bg-[#fafafa]">L</td>
-                        <td className="p-2 border-r border-black/10">19</td>
-                        <td className="p-2 border-r border-black/10">14</td>
-                        <td className="p-2 border-r border-black/10">25</td>
-                        <td className="p-2">44</td>
-                      </tr>
-                      <tr>
-                        <td className="p-2 font-bold border-r border-black/10 bg-[#fafafa]">XL</td>
-                        <td className="p-2 border-r border-black/10">19.5</td>
-                        <td className="p-2 border-r border-black/10">16</td>
-                        <td className="p-2 border-r border-black/10">25</td>
-                        <td className="p-2">45</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              <div className="overflow-x-auto border border-black/20">
+                <table className="w-full text-center text-xs border-collapse">
+                  <thead className="bg-black text-white font-bold text-[11px]">
+                    <tr>
+                      <th className="p-2 border-r border-white/20 text-left font-semibold">Details</th>
+                      <th className="p-2 border-r border-white/20">Ex Small</th>
+                      <th className="p-2 border-r border-white/20">Small</th>
+                      <th className="p-2 border-r border-white/20">Medium</th>
+                      <th className="p-2 border-r border-white/20">Large</th>
+                      <th className="p-2">Ex Large</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-black/15 text-black">
+                    <tr className="hover:bg-neutral-50">
+                      <td className="p-2 text-left font-semibold border-r border-black/15">Shoulder</td>
+                      <td className="p-2 border-r border-black/15">13.5</td>
+                      <td className="p-2 border-r border-black/15">14</td>
+                      <td className="p-2 border-r border-black/15">14.5</td>
+                      <td className="p-2 border-r border-black/15">15</td>
+                      <td className="p-2">16</td>
+                    </tr>
+                    <tr className="hover:bg-neutral-50">
+                      <td className="p-2 text-left font-semibold border-r border-black/15">Bust</td>
+                      <td className="p-2 border-r border-black/15">18</td>
+                      <td className="p-2 border-r border-black/15">19</td>
+                      <td className="p-2 border-r border-black/15">20.5</td>
+                      <td className="p-2 border-r border-black/15">22</td>
+                      <td className="p-2">23.5</td>
+                    </tr>
+                    <tr className="hover:bg-neutral-50">
+                      <td className="p-2 text-left font-semibold border-r border-black/15">Hip</td>
+                      <td className="p-2 border-r border-black/15">18.5</td>
+                      <td className="p-2 border-r border-black/15">19.5</td>
+                      <td className="p-2 border-r border-black/15">22</td>
+                      <td className="p-2 border-r border-black/15">23</td>
+                      <td className="p-2">24.5</td>
+                    </tr>
+                    <tr className="hover:bg-neutral-50">
+                      <td className="p-2 text-left font-semibold border-r border-black/15">Arm Hole</td>
+                      <td className="p-2 border-r border-black/15">8</td>
+                      <td className="p-2 border-r border-black/15">8.5</td>
+                      <td className="p-2 border-r border-black/15">9.5</td>
+                      <td className="p-2 border-r border-black/15">10.5</td>
+                      <td className="p-2">12</td>
+                    </tr>
+                    <tr className="hover:bg-neutral-50">
+                      <td className="p-2 text-left font-semibold border-r border-black/15">Bicep</td>
+                      <td className="p-2 border-r border-black/15">6</td>
+                      <td className="p-2 border-r border-black/15">6.5</td>
+                      <td className="p-2 border-r border-black/15">7</td>
+                      <td className="p-2 border-r border-black/15">8</td>
+                      <td className="p-2">9.5</td>
+                    </tr>
+                    <tr className="hover:bg-neutral-50">
+                      <td className="p-2 text-left font-semibold border-r border-black/15">Wrist (Round)</td>
+                      <td className="p-2 border-r border-black/15">7</td>
+                      <td className="p-2 border-r border-black/15">7</td>
+                      <td className="p-2 border-r border-black/15">8</td>
+                      <td className="p-2 border-r border-black/15">9</td>
+                      <td className="p-2">10</td>
+                    </tr>
+                    <tr className="hover:bg-neutral-50">
+                      <td className="p-2 text-left font-semibold border-r border-black/15">Sleeves Length</td>
+                      <td className="p-2 border-r border-black/15">22.5</td>
+                      <td className="p-2 border-r border-black/15">23</td>
+                      <td className="p-2 border-r border-black/15">23.5</td>
+                      <td className="p-2 border-r border-black/15">24</td>
+                      <td className="p-2">24</td>
+                    </tr>
+                    <tr className="hover:bg-neutral-50">
+                      <td className="p-2 text-left font-semibold border-r border-black/15">Shirt Length</td>
+                      <td className="p-2 border-r border-black/15">55</td>
+                      <td className="p-2 border-r border-black/15">55</td>
+                      <td className="p-2 border-r border-black/15">55</td>
+                      <td className="p-2 border-r border-black/15">55</td>
+                      <td className="p-2">55</td>
+                    </tr>
+                    <tr className="hover:bg-neutral-50">
+                      <td className="p-2 text-left font-semibold border-r border-black/15">HEM</td>
+                      <td className="p-2 border-r border-black/15">28</td>
+                      <td className="p-2 border-r border-black/15">28</td>
+                      <td className="p-2 border-r border-black/15">28</td>
+                      <td className="p-2 border-r border-black/15">28</td>
+                      <td className="p-2">28</td>
+                    </tr>
+
+                    {/* Trouser Size Header */}
+                    <tr className="bg-black text-white font-bold text-center">
+                      <td colSpan={6} className="py-2 text-xs uppercase tracking-[0.2em]">
+                        Trouser Size
+                      </td>
+                    </tr>
+
+                    <tr className="hover:bg-neutral-50">
+                      <td className="p-2 text-left font-semibold border-r border-black/15">Waist</td>
+                      <td className="p-2 border-r border-black/15">14</td>
+                      <td className="p-2 border-r border-black/15">15</td>
+                      <td className="p-2 border-r border-black/15">17</td>
+                      <td className="p-2 border-r border-black/15">19</td>
+                      <td className="p-2">19.5</td>
+                    </tr>
+                    <tr className="hover:bg-neutral-50">
+                      <td className="p-2 text-left font-semibold border-r border-black/15">Thigh</td>
+                      <td className="p-2 border-r border-black/15">11</td>
+                      <td className="p-2 border-r border-black/15">12</td>
+                      <td className="p-2 border-r border-black/15">13</td>
+                      <td className="p-2 border-r border-black/15">14</td>
+                      <td className="p-2">16</td>
+                    </tr>
+                    <tr className="hover:bg-neutral-50">
+                      <td className="p-2 text-left font-semibold border-r border-black/15">Bottom (Half)</td>
+                      <td className="p-2 border-r border-black/15">36</td>
+                      <td className="p-2 border-r border-black/15">36</td>
+                      <td className="p-2 border-r border-black/15">36</td>
+                      <td className="p-2 border-r border-black/15">36</td>
+                      <td className="p-2">36</td>
+                    </tr>
+                    <tr className="hover:bg-neutral-50">
+                      <td className="p-2 text-left font-semibold border-r border-black/15">Trouser Lengths</td>
+                      <td className="p-2 border-r border-black/15">43</td>
+                      <td className="p-2 border-r border-black/15">43</td>
+                      <td className="p-2 border-r border-black/15">44</td>
+                      <td className="p-2 border-r border-black/15">44</td>
+                      <td className="p-2">45</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
 
-            {/* Disclaimer & Social Share Links */}
-            <div className="border-t border-black/10 pt-4 space-y-3">
-              <p className="text-xs text-black/70 italic">
-                <strong>Disclaimer:</strong> Product color may slightly vary due to photographic lighting sources or your monitor setting.
-              </p>
+            {/* Disclaimer & Social Share Links matching real Sillhouete site */}
+            <div className="border-t border-black/10 pt-4 space-y-3 font-serif">
+              <div className="product-block pr-cstm">
+                <p className="text-[12px] text-black leading-snug">
+                  <strong className="font-bold mr-1">Disclaimer:</strong>
+                  Product color may slightly vary due to photographic lighting sources or your monitor setting.
+                </p>
+              </div>
 
-              <div className="flex items-center gap-6 pt-1 text-xs font-semibold text-black/80">
-                <a
-                  href={`https://www.facebook.com/sharer/sharer.php?u=https://sillhouete.com/products/${product.handle}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 hover:text-black transition-colors"
-                >
-                  <span className="font-bold font-serif">f</span>
-                  <span>Share</span>
-                </a>
-                <a
-                  href={`https://twitter.com/intent/tweet?url=https://sillhouete.com/products/${product.handle}&text=${encodeURIComponent(product.title)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 hover:text-black transition-colors"
-                >
-                  <span className="font-bold">𝕏</span>
-                  <span>Share</span>
-                </a>
-                <a
-                  href={`https://pinterest.com/pin/create/button/?url=https://sillhouete.com/products/${product.handle}&media=${encodeURIComponent(product.image)}&description=${encodeURIComponent(product.title)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 hover:text-black transition-colors"
-                >
-                  <span className="font-bold font-serif text-red-600">P</span>
-                  <span>Pin it</span>
-                </a>
+              <div className="product-block sharing pt-1">
+                <div className="flex items-center gap-6 text-[13px] text-black">
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={`https://www.facebook.com/sharer.php?u=https://sillhouete.com/products/${product.handle}`}
+                    className="flex items-center gap-2 hover:opacity-75 transition-opacity"
+                    title="Share on Facebook"
+                  >
+                    <svg className="h-4 w-4 fill-current" viewBox="0 0 14222 14222">
+                      <path d="M14222 7112c0 3549.352-2600.418 6491.344-6000 7024.72V9168h1657l315-2056H8222V5778c0-562 275-1111 1159-1111h897V2917s-814-139-1592-139c-1624 0-2686 984-2686 2767v1567H4194v2056h1806v4968.72C2600.418 13603.344 0 10661.352 0 7112 0 3184.703 3183.703 1 7111 1s7111 3183.703 7111 7111Z"/>
+                    </svg>
+                    <span>Share</span>
+                  </a>
+
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={`https://twitter.com/share?text=${encodeURIComponent(product.title)}&url=https://sillhouete.com/products/${product.handle}`}
+                    className="flex items-center gap-2 hover:opacity-75 transition-opacity"
+                    title="Tweet on X"
+                  >
+                    <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 20 20">
+                      <path d="M11.095 5.514c.1-.167.158-.3.249-.409A986.714 986.714 0 0 1 14.67 1.11c.43-.514.876-.614 1.35-.327.53.32.609.932.166 1.485-.477.598-.978 1.178-1.467 1.766-.772.927-1.538 1.862-2.322 2.78-.184.216-.21.358-.038.609 2.158 3.157 4.304 6.323 6.448 9.49.18.266.345.55.463.845.435 1.093-.138 2.07-1.319 2.157-1.61.118-3.226.142-4.829-.11-.95-.15-1.607-.758-2.13-1.513-1.15-1.66-2.28-3.334-3.42-5.002-.071-.105-.155-.203-.289-.377-.086.124-.14.214-.207.295a4455.405 4455.405 0 0 1-4.44 5.31 3.698 3.698 0 0 1-.387.42c-.351.308-.85.304-1.217.008-.353-.286-.466-.811-.194-1.194.352-.495.75-.96 1.139-1.43 1.328-1.6 2.66-3.2 4-4.79.184-.219.16-.371.011-.59a1936.237 1936.237 0 0 1-5.324-7.87c-.205-.304-.4-.63-.533-.97C-.27 1.092.28.095 1.357.045c1.514-.07 3.037-.046 4.553.008 1.13.04 1.915.732 2.532 1.62.791 1.14 1.57 2.287 2.354 3.43.066.096.136.19.297.414l.002-.003Zm-8.888-3.6c.098.168.16.293.237.407 3.38 4.967 6.762 9.933 10.14 14.903.331.487.757.792 1.357.804 1.004.017 2.008.028 3.011.037.065 0 .13-.039.24-.076-.113-.184-.205-.345-.309-.5-2.271-3.352-4.54-6.706-6.816-10.054-1.101-1.62-2.224-3.227-3.324-4.847-.337-.495-.8-.693-1.37-.702-.897-.011-1.793-.02-2.69-.024-.138 0-.276.029-.473.05l-.003.002Z"/>
+                    </svg>
+                    <span>Share</span>
+                  </a>
+
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={`https://pinterest.com/pin/create/button/?url=https://sillhouete.com/products/${product.handle}&media=${encodeURIComponent(product.image)}&description=${encodeURIComponent(product.title)}`}
+                    className="flex items-center gap-2 hover:opacity-75 transition-opacity"
+                    title="Pin on Pinterest"
+                  >
+                    <svg className="h-4 w-4 fill-[#bd081c]" viewBox="0 0 256 256">
+                      <path d="M0 128.002c0 52.414 31.518 97.442 76.619 117.239-.36-8.938-.064-19.668 2.228-29.393 2.461-10.391 16.47-69.748 16.47-69.748s-4.089-8.173-4.089-20.252c0-18.969 10.994-33.136 24.686-33.136 11.643 0 17.268 8.745 17.268 19.217 0 11.704-7.465 29.211-11.304 45.426-3.207 13.578 6.808 24.653 20.203 24.653 24.252 0 40.586-31.149 40.586-68.055 0-28.054-18.895-49.052-53.262-49.052-38.828 0-63.017 28.956-63.017 61.3 0 11.152 3.288 19.016 8.438 25.106 2.368 2.797 2.697 3.922 1.84 7.134-.614 2.355-2.024 8.025-2.608 10.272-.852 3.242-3.479 4.401-6.409 3.204-17.884-7.301-26.213-26.886-26.213-48.902 0-36.361 30.666-79.961 91.482-79.961 48.87 0 81.035 35.364 81.035 73.325 0 50.213-27.916 87.726-69.066 87.726-13.819 0-26.818-7.47-31.271-15.955 0 0-7.431 29.492-9.005 35.187-2.714 9.869-8.026 19.733-12.883 27.421a127.897 127.897 0 0 0 36.277 5.249c70.684 0 127.996-57.309 127.996-128.005C256.001 57.309 198.689 0 128.005 0 57.314 0 0 57.309 0 128.002Z"/>
+                    </svg>
+                    <span>Pin it</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -448,40 +488,10 @@ export default async function ProductPage({ params }: Props) {
           </div>
         </section>
 
-        {/* Editorial Journal Insights */}
-        <section className="mt-16 border-t border-black/10 pt-10">
-          <div className="flex items-center justify-between border-b border-black/10 pb-3 mb-6">
-            <div>
-              <span className="text-[11px] font-bold uppercase tracking-widest text-[#9b8065]">Sillhouete Journal</span>
-              <h2 className="heading text-[20px] md:text-[24px]">Styling &amp; Bridal Insights</h2>
-            </div>
-            <Link href="/blogs/news" className="text-xs uppercase font-bold tracking-wider hover:underline text-black">
-              View All Stories &rarr;
-            </Link>
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {SEED_BLOGS.map((blog) => (
-              <div key={blog.id} className="group border border-black/10 bg-white overflow-hidden">
-                <Link href={`/blogs/news/${blog.slug}`} className="relative aspect-[16/10] block overflow-hidden">
-                  <Image
-                    src={blog.coverImage}
-                    alt={blog.title}
-                    fill
-                    sizes="(min-width: 768px) 33vw, 100vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </Link>
-                <div className="p-4 space-y-2">
-                  <span className="text-[10px] font-bold uppercase text-[#9b8065]">{blog.category}</span>
-                  <h3 className="heading text-[14px] leading-snug line-clamp-2">
-                    <Link href={`/blogs/news/${blog.slug}`} className="hover:underline">{blog.title}</Link>
-                  </h3>
-                  <p className="text-xs text-black/60 line-clamp-2">{blog.excerpt}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+
+
+        {/* Customer Reviews Component */}
+        <ProductReviews productTitle={product.title} />
 
         {/* Let Customers Speak For Us */}
         <CustomerTestimonials />

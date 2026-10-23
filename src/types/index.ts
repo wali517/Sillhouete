@@ -12,6 +12,8 @@ export interface Product {
   /** height / width of the product image */
   ratio: number;
   isNew?: boolean;
+  isSale?: boolean;
+  isBestSeller?: boolean;
   category?: string;
   description?: string;
   inStock?: boolean;

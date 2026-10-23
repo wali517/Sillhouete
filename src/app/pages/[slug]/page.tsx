@@ -2,8 +2,6 @@ import { notFound } from "next/navigation";
 import { FOOTER_LINKS } from "@/data/site";
 import ContactFormSection from "./ContactFormSection";
 import FaqAccordion from "./FaqAccordion";
-import { allProducts } from "@/data/products";
-import ProductCard from "@/components/products/ProductCard";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -418,19 +416,6 @@ export default async function InfoPage({ params }: Props) {
           </div>
         </div>
       )}
-
-      {/* Featured Products Showcase on every info/policy page so no page is left without products */}
-      <section className="mt-16 border-t border-line pt-12">
-        <div className="mb-8 text-center">
-          <p className="text-xs uppercase tracking-[0.25em] text-black/60">Sillhouete Atelier</p>
-          <h2 className="heading mt-1 text-[22px] md:text-[28px]">Featured Designer Outfits</h2>
-        </div>
-        <div className="grid grid-cols-2 gap-[10px] md:grid-cols-4 md:gap-[17px]">
-          {allProducts.slice(0, 8).map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
-      </section>
     </article>
   );
 }

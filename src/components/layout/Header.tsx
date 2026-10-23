@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown, Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { NAV, SITE } from "@/data/site";
 import { allProducts } from "@/data/products";
 import { useStore } from "@/components/providers/StoreProvider";
@@ -43,7 +43,7 @@ export default function Header() {
   const NAV_ROW2 = NAV.slice(8);
 
   return (
-    <header className="relative z-40 border-b border-black/10 bg-white">
+    <header className="relative z-40 border-b border-[#e8e8e1] bg-white">
       <div className="mx-auto flex w-full max-w-[1920px] items-center justify-between gap-4 px-4 py-3 md:px-10">
         {/* Left Logo */}
         <Link
@@ -72,7 +72,7 @@ export default function Header() {
                 <li key={item.label} className="relative group">
                   <Link
                     href={item.href}
-                    className={`relative flex items-center gap-1 px-2.5 py-1 text-[12px] uppercase tracking-wide font-normal transition-colors hover:text-black after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:origin-center ${
+                    className={`relative flex items-center gap-1 px-1.5 py-1 text-[15px] uppercase tracking-wide font-normal transition-colors hover:text-black after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:origin-center ${
                       item.sale ? "text-[red] font-bold animate-blinks sale-menu" : "text-black/90"
                     }`}
                   >
@@ -93,7 +93,7 @@ export default function Header() {
                           <li key={child.label}>
                             <Link
                               href={child.href}
-                              className="block px-5 py-2 text-[13px] text-black/85 hover:text-black hover:bg-neutral-50 transition-colors font-medium whitespace-nowrap"
+                              className="block px-5 py-2 text-[15px] text-black/85 hover:text-black hover:bg-neutral-50 transition-colors font-medium whitespace-nowrap"
                             >
                               {child.label}
                             </Link>
@@ -116,7 +116,7 @@ export default function Header() {
                 <li key={item.label} className="relative group">
                   <Link
                     href={item.href}
-                    className="relative flex items-center gap-1 px-2.5 py-0.5 text-[12px] uppercase tracking-wide font-normal text-black/90 hover:text-black transition-colors after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:origin-center"
+                    className="relative flex items-center gap-1 px-2.5 py-0.5 text-[15px] uppercase tracking-wide font-normal text-black/90 hover:text-black transition-colors after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:origin-center"
                   >
                     <span>{item.label}</span>
                     {hasDropdown && (
@@ -135,7 +135,7 @@ export default function Header() {
                           <li key={child.label}>
                             <Link
                               href={child.href}
-                              className="block px-5 py-2 text-[13px] text-black/85 hover:text-black hover:bg-neutral-50 transition-colors font-medium whitespace-nowrap"
+                              className="block px-5 py-2 text-[15px] text-black/85 hover:text-black hover:bg-neutral-50 transition-colors font-medium whitespace-nowrap"
                             >
                               {child.label}
                             </Link>
@@ -154,10 +154,22 @@ export default function Header() {
         <div className="flex items-center gap-1 shrink-0">
           <Link
             href="/account"
-            className="hidden h-10 w-10 place-items-center md:grid text-black/85 hover:text-black"
+            className="hidden h-10 w-10 place-items-center md:grid text-black hover:text-black/70 transition-colors"
             aria-label="Customer Account"
           >
-            <User className="h-5 w-5 stroke-[1.5]" />
+            <svg
+              aria-hidden="true"
+              focusable="false"
+              role="presentation"
+              className="h-6 w-6"
+              viewBox="0 0 64 64"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeMiterlimit="10"
+            >
+              <path d="M35 39.84v-2.53c3.3-1.91 6-6.66 6-11.41 0-7.63 0-13.82-9-13.82s-9 6.19-9 13.82c0 4.75 2.7 9.51 6 11.41v2.53c-10.18.85-18 6-18 12.16h42c0-6.19-7.82-11.31-18-12.16Z" />
+            </svg>
           </Link>
 
           <button
@@ -165,30 +177,67 @@ export default function Header() {
             onClick={() => setSearchOpen((o) => !o)}
             aria-expanded={searchOpen}
             aria-label="Search"
-            className="grid h-10 w-10 place-items-center text-black/85 hover:text-black"
+            className="grid h-10 w-10 place-items-center text-black hover:text-black/70 transition-colors cursor-pointer"
           >
-            <Search className="h-5 w-5 stroke-[1.5]" />
+            <svg
+              aria-hidden="true"
+              focusable="false"
+              role="presentation"
+              className="h-6 w-6"
+              viewBox="0 0 64 64"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeMiterlimit="10"
+            >
+              <path d="M47.16 28.58A18.58 18.58 0 1 1 28.58 10a18.58 18.58 0 0 1 18.58 18.58ZM54 54 41.94 42" />
+            </svg>
           </button>
 
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label="Site navigation"
-            className="grid h-10 w-10 place-items-center md:hidden"
+            className="grid h-10 w-10 place-items-center md:hidden text-black hover:text-black/70 cursor-pointer"
           >
-            <Menu className="h-5 w-5 stroke-[1.5]" />
+            <svg
+              aria-hidden="true"
+              focusable="false"
+              role="presentation"
+              className="h-6 w-6"
+              viewBox="0 0 64 64"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeMiterlimit="10"
+            >
+              <path d="M7 15h51M7 32h43M7 49h51" />
+            </svg>
           </button>
 
           <button
             type="button"
             onClick={() => setCartOpen(true)}
             aria-label={`Cart, ${count} items`}
-            className="relative grid h-10 w-10 place-items-center text-black/85 hover:text-black"
+            className="relative grid h-10 w-10 place-items-center text-black hover:text-black/70 transition-colors cursor-pointer"
           >
-            <ShoppingBag className="h-5 w-5 stroke-[1.5]" />
+            <svg
+              aria-hidden="true"
+              focusable="false"
+              role="presentation"
+              className="h-6 w-6"
+              viewBox="0 0 64 64"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeMiterlimit="10"
+            >
+              <path d="M11.375 17.863h41.25v36.75h-41.25z" />
+              <path d="M22.25 18c0-7.105 4.35-9 9.75-9s9.75 1.895 9.75 9" />
+            </svg>
             {count > 0 && (
               <span
-                className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[9px] font-bold text-white"
+                className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#111111] text-[9px] font-bold text-white"
                 aria-hidden="true"
               >
                 {count}
@@ -207,7 +256,7 @@ export default function Header() {
             onClick={() => setSearchOpen(false)}
           />
 
-          <div className="relative z-40 border-t border-b border-black/10 bg-white px-4 py-4 md:px-10 shadow-md">
+          <div className="relative z-40 border-b border-[#e8e8e1] bg-white px-4 py-4 md:px-10 shadow-xs">
             <form onSubmit={submit} role="search" className="mx-auto flex max-w-3xl items-center gap-3">
               <div className="relative flex-1">
                 <input
@@ -225,7 +274,19 @@ export default function Header() {
                   aria-label="Submit search"
                   className="absolute right-0 top-0 bottom-0 px-3.5 flex items-center justify-center text-neutral-600 hover:text-black transition-colors"
                 >
-                  <Search className="h-4 w-4 stroke-[1.75]" />
+                  <svg
+                    aria-hidden="true"
+                    focusable="false"
+                    role="presentation"
+                    className="h-4 w-4"
+                    viewBox="0 0 64 64"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeMiterlimit="10"
+                  >
+                    <path d="M47.16 28.58A18.58 18.58 0 1 1 28.58 10a18.58 18.58 0 0 1 18.58 18.58ZM54 54 41.94 42" />
+                  </svg>
                 </button>
               </div>
 
@@ -233,9 +294,20 @@ export default function Header() {
                 type="button"
                 aria-label="Close search"
                 onClick={() => setSearchOpen(false)}
-                className="p-1.5 text-neutral-800 hover:text-black transition-colors"
+                className="p-1.5 text-neutral-800 hover:text-black transition-colors cursor-pointer"
               >
-                <X className="h-6 w-6 stroke-[1.5]" />
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  role="presentation"
+                  className="h-6 w-6"
+                  viewBox="0 0 64 64"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <path d="m19 17.61 27.12 27.13m0-27.12L19 44.74" />
+                </svg>
               </button>
             </form>
 

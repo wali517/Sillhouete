@@ -51,29 +51,17 @@ export default function CartPage() {
       </div>
 
       {items.length === 0 ? (
-        <div className="py-12 text-center">
-          <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-soft">
-            <ShoppingBag className="h-8 w-8 text-black/40" />
+        <div className="py-16 text-center">
+          <div className="mx-auto mb-4 grid h-20 w-20 place-items-center rounded-full bg-soft">
+            <ShoppingBag className="h-10 w-10 text-black/40" />
           </div>
-          <p className="text-base font-semibold uppercase tracking-wider">Your cart is currently empty.</p>
-          <p className="mt-2 text-xs text-black/60">
-            Explore our handcrafted luxury bridal, formal, and prêt collections.
+          <p className="text-lg font-medium">Your cart is currently empty.</p>
+          <p className="mt-2 text-sm text-black/60">
+            Explore our latest bridal, formal, and luxury pret collections.
           </p>
-          <Link href="/collections/1" className="btn mt-5 bg-black text-white hover:bg-neutral-800">
-            Start Shopping
+          <Link href="/collections/1" className="btn mt-6">
+            Continue Shopping
           </Link>
-
-          {/* Curated showcase so cart page is never empty of products */}
-          <div className="mt-14 border-t border-black/10 pt-10 text-left">
-            <h2 className="heading mb-6 text-center text-[20px] md:text-[24px] uppercase tracking-[0.2em] text-[#111111]">
-              Trending Designer Styles
-            </h2>
-            <div className="grid grid-cols-2 gap-[10px] md:grid-cols-4 md:gap-[17px]">
-              {allProducts.slice(0, 8).map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          </div>
         </div>
       ) : (
         <div className="grid gap-10 lg:grid-cols-[1fr_380px]">

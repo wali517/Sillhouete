@@ -1,13 +1,13 @@
 [
   {
-    "id": "msg-1792398421808",
-    "name": "Sarah Miller",
-    "email": "sarah.miller@example.com",
-    "phone": "+44 7700 900077",
-    "subject": "Custom Bridal Inquiry",
-    "message": "Hi Sillhouete, I am planning my wedding in October and love your Husan Ara bridal collection. Could I request a custom colorway?",
-    "createdAt": "2026-10-19T08:27:01.808Z",
-    "status": "read"
+    "id": "msg-1792743245849",
+    "name": "Newsletter Subscriber",
+    "email": "asd@gmail.com",
+    "phone": "",
+    "subject": "Newsletter 5% Off Subscription",
+    "message": "Subscribed on 10/23/2026",
+    "createdAt": "2026-10-23T08:14:05.849Z",
+    "status": "unread"
   },
   {
     "id": "msg-1",
@@ -16,7 +16,7 @@
     "phone": "+92 333 4567890",
     "subject": "Bridal Customization Appointment",
     "message": "Hi, I am interested in customizing the Husan Ara Bridal dress for my wedding in December. Can I book a studio appointment at MM Alam Road?",
-    "createdAt": "2026-10-16T06:35:28.845Z",
+    "createdAt": "2026-10-20T07:49:04.148Z",
     "status": "read",
     "replyNotes": "Customer invited to MM Alam studio for consultation."
   },
@@ -27,7 +27,7 @@
     "phone": "+1 312 555 0192",
     "subject": "International Shipping to Chicago",
     "message": "Hello! I live in Chicago and would like to know if the Maahi II collection can be delivered within 8 days for an Eid gathering?",
-    "createdAt": "2026-10-18T06:35:28.845Z",
+    "createdAt": "2026-10-22T07:49:04.148Z",
     "status": "unread"
   }
 ]

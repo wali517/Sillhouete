@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
-import { ChevronDown, X, Globe, User } from "lucide-react";
+import { Globe } from "lucide-react";
 import { NAV } from "@/data/site";
 import Socials from "@/components/ui/Socials";
 import { useStore, type CurrencyCode } from "@/components/providers/StoreProvider";
@@ -37,15 +37,26 @@ export default function MobileMenu({ open, onClose }: { open: boolean; onClose: 
             exit={{ x: "100%" }}
             transition={{ type: "tween", duration: 0.3 }}
           >
-            <div className="flex items-center justify-between border-b border-line px-5 py-4">
-              <span className="heading text-sm">Navigation</span>
+            <div className="flex items-center justify-between border-b border-[#e8e8e1] px-5 py-4">
+              <span className="text-sm font-bold uppercase tracking-wider">Navigation</span>
               <button
                 type="button"
                 onClick={onClose}
                 aria-label="Close menu"
-                className="grid h-8 w-8 place-items-center text-black/70 hover:text-black"
+                className="grid h-8 w-8 place-items-center text-black hover:opacity-70 transition-opacity"
               >
-                <X className="h-5 w-5" />
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  role="presentation"
+                  className="h-5 w-5"
+                  viewBox="0 0 64 64"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <path d="m19 17.61 27.12 27.13m0-27.12L19 44.74" />
+                </svg>
               </button>
             </div>
 
@@ -70,11 +81,20 @@ export default function MobileMenu({ open, onClose }: { open: boolean; onClose: 
                         onClick={() => setExpanded(expanded === item.label ? null : item.label)}
                         className="grid h-10 w-10 place-items-center"
                       >
-                        <ChevronDown
-                          className={`h-4 w-4 transition-transform ${
+                        <svg
+                          aria-hidden="true"
+                          focusable="false"
+                          role="presentation"
+                          className={`h-3 w-3.5 transition-transform ${
                             expanded === item.label ? "rotate-180" : ""
                           }`}
-                        />
+                          viewBox="0 0 28 16"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                        >
+                          <path d="m1.57 1.59 12.76 12.77L27.1 1.59" />
+                        </svg>
                       </button>
                     )}
                   </div>
@@ -95,8 +115,19 @@ export default function MobileMenu({ open, onClose }: { open: boolean; onClose: 
                   )}
                 </li>
               ))}
-              <li className="py-3 flex items-center gap-2">
-                <User className="h-4 w-4 text-black/70" />
+              <li className="py-3 flex items-center gap-2.5">
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  role="presentation"
+                  className="h-5 w-5 text-black"
+                  viewBox="0 0 64 64"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <path d="M35 39.84v-2.53c3.3-1.91 6-6.66 6-11.41 0-7.63 0-13.82-9-13.82s-9 6.19-9 13.82c0 4.75 2.7 9.51 6 11.41v2.53c-10.18.85-18 6-18 12.16h42c0-6.19-7.82-11.31-18-12.16Z" />
+                </svg>
                 <Link href="/account" onClick={onClose} className="text-sm uppercase font-semibold">
                   Customer Account
                 </Link>

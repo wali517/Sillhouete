@@ -3,8 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Calendar, Clock, ArrowRight, User } from "lucide-react";
 import { getBlogs } from "@/lib/db";
-import { allProducts } from "@/data/products";
-import ProductCard from "@/components/products/ProductCard";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -135,19 +133,6 @@ export default async function BlogPage({ params }: Props) {
                 </div>
               </div>
             </article>
-          ))}
-        </div>
-      </section>
-
-      {/* Featured Outfits matching the Editorial Journal */}
-      <section className="mt-16 border-t border-line pt-12">
-        <div className="mb-8 text-center">
-          <p className="text-xs uppercase tracking-[0.25em] text-black/60">Sillhouete Edit</p>
-          <h2 className="heading mt-1 text-[22px] md:text-[28px]">Shop The Editorial Looks</h2>
-        </div>
-        <div className="grid grid-cols-2 gap-[10px] md:grid-cols-4 md:gap-[17px]">
-          {allProducts.slice(0, 8).map((p) => (
-            <ProductCard key={p.id} product={p} />
           ))}
         </div>
       </section>

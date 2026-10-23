@@ -1,23 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { X } from "lucide-react";
+import { X, ArrowRight, CheckCircle2 } from "lucide-react";
 import { POPUP_IMAGE } from "@/data/campaigns";
-import NewsletterForm from "@/components/ui/NewsletterForm";
 import Socials from "@/components/ui/Socials";
 
 const KEY = "sillhouete-popup-dismissed";
-const DELAY_MS = 800; // Opens promptly when user visits website
+const DELAY_MS = 2500; // Opens gently when user visits the site
 const HIDE_DAYS = 1;
 
 export default function NewsletterPopup() {
   const [open, setOpen] = useState(false);
-  const [view, setView] = useState<"subscribe" | "login">("subscribe");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loginMsg, setLoginMsg] = useState("");
+  const [status, setStatus] = useState<"idle" | "error" | "loading" | "done">("idle");
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     let skip = false;
@@ -38,7 +36,9 @@ export default function NewsletterPopup() {
 
   const close = () => {
     setOpen(false);
-    try { sessionStorage.setItem(KEY, String(Date.now())); } catch {}
+    try {
+      sessionStorage.setItem(KEY, String(Date.now()));
+    } catch {}
   };
 
   useEffect(() => {
@@ -48,139 +48,135 @@ export default function NewsletterPopup() {
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!email) return;
-    setLoginMsg("Logged in successfully!");
-    setTimeout(() => {
-      close();
-    }, 1000);
+    const cleanEmail = email.trim();
+    if (!cleanEmail || !cleanEmail.includes("@")) {
+      setStatus("error");
+      setMessage("Please enter a valid email address.");
+      return;
+    }
+
+    setStatus("loading");
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Newsletter Subscriber",
+          email: cleanEmail,
+          subject: "Newsletter 5% Off Subscription",
+          message: `Subscribed on ${new Date().toLocaleDateString()}`,
+        }),
+      });
+      setStatus("done");
+      setMessage("Thank you! Use code SILLHOUETE5 for 5% off.");
+      setEmail("");
+      setTimeout(() => close(), 2500);
+    } catch {
+      setStatus("done");
+      setMessage("Thank you for subscribing!");
+      setEmail("");
+      setTimeout(() => close(), 2500);
+    }
   };
 
   if (!open) return null;
+
   return (
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Welcome Popup"
-      className="fixed inset-0 z-[110] grid place-items-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in"
+      aria-label="Subscribe Newsletter"
+      className="fixed inset-0 z-[110] grid place-items-center bg-black/60 backdrop-blur-[2px] p-4 animate-fade-in"
       onClick={close}
     >
       <div
-        className="relative flex max-h-[92vh] w-full max-w-3xl flex-col overflow-y-auto bg-white shadow-2xl md:flex-row border border-black/10"
+        className="relative flex max-h-[92vh] w-full max-w-[820px] flex-col overflow-visible bg-white shadow-2xl md:flex-row"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative hidden w-2/5 md:block bg-neutral-100">
-          <Image
-            src={POPUP_IMAGE}
-            alt="Sillhouete Haute Couture Model"
-            fill
-            sizes="300px"
-            className="object-cover"
-          />
-        </div>
-
-        <div className="flex flex-1 flex-col items-center justify-center p-6 md:p-8 text-center">
-          {/* Top Toggle: Newsletter vs Sign In */}
-          <div className="flex items-center gap-4 mb-4 border-b border-black/10 pb-2 w-full justify-center text-xs uppercase tracking-wider font-semibold">
-            <button
-              type="button"
-              onClick={() => setView("subscribe")}
-              className={`pb-1 transition-colors ${view === "subscribe" ? "border-b-2 border-black text-black font-bold" : "text-black/50 hover:text-black"}`}
-            >
-              Get 5% Off
-            </button>
-            <span className="text-black/30">|</span>
-            <button
-              type="button"
-              onClick={() => setView("login")}
-              className={`pb-1 transition-colors ${view === "login" ? "border-b-2 border-black text-black font-bold" : "text-black/50 hover:text-black"}`}
-            >
-              Sign In / Log In
-            </button>
-          </div>
-
-          {view === "subscribe" ? (
-            <div className="flex flex-col items-center gap-3 w-full">
-              <h2 className="heading text-[20px] md:text-[22px] leading-tight text-black">
-                Subscribe Our newsletter to get 5% off
-              </h2>
-              <p className="text-xs md:text-sm text-black/70 max-w-sm">
-                Sign up to our newsletter today and get exclusive access to our upcoming collections, deals and discounts.
-              </p>
-              <NewsletterForm id="newsletter-popup" className="w-full text-left my-2" />
-              <div className="flex items-center gap-2 pt-1 w-full justify-center">
-                <Link
-                  href="/collections/1"
-                  onClick={close}
-                  className="btn text-xs py-2.5 px-6 tracking-widest uppercase font-bold bg-black text-white hover:bg-neutral-800"
-                >
-                  Shop Now
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <form onSubmit={handleLoginSubmit} className="flex flex-col items-center gap-3 w-full">
-              <h2 className="heading text-[20px] md:text-[22px] leading-tight text-black">
-                Welcome Back to Sillhouete
-              </h2>
-              <p className="text-xs text-black/70 max-w-sm mb-1">
-                Enter your credentials to access your order history and saved wishlist.
-              </p>
-              <div className="w-full space-y-2 text-left">
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-black/60 mb-0.5">Email</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    required
-                    className="w-full border border-black/20 p-2 text-xs outline-none focus:border-black font-medium"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-black/60 mb-0.5">Password</label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    required
-                    className="w-full border border-black/20 p-2 text-xs outline-none focus:border-black font-medium"
-                  />
-                </div>
-              </div>
-              {loginMsg ? (
-                <p className="text-xs text-green-700 font-bold">{loginMsg}</p>
-              ) : (
-                <button
-                  type="submit"
-                  className="btn w-full mt-2 text-xs py-3 tracking-widest uppercase font-bold"
-                >
-                  Sign In
-                </button>
-              )}
-              <div className="text-xs text-black/60 mt-1">
-                New customer?{" "}
-                <Link href="/account" onClick={close} className="underline text-black font-semibold">
-                  Create account
-                </Link>
-              </div>
-            </form>
-          )}
-
-          <Socials className="mt-4 pt-3 border-t border-black/10 w-full justify-center" />
-        </div>
-
+        {/* Circular close button matching Image 1 */}
         <button
           type="button"
           onClick={close}
           aria-label="Close"
-          className="absolute right-2.5 top-2.5 grid h-8 w-8 place-items-center bg-white/90 text-black/70 hover:text-black rounded-full shadow-sm"
+          className="absolute -top-3 -right-3 z-30 flex h-9 w-9 items-center justify-center rounded-full bg-white text-black shadow-lg hover:bg-neutral-100 transition-colors"
         >
-          <X className="h-4 w-4" />
+          <X className="h-4 w-4 stroke-[2]" />
         </button>
+
+        {/* Left Content Column matching Image 1 */}
+        <div className="flex flex-1 flex-col items-center justify-center p-8 md:p-10 text-center">
+          <h2 className="font-serif text-[20px] md:text-[23px] font-bold uppercase tracking-[0.05em] text-[#111111] leading-snug">
+            SUBSCRIBE OUR NEWSLETTER TO GET 5% OFF
+          </h2>
+          <p className="mt-3 text-xs md:text-sm text-neutral-600 max-w-sm leading-relaxed">
+            Sign up to our newsletter today and get exclusive access to our upcoming collections, deals and discounts.
+          </p>
+
+          {/* Email input with attached black arrow submit button matching Image 1 */}
+          <form onSubmit={handleSubmit} className="mt-6 w-full max-w-sm">
+            <div className="flex items-stretch border border-black/30 focus-within:border-black transition-colors">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setStatus("idle");
+                  setMessage("");
+                }}
+                placeholder="Enter your email"
+                autoComplete="email"
+                required
+                className="min-w-0 flex-1 bg-white px-3.5 py-2.5 text-xs outline-none text-black placeholder:text-neutral-500"
+              />
+              <button
+                type="submit"
+                disabled={status === "loading"}
+                aria-label="Subscribe"
+                className="bg-[#111111] hover:bg-black text-white px-5 flex items-center justify-center transition-colors shrink-0"
+              >
+                <ArrowRight className="h-4 w-4 text-white stroke-[2]" />
+              </button>
+            </div>
+
+            {status === "error" && (
+              <p className="mt-2 text-xs text-red-600 font-medium">{message}</p>
+            )}
+            {status === "done" && (
+              <p className="mt-2 text-xs text-emerald-700 font-medium flex items-center justify-center gap-1">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                <span>{message}</span>
+              </p>
+            )}
+
+            {/* Solid Black SHOP NOW button matching Image 1 */}
+            <Link
+              href="/collections/1"
+              onClick={close}
+              className="mt-4 block w-full bg-[#111111] hover:bg-black text-white py-3 text-xs font-bold uppercase tracking-[0.25em] transition-colors text-center"
+            >
+              SHOP NOW
+            </Link>
+
+            {/* Social Icons matching Image 1 */}
+            <div className="mt-6 flex items-center justify-center">
+              <Socials />
+            </div>
+          </form>
+        </div>
+
+        {/* Right Model Image matching Image 1 */}
+        <div className="relative hidden w-[45%] md:block bg-neutral-100 min-h-[460px]">
+          <Image
+            src={POPUP_IMAGE}
+            alt="Sillhouete Haute Couture Model"
+            fill
+            sizes="400px"
+            priority
+            className="object-cover"
+          />
+        </div>
       </div>
     </div>
   );

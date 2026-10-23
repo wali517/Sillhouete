@@ -6,8 +6,6 @@ import { useRouter } from "next/navigation";
 import { User, Package, MapPin, LogOut, CheckCircle2, Search, ArrowRight } from "lucide-react";
 import type { Order } from "@/types";
 import { formatPrice } from "@/lib/format";
-import ProductCard from "@/components/products/ProductCard";
-import { allProducts } from "@/data/products";
 
 export default function AccountPage() {
   const router = useRouter();
@@ -153,24 +151,14 @@ export default function AccountPage() {
             {loadingOrders ? (
               <p className="text-xs text-black/60">Loading orders...</p>
             ) : userOrders.length === 0 ? (
-              <div className="space-y-6">
-                <div className="border border-line bg-soft p-8 text-center space-y-3">
-                  <p className="text-sm font-medium">You haven&apos;t placed any orders yet.</p>
-                  <p className="text-xs text-black/60">
-                    Ready to discover luxury designer dresses? Browse our newest festive arrivals.
-                  </p>
-                  <Link href="/collections/new-arrivals" className="btn mt-2 text-xs bg-black text-white hover:bg-neutral-800">
-                    Shop New Arrivals
-                  </Link>
-                </div>
-                <div>
-                  <h3 className="heading text-[16px] mb-4">Recommended For You</h3>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                    {allProducts.slice(0, 3).map((p) => (
-                      <ProductCard key={p.id} product={p} />
-                    ))}
-                  </div>
-                </div>
+              <div className="border border-line bg-soft p-8 text-center space-y-3">
+                <p className="text-sm font-medium">You haven&apos;t placed any orders yet.</p>
+                <p className="text-xs text-black/60">
+                  Ready to discover luxury designer dresses? Browse our newest festive arrivals.
+                </p>
+                <Link href="/collections/new-arrivals" className="btn mt-2 text-xs bg-black text-white hover:bg-neutral-800">
+                  Shop New Arrivals
+                </Link>
               </div>
             ) : (
               <div className="border border-line divide-y divide-line">
