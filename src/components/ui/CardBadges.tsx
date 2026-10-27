@@ -6,6 +6,8 @@ export function AmexBadge({ className = "h-5 w-8" }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       viewBox="0 0 38 24"
+      width="38"
+      height="24"
       fill="none"
       aria-labelledby="pi-american_express"
       className={`${className} rounded-[3px] shadow-2xs border border-neutral-200 shrink-0`}
@@ -22,9 +24,11 @@ export function AmexBadge({ className = "h-5 w-8" }: { className?: string }) {
 export function DinersBadge({ className = "h-5 w-8" }: { className?: string }) {
   return (
     <svg
+      viewBox="0 0 38 24"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
-      viewBox="0 0 38 24"
+      width="38"
+      height="24"
       aria-labelledby="pi-diners_club"
       className={`${className} rounded-[3px] shadow-2xs border border-neutral-200 shrink-0`}
     >
@@ -39,11 +43,13 @@ export function DinersBadge({ className = "h-5 w-8" }: { className?: string }) {
 export function DiscoverBadge({ className = "h-5 w-8" }: { className?: string }) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
-      role="img"
       viewBox="0 0 38 24"
-      fill="none"
+      width="38"
+      height="24"
+      role="img"
       aria-labelledby="pi-discover"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
       className={`${className} rounded-[3px] shadow-2xs border border-neutral-200 shrink-0`}
     >
       <title id="pi-discover">Discover</title>
@@ -78,10 +84,12 @@ export function DiscoverBadge({ className = "h-5 w-8" }: { className?: string })
 export function JcbBadge({ className = "h-5 w-8" }: { className?: string }) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
+      width="38"
+      height="24"
       role="img"
-      viewBox="0 0 38 24"
       aria-labelledby="pi-jcb"
+      viewBox="0 0 38 24"
+      xmlns="http://www.w3.org/2000/svg"
       className={`${className} rounded-[3px] shadow-2xs border border-neutral-200 shrink-0`}
     >
       <title id="pi-jcb">JCB</title>
@@ -105,6 +113,8 @@ export function MastercardBadge({ className = "h-5 w-8" }: { className?: string 
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       viewBox="0 0 38 24"
+      width="38"
+      height="24"
       fill="none"
       aria-labelledby="pi-master"
       className={`${className} rounded-[3px] shadow-2xs border border-neutral-200 shrink-0`}
@@ -126,6 +136,8 @@ export function VisaBadge({ className = "h-5 w-8" }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       viewBox="0 0 38 24"
+      width="38"
+      height="24"
       fill="none"
       aria-labelledby="pi-visa"
       className={`${className} rounded-[3px] shadow-2xs border border-neutral-200 shrink-0`}

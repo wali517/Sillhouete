@@ -1,19 +1,19 @@
 [
   {
-    "id": "cust-1792736484005",
-    "name": "jwdjwkwe weknmdwefm",
-    "email": "43223344442222",
-    "phone": "2323423432",
-    "createdAt": "2026-10-23T06:21:24.005Z",
+    "id": "cust-1792999075002",
+    "name": "kkfwfw wldekmw",
+    "email": "sdjc@gmail.com",
+    "phone": "222222222224",
+    "createdAt": "2026-10-26T07:17:55.002Z",
     "ordersCount": 1,
-    "totalSpent": 39900
+    "totalSpent": 119700
   },
   {
     "id": "cust-1",
     "name": "Ayesha Khan",
     "email": "ayesha.khan@example.com",
     "phone": "+92 300 1234567",
-    "createdAt": "2026-09-23T06:21:23.707Z",
+    "createdAt": "2026-09-26T07:16:17.789Z",
     "ordersCount": 1,
     "totalSpent": 44900
   },
@@ -22,7 +22,7 @@
     "name": "Fatima Zahra",
     "email": "fatima.z@example.com",
     "phone": "+92 321 9876543",
-    "createdAt": "2026-10-08T06:21:23.707Z",
+    "createdAt": "2026-10-11T07:16:17.789Z",
     "ordersCount": 1,
     "totalSpent": 33150
   }

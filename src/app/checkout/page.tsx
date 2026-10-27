@@ -613,9 +613,9 @@ export default function CheckoutPage() {
                   {/* Bank Deposit Details Subpanel */}
                   {paymentMethod === "bank_deposit" && (
                     <div className="border-t border-neutral-200 bg-[#fbfbfb] p-4 text-xs text-neutral-800 space-y-1.5 leading-relaxed">
-                      <p className="font-semibold text-black">Bank: Meezan Bank</p>
+                      <p className="font-semibold text-black">Bank Meezan Bank</p>
                       <p>
-                        <span className="text-neutral-600">Ac title: </span>
+                        <span className="text-neutral-600">Ac title </span>
                         <strong>SILLHOUETE</strong>
                       </p>
                       <p>
@@ -687,7 +687,7 @@ export default function CheckoutPage() {
                 disabled={isProcessing}
                 className="checkout-submit-btn w-full bg-[#005bd3] hover:bg-[#004bb0] text-white py-3.5 px-6 rounded-[6px] font-semibold text-[15px] transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
-                {isProcessing ? "Processing..." : "Complete order"}
+                {isProcessing ? "Processing..." : paymentMethod === "bank_deposit" ? "Complete order" : "Pay now"}
               </button>
             </div>
 
