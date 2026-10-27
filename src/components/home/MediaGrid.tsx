@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { MEDIA_IMAGE, VIDEO_URL } from "@/data/campaigns";
-
 export default function MediaGrid() {
   const video = (
     <video

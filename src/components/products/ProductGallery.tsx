@@ -140,13 +140,6 @@ export default function ProductGallery({ product }: { product: Product }) {
               className={`object-cover transition-transform duration-300 ${
                 isZoomed ? "scale-150" : "scale-100"
               }`}
-              style={
-                isZoomed
-                  ? {
-                      transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
-                    }
-                  : undefined
-              }
             />
 
             <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-white/80 p-1.5 text-black shadow backdrop-blur-sm">

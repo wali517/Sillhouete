@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { deleteBlog, getBlogBySlug, saveBlog } from "@/lib/db";
+import { getBlogBySlug, saveBlog, deleteBlog } from "@/lib/db";
 
-type Props = { params: Promise<{ id: string }> };
-
-export async function GET(req: Request, { params }: Props) {
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   try {
-    const { id } = await params;
     const blog = await getBlogBySlug(id);
     if (!blog) return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     return NextResponse.json({ blog });
@@ -15,23 +16,32 @@ export async function GET(req: Request, { params }: Props) {
   }
 }
 
-export async function PUT(req: Request, { params }: Props) {
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   try {
-    const { id } = await params;
     const body = await req.json();
-    const updated = await saveBlog({ ...body, id });
-    return NextResponse.json({ success: true, blog: updated });
+    if (!body.title || !body.content) {
+      return NextResponse.json({ error: "Title and content are required" }, { status: 400 });
+    }
+    const blog = await saveBlog({ ...body, id });
+    return NextResponse.json({ success: true, blog });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to update blog";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
-export async function DELETE(req: Request, { params }: Props) {
+export async function DELETE(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   try {
-    const { id } = await params;
-    const deleted = await deleteBlog(id);
-    if (!deleted) return NextResponse.json({ error: "Blog not found" }, { status: 404 });
+    const ok = await deleteBlog(id);
+    if (!ok) return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     return NextResponse.json({ success: true });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to delete blog";

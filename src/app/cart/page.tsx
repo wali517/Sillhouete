@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, ShieldCheck } from "lucide-react";
 import { useStore } from "@/components/providers/StoreProvider";
 import ProductCard from "@/components/products/ProductCard";
-import { allProducts } from "@/data/products";
+import type { Product } from "@/types";
 
-const FREE_SHIPPING_THRESHOLD = 140000;
+const FREE_SHIPPING_THRESHOLD = 14000;
 
 export default function CartPage() {
   const router = useRouter();
@@ -24,6 +24,14 @@ export default function CartPage() {
   } = useStore();
   const [agree, setAgree] = useState(true);
   const [error, setError] = useState("");
+  const [recentProducts, setRecentProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    fetch("/api/products?limit=4")
+      .then((r) => r.json())
+      .then((d) => setRecentProducts(d.products?.slice(0, 4) ?? []))
+      .catch(() => {});
+  }, []);
 
   const handleCheckout = () => {
     if (!agree) {
@@ -274,7 +282,7 @@ export default function CartPage() {
           Recently Viewed
         </h2>
         <div className="grid grid-cols-2 gap-[10px] md:grid-cols-4 md:gap-[17px]">
-          {allProducts.slice(0, 4).map((p) => (
+          {recentProducts.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
         </div>

@@ -99,6 +99,10 @@ export interface OrderItem {
   size: string;
   quantity: number;
   image: string;
+  dupatta?: string;
+  adOn?: string;
+  expedite?: boolean;
+  slip?: string;
 }
 
 export interface OrderShippingAddress {
@@ -116,7 +120,7 @@ export interface OrderShippingAddress {
 
 export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
-export type PaymentMethod = "stripe" | "cod" | "bank_transfer";
+export type PaymentMethod = "stripe" | "cod" | "bank_transfer" | "payfast" | "bank_deposit";
 
 export interface Order {
   id: string;

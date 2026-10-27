@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { createOrder, getOrders } from "@/lib/db";
+import { runSeedIfEmpty } from "@/lib/seed";
 
 export async function GET(req: Request) {
   try {
+    await runSeedIfEmpty();
     const { searchParams } = new URL(req.url);
     const email = searchParams.get("email");
     const orders = await getOrders();
