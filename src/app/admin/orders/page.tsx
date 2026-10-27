@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Search, Package, ChevronDown, Filter, Printer,
@@ -190,8 +190,8 @@ export default function AdminOrdersPage() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {filtered.map((order) => (
-                  <>
-                    <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+  <Fragment key={order.id}>
+    <tr className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3">
                         <div className="font-mono font-bold text-sm">#{order.orderNumber}</div>
                         <div className="text-xs text-gray-400">{order.currency}</div>
@@ -229,7 +229,7 @@ export default function AdminOrdersPage() {
                       </td>
                     </tr>
                     {expandedId === order.id && (
-                      <tr key={`${order.id}-expand`} className="bg-gray-50">
+  <tr key={`${order.id}-expand`} className="bg-gray-50">
                         <td colSpan={8} className="px-4 pb-4 pt-2">
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             <div>
@@ -279,8 +279,8 @@ export default function AdminOrdersPage() {
                         </td>
                       </tr>
                     )}
-                  </>
-                ))}
+                   </Fragment>
+))}
               </tbody>
             </table>
           )}
