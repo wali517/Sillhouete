@@ -1,6 +1,7 @@
+
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/sillhouete";
+const MONGODB_URI = process.env.MONGODB_URI;
 
 declare global {
   // eslint-disable-next-line no-var
@@ -10,6 +11,10 @@ declare global {
 let cached = global._mongooseConn;
 
 export async function connectDB(): Promise<typeof mongoose> {
+  if (!MONGODB_URI) {
+    throw new Error("MONGODB_URI is missing. Check your .env.local file.");
+  }
+
   if (cached) {
     return cached;
   }
@@ -25,15 +30,14 @@ export async function connectDB(): Promise<typeof mongoose> {
 
   try {
     await cached;
-    console.log("✅ MongoDB connected:", MONGODB_URI);
+    console.log("MongoDB connected successfully.");
+    return cached;
   } catch (err) {
     global._mongooseConn = undefined;
     cached = undefined;
-    console.error("❌ MongoDB connection failed:", err);
+   console.error("MongoDB connection failed:", err);
     throw err;
   }
-
-  return cached;
 }
 
 export default connectDB;
