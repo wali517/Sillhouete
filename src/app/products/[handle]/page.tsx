@@ -10,6 +10,8 @@ import CustomerTestimonials from "@/components/products/CustomerTestimonials";
 import KeyActives from "@/components/products/KeyActives";
 import ProductVideoReel from "@/components/products/ProductVideoReel";
 import { allProducts, getProduct } from "@/data/products";
+import { getProductByHandle, getProducts } from "@/lib/db";
+import type { Product } from "@/types";
 import { SEED_BLOGS } from "@/data/seed-blogs";
 import { ChevronRight, Globe, ShieldCheck, Truck, RotateCcw, Share2 } from "lucide-react";
 
@@ -21,7 +23,13 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props) {
   const { handle } = await params;
-  const p = getProduct(handle);
+  let p = null;
+  try {
+    p = await getProductByHandle(handle);
+  } catch {
+    // fallback
+  }
+  if (!p) p = getProduct(handle);
   if (!p) return { title: "Product – Sillhouete" };
 
   const pageTitle = p.handle === "iris-rm-03"
@@ -62,11 +70,28 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function ProductPage({ params }: Props) {
   const { handle } = await params;
-  const product = getProduct(handle);
+  let product = null;
+  try {
+    product = await getProductByHandle(handle);
+  } catch {
+    // fallback
+  }
+  if (!product) product = getProduct(handle);
   if (!product) notFound();
 
-  // Related products
-  const related = allProducts.filter((p) => p.handle !== handle).slice(0, 4);
+  // Related products from DB or fallback
+  let related: Product[] = [];
+  try {
+    const dbProds = await getProducts();
+    if (dbProds && dbProds.length > 0) {
+      related = dbProds.filter((p) => p.handle !== handle).slice(0, 4);
+    }
+  } catch {
+    // fallback
+  }
+  if (related.length === 0) {
+    related = allProducts.filter((p) => p.handle !== handle).slice(0, 4);
+  }
 
   // Exact JSON-LD structured data as on the real Sillhouete website
   const jsonLd = {

@@ -1,9 +1,11 @@
-﻿/**
+/**
  * db.ts â€” MongoDB-backed data layer for Sillhouete
  * Drop-in replacement for the previous JSON flat-file implementation.
  * All public function signatures are identical so no other file needs changing.
  */
 
+import fs from "fs";
+import path from "path";
 import connectDB from "./mongodb";
 import { ProductModel } from "./models/Product";
 import { OrderModel } from "./models/Order";
@@ -11,6 +13,7 @@ import { CustomerModel } from "./models/Customer";
 import { ContactMessageModel } from "./models/ContactMessage";
 import { BlogPostModel } from "./models/BlogPost";
 import { SiteSettingsModel } from "./models/SiteSettings";
+import { allProducts as staticCatalog } from "@/data/products";
 
 import type {
   Product,
@@ -22,6 +25,33 @@ import type {
   OrderStatus,
   PaymentStatus,
 } from "@/types";
+
+// ─── Local JSON File Helpers for Offline / Unconnected Resilience ───
+function readLocalJson<T>(filename: string, fallback: T): T {
+  try {
+    const filePath = path.join(process.cwd(), "data", filename);
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, "utf-8");
+      return JSON.parse(data) as T;
+    }
+  } catch (e) {
+    console.warn(`Could not read local ${filename}:`, e);
+  }
+  return fallback;
+}
+
+function writeLocalJson<T>(filename: string, data: T) {
+  try {
+    const dataDir = path.join(process.cwd(), "data");
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+    const filePath = path.join(dataDir, filename);
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
+  } catch (e) {
+    console.warn(`Could not write local ${filename}:`, e);
+  }
+}
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -42,21 +72,39 @@ function toPlainArray<T>(docs: unknown[]): T[] {
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ PRODUCTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 export async function getProducts(): Promise<Product[]> {
-  await connectDB();
-  const docs = await ProductModel.find({}).sort({ createdAt: -1 }).lean();
-  return toPlainArray<Product>(docs );
+  try {
+    await connectDB();
+    const docs = await ProductModel.find({}).sort({ createdAt: -1 }).lean();
+    const list = toPlainArray<Product>(docs);
+    if (list && list.length > 0) return list;
+  } catch (err) {
+    console.warn("MongoDB getProducts fallback:", err);
+  }
+  return staticCatalog;
 }
 
 export async function getProductByHandle(handle: string): Promise<Product | undefined> {
-  await connectDB();
-  const doc = await ProductModel.findOne({ handle }).lean();
-  return toPlain<Product>(doc);
+  try {
+    await connectDB();
+    const doc = await ProductModel.findOne({ handle }).lean();
+    const prod = toPlain<Product>(doc);
+    if (prod) return prod;
+  } catch (err) {
+    console.warn("MongoDB getProductByHandle fallback:", err);
+  }
+  return staticCatalog.find((p) => p.handle === handle);
 }
 
 export async function getProductById(id: string): Promise<Product | undefined> {
-  await connectDB();
-  const doc = await ProductModel.findOne({ id }).lean();
-  return toPlain<Product>(doc);
+  try {
+    await connectDB();
+    const doc = await ProductModel.findOne({ id }).lean();
+    const prod = toPlain<Product>(doc);
+    if (prod) return prod;
+  } catch (err) {
+    console.warn("MongoDB getProductById fallback:", err);
+  }
+  return staticCatalog.find((p) => p.id === id);
 }
 
 export async function saveProduct(
@@ -132,14 +180,27 @@ export async function deleteProduct(id: string): Promise<boolean> {
 }
 
 export async function searchProducts(query: string): Promise<Product[]> {
-  await connectDB();
-  const regex = new RegExp(query, "i");
-  const docs = await ProductModel.find({
-    $or: [{ title: regex }, { category: regex }, { sku: regex }, { description: regex }],
-  })
-    .limit(50)
-    .lean();
-  return toPlainArray<Product>(docs );
+  try {
+    await connectDB();
+    const regex = new RegExp(query, "i");
+    const docs = await ProductModel.find({
+      $or: [{ title: regex }, { category: regex }, { sku: regex }, { description: regex }],
+    })
+      .limit(50)
+      .lean();
+    const list = toPlainArray<Product>(docs);
+    if (list && list.length > 0) return list;
+  } catch (err) {
+    console.warn("MongoDB searchProducts fallback:", err);
+  }
+  const q = query.toLowerCase();
+  return staticCatalog.filter(
+    (p) =>
+      p.title.toLowerCase().includes(q) ||
+      (p.category && p.category.toLowerCase().includes(q)) ||
+      (p.sku && p.sku.toLowerCase().includes(q)) ||
+      p.alt.toLowerCase().includes(q)
+  );
 }
 
 export async function getProductsByCategory(category: string): Promise<Product[]> {
@@ -150,43 +211,84 @@ export async function getProductsByCategory(category: string): Promise<Product[]
   return toPlainArray<Product>(docs );
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ ORDERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ──────────────── ORDERS ──────────────── */
 
 export async function getOrders(): Promise<Order[]> {
-  await connectDB();
-  const docs = await OrderModel.find({}).sort({ createdAt: -1 }).lean();
-  return toPlainArray<Order>(docs );
+  try {
+    await connectDB();
+    const docs = await OrderModel.find({}).sort({ createdAt: -1 }).lean();
+    const list = toPlainArray<Order>(docs);
+    if (list && list.length > 0) return list;
+  } catch (err) {
+    console.warn("MongoDB getOrders fallback to local file:", err);
+  }
+  return readLocalJson<Order[]>("orders.json", []);
 }
 
 export async function getOrderById(id: string): Promise<Order | undefined> {
-  await connectDB();
-  const doc = await OrderModel.findOne({
-    $or: [{ id }, { orderNumber: id }],
-  }).lean();
-  return toPlain<Order>(doc);
+  try {
+    await connectDB();
+    const doc = await OrderModel.findOne({
+      $or: [{ id }, { orderNumber: id }],
+    }).lean();
+    const order = toPlain<Order>(doc);
+    if (order) return order;
+  } catch (err) {
+    console.warn("MongoDB getOrderById fallback:", err);
+  }
+  const orders = readLocalJson<Order[]>("orders.json", []);
+  return orders.find((o) => o.id === id || o.orderNumber === id);
 }
 
 export async function createOrder(
   data: Omit<Order, "id" | "orderNumber" | "createdAt">
 ): Promise<Order> {
-  await connectDB();
-
   const id = `ord-${Date.now()}`;
   const orderNumber = `SLH-${Math.floor(10000 + Math.random() * 90000)}`;
 
-  const newOrder = {
+  const newOrder: Order = {
     ...data,
     id,
     orderNumber,
     createdAt: new Date().toISOString(),
   };
 
-  await OrderModel.create(newOrder);
+  try {
+    await connectDB();
+    await OrderModel.create(newOrder);
+    await recordCustomerFromOrder(newOrder);
+  } catch (err) {
+    console.warn("MongoDB createOrder fallback to local storage:", err);
+    // Persist to local JSON so admin or local review still works
+    const orders = readLocalJson<Order[]>("orders.json", []);
+    orders.unshift(newOrder);
+    writeLocalJson("orders.json", orders);
+    try {
+      const customers = readLocalJson<Customer[]>("customers.json", []);
+      const email = newOrder.customer.email.toLowerCase();
+      const existing = customers.find((c) => c.email.toLowerCase() === email);
+      if (existing) {
+        existing.ordersCount = (existing.ordersCount || 0) + 1;
+        existing.totalSpent = (existing.totalSpent || 0) + newOrder.total;
+        if (newOrder.customer.phone && !existing.phone) {
+          existing.phone = newOrder.customer.phone;
+        }
+      } else {
+        customers.push({
+          id: `cust-${Date.now()}`,
+          name: newOrder.customer.name,
+          email,
+          phone: newOrder.customer.phone || "",
+          ordersCount: 1,
+          totalSpent: newOrder.total,
+          createdAt: new Date().toISOString(),
+        });
+      }
+      writeLocalJson("customers.json", customers);
+    } catch {}
+  }
 
-  // Update or create customer
-  await recordCustomerFromOrder(newOrder as Order);
-
-  return newOrder as Order;
+  return newOrder;
 }
 
 export async function updateOrderStatus(
@@ -198,59 +300,87 @@ export async function updateOrderStatus(
     courier?: string;
   }
 ): Promise<Order | null> {
-  await connectDB();
+  try {
+    await connectDB();
+    const updateFields: Record<string, unknown> = {};
+    if (updates.status) updateFields.status = updates.status;
+    if (updates.paymentStatus) updateFields.paymentStatus = updates.paymentStatus;
+    if (updates.trackingNumber !== undefined) updateFields.trackingNumber = updates.trackingNumber;
+    if (updates.courier !== undefined) updateFields.courier = updates.courier;
 
-  const updateFields: Record<string, unknown> = {};
-  if (updates.status) updateFields.status = updates.status;
-  if (updates.paymentStatus) updateFields.paymentStatus = updates.paymentStatus;
-  if (updates.trackingNumber !== undefined) updateFields.trackingNumber = updates.trackingNumber;
-  if (updates.courier !== undefined) updateFields.courier = updates.courier;
+    const doc = await OrderModel.findOneAndUpdate(
+      { $or: [{ id }, { orderNumber: id }] },
+      { $set: updateFields },
+      { new: true }
+    ).lean();
 
-  const doc = await OrderModel.findOneAndUpdate(
-    { $or: [{ id }, { orderNumber: id }] },
-    { $set: updateFields },
-    { new: true }
-  ).lean();
+    if (doc) return toPlain<Order>(doc) ?? null;
+  } catch (err) {
+    console.warn("MongoDB updateOrderStatus fallback:", err);
+  }
 
-  return toPlain<Order>(doc) ?? null;
+  const orders = readLocalJson<Order[]>("orders.json", []);
+  const idx = orders.findIndex((o) => o.id === id || o.orderNumber === id);
+  if (idx !== -1) {
+    orders[idx] = { ...orders[idx], ...updates };
+    writeLocalJson("orders.json", orders);
+    return orders[idx];
+  }
+  return null;
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ CUSTOMERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ──────────────── CUSTOMERS ──────────────── */
 
 export async function getCustomers(): Promise<Customer[]> {
-  await connectDB();
-  const docs = await CustomerModel.find({}).sort({ createdAt: -1 }).lean();
-  return toPlainArray<Customer>(docs );
+  try {
+    await connectDB();
+    const docs = await CustomerModel.find({}).sort({ createdAt: -1 }).lean();
+    const list = toPlainArray<Customer>(docs);
+    if (list && list.length > 0) return list;
+  } catch (err) {
+    console.warn("MongoDB getCustomers fallback:", err);
+  }
+  return readLocalJson<Customer[]>("customers.json", []);
 }
 
 export async function getCustomerById(id: string): Promise<Customer | undefined> {
-  await connectDB();
-  const doc = await CustomerModel.findOne({ $or: [{ id }, { email: id }] }).lean();
-  return toPlain<Customer>(doc);
+  try {
+    await connectDB();
+    const doc = await CustomerModel.findOne({ $or: [{ id }, { email: id }] }).lean();
+    const cust = toPlain<Customer>(doc);
+    if (cust) return cust;
+  } catch (err) {
+    console.warn("MongoDB getCustomerById fallback:", err);
+  }
+  const customers = readLocalJson<Customer[]>("customers.json", []);
+  return customers.find((c) => c.id === id || c.email.toLowerCase() === id.toLowerCase());
 }
 
 async function recordCustomerFromOrder(order: Order) {
-  await connectDB();
+  try {
+    await connectDB();
+    const email = order.customer.email.toLowerCase();
+    const existing = await CustomerModel.findOne({ email });
 
-  const email = order.customer.email.toLowerCase();
-  const existing = await CustomerModel.findOne({ email });
-
-  if (existing) {
-    existing.ordersCount += 1;
-    existing.totalSpent += order.total;
-    if (order.customer.phone && !existing.phone) {
-      existing.phone = order.customer.phone;
+    if (existing) {
+      existing.ordersCount += 1;
+      existing.totalSpent += order.total;
+      if (order.customer.phone && !existing.phone) {
+        existing.phone = order.customer.phone;
+      }
+      await existing.save();
+    } else {
+      await CustomerModel.create({
+        id: `cust-${Date.now()}`,
+        name: order.customer.name,
+        email,
+        phone: order.customer.phone || "",
+        ordersCount: 1,
+        totalSpent: order.total,
+      });
     }
-    await existing.save();
-  } else {
-    await CustomerModel.create({
-      id: `cust-${Date.now()}`,
-      name: order.customer.name,
-      email,
-      phone: order.customer.phone || "",
-      ordersCount: 1,
-      totalSpent: order.total,
-    });
+  } catch (err) {
+    console.warn("recordCustomerFromOrder error:", err);
   }
 }
 
@@ -393,17 +523,24 @@ const DEFAULT_SETTINGS: Partial<SiteSettings> = {
 };
 
 export async function getSettings(): Promise<SiteSettings> {
-  await connectDB();
+  let settings: SiteSettings = {
+    ...DEFAULT_SETTINGS,
+    stripePublishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "",
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY || "",
+  } as SiteSettings;
 
-  let doc = await SiteSettingsModel.findOne({}).lean();
-
-  if (!doc) {
-    // Create default settings document
-    const created = await SiteSettingsModel.create(DEFAULT_SETTINGS);
-    doc = created.toObject();
+  try {
+    await connectDB();
+    let doc = await SiteSettingsModel.findOne({}).lean();
+    if (!doc) {
+      const created = await SiteSettingsModel.create(DEFAULT_SETTINGS);
+      doc = created.toObject();
+    }
+    const dbSettings = toPlain<SiteSettings>(doc);
+    if (dbSettings) settings = { ...settings, ...dbSettings };
+  } catch (err) {
+    console.warn("MongoDB getSettings fallback:", err);
   }
-
-  const settings = toPlain<SiteSettings>(doc)!;
 
   // Environment variables always override stored values
   if (process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
@@ -417,14 +554,18 @@ export async function getSettings(): Promise<SiteSettings> {
 }
 
 export async function updateSettings(updates: Partial<SiteSettings>): Promise<SiteSettings> {
-  await connectDB();
+  try {
+    await connectDB();
+    const doc = await SiteSettingsModel.findOneAndUpdate(
+      {},
+      { $set: updates },
+      { upsert: true, new: true }
+    ).lean();
+    if (doc) return toPlain<SiteSettings>(doc)!;
+  } catch (err) {
+    console.warn("MongoDB updateSettings fallback:", err);
+  }
 
-  const doc = await SiteSettingsModel.findOneAndUpdate(
-    {},
-    { $set: updates },
-    { upsert: true, new: true }
-  ).lean();
-
-  return toPlain<SiteSettings>(doc)!;
+  return { ...DEFAULT_SETTINGS, ...updates } as SiteSettings;
 }
 

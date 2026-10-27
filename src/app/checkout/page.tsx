@@ -298,6 +298,9 @@ function CheckoutForm() {
 
   // Card details
   const [cardName, setCardName] = useState("");
+  const [mockCardNum, setMockCardNum] = useState("");
+  const [mockExp, setMockExp] = useState("");
+  const [mockCvc, setMockCvc] = useState("");
 
   // Submit
   const [isProcessing, setIsProcessing] = useState(false);
@@ -464,20 +467,16 @@ function CheckoutForm() {
             <ShoppingBag className="w-5 h-5" />
           </div>
 
-          {/* Centered Urdu & English Brand Logo */}
-          <Link href="/" className="flex flex-col items-center leading-tight select-none">
-            <span
-              className="text-[14px] font-medium text-black tracking-normal"
-              style={{ fontFamily: "'Noto Nastaliq Urdu', 'Scheherazade New', serif" }}
-            >
-              سلوٹ
-            </span>
-            <span
-              className="text-[24px] md:text-[28px] font-normal tracking-[0.02em] text-black"
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            >
-              Sillhouete
-            </span>
+          {/* Centered Urdu & English Brand Logo matching real website */}
+          <Link href="/" className="flex items-center justify-center select-none" aria-label="Sillhouete home">
+            <Image
+              src="https://cdn.shopify.com/s/files/1/0709/7755/2627/files/Png_Logo_for_Website_5ca804ea-dc2c-4ca1-bf89-65dd735be7af_x320.png?v=1728024729"
+              alt="Sillhouete"
+              width={200}
+              height={71}
+              priority
+              className="h-[46px] md:h-[54px] w-auto object-contain"
+            />
           </Link>
 
           {/* Blue Shopping Bag Icon on right */}
@@ -666,29 +665,55 @@ function CheckoutForm() {
 
                     {paymentMethod === "credit_card" && (
                       <div className="border-t border-[#d9d9d9] bg-[#f7f7f7] p-4 space-y-3">
-                        {/* Demo card helper */}
-                        <div className="bg-white border border-[#d9d9d9] rounded-[6px] p-2.5 text-[12px] text-[#555] flex items-center gap-2">
-                          <Lock className="w-3.5 h-3.5 text-[#005bd3] shrink-0" />
-                          <span>
-                            <strong>Demo Mode:</strong> Card payment will create a verified order locally. Real Stripe keys can be updated in Admin.
-                          </span>
-                        </div>
-                        <StripeFloatingField label="Card number" endIcon={<Lock className="w-4 h-4" />}>
-                          <CardNumberElement options={STRIPE_ELEMENT_STYLE} />
-                        </StripeFloatingField>
-                        <div className="grid grid-cols-2 gap-2">
-                          <StripeFloatingField label="Expiration date (MM / YY)">
-                            <CardExpiryElement options={STRIPE_ELEMENT_STYLE} />
-                          </StripeFloatingField>
-                          <StripeFloatingField label="Security code" endIcon={<HelpCircle className="w-4 h-4" />}>
-                            <CardCvcElement options={STRIPE_ELEMENT_STYLE} />
-                          </StripeFloatingField>
-                        </div>
+                        {stripe ? (
+                          <>
+                            <StripeFloatingField label="Card number" endIcon={<Lock className="w-4 h-4" />}>
+                              <CardNumberElement options={STRIPE_ELEMENT_STYLE} />
+                            </StripeFloatingField>
+                            <div className="grid grid-cols-2 gap-2">
+                              <StripeFloatingField label="Expiration date (MM / YY)">
+                                <CardExpiryElement options={STRIPE_ELEMENT_STYLE} />
+                              </StripeFloatingField>
+                              <StripeFloatingField label="Security code" endIcon={<HelpCircle className="w-4 h-4" />}>
+                                <CardCvcElement options={STRIPE_ELEMENT_STYLE} />
+                              </StripeFloatingField>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <FloatingInput
+                              id="mockCardNum"
+                              label="Card number"
+                              value={mockCardNum}
+                              onChange={(e) => setMockCardNum(e.target.value)}
+                              autoComplete="cc-number"
+                              endIcon={<Lock className="w-4 h-4" />}
+                            />
+                            <div className="grid grid-cols-2 gap-2">
+                              <FloatingInput
+                                id="mockExp"
+                                label="Expiration date (MM / YY)"
+                                value={mockExp}
+                                onChange={(e) => setMockExp(e.target.value)}
+                                autoComplete="cc-exp"
+                              />
+                              <FloatingInput
+                                id="mockCvc"
+                                label="Security code"
+                                value={mockCvc}
+                                onChange={(e) => setMockCvc(e.target.value)}
+                                autoComplete="cc-csc"
+                                endIcon={<HelpCircle className="w-4 h-4" />}
+                              />
+                            </div>
+                          </>
+                        )}
                         <FloatingInput
                           id="cardName"
                           label="Name on card"
                           value={cardName}
                           onChange={(e) => setCardName(e.target.value)}
+                          autoComplete="cc-name"
                         />
                       </div>
                     )}

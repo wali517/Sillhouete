@@ -12,7 +12,7 @@ export default function EventSection() {
             <div className="relative aspect-[2/3] w-full">
               <Image src={e.image} alt={e.alt} fill sizes="(min-width: 768px) 20vw, 50vw" className="object-cover transition-transform duration-700 motion-reduce:transition-none md:group-hover:scale-105" />
             </div>
-            <span className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black text-white px-5 py-2 text-[13px] uppercase tracking-[0.1em] whitespace-nowrap shadow-md transition-colors group-hover:bg-neutral-800">
+            <span className="absolute bottom-4 left-1/2 -translate-x-1/2 text-black bg-white px-5 py-2 text-[14px] uppercase tracking-[0.1em] shadow-md">
               {e.label}
             </span>
           </Link>

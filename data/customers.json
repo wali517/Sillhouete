@@ -34,5 +34,23 @@
     "createdAt": "2026-10-11T07:16:17.789Z",
     "ordersCount": 1,
     "totalSpent": 33150
+  },
+  {
+    "id": "cust-1793106805369",
+    "name": "Fahad Saleem",
+    "email": "add@gmail.com",
+    "phone": "44442222",
+    "ordersCount": 2,
+    "totalSpent": 77800,
+    "createdAt": "2026-10-27T13:13:25.369Z"
+  },
+  {
+    "id": "cust-1793106902483",
+    "name": "Fahad Saleem",
+    "email": "test@example.com",
+    "phone": "03310397865",
+    "ordersCount": 1,
+    "totalSpent": 37900,
+    "createdAt": "2026-10-27T13:15:02.483Z"
   }
 ]

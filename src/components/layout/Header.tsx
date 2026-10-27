@@ -9,6 +9,7 @@ import { NAV, SITE } from "@/data/site";
 import { allProducts } from "@/data/products";
 import { useStore } from "@/components/providers/StoreProvider";
 import MobileMenu from "./MobileMenu";
+import type { Product } from "@/types";
 
 export default function Header() {
   const router = useRouter();
@@ -17,9 +18,34 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
 
-  const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return q ? allProducts.filter((p) => p.title.toLowerCase().includes(q)).slice(0, 6) : [];
+  const [results, setResults] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const q = query.trim();
+    if (!q) {
+      setResults([]);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      fetch(`/api/products?search=${encodeURIComponent(q)}&limit=6`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.products && d.products.length > 0) {
+            setResults(d.products.slice(0, 6));
+          } else {
+            // Fallback to client-side filtering of initial data
+            const lower = q.toLowerCase();
+            setResults(allProducts.filter((p) => p.title.toLowerCase().includes(lower)).slice(0, 6));
+          }
+        })
+        .catch(() => {
+          const lower = q.toLowerCase();
+          setResults(allProducts.filter((p) => p.title.toLowerCase().includes(lower)).slice(0, 6));
+        });
+    }, 200);
+
+    return () => clearTimeout(timer);
   }, [query]);
 
   useEffect(() => {
@@ -256,9 +282,9 @@ export default function Header() {
             onClick={() => setSearchOpen(false)}
           />
 
-          <div className="relative z-40 border-b border-[#e8e8e1] bg-white px-4 py-4 md:px-10 shadow-xs">
+          <div className="relative z-40 border-b border-[#e8e8e1] bg-white px-4 py-3 md:px-10 shadow-xs">
             <form onSubmit={submit} role="search" className="mx-auto flex max-w-3xl items-center gap-3">
-              <div className="relative flex-1">
+              <div className="relative flex flex-1 items-stretch border border-black bg-white">
                 <input
                   id="header-search"
                   autoFocus
@@ -267,12 +293,12 @@ export default function Header() {
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search"
                   autoComplete="off"
-                  className="w-full h-11 border border-neutral-400 bg-white px-4 pr-11 text-sm text-black placeholder:text-neutral-500 outline-none focus:border-black transition-colors"
+                  className="w-full h-11 bg-transparent px-4 pr-3 text-[14px] text-black placeholder:text-neutral-500 outline-none"
                 />
                 <button
                   type="submit"
                   aria-label="Submit search"
-                  className="absolute right-0 top-0 bottom-0 px-3.5 flex items-center justify-center text-neutral-600 hover:text-black transition-colors"
+                  className="w-12 h-11 bg-black text-white flex items-center justify-center shrink-0 hover:bg-neutral-800 transition-colors cursor-pointer"
                 >
                   <svg
                     aria-hidden="true"
@@ -282,7 +308,7 @@ export default function Header() {
                     viewBox="0 0 64 64"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="2.5"
+                    strokeWidth="3"
                     strokeMiterlimit="10"
                   >
                     <path d="M47.16 28.58A18.58 18.58 0 1 1 28.58 10a18.58 18.58 0 0 1 18.58 18.58ZM54 54 41.94 42" />
@@ -300,13 +326,14 @@ export default function Header() {
                   aria-hidden="true"
                   focusable="false"
                   role="presentation"
-                  className="h-6 w-6"
+                  className="h-5 w-5"
                   viewBox="0 0 64 64"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2.5"
+                  strokeMiterlimit="10"
                 >
-                  <path d="m19 17.61 27.12 27.13m0-27.12L19 44.74" />
+                  <path d="M16 16 48 48M48 16 16 48" />
                 </svg>
               </button>
             </form>
