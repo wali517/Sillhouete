@@ -11,6 +11,12 @@ import {
   ShoppingBag,
   HelpCircle,
 } from "lucide-react";
+import {
+  VisaBadge as SharedVisa,
+  MastercardBadge as SharedMaster,
+  AmexBadge as SharedAmex,
+  UnionPayBadge as SharedUnionPay,
+} from "@/components/ui/CardBadges";
 import { loadStripe, type Stripe as StripeType } from "@stripe/stripe-js";
 import {
   Elements,
@@ -54,42 +60,12 @@ function formatPricePkr(amt: number) {
   return `Rs ${Math.round(amt).toLocaleString("en-US")}.00`;
 }
 
-/* ─── Authentic Card Badges matching Shopify frame-by-frame ─── */
-function VisaBadge() {
-  return (
-    <span className="inline-flex items-center justify-center h-[22px] px-2 rounded-[3px] bg-[#1a1f71] text-white font-bold text-[9px] tracking-wider italic select-none shadow-sm">
-      VISA
-    </span>
-  );
-}
-
-function MastercardBadge() {
-  return (
-    <span className="inline-flex items-center justify-center h-[22px] w-[36px] rounded-[3px] bg-[#111111] overflow-hidden select-none shadow-sm">
-      <span className="flex items-center -space-x-1.5">
-        <span className="w-3.5 h-3.5 rounded-full bg-[#EB001B]" />
-        <span className="w-3.5 h-3.5 rounded-full bg-[#F79E1B] opacity-90" />
-      </span>
-    </span>
-  );
-}
-
-function AmexBadge() {
-  return (
-    <span className="inline-flex items-center justify-center h-[22px] px-1.5 rounded-[3px] bg-[#007bc1] text-white font-black text-[8px] tracking-tight select-none shadow-sm">
-      AMEX
-    </span>
-  );
-}
-
-function UnionPayBadge() {
-  return (
-    <span className="inline-flex items-center justify-center h-[22px] px-1.5 rounded-[3px] bg-[#005a9c] text-white font-bold text-[8px] select-none shadow-sm border border-black/10">
-      <span className="text-[#e21836]">Union</span>
-      <span className="text-white">Pay</span>
-    </span>
-  );
-}
+/* ─── Card badges: shared reference SVGs from @/components/ui/CardBadges ─── */
+const BADGE = "h-6 w-[38px]";
+const VisaBadge = () => <SharedVisa className={BADGE} />;
+const MastercardBadge = () => <SharedMaster className={BADGE} />;
+const AmexBadge = () => <SharedAmex className={BADGE} />;
+const UnionPayBadge = () => <SharedUnionPay className={BADGE} />;
 
 function PlusOneBadge() {
   return (
