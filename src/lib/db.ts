@@ -71,6 +71,23 @@ export async function getProducts(): Promise<Product[]> {
   return readJsonSafe<Product[]>(PRODUCTS_FILE, enriched);
 }
 
+/** Search products by title, handle, alt text, category, or description. */
+export async function searchProducts(query: string): Promise<Product[]> {
+  const term = query.trim().toLowerCase();
+  if (!term) return [];
+
+  const products = await getProducts();
+  return products.filter((product) =>
+    [
+      product.title,
+      product.handle,
+      product.alt,
+      product.category,
+      product.description,
+    ].some((value) => value?.toLowerCase().includes(term)),
+  );
+}
+
 export async function getProductByHandle(handle: string): Promise<Product | undefined> {
   const products = await getProducts();
   return products.find((p) => p.handle === handle);
@@ -292,6 +309,11 @@ const INITIAL_CUSTOMERS: Customer[] = [
 
 export async function getCustomers(): Promise<Customer[]> {
   return readJsonSafe<Customer[]>(CUSTOMERS_FILE, INITIAL_CUSTOMERS);
+}
+
+export async function getCustomerById(id: string): Promise<Customer | undefined> {
+  const customers = await getCustomers();
+  return customers.find((customer) => customer.id === id);
 }
 
 async function recordCustomerFromOrder(order: Order) {
