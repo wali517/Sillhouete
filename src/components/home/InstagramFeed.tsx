@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ChevronDown, ChevronUp, Layers, X } from "lucide-react";
+import { ChevronDown, ChevronUp, X } from "lucide-react";
 import { INSTAGRAM_POSTS } from "@/data/campaigns";
 
 const HANDLE = "sillhouete.official";

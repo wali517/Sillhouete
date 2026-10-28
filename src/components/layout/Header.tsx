@@ -9,7 +9,6 @@ import { NAV, SITE } from "@/data/site";
 import { allProducts } from "@/data/products";
 import { useStore } from "@/components/providers/StoreProvider";
 import MobileMenu from "./MobileMenu";
-import type { Product } from "@/types";
 
 export default function Header() {
   const router = useRouter();
@@ -18,34 +17,9 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
 
-  const [results, setResults] = useState<Product[]>([]);
-
-  useEffect(() => {
-    const q = query.trim();
-    if (!q) {
-      setResults([]);
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      fetch(`/api/products?search=${encodeURIComponent(q)}&limit=6`)
-        .then((r) => r.json())
-        .then((d) => {
-          if (d.products && d.products.length > 0) {
-            setResults(d.products.slice(0, 6));
-          } else {
-            // Fallback to client-side filtering of initial data
-            const lower = q.toLowerCase();
-            setResults(allProducts.filter((p) => p.title.toLowerCase().includes(lower)).slice(0, 6));
-          }
-        })
-        .catch(() => {
-          const lower = q.toLowerCase();
-          setResults(allProducts.filter((p) => p.title.toLowerCase().includes(lower)).slice(0, 6));
-        });
-    }, 200);
-
-    return () => clearTimeout(timer);
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return q ? allProducts.filter((p) => p.title.toLowerCase().includes(q)).slice(0, 6) : [];
   }, [query]);
 
   useEffect(() => {
@@ -70,11 +44,11 @@ export default function Header() {
 
   return (
     <header className="relative z-40 border-b border-[#e8e8e1] bg-white">
-      <div className="mx-auto flex w-full max-w-[1920px] items-center justify-between gap-4 px-4 py-3 md:px-10">
+      <div className="mx-auto flex w-full max-w-[1920px] items-center justify-between gap-2 px-3 py-2.5 sm:gap-3 sm:px-4 md:px-6 lg:gap-4 lg:px-10 lg:py-3">
         {/* Left Logo */}
         <Link
           href="/"
-          className="relative block h-[52px] w-[140px] shrink-0 md:h-[48px] md:w-[130px]"
+          className="relative block h-[44px] w-[112px] shrink-0 sm:h-[48px] sm:w-[126px] lg:h-[48px] lg:w-[130px]"
           aria-label="Sillhouete home"
         >
           <Image
@@ -88,7 +62,7 @@ export default function Header() {
         </Link>
 
         {/* Primary Desktop Navigation: 2 Rows Centered */}
-        <nav aria-label="Primary" className="hidden flex-1 flex-col items-center justify-center md:flex">
+        <nav aria-label="Primary" className="hidden flex-1 flex-col items-center justify-center lg:flex">
           {/* Row 1 */}
           <ul className="flex flex-wrap items-center justify-center gap-0.5">
             {NAV_ROW1.map((item) => {
@@ -177,10 +151,10 @@ export default function Header() {
         </nav>
 
         {/* Right Icons: Account, Search, Cart */}
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex shrink-0 items-center gap-0 sm:gap-1">
           <Link
             href="/account"
-            className="hidden h-10 w-10 place-items-center md:grid text-black hover:text-black/70 transition-colors"
+            className="hidden h-10 w-10 place-items-center lg:grid text-black hover:text-black/70 transition-colors"
             aria-label="Customer Account"
           >
             <svg
@@ -203,7 +177,7 @@ export default function Header() {
             onClick={() => setSearchOpen((o) => !o)}
             aria-expanded={searchOpen}
             aria-label="Search"
-            className="grid h-10 w-10 place-items-center text-black hover:text-black/70 transition-colors cursor-pointer"
+            className="grid h-9 w-9 place-items-center text-black hover:text-black/70 transition-colors cursor-pointer sm:h-10 sm:w-10"
           >
             <svg
               aria-hidden="true"
@@ -224,7 +198,7 @@ export default function Header() {
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label="Site navigation"
-            className="grid h-10 w-10 place-items-center md:hidden text-black hover:text-black/70 cursor-pointer"
+            className="grid h-10 w-10 place-items-center lg:hidden text-black hover:text-black/70 cursor-pointer"
           >
             <svg
               aria-hidden="true"
@@ -282,9 +256,9 @@ export default function Header() {
             onClick={() => setSearchOpen(false)}
           />
 
-          <div className="relative z-40 border-b border-[#e8e8e1] bg-white px-4 py-3 md:px-10 shadow-xs">
+          <div className="relative z-40 border-b border-[#e8e8e1] bg-white px-4 py-4 md:px-10 shadow-xs">
             <form onSubmit={submit} role="search" className="mx-auto flex max-w-3xl items-center gap-3">
-              <div className="relative flex flex-1 items-stretch border border-black bg-white">
+              <div className="relative flex-1">
                 <input
                   id="header-search"
                   autoFocus
@@ -293,12 +267,12 @@ export default function Header() {
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search"
                   autoComplete="off"
-                  className="w-full h-11 bg-transparent px-4 pr-3 text-[14px] text-black placeholder:text-neutral-500 outline-none"
+                  className="w-full h-11 border border-neutral-400 bg-white px-4 pr-11 text-sm text-black placeholder:text-neutral-500 outline-none focus:border-black transition-colors"
                 />
                 <button
                   type="submit"
                   aria-label="Submit search"
-                  className="w-12 h-11 bg-black text-white flex items-center justify-center shrink-0 hover:bg-neutral-800 transition-colors cursor-pointer"
+                  className="absolute right-0 top-0 bottom-0 px-3.5 flex items-center justify-center text-neutral-600 hover:text-black transition-colors"
                 >
                   <svg
                     aria-hidden="true"
@@ -308,7 +282,7 @@ export default function Header() {
                     viewBox="0 0 64 64"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="3"
+                    strokeWidth="2.5"
                     strokeMiterlimit="10"
                   >
                     <path d="M47.16 28.58A18.58 18.58 0 1 1 28.58 10a18.58 18.58 0 0 1 18.58 18.58ZM54 54 41.94 42" />
@@ -326,14 +300,13 @@ export default function Header() {
                   aria-hidden="true"
                   focusable="false"
                   role="presentation"
-                  className="h-5 w-5"
+                  className="h-6 w-6"
                   viewBox="0 0 64 64"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2.5"
-                  strokeMiterlimit="10"
                 >
-                  <path d="M16 16 48 48M48 16 16 48" />
+                  <path d="m19 17.61 27.12 27.13m0-27.12L19 44.74" />
                 </svg>
               </button>
             </form>
