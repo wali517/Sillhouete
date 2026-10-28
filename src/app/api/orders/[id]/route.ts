@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { getOrderById, updateOrderStatus } from "@/lib/db";
 
-type Props = { params: Promise<{ id: string }> };
-
-export async function GET(req: Request, { params }: Props) {
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   try {
-    const { id } = await params;
     const order = await getOrderById(id);
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
     return NextResponse.json({ order });
@@ -15,11 +16,19 @@ export async function GET(req: Request, { params }: Props) {
   }
 }
 
-export async function PUT(req: Request, { params }: Props) {
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   try {
-    const { id } = await params;
-    const body = await req.json();
-    const updated = await updateOrderStatus(id, body);
+    const { status, paymentStatus, trackingNumber, courier } = await req.json();
+    const updated = await updateOrderStatus(id, {
+      status,
+      paymentStatus,
+      trackingNumber,
+      courier,
+    });
     if (!updated) return NextResponse.json({ error: "Order not found" }, { status: 404 });
     return NextResponse.json({ success: true, order: updated });
   } catch (err: unknown) {

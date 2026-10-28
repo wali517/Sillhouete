@@ -1,474 +1,264 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import {
-  Plus,
-  Search,
-  Edit,
-  Trash2,
-  ExternalLink,
-  X,
-  AlertCircle,
-  FileText,
-  Calendar,
-} from "lucide-react";
+import { Plus, Edit, Trash2, FileText, Search } from "lucide-react";
 import type { BlogPost } from "@/types";
+
+const CATEGORIES = ["Fashion & Style", "Bridal", "Events", "Lifestyle", "Behind the Brand", "Styling Tips"];
+
+function slugify(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+const emptyForm = {
+  title: "", slug: "", category: "Fashion & Style", coverImage: "", author: "Sillhouete Editorial",
+  excerpt: "", content: "", tags: "", readTime: "5 min read", publishedAt: new Date().toISOString().split("T")[0],
+};
 
 export default function AdminBlogsPage() {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-
-  // Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
-
-  // Form State
-  const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
-  const [category, setCategory] = useState("Style Guide");
-  const [author, setAuthor] = useState("Sillhouete Editorial");
-  const [readTime, setReadTime] = useState("5 min read");
-  const [coverImage, setCoverImage] = useState("");
-  const [excerpt, setExcerpt] = useState("");
-  const [content, setContent] = useState("");
-  const [tagsInput, setTagsInput] = useState("");
-
-  const [formError, setFormError] = useState("");
-  const [formSubmitting, setFormSubmitting] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState(emptyForm);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState("");
 
   const fetchBlogs = async () => {
     try {
       const res = await fetch("/api/blogs");
       const data = await res.json();
-      if (data.blogs) {
-        setBlogs(data.blogs);
-      }
+      setBlogs(data.blogs || []);
     } catch {
-      // ignore
+      setBlogs([]);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchBlogs();
-  }, []);
+  useEffect(() => { fetchBlogs(); }, []);
 
-  const openAddModal = () => {
-    setEditingBlog(null);
-    setTitle("");
-    setSlug("");
-    setCategory("Style Guide");
-    setAuthor("Sillhouete Editorial");
-    setReadTime("5 min read");
-    setCoverImage("https://sillhouete.com/cdn/shop/articles/muslim_wedding_rituals_34c9db87-5834-4bff-a661-55201ade3345.png?v=1789022954&width=900");
-    setExcerpt("");
-    setContent("");
-    setTagsInput("Fashion, Pakistani Couture, Trends");
-    setFormError("");
-    setIsModalOpen(true);
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
+
+  const openCreate = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+    setIsOpen(true);
   };
 
-  const openEditModal = (b: BlogPost) => {
-    setEditingBlog(b);
-    setTitle(b.title);
-    setSlug(b.slug);
-    setCategory(b.category);
-    setAuthor(b.author);
-    setReadTime(b.readTime);
-    setCoverImage(b.coverImage);
-    setExcerpt(b.excerpt);
-    setContent(b.content);
-    setTagsInput((b.tags || []).join(", "));
-    setFormError("");
-    setIsModalOpen(true);
+  const openEdit = (blog: BlogPost) => {
+    setEditingId(blog.id);
+    setForm({
+      title: blog.title, slug: blog.slug, category: blog.category,
+      coverImage: blog.coverImage, author: blog.author, excerpt: blog.excerpt,
+      content: blog.content, tags: blog.tags.join(", "),
+      readTime: blog.readTime, publishedAt: blog.publishedAt,
+    });
+    setIsOpen(true);
   };
 
-  const handleTitleChange = (val: string) => {
-    setTitle(val);
-    if (!editingBlog) {
-      setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
-    }
-  };
-
-  const handleDelete = async (id: string, blogTitle: string) => {
-    if (!confirm(`Are you sure you want to delete "${blogTitle}"?`)) return;
+  const handleSave = async () => {
+    if (!form.title || !form.content) { showToast("Title and content are required"); return; }
+    setSaving(true);
     try {
-      const res = await fetch(`/api/blogs/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setBlogs((prev) => prev.filter((b) => b.id !== id));
-      } else {
-        alert("Failed to delete article");
-      }
+      const body = {
+        ...form,
+        slug: form.slug || slugify(form.title),
+        tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
+        ...(editingId ? { id: editingId } : {}),
+      };
+
+      const url = editingId ? `/api/blogs/${editingId}` : "/api/blogs";
+      const method = editingId ? "PUT" : "POST";
+      const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      if (!res.ok) throw new Error();
+      showToast(editingId ? "Blog updated" : "Blog created");
+      setIsOpen(false);
+      await fetchBlogs();
     } catch {
-      alert("Error deleting article");
-    }
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setFormError("");
-
-    if (!title.trim() || !content.trim()) {
-      setFormError("Title and content are required.");
-      return;
-    }
-
-    setFormSubmitting(true);
-
-    const tags = tagsInput
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
-
-    const payload = {
-      title: title.trim(),
-      slug: slug.trim() || title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-      category,
-      author,
-      readTime,
-      coverImage: coverImage.trim(),
-      excerpt: excerpt.trim() || content.slice(0, 150) + "...",
-      content: content.trim(),
-      tags,
-    };
-
-    try {
-      if (editingBlog) {
-        const res = await fetch(`/api/blogs/${editingBlog.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Update failed");
-        setBlogs((prev) => prev.map((b) => (b.id === editingBlog.id ? data.blog : b)));
-      } else {
-        const res = await fetch("/api/blogs", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Create failed");
-        setBlogs((prev) => [data.blog, ...prev]);
-      }
-
-      setIsModalOpen(false);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Save failed";
-      setFormError(msg);
+      showToast("Failed to save blog");
     } finally {
-      setFormSubmitting(false);
+      setSaving(false);
     }
   };
 
-  const filteredBlogs = blogs.filter((b) => {
-    const q = search.toLowerCase();
-    return !search || b.title.toLowerCase().includes(q) || b.category.toLowerCase().includes(q);
-  });
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete this blog post?")) return;
+    try {
+      await fetch(`/api/blogs/${id}`, { method: "DELETE" });
+      showToast("Blog deleted");
+      await fetchBlogs();
+    } catch {
+      showToast("Failed to delete");
+    }
+  };
+
+  const filtered = blogs.filter((b) =>
+    !search || b.title.toLowerCase().includes(search.toLowerCase()) || b.category.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {toast && (
+        <div className="fixed top-4 right-4 z-50 bg-gray-900 text-white px-4 py-3 rounded-lg text-sm shadow-lg">{toast}</div>
+      )}
+
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Blog &amp; Editorial</h1>
-          <p className="text-sm text-gray-500">
-            Publish fashion trends, bridal style guides, and wedding ceremony heritage stories.
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900">Blog Posts</h1>
+          <p className="text-sm text-gray-500">{blogs.length} articles</p>
         </div>
-        <button
-          type="button"
-          onClick={openAddModal}
-          className="inline-flex items-center gap-2 rounded-md bg-black px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-gray-800 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Write New Story</span>
+        <button onClick={openCreate}
+          className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors">
+          <Plus className="h-4 w-4" /> New Post
         </button>
       </div>
 
-      {/* Search Bar */}
-      <div className="flex items-center rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search stories by title or category..."
-            className="w-full rounded-md border border-gray-200 py-1.5 pl-9 pr-4 text-xs outline-none focus:border-black"
-          />
+      {/* Search */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div className="p-4 border-b border-gray-100">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input type="text" placeholder="Search blogs..." value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-gray-400 bg-gray-50" />
+          </div>
         </div>
-      </div>
 
-      {/* Blogs Table */}
-      <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-sm text-gray-500">Loading articles...</div>
-        ) : filteredBlogs.length === 0 ? (
-          <div className="p-12 text-center text-sm text-gray-500">No blog posts found.</div>
+          <div className="p-8 text-center text-gray-400 text-sm">Loading...</div>
+        ) : filtered.length === 0 ? (
+          <div className="p-8 text-center text-gray-400 text-sm">No blog posts yet. Create your first one!</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="border-b border-gray-200 bg-gray-50 uppercase tracking-wider text-gray-500 font-semibold">
-                <tr>
-                  <th className="py-3 px-4">Story</th>
-                  <th className="py-3 px-4">Category</th>
-                  <th className="py-3 px-4">Author</th>
-                  <th className="py-3 px-4">Read Time</th>
-                  <th className="py-3 px-4">Published</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredBlogs.map((b) => (
-                  <tr key={b.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded border border-gray-200 bg-gray-100">
-                          <Image
-                            src={b.coverImage}
-                            alt={b.title}
-                            fill
-                            sizes="80px"
-                            className="object-cover"
-                          />
-                        </div>
-                        <div>
-                          <strong className="block text-gray-900 text-sm font-semibold">{b.title}</strong>
-                          <span className="text-[11px] text-gray-400 font-mono">/blogs/news/{b.slug}</span>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="py-3.5 px-4">
-                      <span className="rounded bg-gray-100 px-2 py-1 font-medium text-gray-700">
-                        {b.category}
-                      </span>
-                    </td>
-
-                    <td className="py-3.5 px-4 text-gray-700 font-medium">{b.author}</td>
-
-                    <td className="py-3.5 px-4 text-gray-500">{b.readTime}</td>
-
-                    <td className="py-3.5 px-4 text-gray-500">{b.publishedAt}</td>
-
-                    <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link
-                          href={`/blogs/news/${b.slug}`}
-                          target="_blank"
-                          className="rounded p-1 text-gray-400 hover:text-black hover:bg-gray-100"
-                          title="View on Store"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={() => openEditModal(b)}
-                          className="rounded p-1 text-blue-600 hover:bg-blue-50"
-                          title="Edit"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(b.id, b.title)}
-                          className="rounded p-1 text-red-600 hover:bg-red-50"
-                          title="Delete"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="divide-y divide-gray-50">
+            {filtered.map((blog) => (
+              <div key={blog.id} className="px-5 py-4 flex items-center gap-4 hover:bg-gray-50 transition-colors">
+                {blog.coverImage ? (
+                  <div className="relative h-16 w-24 rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                    <Image src={blog.coverImage} alt={blog.title} fill className="object-cover" />
+                  </div>
+                ) : (
+                  <div className="h-16 w-24 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+                    <FileText className="h-6 w-6 text-gray-400" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-sm truncate">{blog.title}</h3>
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">{blog.category}</span>
+                    <span className="text-xs text-gray-400">{blog.author}</span>
+                    <span className="text-xs text-gray-400">{blog.publishedAt}</span>
+                    <span className="text-xs text-gray-400">{blog.readTime}</span>
+                  </div>
+                  {blog.tags.length > 0 && (
+                    <div className="flex gap-1 mt-1 flex-wrap">
+                      {blog.tags.slice(0, 3).map((t) => (
+                        <span key={t} className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">{t}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <button onClick={() => openEdit(blog)}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600">
+                    <Edit className="h-4 w-4" />
+                  </button>
+                  <button onClick={() => handleDelete(blog.id)}
+                    className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-500">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
 
-      {/* Add / Edit Blog Modal */}
-      {isModalOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={() => setIsModalOpen(false)}
-        >
-          <div
-            className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-2xl space-y-5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-              <h2 className="text-lg font-bold text-gray-900">
-                {editingBlog ? "Edit Article" : "Write New Editorial Article"}
-              </h2>
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-black"
-              >
-                <X className="h-5 w-5" />
-              </button>
+      {/* Modal */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-start justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl w-full max-w-2xl my-4 shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-gray-900">{editingId ? "Edit Blog Post" : "New Blog Post"}</h2>
+              <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-gray-100 rounded-lg text-gray-500">✕</button>
             </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-              <div>
-                <label className="block font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                  Article Title *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={title}
-                  onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder="e.g. Rituals Inside a Muslim Wedding Ceremony"
-                  className="w-full rounded-md border border-gray-300 p-2.5 outline-none focus:border-black"
-                />
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="block font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                    Slug *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={slug}
-                    onChange={(e) => setSlug(e.target.value)}
-                    placeholder="e.g. rituals-inside-a-muslim-wedding"
-                    className="w-full rounded-md border border-gray-300 p-2.5 outline-none focus:border-black font-mono"
-                  />
+            <div className="p-6 space-y-4 overflow-y-auto max-h-[75vh]">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <label className="text-xs font-semibold text-gray-600 block mb-1">Title *</label>
+                  <input type="text" value={form.title}
+                    onChange={(e) => setForm({ ...form, title: e.target.value, slug: form.slug || slugify(e.target.value) })}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400" />
                 </div>
                 <div>
-                  <label className="block font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                    Category *
-                  </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 p-2.5 outline-none focus:border-black bg-white"
-                  >
-                    <option value="Bridal & Weddings">Bridal &amp; Weddings</option>
-                    <option value="Style Guide">Style Guide</option>
-                    <option value="Trends">Trends</option>
-                    <option value="Heritage">Heritage</option>
+                  <label className="text-xs font-semibold text-gray-600 block mb-1">Slug</label>
+                  <input type="text" value={form.slug}
+                    onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-600 block mb-1">Category</label>
+                  <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400">
+                    {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="block font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                    Author
-                  </label>
-                  <input
-                    type="text"
-                    value={author}
-                    onChange={(e) => setAuthor(e.target.value)}
-                    placeholder="Sillhouete Editorial"
-                    className="w-full rounded-md border border-gray-300 p-2.5 outline-none focus:border-black"
-                  />
+                <div className="col-span-2">
+                  <label className="text-xs font-semibold text-gray-600 block mb-1">Cover Image URL</label>
+                  <input type="url" value={form.coverImage}
+                    onChange={(e) => setForm({ ...form, coverImage: e.target.value })}
+                    placeholder="https://..."
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400" />
                 </div>
                 <div>
-                  <label className="block font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                    Estimated Read Time
-                  </label>
-                  <input
-                    type="text"
-                    value={readTime}
-                    onChange={(e) => setReadTime(e.target.value)}
+                  <label className="text-xs font-semibold text-gray-600 block mb-1">Author</label>
+                  <input type="text" value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value })}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-600 block mb-1">Published Date</label>
+                  <input type="date" value={form.publishedAt} onChange={(e) => setForm({ ...form, publishedAt: e.target.value })}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-600 block mb-1">Read Time</label>
+                  <input type="text" value={form.readTime} onChange={(e) => setForm({ ...form, readTime: e.target.value })}
                     placeholder="5 min read"
-                    className="w-full rounded-md border border-gray-300 p-2.5 outline-none focus:border-black"
-                  />
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-600 block mb-1">Tags (comma-separated)</label>
+                  <input type="text" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })}
+                    placeholder="Fashion, Bridal, Style"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400" />
+                </div>
+                <div className="col-span-2">
+                  <label className="text-xs font-semibold text-gray-600 block mb-1">Excerpt (160 chars)</label>
+                  <textarea rows={2} maxLength={200} value={form.excerpt}
+                    onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400 resize-none" />
+                </div>
+                <div className="col-span-2">
+                  <label className="text-xs font-semibold text-gray-600 block mb-1">Content * (Markdown supported)</label>
+                  <textarea rows={10} value={form.content}
+                    onChange={(e) => setForm({ ...form, content: e.target.value })}
+                    placeholder="Write your blog post content here..."
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400 resize-y font-mono" />
                 </div>
               </div>
-
-              <div>
-                <label className="block font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                  Cover Image URL *
-                </label>
-                <input
-                  type="url"
-                  required
-                  value={coverImage}
-                  onChange={(e) => setCoverImage(e.target.value)}
-                  placeholder="https://..."
-                  className="w-full rounded-md border border-gray-300 p-2.5 outline-none focus:border-black"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                  Excerpt (Short Summary)
-                </label>
-                <textarea
-                  rows={2}
-                  value={excerpt}
-                  onChange={(e) => setExcerpt(e.target.value)}
-                  placeholder="A compelling 1-2 sentence preview of the article..."
-                  className="w-full rounded-md border border-gray-300 p-2.5 outline-none focus:border-black"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                  Article Body Content (Markdown supported) *
-                </label>
-                <textarea
-                  required
-                  rows={7}
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Write story paragraphs, use ## for headings, - for bullet lists..."
-                  className="w-full rounded-md border border-gray-300 p-2.5 outline-none focus:border-black font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                  Tags (comma separated)
-                </label>
-                <input
-                  type="text"
-                  value={tagsInput}
-                  onChange={(e) => setTagsInput(e.target.value)}
-                  placeholder="Bridal, Trends, Silk, Eid"
-                  className="w-full rounded-md border border-gray-300 p-2.5 outline-none focus:border-black"
-                />
-              </div>
-
-              {formError && (
-                <div className="flex items-center gap-2 rounded bg-red-50 p-2.5 text-red-600">
-                  <AlertCircle className="h-4 w-4 shrink-0" />
-                  <span>{formError}</span>
-                </div>
-              )}
-
-              <div className="flex justify-end gap-3 border-t border-gray-200 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="rounded-md border border-gray-300 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={formSubmitting}
-                  className="rounded-md bg-black px-6 py-2 font-bold uppercase tracking-wider text-white hover:bg-gray-800"
-                >
-                  {formSubmitting ? "Publishing..." : editingBlog ? "Save Story" : "Publish Article"}
-                </button>
-              </div>
-            </form>
+            </div>
+            <div className="flex gap-3 p-6 border-t border-gray-100">
+              <button onClick={handleSave} disabled={saving}
+                className="bg-black text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50">
+                {saving ? "Saving..." : editingId ? "Update Post" : "Publish Post"}
+              </button>
+              <button onClick={() => setIsOpen(false)}
+                className="px-6 py-2.5 rounded-lg text-sm font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

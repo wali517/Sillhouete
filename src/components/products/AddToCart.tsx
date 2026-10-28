@@ -1,304 +1,244 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { Minus, Plus, MessageCircle } from "lucide-react";
 import type { Product } from "@/types";
 import { useStore } from "@/components/providers/StoreProvider";
 
 const SIZES = ["XS", "S", "M", "L", "XL"];
+const EXPEDITE_FEE = 8000;
+const SAME_AS_SAMPLE = "Same as sample";
+const WITH_SLEEVES = "With sleeves";
 
-const DEFAULT_DUPATTA_OPTIONS = [
-  { label: "None", priceDiff: 0 },
-  { label: "Organza Ruffled dupatta", priceDiff: 4600 },
-  { label: "Organza dupatta with pearl spray", priceDiff: 2600 },
-];
+const isNone = (v?: string | null) => !v || v.trim().toLowerCase() === "none";
 
-const DEFAULT_AD_ON_OPTIONS = [
-  { label: "None", priceDiff: 0 },
-  { label: "Grip Head scarf", priceDiff: 1600 },
-];
+/** Unique, non-"None" option values for a variant slot, in product order. */
+function optionValues(product: Product, slot: "option2" | "option3", fallback?: string[]) {
+  const fromVariants = (product.variants ?? [])
+    .map((v) => v[slot])
+    .filter((v): v is string => !isNone(v));
+  const unique = Array.from(new Set(fromVariants));
+  if (unique.length > 0) return unique;
+  return (fallback ?? []).filter((v) => !isNone(v));
+}
 
-const SLIP_OPTIONS = [
-  "Select one",
-  "Slip with sleeves (complimentary)",
-  "Slip without sleeves (complimentary)",
-];
+const labelCls = "mb-2 font-serif text-[13px] font-bold uppercase tracking-[0.22em] text-black";
 
-export default function AddToCart({ product }: { product: Product }) {
+export default function AddToCart({ product, children }: { product: Product; children?: ReactNode }) {
   const router = useRouter();
   const { addToCart, setCartOpen, formatPrice } = useStore();
 
+  const dupattaValues = useMemo(() => optionValues(product, "option2", product.dupattaOptions), [product]);
+  const adOnValues = useMemo(() => optionValues(product, "option3", product.adOnOptions), [product]);
+
   const [size, setSize] = useState("XS");
-  const [dupatta, setDupatta] = useState<string>("None");
-  const [adOn, setAdOn] = useState<string>("None");
-  const [expedite, setExpedite] = useState<boolean>(false);
-  const [slip, setSlip] = useState<string>("Select one");
+  const [dupatta, setDupatta] = useState("None");
+  const [adOn, setAdOn] = useState("None");
+  const [expedite, setExpedite] = useState(false);
+  const [extra, setExtra] = useState(SAME_AS_SAMPLE);
   const [qty, setQty] = useState(1);
   const [addedNotice, setAddedNotice] = useState(false);
 
-  // Compute available dupatta options based on product data or defaults
-  const dupattaOptions = useMemo(() => {
-    if (product.dupattaOptions && product.dupattaOptions.length > 0) {
-      return product.dupattaOptions.map((opt) => {
-        let diff = 0;
-        if (opt.includes("Ruffled")) diff = 4600;
-        else if (opt.includes("pearl spray")) diff = 2600;
-        return { label: opt, priceDiff: diff };
-      });
-    }
-    return DEFAULT_DUPATTA_OPTIONS;
-  }, [product]);
+  /** Price of the exact variant for a size/dupatta/add-on combination (falls back to base price). */
+  const variantPrice = (sz: string, d: string, a: string) => {
+    const match = product.variants?.find(
+      (v) =>
+        (!v.option1 || v.option1.toLowerCase() === sz.toLowerCase()) &&
+        (isNone(v.option2) ? isNone(d) : (v.option2 ?? "").toLowerCase() === d.toLowerCase()) &&
+        (isNone(v.option3) ? isNone(a) : (v.option3 ?? "").toLowerCase() === a.toLowerCase()),
+    );
+    return match?.price ?? product.price;
+  };
 
-  const adOnOptions = DEFAULT_AD_ON_OPTIONS;
+  const unitPrice = variantPrice(size, dupatta, adOn) + (expedite ? EXPEDITE_FEE : 0);
+  const priceDiff = (d: string, a: string) => variantPrice(size, d, a) - variantPrice(size, "None", "None");
 
-  // Compute live unit price matching exact variant or option diffs
-  const calculatedUnitPrice = useMemo(() => {
-    if (product.variants && product.variants.length > 0) {
-      const match = product.variants.find((v) => {
-        const opt1Match = !v.option1 || v.option1.toLowerCase() === size.toLowerCase();
-        const opt2Match = !v.option2 || v.option2.toLowerCase() === dupatta.toLowerCase();
-        const opt3Match = !v.option3 || v.option3.toLowerCase() === adOn.toLowerCase();
-        return opt1Match && opt2Match && opt3Match;
-      });
-      if (match && match.price) {
-        return match.price + (expedite ? 8000 : 0);
-      }
-    }
-
-    let base = product.price;
-    const d = dupattaOptions.find((opt) => opt.label === dupatta);
-    if (d) base += d.priceDiff;
-
-    const a = adOnOptions.find((opt) => opt.label === adOn);
-    if (a) base += a.priceDiff;
-
-    if (expedite) base += 8000;
-
-    return base;
-  }, [product, size, dupatta, adOn, expedite, dupattaOptions]);
+  const payload = () => ({
+    size,
+    dupatta: !isNone(dupatta) ? dupatta : undefined,
+    adOn: !isNone(adOn) ? adOn : undefined,
+    expedite,
+    slip: extra === WITH_SLEEVES ? WITH_SLEEVES : undefined,
+    unitPrice,
+    quantity: qty,
+  });
 
   const handleAddToCart = () => {
-    addToCart(product, {
-      size,
-      dupatta: dupatta !== "None" ? dupatta : undefined,
-      adOn: adOn !== "None" ? adOn : undefined,
-      expedite,
-      slip: slip !== "Select one" ? slip : undefined,
-      unitPrice: calculatedUnitPrice,
-      quantity: qty,
-    });
+    addToCart(product, payload());
     setAddedNotice(true);
     setTimeout(() => setAddedNotice(false), 2200);
   };
 
   const handleBuyNow = () => {
-    addToCart(product, {
-      size,
-      dupatta: dupatta !== "None" ? dupatta : undefined,
-      adOn: adOn !== "None" ? adOn : undefined,
-      expedite,
-      slip: slip !== "Select one" ? slip : undefined,
-      unitPrice: calculatedUnitPrice,
-      quantity: qty,
-    });
+    addToCart(product, payload());
     setCartOpen(false);
     router.push("/checkout");
   };
 
   const dynamicSku = `${product.sku || product.handle.toUpperCase()}-${size}`;
 
+  const optionButton = (selected: boolean) =>
+    `h-[38px] px-4 text-[13px] transition-colors cursor-pointer flex items-center justify-center border-2 ${
+      selected ? "border-black text-black font-bold" : "border-neutral-300 text-neutral-500 font-bold hover:border-neutral-500"
+    }`;
+
   return (
-    <div className="space-y-3 pt-1 font-serif">
-      {/* Live dynamic price indicator when variants change */}
-      <div className="flex items-baseline gap-2 pt-1 pb-1">
-        <span className="text-[22px] md:text-[26px] font-bold text-black">
-          Rs.{calculatedUnitPrice.toLocaleString()}
-        </span>
+    <div className="space-y-5">
+      {/* Price (updates with the chosen variant) */}
+      <div className="flex items-baseline gap-3">
+        <span className="text-[22px] font-bold text-black">{formatPrice(unitPrice)}</span>
         {product.originalPrice && (
-          <span className="text-sm text-neutral-400 line-through">
-            Rs.{product.originalPrice.toLocaleString()}
-          </span>
+          <span className="text-sm text-neutral-400 line-through">{formatPrice(product.originalPrice)}</span>
         )}
       </div>
 
-      {/* 1. SIZE Selector with clean compact styling & Halant font */}
+      {children}
+
+      {/* SIZE */}
       <div>
-        <div className="mb-1.5 text-xs font-semibold uppercase tracking-[0.05em] text-black">
-          Size: <span className="font-normal text-neutral-600">{size}</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {SIZES.map((s) => {
-            const isSelected = size === s;
-            return (
-              <button
-                key={s}
-                type="button"
-                onClick={() => setSize(s)}
-                className={`min-w-[42px] h-[34px] px-3 text-xs font-semibold tracking-normal transition-all cursor-pointer flex items-center justify-center rounded-none ${
-                  isSelected
-                    ? "border-2 border-black bg-black text-white font-bold"
-                    : "border border-neutral-300 bg-white text-neutral-800 hover:border-black"
-                }`}
-              >
-                {s}
-              </button>
-            );
-          })}
+        <div className={labelCls}>Size</div>
+        <div className="flex flex-wrap gap-3">
+          {SIZES.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setSize(s)}
+              aria-pressed={size === s}
+              className={`${optionButton(size === s)} min-w-[52px] font-sans`}
+            >
+              {s}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* 2. DUPATTA Selector */}
-      <div>
-        <div className="mb-1.5 text-xs font-semibold uppercase tracking-[0.05em] text-black">
-          Dupatta: <span className="font-normal text-neutral-600">{dupatta}</span>
+      {/* DUPATTA — only for products that really have the option */}
+      {dupattaValues.length > 0 && (
+        <div>
+          <div className={labelCls}>Dupatta</div>
+          <div className="flex flex-wrap gap-3">
+            {["None", ...dupattaValues].map((opt) => {
+              const diff = isNone(opt) ? 0 : priceDiff(opt, adOn) - priceDiff("None", adOn);
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => setDupatta(opt)}
+                  aria-pressed={dupatta === opt}
+                  className={`${optionButton(dupatta === opt)} font-sans`}
+                >
+                  {opt}
+                  {diff > 0 && <span className="ml-1 font-normal">(+{formatPrice(diff)})</span>}
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {dupattaOptions.map((opt) => {
-            const isSelected = dupatta === opt.label;
-            return (
-              <button
-                key={opt.label}
-                type="button"
-                onClick={() => setDupatta(opt.label)}
-                className={`h-[34px] px-3.5 text-xs tracking-normal transition-all cursor-pointer flex items-center justify-center rounded-none ${
-                  isSelected
-                    ? "border-2 border-black bg-black text-white font-bold"
-                    : "border border-neutral-300 bg-white text-neutral-800 hover:border-black font-normal"
-                }`}
-              >
-                <span>{opt.label}</span>
-                {opt.priceDiff > 0 && (
-                  <span className={`ml-1 text-[11px] ${isSelected ? "text-neutral-200" : "text-neutral-500"}`}>
-                    (+Rs.{opt.priceDiff.toLocaleString()})
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      )}
 
-      {/* 3. AD ONS */}
-      <div>
-        <div className="mb-1.5 text-xs font-semibold uppercase tracking-[0.05em] text-black">
-          Ad Ons: <span className="font-normal text-neutral-600">{adOn}</span>
+      {/* AD ONS — only for products that really have the option */}
+      {adOnValues.length > 0 && (
+        <div>
+          <div className={labelCls}>Ad Ons</div>
+          <div className="flex flex-wrap gap-3">
+            {["None", ...adOnValues].map((opt) => {
+              const diff = isNone(opt) ? 0 : priceDiff(dupatta, opt) - priceDiff(dupatta, "None");
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => setAdOn(opt)}
+                  aria-pressed={adOn === opt}
+                  className={`${optionButton(adOn === opt)} font-sans`}
+                >
+                  {opt}
+                  {diff > 0 && <span className="ml-1 font-normal">(+{formatPrice(diff)})</span>}
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {adOnOptions.map((opt) => {
-            const isSelected = adOn === opt.label;
-            return (
-              <button
-                key={opt.label}
-                type="button"
-                onClick={() => setAdOn(opt.label)}
-                className={`h-[34px] px-3.5 text-xs tracking-normal transition-all cursor-pointer flex items-center justify-center rounded-none ${
-                  isSelected
-                    ? "border-2 border-black bg-black text-white font-bold"
-                    : "border border-neutral-300 bg-white text-neutral-800 hover:border-black font-normal"
-                }`}
-              >
-                <span>{opt.label}</span>
-                {opt.priceDiff > 0 && (
-                  <span className={`ml-1 text-[11px] ${isSelected ? "text-neutral-200" : "text-neutral-500"}`}>
-                    (+Rs.{opt.priceDiff.toLocaleString()})
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      )}
 
-      {/* 4. EXPEDITE ORDER */}
-      <div className="pt-0.5">
-        <label className="border border-neutral-300 bg-white p-3 flex items-center gap-3 cursor-pointer select-none hover:border-black transition-colors rounded-none">
+      {/* EXPEDITE ORDER */}
+      <div>
+        <div className={labelCls}>Expedite Order</div>
+        <label className="flex items-start gap-3 border border-neutral-200 bg-white px-3.5 py-3 cursor-pointer select-none">
           <input
             type="checkbox"
             checked={expedite}
             onChange={(e) => setExpedite(e.target.checked)}
-            className="h-4 w-4 rounded-none border-neutral-400 accent-black cursor-pointer"
+            className="mt-1 h-4 w-4 accent-black cursor-pointer"
           />
-          <span className="text-xs text-black font-medium tracking-normal">
-            Express-Shipping (5-6 Working Days) [+PKR 8,000]
+          <span className="font-serif text-[13px] font-bold uppercase tracking-[0.2em] text-black leading-relaxed">
+            Express-Shipping (5-6 Working Days) [+PKR {EXPEDITE_FEE}]
           </span>
         </label>
       </div>
 
-      {/* 5. YOU MAY ALSO ADD (Slip options) */}
-      <div className="pt-1">
-        <div className="mb-1.5 text-xs font-semibold uppercase tracking-[0.05em] text-black">
-          You may also add:
-        </div>
-        <div className="space-y-1.5">
-          {SLIP_OPTIONS.map((opt) => (
-            <label
-              key={opt}
-              className="flex items-center gap-2.5 cursor-pointer text-xs text-neutral-900 select-none"
-            >
+      {/* YOU MAY ALSO ADD */}
+      <div>
+        <div className={labelCls}>You may also add:</div>
+        <div className="space-y-2">
+          {[SAME_AS_SAMPLE, WITH_SLEEVES].map((opt) => (
+            <label key={opt} className="flex items-center gap-3 cursor-pointer select-none">
               <input
                 type="radio"
-                name="slip_option"
-                checked={slip === opt}
-                onChange={() => setSlip(opt)}
-                className="h-3.5 w-3.5 accent-black cursor-pointer"
+                name="extra_option"
+                checked={extra === opt}
+                onChange={() => setExtra(opt)}
+                className="h-4 w-4 accent-[#0b72ff] cursor-pointer"
               />
-              <span className={slip === opt ? "font-semibold text-black" : "font-normal text-neutral-700"}>
-                {opt}
-              </span>
+              <span className="font-serif text-[13px] font-bold uppercase tracking-[0.22em] text-black">{opt}</span>
             </label>
           ))}
         </div>
       </div>
 
-      {/* 6. Quantity Stepper */}
-      <div className="pt-2">
-        <div className="flex w-[120px] items-center justify-between border border-neutral-300 rounded-none px-3 py-1 bg-white">
-          <button
-            type="button"
-            aria-label="Reduce quantity"
-            onClick={() => setQty((q) => Math.max(1, q - 1))}
-            className="grid h-6 w-6 place-items-center text-neutral-600 hover:text-black transition-colors"
-          >
-            <Minus className="h-3.5 w-3.5" />
-          </button>
-          <span className="text-xs font-semibold text-black" aria-live="polite">
-            {qty}
-          </span>
-          <button
-            type="button"
-            aria-label="Increase quantity"
-            onClick={() => setQty((q) => q + 1)}
-            className="grid h-6 w-6 place-items-center text-neutral-600 hover:text-black transition-colors"
-          >
-            <Plus className="h-3.5 w-3.5" />
-          </button>
-        </div>
+      {/* Quantity */}
+      <div className="flex items-center gap-1 pl-5">
+        <button
+          type="button"
+          aria-label="Reduce quantity"
+          onClick={() => setQty((q) => Math.max(1, q - 1))}
+          className="grid h-9 w-9 place-items-center rounded-full border border-neutral-300 text-neutral-600 hover:text-black hover:border-black transition-colors"
+        >
+          <Minus className="h-4 w-4" />
+        </button>
+        <span className="w-8 text-center text-xs text-black" aria-live="polite">
+          {qty}
+        </span>
+        <button
+          type="button"
+          aria-label="Increase quantity"
+          onClick={() => setQty((q) => q + 1)}
+          className="grid h-9 w-9 place-items-center rounded-full border border-neutral-300 text-neutral-600 hover:text-black hover:border-black transition-colors"
+        >
+          <Plus className="h-4 w-4" />
+        </button>
       </div>
 
-      {/* 7. Action Buttons */}
-      <div className="space-y-2 pt-2">
-        {/* ADD TO CART */}
+      {/* Actions */}
+      <div className="space-y-3">
         <button
           type="button"
           onClick={handleAddToCart}
-          className="w-full bg-[#111111] hover:bg-neutral-800 text-white py-3.5 text-xs font-extrabold uppercase tracking-[0.25em] transition-colors shadow-none rounded-none cursor-pointer"
+          className="w-full bg-black py-4 font-sans text-[15px] font-bold uppercase text-white transition-opacity hover:opacity-85 cursor-pointer"
         >
-          {addedNotice ? "✓ ADDED TO BAG" : "ADD TO CART"}
+          {addedNotice ? "✓ Added to cart" : "Add to cart"}
         </button>
 
-        {/* BUY IT NOW */}
         <button
           type="button"
           onClick={handleBuyNow}
-          className="w-full bg-white hover:bg-neutral-100 text-black border border-black py-3.5 text-xs font-extrabold uppercase tracking-[0.25em] transition-colors shadow-none rounded-none cursor-pointer"
+          className="w-full border border-black bg-white py-4 font-sans text-[15px] font-bold uppercase text-black transition-colors hover:bg-neutral-100 cursor-pointer"
         >
-          BUY IT NOW
+          Buy it now
         </button>
 
-        {/* We accept Google Pay / Apple Pay badges */}
-        <div className="flex items-center justify-end gap-2 text-xs text-neutral-700 py-1 font-serif">
-          <span className="text-[12px] font-normal text-neutral-600">We accept</span>
+        <div className="flex items-center justify-center gap-2 py-1 font-serif text-xs text-neutral-700">
+          <span className="text-[13px] text-neutral-600">We accept</span>
           {/* Real Google Pay SVG badge */}
           <span className="inline-flex items-center justify-center border border-neutral-300 rounded-none px-2 py-0.5 bg-white text-[10px] font-bold tracking-wider text-black shadow-xs">
             <svg className="h-3.5 w-8 mr-1" viewBox="0 0 38 15" fill="none">
@@ -319,17 +259,18 @@ export default function AddToCart({ product }: { product: Product }) {
           </span>
         </div>
 
-        {/* CHAT WITH FASHION CONSULTANT - Vibrant Green */}
         <a
           href={`https://wa.me/923310397865?text=${encodeURIComponent(
-            `Hi Sillhouete, I am interested in ${product.title} (SKU: ${dynamicSku}, Size: ${size}, Dupatta: ${dupatta}). Could you please share more details?`
+            `Hi Sillhouete, I am interested in ${product.title} (SKU: ${dynamicSku}, Size: ${size}${
+              !isNone(dupatta) ? `, Dupatta: ${dupatta}` : ""
+            }). Could you please share more details?`,
           )}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex w-full items-center justify-center gap-2 bg-[#00a63f] hover:bg-[#008f36] text-white py-3.5 text-xs font-bold uppercase tracking-wider transition-colors shadow-none rounded-none cursor-pointer"
+          className="flex w-full items-center justify-center gap-2 bg-[#0a8f2e] hover:bg-[#087a27] text-white py-3.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
         >
           <MessageCircle className="h-4 w-4 fill-white text-white" />
-          <span>CHAT WITH FASHION CONSULTANT</span>
+          <span>Chat with fashion consultant</span>
         </a>
       </div>
     </div>

@@ -1,154 +1,145 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, Search, Mail, Phone, ShoppingBag, DollarSign } from "lucide-react";
-import type { Customer } from "@/types";
+import Link from "next/link";
+import { Search, Users, TrendingUp, ShoppingBag } from "lucide-react";
 import { formatPrice } from "@/lib/format";
+import type { Customer } from "@/types";
 
 export default function AdminCustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-
-  const fetchCustomers = async () => {
-    try {
-      const res = await fetch("/api/customers");
-      const data = await res.json();
-      if (data.customers) {
-        setCustomers(data.customers);
-      }
-    } catch {
-      // ignore
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 20;
 
   useEffect(() => {
-    fetchCustomers();
+    fetch("/api/customers")
+      .then((r) => r.json())
+      .then((d) => setCustomers(d.customers || []))
+      .catch(() => setCustomers([]))
+      .finally(() => setLoading(false));
   }, []);
 
-  const totalSpentAll = customers.reduce((sum, c) => sum + (c.totalSpent || 0), 0);
-
-  const filteredCustomers = customers.filter((c) => {
+  const filtered = customers.filter((c) => {
+    if (!search) return true;
     const q = search.toLowerCase();
     return (
-      !search ||
       c.name.toLowerCase().includes(q) ||
       c.email.toLowerCase().includes(q) ||
-      (c.phone && c.phone.includes(q))
+      (c.phone || "").includes(q)
     );
   });
+
+  const totalPages = Math.ceil(filtered.length / PER_PAGE);
+  const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0);
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900">Customers</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
         <p className="text-sm text-gray-500">
-          View registered and guest shoppers, order frequencies, and lifetime values.
+          {customers.length} customers · Total spent: <strong>{formatPrice(totalRevenue)}</strong>
         </p>
       </div>
 
-      {/* Metrics */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm space-y-1">
-          <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-            Total Customers
-          </span>
-          <div className="text-2xl font-bold text-gray-900">{customers.length}</div>
-        </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm space-y-1">
-          <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-            Total Customer Spend
-          </span>
-          <div className="text-2xl font-bold text-gray-900">{formatPrice(totalSpentAll)}</div>
-        </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm space-y-1">
-          <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-            Average Lifetime Value
-          </span>
-          <div className="text-2xl font-bold text-gray-900">
-            {formatPrice(customers.length ? Math.round(totalSpentAll / customers.length) : 0)}
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {[
+          { label: "Total Customers", value: customers.length, icon: Users },
+          { label: "Total Revenue", value: formatPrice(totalRevenue), icon: TrendingUp, isText: true },
+          { label: "Avg Order Value", value: customers.length > 0 ? formatPrice(Math.round(totalRevenue / customers.reduce((s, c) => s + c.ordersCount, 0) || 0)) : "—", icon: ShoppingBag, isText: true },
+        ].map(({ label, value, icon: Icon, isText }) => (
+          <div key={label} className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">{label}</span>
+              <div className="rounded-full p-1.5 bg-gray-50 text-gray-600">
+                <Icon className="h-4 w-4" />
+              </div>
+            </div>
+            <div className={`font-bold text-gray-900 ${isText ? "text-lg" : "text-2xl"}`}>{value}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div className="p-4 border-b border-gray-100">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input type="text" placeholder="Search by name, email or phone..."
+              value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-gray-400 bg-gray-50" />
           </div>
         </div>
-      </div>
 
-      {/* Search Toolbar */}
-      <div className="flex items-center rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by customer name, email, or phone..."
-            className="w-full rounded-md border border-gray-200 py-1.5 pl-9 pr-4 text-xs outline-none focus:border-black"
-          />
-        </div>
-      </div>
-
-      {/* Customers Table */}
-      <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-        {loading ? (
-          <div className="p-12 text-center text-sm text-gray-500">Loading customers...</div>
-        ) : filteredCustomers.length === 0 ? (
-          <div className="p-12 text-center text-sm text-gray-500">No customers found.</div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="border-b border-gray-200 bg-gray-50 uppercase tracking-wider text-gray-500 font-semibold">
-                <tr>
-                  <th className="py-3 px-4">Customer Name</th>
-                  <th className="py-3 px-4">Contact</th>
-                  <th className="py-3 px-4">Orders Placed</th>
-                  <th className="py-3 px-4">Total Spent</th>
-                  <th className="py-3 px-4">Joined / First Order</th>
+        <div className="overflow-x-auto">
+          {loading ? (
+            <div className="p-8 text-center text-gray-400 text-sm">Loading customers...</div>
+          ) : paginated.length === 0 ? (
+            <div className="p-8 text-center text-gray-400 text-sm">No customers found</div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wider">
+                  <th className="text-left px-4 py-3 font-semibold">Customer</th>
+                  <th className="text-left px-4 py-3 font-semibold hidden sm:table-cell">Phone</th>
+                  <th className="text-right px-4 py-3 font-semibold">Orders</th>
+                  <th className="text-right px-4 py-3 font-semibold hidden md:table-cell">Total Spent</th>
+                  <th className="text-left px-4 py-3 font-semibold hidden lg:table-cell">Joined</th>
+                  <th className="text-right px-4 py-3 font-semibold">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredCustomers.map((cust) => (
-                  <tr key={cust.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black text-white font-bold text-xs uppercase">
-                          {cust.name.slice(0, 2)}
-                        </div>
-                        <span className="font-bold text-gray-900 text-sm">{cust.name}</span>
-                      </div>
+              <tbody className="divide-y divide-gray-50">
+                {paginated.map((customer) => (
+                  <tr key={customer.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-gray-900">{customer.name}</div>
+                      <div className="text-xs text-gray-500">{customer.email}</div>
                     </td>
-
-                    <td className="py-3.5 px-4 space-y-1">
-                      <div className="flex items-center gap-1.5 text-gray-700">
-                        <Mail className="h-3.5 w-3.5 text-gray-400" />
-                        <span>{cust.email}</span>
-                      </div>
-                      {cust.phone && (
-                        <div className="flex items-center gap-1.5 text-gray-500">
-                          <Phone className="h-3.5 w-3.5 text-gray-400" />
-                          <span>{cust.phone}</span>
-                        </div>
-                      )}
-                    </td>
-
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1 font-bold text-gray-900 bg-gray-100 px-2 py-0.5 rounded">
-                        <ShoppingBag className="h-3 w-3" />
-                        {cust.ordersCount}
+                    <td className="px-4 py-3 hidden sm:table-cell text-gray-600 text-xs">{customer.phone || "—"}</td>
+                    <td className="px-4 py-3 text-right">
+                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 text-gray-800 text-xs font-bold">
+                        {customer.ordersCount}
                       </span>
                     </td>
-
-                    <td className="py-3.5 px-4 font-bold text-gray-900 text-sm">
-                      {formatPrice(cust.totalSpent)}
+                    <td className="px-4 py-3 text-right hidden md:table-cell font-semibold text-gray-900">
+                      {formatPrice(customer.totalSpent)}
                     </td>
-
-                    <td className="py-3.5 px-4 text-gray-500">
-                      {new Date(cust.createdAt).toLocaleDateString()}
+                    <td className="px-4 py-3 hidden lg:table-cell text-gray-500 text-xs">
+                      {new Date(customer.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Link href={`/admin/customers/${customer.id}`}
+                        className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md font-medium transition-colors">
+                        View Orders
+                      </Link>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          )}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
+            <p className="text-xs text-gray-500">
+              Showing {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length}
+            </p>
+            <div className="flex gap-2">
+              <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
+                className="text-xs px-3 py-1.5 border border-gray-200 rounded-md disabled:opacity-40 hover:bg-gray-50">
+                ← Prev
+              </button>
+              <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+                className="text-xs px-3 py-1.5 border border-gray-200 rounded-md disabled:opacity-40 hover:bg-gray-50">
+                Next →
+              </button>
+            </div>
           </div>
         )}
       </div>

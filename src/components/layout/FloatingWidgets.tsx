@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 import { ChevronDown, Tag, X } from "lucide-react";
-import { useStore, type CurrencyCode, CURRENCY_RATES } from "@/components/providers/StoreProvider";
+import { useStore, type CurrencyCode } from "@/components/providers/StoreProvider";
 
 const CURRENCY_LIST: { code: CurrencyCode; flag: string; label: string }[] = [
-  { code: "PKR", flag: "🇵🇰", label: "Pakistan (PKR Rs.)" },
-  { code: "USD", flag: "🇺🇸", label: "United States (USD $)" },
-  { code: "GBP", flag: "🇬🇧", label: "United Kingdom (GBP £)" },
-  { code: "EUR", flag: "🇪🇺", label: "European Union (EUR €)" },
-  { code: "CAD", flag: "🇨🇦", label: "Canada (CAD CA$)" },
-  { code: "AED", flag: "AED", label: "United Arab Emirates (AED)" },
+  { code: "PKR", flag: "🇵🇰", label: "Auto Location" },
+  { code: "USD", flag: "🇺🇸", label: "US Dollar (USD)" },
+  { code: "EUR", flag: "🇪🇺", label: "Euro (EUR)" },
+  { code: "GBP", flag: "🇬🇧", label: "British Pound (GBP)" },
+  { code: "CAD", flag: "🇨🇦", label: "Canadian Dollar (CAD)" },
+  { code: "AED", flag: "🇦🇪", label: "UAE Dirham (AED)" },
 ];
 
 export default function FloatingWidgets() {
@@ -65,30 +65,20 @@ export default function FloatingWidgets() {
           </button>
 
           {currencyOpen && (
-            <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg border border-black/10 bg-white p-1.5 shadow-2xl z-50 text-xs">
-              <div className="px-3 py-1.5 font-bold uppercase tracking-wider text-[11px] text-black/60 border-b border-black/5">
-                Select Currency
-              </div>
-              <ul className="py-1">
+            <div className="absolute bottom-full left-0 mb-2 w-[250px] max-h-[290px] overflow-y-auto rounded-md bg-white shadow-[0_4px_20px_rgba(0,0,0,0.18)] z-50 font-serif text-[14px] text-neutral-800">
+              <ul>
                 {CURRENCY_LIST.map((c) => (
-                  <li key={c.code}>
+                  <li key={c.label} className="border-b border-neutral-200 last:border-b-0">
                     <button
                       type="button"
                       onClick={() => {
                         setCurrency(c.code);
                         setCurrencyOpen(false);
                       }}
-                      className={`flex w-full items-center justify-between px-3 py-2 text-left rounded transition-colors ${
-                        currency === c.code ? "bg-black text-white font-semibold" : "hover:bg-neutral-100 text-black/90"
-                      }`}
+                      className="flex w-full items-center gap-3 px-4 py-3.5 text-left tracking-wide hover:bg-neutral-50 transition-colors"
                     >
-                      <span className="flex items-center gap-2">
-                        <span className="text-base">{c.flag}</span>
-                        <span>{c.code}</span>
-                      </span>
-                      <span className="text-[11px] opacity-70">
-                        {CURRENCY_RATES[c.code]?.symbol}
-                      </span>
+                      <span className="text-xl leading-none">{c.flag}</span>
+                      <span>{c.label}</span>
                     </button>
                   </li>
                 ))}

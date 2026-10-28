@@ -1,17 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { parseDescription } from "@/lib/description";
 import AddToCart from "@/components/products/AddToCart";
 import ProductReviews from "@/components/products/ProductReviews";
 import ProductCard from "@/components/products/ProductCard";
 import ProductGallery from "@/components/products/ProductGallery";
-import ProductPriceDisplay from "@/components/products/ProductPriceDisplay";
 import CustomerTestimonials from "@/components/products/CustomerTestimonials";
 import KeyActives from "@/components/products/KeyActives";
 import ProductVideoReel from "@/components/products/ProductVideoReel";
 import { allProducts, getProduct } from "@/data/products";
+import { getProductByHandle, getProducts } from "@/lib/db";
+import type { Product } from "@/types";
 import { SEED_BLOGS } from "@/data/seed-blogs";
-import { ChevronRight, Star, Globe, ShieldCheck, Truck, RotateCcw, Share2 } from "lucide-react";
+import { ChevronRight, Globe, ShieldCheck, Truck, RotateCcw, Share2 } from "lucide-react";
 
 type Props = { params: Promise<{ handle: string }> };
 
@@ -21,7 +23,13 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props) {
   const { handle } = await params;
-  const p = getProduct(handle);
+  let p = null;
+  try {
+    p = await getProductByHandle(handle);
+  } catch {
+    // fallback
+  }
+  if (!p) p = getProduct(handle);
   if (!p) return { title: "Product – Sillhouete" };
 
   const pageTitle = p.handle === "iris-rm-03"
@@ -31,7 +39,7 @@ export async function generateMetadata({ params }: Props) {
   return {
     title: pageTitle,
     description: p.description
-      ? p.description.slice(0, 160)
+      ? p.description.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").replace(/^\s*Description:\s*/i, "").trim().slice(0, 160)
       : `Shop ${p.title} handcrafted Pakistani designer dress at Sillhouete. Worldwide delivery.`,
     alternates: {
       canonical: `https://sillhouete.com/products/${p.handle}`,
@@ -62,11 +70,28 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function ProductPage({ params }: Props) {
   const { handle } = await params;
-  const product = getProduct(handle);
+  let product = null;
+  try {
+    product = await getProductByHandle(handle);
+  } catch {
+    // fallback
+  }
+  if (!product) product = getProduct(handle);
   if (!product) notFound();
 
-  // Related products
-  const related = allProducts.filter((p) => p.handle !== handle).slice(0, 4);
+  // Related products from DB or fallback
+  let related: Product[] = [];
+  try {
+    const dbProds = await getProducts();
+    if (dbProds && dbProds.length > 0) {
+      related = dbProds.filter((p) => p.handle !== handle).slice(0, 4);
+    }
+  } catch {
+    // fallback
+  }
+  if (related.length === 0) {
+    related = allProducts.filter((p) => p.handle !== handle).slice(0, 4);
+  }
 
   // Exact JSON-LD structured data as on the real Sillhouete website
   const jsonLd = {
@@ -119,12 +144,16 @@ export default async function ProductPage({ params }: Props) {
     ],
   };
 
-  const rating = product.rating || 5.0;
-  const reviewCount = product.reviewCount || 62;
 
   // Derive collection breadcrumb
-  const collectionName = product.category || "Best Sellers";
+  const description = parseDescription(product.description);
+  const rawCategory = product.category || "Best Sellers";
+  const isLuxuryPret = rawCategory.toLowerCase().includes("luxury pret");
+  const collectionName = isLuxuryPret
+    ? "Luxury Pret Dresses for Women – Shop Pakistani Ready-to-Wear Online"
+    : rawCategory;
   const collectionSlug =
+    isLuxuryPret ? "luxury-pret" :
     collectionName.toLowerCase().includes("formal") ? "formal-dresses" :
     collectionName.toLowerCase().includes("maahi") ? "maahi-ii-luxury-eid-pret" :
     collectionName.toLowerCase().includes("silk") ? "silk-solids26" :
@@ -148,8 +177,8 @@ export default async function ProductPage({ params }: Props) {
             Home
           </Link>
           <span className="text-neutral-400">&gt;</span>
-          <Link href={`/collections/${collectionSlug}`} className="hover:text-black uppercase">
-            {collectionName.toUpperCase()}
+          <Link href={`/collections/${collectionSlug}`} className="hover:text-black">
+            {collectionName}
           </Link>
           <span className="text-neutral-400">&gt;</span>
           <span className="text-black">
@@ -179,20 +208,12 @@ export default async function ProductPage({ params }: Props) {
               <p className="product-single__sku text-[10px] uppercase tracking-[0.2em] text-black/50 font-black mt-1">
                 {product.sku || `${product.handle.toUpperCase()}-XS`}
               </p>
+            </div>
 
-              {/* Judge.me Star Rating with #108474 brand teal from live site */}
-              <div className="flex items-center gap-1.5 mt-1">
-                <div className="flex text-[#108474]">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-3.5 w-3.5 fill-[#108474] text-[#108474]" />
-                  ))}
-                </div>
-                <span className="text-[12px] text-neutral-600 font-serif">
-                  ({reviewCount} reviews)
-                </span>
-              </div>
-
-              {/* Price with Shipping note */}
+            {/* Add to Cart Component with Size, Dupatta, Ad-Ons, Expedite, Slips, Buy It Now, WhatsApp */}
+            <AddToCart product={product}>
+              <div className="space-y-2.5">
+                {/* Price with Shipping note */}
               <div className="mt-2">
                 <p className="text-[13px] text-neutral-600">
                   <Link href="/pages/shipping-policy" className="underline hover:text-black">
@@ -207,15 +228,13 @@ export default async function ProductPage({ params }: Props) {
                 <Globe className="h-4 w-4 text-black stroke-[1.5]" />
                 <span>World Wide Shipping</span>
               </div>
-            </div>
-
-            {/* Add to Cart Component with Size, Dupatta, Ad-Ons, Expedite, Slips, Buy It Now, WhatsApp */}
-            <AddToCart product={product} />
+              </div>
+            </AddToCart>
 
             {/* Shipping & Making Time */}
             <div className="border-t border-black/10 pt-4 text-xs text-black/85 space-y-1">
               <p>
-                <strong>Making Time:</strong> 18 – 20 days.
+                <strong>Making Time:</strong> {isLuxuryPret ? "15 – 18" : "18 – 20"} days.
               </p>
               <p>
                 <strong>Transit time :</strong>Normal 10–12 days, Express 5–6 days
@@ -238,186 +257,25 @@ export default async function ProductPage({ params }: Props) {
               </div>
             </details>
 
-            {/* Description matching real site */}
-            <div className="pt-2 text-xs leading-relaxed space-y-3">
-              <div>
-                <strong className="block font-bold uppercase tracking-wider text-xs mb-1.5 text-black">
-                  Description:
-                </strong>
-                <p className="text-black/80">
-                  {product.description ||
-                    `${product.title} is an exquisite haute couture ensemble featuring refined hand-embellishment with Swarovski crystals, shimmering naqshi, fine dabka, and delicate sequins. Paired with tailored matching trousers and a regal flowing dupatta, it exudes timeless sophistication.`}
-                </p>
-              </div>
+            {/* Description — the store's real per-product description (price includes, fabric, customization) */}
+            <div
+              className="product-description pt-2 text-xs leading-relaxed text-black/85 [&_p]:mb-2 [&_strong]:font-bold [&_strong]:text-black [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-2 [&_li]:mb-0.5"
+              dangerouslySetInnerHTML={{ __html: description.bodyHtml }}
+            />
 
-              {/* Fabric Detail */}
-              <div>
-                <strong className="block font-bold uppercase tracking-wider text-xs mb-1 text-black">
-                  Fabric Detail:
-                </strong>
-                <ul className="list-disc list-inside space-y-0.5 text-black/80">
-                  <li>Shirt: {product.fabricDetail?.shirt || "Net"}</li>
-                  <li>Pants: {product.fabricDetail?.trousers || "PK Rawsilk"}</li>
-                  <li>Bustier top/Lining: PK Rawsilk</li>
-                  <li>Dupatta: {product.fabricDetail?.dupatta || "Organza Dupatta + Patches"}</li>
-                </ul>
+            {/* Size chart — each product's own chart image from its description */}
+            {description.images.length > 0 && (
+              <div className="border-t border-black/10 pt-6 space-y-4">
+                <div className="flex flex-col items-center justify-center mb-1">
+                  <span className="font-serif text-[18px] leading-none text-black select-none">سلوٹ</span>
+                  <span className="font-serif text-[24px] font-bold tracking-[0.05em] text-black">Sillhouete</span>
+                </div>
+                {description.images.map((src) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={src} src={src} alt={`${product.title} size chart`} loading="lazy" className="w-full h-auto" />
+                ))}
               </div>
-
-              {/* Price Includes */}
-              <div>
-                <p className="text-black/90">
-                  <strong>Price Includes:</strong> {product.priceIncludes?.join(", ") || "Shirt, Bustier top & Pants."}
-                </p>
-              </div>
-
-              {/* Size Customization details */}
-              <div className="space-y-0.5 text-black/80">
-                <p><strong>Size Customization:</strong> Yes</p>
-                <p><strong>Colour Customization:</strong> No</p>
-              </div>
-            </div>
-
-            {/* Authentic Garment Size Guide Tables matching frame_07_21.0s.jpg and frame_08_24.0s.jpg */}
-            <div className="border-t border-black/10 pt-6 space-y-4">
-              <div className="flex flex-col items-center justify-center mb-1">
-                <span className="font-serif text-[18px] leading-none text-black select-none">سلوٹ</span>
-                <span className="font-serif text-[24px] font-bold tracking-[0.05em] text-black">
-                  Sillhouete
-                </span>
-              </div>
-              <div className="bg-black text-white text-center py-2 text-xs font-bold uppercase tracking-[0.25em]">
-                Size Chart
-              </div>
-
-              <div className="overflow-x-auto border border-black/20">
-                <table className="w-full text-center text-xs border-collapse">
-                  <thead className="bg-black text-white font-bold text-[11px]">
-                    <tr>
-                      <th className="p-2 border-r border-white/20 text-left font-semibold">Details</th>
-                      <th className="p-2 border-r border-white/20">Ex Small</th>
-                      <th className="p-2 border-r border-white/20">Small</th>
-                      <th className="p-2 border-r border-white/20">Medium</th>
-                      <th className="p-2 border-r border-white/20">Large</th>
-                      <th className="p-2">Ex Large</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-black/15 text-black">
-                    <tr className="hover:bg-neutral-50">
-                      <td className="p-2 text-left font-semibold border-r border-black/15">Shoulder</td>
-                      <td className="p-2 border-r border-black/15">13.5</td>
-                      <td className="p-2 border-r border-black/15">14</td>
-                      <td className="p-2 border-r border-black/15">14.5</td>
-                      <td className="p-2 border-r border-black/15">15</td>
-                      <td className="p-2">16</td>
-                    </tr>
-                    <tr className="hover:bg-neutral-50">
-                      <td className="p-2 text-left font-semibold border-r border-black/15">Bust</td>
-                      <td className="p-2 border-r border-black/15">18</td>
-                      <td className="p-2 border-r border-black/15">19</td>
-                      <td className="p-2 border-r border-black/15">20.5</td>
-                      <td className="p-2 border-r border-black/15">22</td>
-                      <td className="p-2">23.5</td>
-                    </tr>
-                    <tr className="hover:bg-neutral-50">
-                      <td className="p-2 text-left font-semibold border-r border-black/15">Hip</td>
-                      <td className="p-2 border-r border-black/15">18.5</td>
-                      <td className="p-2 border-r border-black/15">19.5</td>
-                      <td className="p-2 border-r border-black/15">22</td>
-                      <td className="p-2 border-r border-black/15">23</td>
-                      <td className="p-2">24.5</td>
-                    </tr>
-                    <tr className="hover:bg-neutral-50">
-                      <td className="p-2 text-left font-semibold border-r border-black/15">Arm Hole</td>
-                      <td className="p-2 border-r border-black/15">8</td>
-                      <td className="p-2 border-r border-black/15">8.5</td>
-                      <td className="p-2 border-r border-black/15">9.5</td>
-                      <td className="p-2 border-r border-black/15">10.5</td>
-                      <td className="p-2">12</td>
-                    </tr>
-                    <tr className="hover:bg-neutral-50">
-                      <td className="p-2 text-left font-semibold border-r border-black/15">Bicep</td>
-                      <td className="p-2 border-r border-black/15">6</td>
-                      <td className="p-2 border-r border-black/15">6.5</td>
-                      <td className="p-2 border-r border-black/15">7</td>
-                      <td className="p-2 border-r border-black/15">8</td>
-                      <td className="p-2">9.5</td>
-                    </tr>
-                    <tr className="hover:bg-neutral-50">
-                      <td className="p-2 text-left font-semibold border-r border-black/15">Wrist (Round)</td>
-                      <td className="p-2 border-r border-black/15">7</td>
-                      <td className="p-2 border-r border-black/15">7</td>
-                      <td className="p-2 border-r border-black/15">8</td>
-                      <td className="p-2 border-r border-black/15">9</td>
-                      <td className="p-2">10</td>
-                    </tr>
-                    <tr className="hover:bg-neutral-50">
-                      <td className="p-2 text-left font-semibold border-r border-black/15">Sleeves Length</td>
-                      <td className="p-2 border-r border-black/15">22.5</td>
-                      <td className="p-2 border-r border-black/15">23</td>
-                      <td className="p-2 border-r border-black/15">23.5</td>
-                      <td className="p-2 border-r border-black/15">24</td>
-                      <td className="p-2">24</td>
-                    </tr>
-                    <tr className="hover:bg-neutral-50">
-                      <td className="p-2 text-left font-semibold border-r border-black/15">Shirt Length</td>
-                      <td className="p-2 border-r border-black/15">55</td>
-                      <td className="p-2 border-r border-black/15">55</td>
-                      <td className="p-2 border-r border-black/15">55</td>
-                      <td className="p-2 border-r border-black/15">55</td>
-                      <td className="p-2">55</td>
-                    </tr>
-                    <tr className="hover:bg-neutral-50">
-                      <td className="p-2 text-left font-semibold border-r border-black/15">HEM</td>
-                      <td className="p-2 border-r border-black/15">28</td>
-                      <td className="p-2 border-r border-black/15">28</td>
-                      <td className="p-2 border-r border-black/15">28</td>
-                      <td className="p-2 border-r border-black/15">28</td>
-                      <td className="p-2">28</td>
-                    </tr>
-
-                    {/* Trouser Size Header */}
-                    <tr className="bg-black text-white font-bold text-center">
-                      <td colSpan={6} className="py-2 text-xs uppercase tracking-[0.2em]">
-                        Trouser Size
-                      </td>
-                    </tr>
-
-                    <tr className="hover:bg-neutral-50">
-                      <td className="p-2 text-left font-semibold border-r border-black/15">Waist</td>
-                      <td className="p-2 border-r border-black/15">14</td>
-                      <td className="p-2 border-r border-black/15">15</td>
-                      <td className="p-2 border-r border-black/15">17</td>
-                      <td className="p-2 border-r border-black/15">19</td>
-                      <td className="p-2">19.5</td>
-                    </tr>
-                    <tr className="hover:bg-neutral-50">
-                      <td className="p-2 text-left font-semibold border-r border-black/15">Thigh</td>
-                      <td className="p-2 border-r border-black/15">11</td>
-                      <td className="p-2 border-r border-black/15">12</td>
-                      <td className="p-2 border-r border-black/15">13</td>
-                      <td className="p-2 border-r border-black/15">14</td>
-                      <td className="p-2">16</td>
-                    </tr>
-                    <tr className="hover:bg-neutral-50">
-                      <td className="p-2 text-left font-semibold border-r border-black/15">Bottom (Half)</td>
-                      <td className="p-2 border-r border-black/15">36</td>
-                      <td className="p-2 border-r border-black/15">36</td>
-                      <td className="p-2 border-r border-black/15">36</td>
-                      <td className="p-2 border-r border-black/15">36</td>
-                      <td className="p-2">36</td>
-                    </tr>
-                    <tr className="hover:bg-neutral-50">
-                      <td className="p-2 text-left font-semibold border-r border-black/15">Trouser Lengths</td>
-                      <td className="p-2 border-r border-black/15">43</td>
-                      <td className="p-2 border-r border-black/15">43</td>
-                      <td className="p-2 border-r border-black/15">44</td>
-                      <td className="p-2 border-r border-black/15">44</td>
-                      <td className="p-2">45</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            )}
 
             {/* Disclaimer & Social Share Links matching real Sillhouete site */}
             <div className="border-t border-black/10 pt-4 space-y-3 font-serif">

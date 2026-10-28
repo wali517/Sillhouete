@@ -49,9 +49,9 @@ export default function ProductCard({
           </span>
         )}
 
-        {/* NEW badge – hidden until hover, appears top‑right on product image */}
-        {!showSaleBadge && product.isNew && (
-          <span className="pointer-events-none absolute right-2.5 top-2.5 z-10 border border-black/20 bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-black opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
+        {/* NEW badge – appears on hover top-right on product image */}
+        {!showSaleBadge && product.isNew !== false && (
+          <span className="pointer-events-none absolute right-2.5 top-2.5 z-10 border border-black/20 bg-white px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-black opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm">
             NEW
           </span>
         )}
