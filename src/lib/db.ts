@@ -1,5 +1,13 @@
-import fs from "fs/promises";
-import path from "path";
+import connectDB from "./mongodb";
+import { ProductModel } from "./models/Product";
+import { OrderModel } from "./models/Order";
+import { CustomerModel } from "./models/Customer";
+import { ContactMessageModel } from "./models/ContactMessage";
+import { BlogPostModel } from "./models/BlogPost";
+import { SiteSettingsModel } from "./models/SiteSettings";
+import { allProducts as initialProducts } from "@/data/products";
+import { SEED_BLOGS } from "@/data/seed-blogs";
+import { ANNOUNCEMENTS, SITE } from "@/data/site";
 import type {
   Product,
   Order,
@@ -10,44 +18,20 @@ import type {
   OrderStatus,
   PaymentStatus,
 } from "@/types";
-import { allProducts as initialProducts } from "@/data/products";
-import { SEED_BLOGS } from "@/data/seed-blogs";
-import { ANNOUNCEMENTS, SITE } from "@/data/site";
 
-const DATA_DIR = path.join(process.cwd(), "data");
+/* ──────────────── SERIALIZATION HELPERS ──────────────── */
 
-const PRODUCTS_FILE = path.join(DATA_DIR, "products.json");
-const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
-const CUSTOMERS_FILE = path.join(DATA_DIR, "customers.json");
-const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
-const BLOGS_FILE = path.join(DATA_DIR, "blogs.json");
-const SETTINGS_FILE = path.join(DATA_DIR, "settings.json");
-
-// Ensure data directory exists
-async function ensureDir() {
-  try {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-  } catch {
-    // Already exists
-  }
+function toPlain<T>(doc: unknown): T | undefined {
+  if (!doc) return undefined;
+  const obj = JSON.parse(JSON.stringify(doc));
+  if (!obj.id && obj._id) obj.id = String(obj._id);
+  delete obj._id;
+  delete obj.__v;
+  return obj as T;
 }
 
-// File write safe for Windows
-async function writeJsonAtomic(filePath: string, data: unknown) {
-  await ensureDir();
-  const content = JSON.stringify(data, null, 2);
-  await fs.writeFile(filePath, content, "utf8");
-}
-
-async function readJsonSafe<T>(filePath: string, fallback: T): Promise<T> {
-  try {
-    await ensureDir();
-    const content = await fs.readFile(filePath, "utf8");
-    return JSON.parse(content) as T;
-  } catch {
-    // If file doesn't exist or during parallel build, return fallback without writing
-    return fallback;
-  }
+function toPlainArray<T>(docs: unknown[]): T[] {
+  return (docs || []).map((d) => toPlain<T>(d)!).filter(Boolean);
 }
 
 /* ──────────────── PRODUCTS ──────────────── */
@@ -59,16 +43,24 @@ function enrichInitialProducts(prods: typeof initialProducts): Product[] {
     description:
       p.description ||
       `${p.alt}. Crafted from premium fabrics with bespoke hand embroidery, fine zardozi detailing, and artisanal tailoring. Perfect for festive ceremonies, weddings, and formal celebrations.`,
-    inStock: true,
+    inStock: p.inStock ?? true,
     sizes: p.sizes || ["XS", "S", "M", "L", "XL"],
-    images: [p.image, p.hoverImage],
+    images: p.images && p.images.length ? p.images : [p.image, p.hoverImage].filter(Boolean),
     sku: p.sku || `SLH-${p.handle.toUpperCase()}`,
   }));
 }
 
 export async function getProducts(): Promise<Product[]> {
-  const enriched = enrichInitialProducts(initialProducts);
-  return readJsonSafe<Product[]>(PRODUCTS_FILE, enriched);
+  try {
+    await connectDB();
+    const docs = await ProductModel.find({}).sort({ createdAt: -1 }).lean();
+    if (docs && docs.length > 0) {
+      return toPlainArray<Product>(docs);
+    }
+  } catch (err) {
+    console.warn("MongoDB getProducts fallback:", err);
+  }
+  return enrichInitialProducts(initialProducts);
 }
 
 /** Search products by title, handle, alt text, category, or description. */
@@ -89,17 +81,32 @@ export async function searchProducts(query: string): Promise<Product[]> {
 }
 
 export async function getProductByHandle(handle: string): Promise<Product | undefined> {
-  const products = await getProducts();
-  return products.find((p) => p.handle === handle);
+  try {
+    await connectDB();
+    const doc = await ProductModel.findOne({ handle }).lean();
+    const prod = toPlain<Product>(doc);
+    if (prod) return prod;
+  } catch (err) {
+    console.warn("MongoDB getProductByHandle fallback:", err);
+  }
+  const enriched = enrichInitialProducts(initialProducts);
+  return enriched.find((p) => p.handle === handle);
 }
 
 export async function getProductById(id: string): Promise<Product | undefined> {
-  const products = await getProducts();
-  return products.find((p) => p.id === id);
+  try {
+    await connectDB();
+    const doc = await ProductModel.findOne({ $or: [{ id }, { handle: id }] }).lean();
+    const prod = toPlain<Product>(doc);
+    if (prod) return prod;
+  } catch (err) {
+    console.warn("MongoDB getProductById fallback:", err);
+  }
+  const enriched = enrichInitialProducts(initialProducts);
+  return enriched.find((p) => p.id === id || p.handle === id);
 }
 
 export async function saveProduct(product: Partial<Product> & { title: string; price: number }): Promise<Product> {
-  const products = await getProducts();
   const handle =
     product.handle ||
     product.title
@@ -108,7 +115,6 @@ export async function saveProduct(product: Partial<Product> & { title: string; p
       .replace(/(^-|-$)/g, "");
 
   const id = product.id || `prod-${Date.now()}`;
-  const existingIndex = products.findIndex((p) => p.id === id || p.handle === handle);
 
   const fullProduct: Product = {
     id,
@@ -129,24 +135,34 @@ export async function saveProduct(product: Partial<Product> & { title: string; p
     sizes: product.sizes && product.sizes.length ? product.sizes : ["XS", "S", "M", "L", "XL"],
     fabric: product.fabric || "Pure Silk / Chiffon",
     sku: product.sku || `SLH-${handle.toUpperCase()}`,
+    dupattaOptions: product.dupattaOptions,
+    adOnOptions: product.adOnOptions,
+    variants: product.variants,
   };
 
-  if (existingIndex >= 0) {
-    products[existingIndex] = fullProduct;
-  } else {
-    products.unshift(fullProduct);
+  try {
+    await connectDB();
+    await ProductModel.findOneAndUpdate(
+      { $or: [{ id }, { handle }] },
+      { $set: fullProduct },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+  } catch (err) {
+    console.warn("MongoDB saveProduct fallback:", err);
   }
 
-  await writeJsonAtomic(PRODUCTS_FILE, products);
   return fullProduct;
 }
 
 export async function deleteProduct(id: string): Promise<boolean> {
-  const products = await getProducts();
-  const filtered = products.filter((p) => p.id !== id && p.handle !== id);
-  if (filtered.length === products.length) return false;
-  await writeJsonAtomic(PRODUCTS_FILE, filtered);
-  return true;
+  try {
+    await connectDB();
+    const res = await ProductModel.deleteOne({ $or: [{ id }, { handle: id }] });
+    return res.deletedCount > 0;
+  } catch (err) {
+    console.warn("MongoDB deleteProduct error:", err);
+    return false;
+  }
 }
 
 /* ──────────────── ORDERS ──────────────── */
@@ -237,18 +253,33 @@ const INITIAL_ORDERS: Order[] = [
 ];
 
 export async function getOrders(): Promise<Order[]> {
-  return readJsonSafe<Order[]>(ORDERS_FILE, INITIAL_ORDERS);
+  try {
+    await connectDB();
+    const docs = await OrderModel.find({}).sort({ createdAt: -1 }).lean();
+    if (docs && docs.length > 0) {
+      return toPlainArray<Order>(docs);
+    }
+  } catch (err) {
+    console.warn("MongoDB getOrders fallback:", err);
+  }
+  return INITIAL_ORDERS;
 }
 
 export async function getOrderById(id: string): Promise<Order | undefined> {
-  const orders = await getOrders();
-  return orders.find((o) => o.id === id || o.orderNumber === id);
+  try {
+    await connectDB();
+    const doc = await OrderModel.findOne({ $or: [{ id }, { orderNumber: id }] }).lean();
+    const o = toPlain<Order>(doc);
+    if (o) return o;
+  } catch (err) {
+    console.warn("MongoDB getOrderById fallback:", err);
+  }
+  return INITIAL_ORDERS.find((o) => o.id === id || o.orderNumber === id);
 }
 
 export async function createOrder(
   data: Omit<Order, "id" | "orderNumber" | "createdAt">,
 ): Promise<Order> {
-  const orders = await getOrders();
   const id = `ord-${Date.now()}`;
   const orderNumber = `SLH-${Math.floor(10000 + Math.random() * 90000)}`;
   const newOrder: Order = {
@@ -258,11 +289,13 @@ export async function createOrder(
     createdAt: new Date().toISOString(),
   };
 
-  orders.unshift(newOrder);
-  await writeJsonAtomic(ORDERS_FILE, orders);
-
-  // Update or create customer
-  await recordCustomerFromOrder(newOrder);
+  try {
+    await connectDB();
+    await OrderModel.create(newOrder);
+    await recordCustomerFromOrder(newOrder);
+  } catch (err) {
+    console.warn("MongoDB createOrder error:", err);
+  }
 
   return newOrder;
 }
@@ -271,17 +304,18 @@ export async function updateOrderStatus(
   id: string,
   updates: { status?: OrderStatus; paymentStatus?: PaymentStatus; trackingNumber?: string; courier?: string },
 ): Promise<Order | null> {
-  const orders = await getOrders();
-  const order = orders.find((o) => o.id === id || o.orderNumber === id);
-  if (!order) return null;
-
-  if (updates.status) order.status = updates.status;
-  if (updates.paymentStatus) order.paymentStatus = updates.paymentStatus;
-  if (updates.trackingNumber !== undefined) order.trackingNumber = updates.trackingNumber;
-  if (updates.courier !== undefined) order.courier = updates.courier;
-
-  await writeJsonAtomic(ORDERS_FILE, orders);
-  return order;
+  try {
+    await connectDB();
+    const doc = await OrderModel.findOneAndUpdate(
+      { $or: [{ id }, { orderNumber: id }] },
+      { $set: updates },
+      { new: true }
+    ).lean();
+    if (doc) return toPlain<Order>(doc)!;
+  } catch (err) {
+    console.warn("MongoDB updateOrderStatus error:", err);
+  }
+  return null;
 }
 
 /* ──────────────── CUSTOMERS ──────────────── */
@@ -308,33 +342,60 @@ const INITIAL_CUSTOMERS: Customer[] = [
 ];
 
 export async function getCustomers(): Promise<Customer[]> {
-  return readJsonSafe<Customer[]>(CUSTOMERS_FILE, INITIAL_CUSTOMERS);
+  try {
+    await connectDB();
+    const docs = await CustomerModel.find({}).sort({ createdAt: -1 }).lean();
+    if (docs && docs.length > 0) {
+      return toPlainArray<Customer>(docs);
+    }
+  } catch (err) {
+    console.warn("MongoDB getCustomers fallback:", err);
+  }
+  return INITIAL_CUSTOMERS;
 }
 
 export async function getCustomerById(id: string): Promise<Customer | undefined> {
-  const customers = await getCustomers();
-  return customers.find((customer) => customer.id === id);
+  try {
+    await connectDB();
+    const doc = await CustomerModel.findOne({ id }).lean();
+    if (doc) return toPlain<Customer>(doc);
+  } catch (err) {
+    console.warn("MongoDB getCustomerById fallback:", err);
+  }
+  return INITIAL_CUSTOMERS.find((customer) => customer.id === id);
 }
 
 async function recordCustomerFromOrder(order: Order) {
-  const customers = await getCustomers();
-  const existing = customers.find((c) => c.email.toLowerCase() === order.customer.email.toLowerCase());
-  if (existing) {
-    existing.ordersCount += 1;
-    existing.totalSpent += order.total;
-    if (order.customer.phone && !existing.phone) existing.phone = order.customer.phone;
-  } else {
-    customers.unshift({
-      id: `cust-${Date.now()}`,
-      name: order.customer.name,
-      email: order.customer.email,
-      phone: order.customer.phone,
-      createdAt: new Date().toISOString(),
-      ordersCount: 1,
-      totalSpent: order.total,
-    });
+  try {
+    await connectDB();
+    const email = order.customer.email.toLowerCase().trim();
+    const existing = await CustomerModel.findOne({ email });
+
+    if (existing) {
+      existing.ordersCount = (existing.ordersCount || 0) + 1;
+      existing.totalSpent = (existing.totalSpent || 0) + order.total;
+      if (order.customer.phone && !existing.phone) {
+        existing.phone = order.customer.phone;
+      }
+      if (order.shippingAddress) {
+        existing.addresses = existing.addresses || [];
+        existing.addresses.push(order.shippingAddress);
+      }
+      await existing.save();
+    } else {
+      await CustomerModel.create({
+        id: `cust-${Date.now()}`,
+        name: order.customer.name,
+        email,
+        phone: order.customer.phone || "",
+        ordersCount: 1,
+        totalSpent: order.total,
+        addresses: order.shippingAddress ? [order.shippingAddress] : [],
+      });
+    }
+  } catch (err) {
+    console.warn("recordCustomerFromOrder error:", err);
   }
-  await writeJsonAtomic(CUSTOMERS_FILE, customers);
 }
 
 /* ──────────────── CONTACT MESSAGES ──────────────── */
@@ -364,11 +425,19 @@ const INITIAL_MESSAGES: ContactMessage[] = [
 ];
 
 export async function getContactMessages(): Promise<ContactMessage[]> {
-  return readJsonSafe<ContactMessage[]>(MESSAGES_FILE, INITIAL_MESSAGES);
+  try {
+    await connectDB();
+    const docs = await ContactMessageModel.find({}).sort({ createdAt: -1 }).lean();
+    if (docs && docs.length > 0) {
+      return toPlainArray<ContactMessage>(docs);
+    }
+  } catch (err) {
+    console.warn("MongoDB getContactMessages fallback:", err);
+  }
+  return INITIAL_MESSAGES;
 }
 
 export async function saveContactMessage(data: Omit<ContactMessage, "id" | "createdAt" | "status">): Promise<ContactMessage> {
-  const messages = await getContactMessages();
   const newMessage: ContactMessage = {
     id: `msg-${Date.now()}`,
     name: data.name,
@@ -379,42 +448,71 @@ export async function saveContactMessage(data: Omit<ContactMessage, "id" | "crea
     createdAt: new Date().toISOString(),
     status: "unread",
   };
-  messages.unshift(newMessage);
-  await writeJsonAtomic(MESSAGES_FILE, messages);
+
+  try {
+    await connectDB();
+    await ContactMessageModel.create(newMessage);
+  } catch (err) {
+    console.warn("MongoDB saveContactMessage error:", err);
+  }
+
   return newMessage;
 }
 
 export async function updateMessageStatus(id: string, status: "unread" | "read" | "replied", replyNotes?: string): Promise<ContactMessage | null> {
-  const messages = await getContactMessages();
-  const msg = messages.find((m) => m.id === id);
-  if (!msg) return null;
-  msg.status = status;
-  if (replyNotes !== undefined) msg.replyNotes = replyNotes;
-  await writeJsonAtomic(MESSAGES_FILE, messages);
-  return msg;
+  try {
+    await connectDB();
+    const doc = await ContactMessageModel.findOneAndUpdate(
+      { id },
+      { $set: { status, ...(replyNotes !== undefined ? { replyNotes } : {}) } },
+      { new: true }
+    ).lean();
+    if (doc) return toPlain<ContactMessage>(doc)!;
+  } catch (err) {
+    console.warn("MongoDB updateMessageStatus error:", err);
+  }
+  return null;
 }
 
 export async function deleteContactMessage(id: string): Promise<boolean> {
-  const messages = await getContactMessages();
-  const filtered = messages.filter((m) => m.id !== id);
-  if (filtered.length === messages.length) return false;
-  await writeJsonAtomic(MESSAGES_FILE, filtered);
-  return true;
+  try {
+    await connectDB();
+    const res = await ContactMessageModel.deleteOne({ id });
+    return res.deletedCount > 0;
+  } catch (err) {
+    console.warn("MongoDB deleteContactMessage error:", err);
+    return false;
+  }
 }
 
 /* ──────────────── BLOGS ──────────────── */
 
 export async function getBlogs(): Promise<BlogPost[]> {
-  return readJsonSafe<BlogPost[]>(BLOGS_FILE, SEED_BLOGS);
+  try {
+    await connectDB();
+    const docs = await BlogPostModel.find({}).sort({ publishedAt: -1, createdAt: -1 }).lean();
+    if (docs && docs.length > 0) {
+      return toPlainArray<BlogPost>(docs);
+    }
+  } catch (err) {
+    console.warn("MongoDB getBlogs fallback:", err);
+  }
+  return SEED_BLOGS;
 }
 
 export async function getBlogBySlug(slug: string): Promise<BlogPost | undefined> {
-  const blogs = await getBlogs();
-  return blogs.find((b) => b.slug === slug);
+  try {
+    await connectDB();
+    const doc = await BlogPostModel.findOne({ $or: [{ slug }, { id: slug }] }).lean();
+    const b = toPlain<BlogPost>(doc);
+    if (b) return b;
+  } catch (err) {
+    console.warn("MongoDB getBlogBySlug fallback:", err);
+  }
+  return SEED_BLOGS.find((b) => b.slug === slug || b.id === slug);
 }
 
 export async function saveBlog(blog: Partial<BlogPost> & { title: string; content: string }): Promise<BlogPost> {
-  const blogs = await getBlogs();
   const slug =
     blog.slug ||
     blog.title
@@ -423,7 +521,6 @@ export async function saveBlog(blog: Partial<BlogPost> & { title: string; conten
       .replace(/(^-|-$)/g, "");
 
   const id = blog.id || `blog-${Date.now()}`;
-  const existingIndex = blogs.findIndex((b) => b.id === id || b.slug === slug);
 
   const fullBlog: BlogPost = {
     id,
@@ -439,22 +536,29 @@ export async function saveBlog(blog: Partial<BlogPost> & { title: string; conten
     readTime: blog.readTime || "5 min read",
   };
 
-  if (existingIndex >= 0) {
-    blogs[existingIndex] = fullBlog;
-  } else {
-    blogs.unshift(fullBlog);
+  try {
+    await connectDB();
+    await BlogPostModel.findOneAndUpdate(
+      { $or: [{ id }, { slug }] },
+      { $set: fullBlog },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+  } catch (err) {
+    console.warn("MongoDB saveBlog error:", err);
   }
 
-  await writeJsonAtomic(BLOGS_FILE, blogs);
   return fullBlog;
 }
 
 export async function deleteBlog(id: string): Promise<boolean> {
-  const blogs = await getBlogs();
-  const filtered = blogs.filter((b) => b.id !== id && b.slug !== id);
-  if (filtered.length === blogs.length) return false;
-  await writeJsonAtomic(BLOGS_FILE, filtered);
-  return true;
+  try {
+    await connectDB();
+    const res = await BlogPostModel.deleteOne({ $or: [{ id }, { slug: id }] });
+    return res.deletedCount > 0;
+  } catch (err) {
+    console.warn("MongoDB deleteBlog error:", err);
+    return false;
+  }
 }
 
 /* ──────────────── SETTINGS ──────────────── */
@@ -476,25 +580,63 @@ const INITIAL_SETTINGS: SiteSettings = {
   stripeSecretKey: process.env.STRIPE_SECRET_KEY || "",
   stripeEnabled: true,
   currency: "PKR",
-  adminPasswordHash: "admin123", // Default admin password
+  adminPasswordHash: "admin123",
+  bankName: "Meezan Bank",
+  bankAccountTitle: "SILLHOUETE",
+  bankIban: "PK80MEZN0002160109517881",
+  discountCodes: [
+    { code: "WELCOME5", percent: 5, active: true },
+    { code: "EID2026", percent: 10, active: true },
+  ],
 };
 
 export async function getSettings(): Promise<SiteSettings> {
-  const settings = await readJsonSafe<SiteSettings>(SETTINGS_FILE, INITIAL_SETTINGS);
-  return {
+  let settings: SiteSettings = {
     ...INITIAL_SETTINGS,
-    ...settings,
-    stripePublishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || settings.stripePublishableKey,
-    stripeSecretKey: process.env.STRIPE_SECRET_KEY || settings.stripeSecretKey,
+    stripePublishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "",
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY || "",
   };
+
+  try {
+    await connectDB();
+    let doc = await SiteSettingsModel.findOne({}).lean();
+    if (!doc) {
+      const created = await SiteSettingsModel.create(INITIAL_SETTINGS);
+      doc = created.toObject();
+    }
+    const dbSettings = toPlain<SiteSettings>(doc);
+    if (dbSettings) {
+      settings = { ...settings, ...dbSettings };
+    }
+  } catch (err) {
+    console.warn("MongoDB getSettings fallback:", err);
+  }
+
+  if (process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+    settings.stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+  }
+  if (process.env.STRIPE_SECRET_KEY) {
+    settings.stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  }
+
+  return settings;
 }
 
 export async function updateSettings(updates: Partial<SiteSettings>): Promise<SiteSettings> {
-  const current = await getSettings();
-  const updated: SiteSettings = {
-    ...current,
-    ...updates,
-  };
-  await writeJsonAtomic(SETTINGS_FILE, updated);
-  return updated;
+  try {
+    await connectDB();
+    const doc = await SiteSettingsModel.findOneAndUpdate(
+      {},
+      { $set: updates },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    ).lean();
+    if (doc) {
+      const plain = toPlain<SiteSettings>(doc);
+      if (plain) return plain;
+    }
+  } catch (err) {
+    console.warn("MongoDB updateSettings fallback:", err);
+  }
+
+  return { ...INITIAL_SETTINGS, ...updates };
 }

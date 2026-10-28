@@ -202,4 +202,8 @@ export interface SiteSettings {
   stripeEnabled: boolean;
   currency: string;
   adminPasswordHash?: string;
+  bankName?: string;
+  bankAccountTitle?: string;
+  bankIban?: string;
+  discountCodes?: Array<{ code: string; percent: number; active: boolean }>;
 }
