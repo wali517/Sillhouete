@@ -99,6 +99,9 @@ export interface OrderItem {
   size: string;
   quantity: number;
   image: string;
+  /** Optional product customization selections saved with the order. */
+  dupatta?: string;
+  adOn?: string;
 }
 
 export interface OrderShippingAddress {
