@@ -99,9 +99,10 @@ export interface OrderItem {
   size: string;
   quantity: number;
   image: string;
-  /** Optional product customization selections saved with the order. */
   dupatta?: string;
   adOn?: string;
+  expedite?: boolean;
+  slip?: string;
 }
 
 export interface OrderShippingAddress {
@@ -119,7 +120,7 @@ export interface OrderShippingAddress {
 
 export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
-export type PaymentMethod = "stripe" | "cod" | "bank_transfer";
+export type PaymentMethod = "stripe" | "cod" | "bank_transfer" | "payfast" | "bank_deposit";
 
 export interface Order {
   id: string;
@@ -202,8 +203,4 @@ export interface SiteSettings {
   stripeEnabled: boolean;
   currency: string;
   adminPasswordHash?: string;
-  bankName?: string;
-  bankAccountTitle?: string;
-  bankIban?: string;
-  discountCodes?: Array<{ code: string; percent: number; active: boolean }>;
 }

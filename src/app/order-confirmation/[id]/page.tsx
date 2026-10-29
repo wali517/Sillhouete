@@ -63,10 +63,8 @@ export default function OrderConfirmationPage() {
     );
   }
 
-  // Keep support for legacy payment-method values stored in older orders.
-  const paymentMethod = order.paymentMethod as string;
   const isBankDeposit =
-    paymentMethod === "bank_transfer" || paymentMethod === "bank_deposit";
+    order.paymentMethod === "bank_transfer" || order.paymentMethod === "bank_deposit";
   const isPaid = order.paymentStatus === "paid";
 
   return (
@@ -239,7 +237,7 @@ export default function OrderConfirmationPage() {
               <p className="text-[13px] text-[#1a1a1a] capitalize">
                 {isBankDeposit
                   ? "Bank Deposit"
-                  : paymentMethod === "payfast"
+                  : order.paymentMethod === "payfast"
                   ? "PAYFAST"
                   : "Card"}
               </p>

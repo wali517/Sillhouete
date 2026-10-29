@@ -40,6 +40,24 @@ function Column({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
+const Badge = ({
+  label,
+  bg,
+  fg = "#fff",
+}: {
+  label: string;
+  bg: string;
+  fg?: string;
+}) => (
+  <li
+    aria-label={label}
+    className="grid h-6 w-[38px] place-items-center rounded-[3px] border border-black/10 text-[8px] font-bold shadow-xs select-none"
+    style={{ background: bg, color: fg }}
+  >
+    {label}
+  </li>
+);
+
 export default function Footer() {
   const [footerEmail, setFooterEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);

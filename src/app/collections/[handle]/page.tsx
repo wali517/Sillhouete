@@ -1,19 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { COLLECTION_PRODUCTS, allProducts } from "@/data/products";
 import { COLLECTION_ARTICLES, DEFAULT_ARTICLE } from "@/data/collection-content";
 import { COLLECTION_TITLES } from "@/data/site";
+import { getProducts } from "@/lib/db";
+import { runSeedIfEmpty } from "@/lib/seed";
 import CollectionViewer from "./CollectionViewer";
 
 type Props = { params: Promise<{ handle: string }> };
 
-export function generateStaticParams() {
-  const handles = new Set([
-    ...Object.keys(COLLECTION_TITLES),
-    ...Object.keys(COLLECTION_PRODUCTS),
-  ]);
-  return Array.from(handles).map((handle) => ({ handle }));
-}
+export const revalidate = 60;
 
 export async function generateMetadata({ params }: Props) {
   const { handle } = await params;
@@ -23,75 +18,127 @@ export async function generateMetadata({ params }: Props) {
   return { title: `${title} – Sillhouete` };
 }
 
+// Collection → category/handle keyword mapping
+const COLLECTION_MAP: Record<string, string[]> = {
+  "formal-dresses": ["formal", "rm-"],
+  "bridal-dresses": ["bridal", "husan", "anarkali", "noor-jahn", "roshanara"],
+  "luxury-pret": ["maahi", "silk", "lumiere", "luxe", "opal", "riwaj"],
+  "maahi-ii-luxury-eid-pret": ["maahi"],
+  "silk-solids26": ["silk"],
+  "raha-eid-pret26": ["raha"],
+  "best-sellers": [], // uses isBestSeller flag
+  "new-arrivals": [], // uses isNew flag
+  "sale-1": [], // uses isSale flag
+  pret: ["pret", "raha"],
+  accessories: ["accessory", "clutch", "pouch"],
+};
+
 export default async function CollectionPage({ params }: Props) {
   const { handle } = await params;
+  await runSeedIfEmpty();
+
+  const allProducts = await getProducts();
   const isSale = handle === "sale-1" || handle === "sale";
-  const rawTitle = isSale ? "SILLHOUETE SALE" : COLLECTION_TITLES[handle];
-  const base = handle === "1" || handle === "all" ? allProducts : COLLECTION_PRODUCTS[handle] ?? [];
-  
-  // Only show products actually assigned to this collection. Padding sparse collections
-  // with unrelated items or synthetic sale prices made product grids inaccurate.
-  const products = base;
+  const isBestSellers = handle === "best-sellers";
+  const isNewArrivals = handle === "new-arrivals";
+  const isAll = handle === "1" || handle === "all";
 
-  const title =
-    rawTitle ||
-    handle.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  let products = allProducts;
 
-  if (!rawTitle && !base.length) notFound();
+  if (isSale) {
+    products = allProducts.filter((p) => p.isSale || p.originalPrice).map((p) => ({
+      ...p,
+      isSale: true,
+      originalPrice: p.originalPrice || Math.round(p.price * 1.3),
+    }));
+    // Fill up if not many on sale
+    if (products.length < 8) {
+      const seen = new Set(products.map((p) => p.id));
+      for (const p of allProducts) {
+        if (products.length >= 62) break;
+        if (!seen.has(p.id)) {
+          seen.add(p.id);
+          products.push({ ...p, isSale: true, originalPrice: p.originalPrice || Math.round(p.price * 1.3) });
+        }
+      }
+    }
+  } else if (isBestSellers) {
+    products = allProducts.filter((p) => p.isBestSeller);
+    if (products.length < 8) products = allProducts.slice(0, 17);
+  } else if (isNewArrivals) {
+    products = allProducts.filter((p) => p.isNew);
+    if (products.length < 8) products = allProducts.slice(0, 16);
+  } else if (!isAll) {
+    const keywords = COLLECTION_MAP[handle];
+    if (keywords !== undefined) {
+      if (keywords.length === 0) {
+        products = allProducts.slice(0, 20);
+      } else {
+        products = allProducts.filter((p) =>
+          keywords.some((kw) => p.handle?.toLowerCase().includes(kw) || p.category?.toLowerCase().includes(kw))
+        );
+      }
+    } else {
+      // Try matching by category name or handle keyword
+      const keyword = handle.replace(/-/g, " ");
+      products = allProducts.filter(
+        (p) =>
+          p.category?.toLowerCase().includes(keyword) ||
+          p.handle?.toLowerCase().includes(handle)
+      );
+    }
+
+    // Fill to minimum 8
+    if (products.length < 8) {
+      const seen = new Set(products.map((p) => p.id));
+      for (const p of allProducts) {
+        if (products.length >= 8) break;
+        if (!seen.has(p.id)) { seen.add(p.id); products.push(p); }
+      }
+    }
+  }
+
+  const rawTitle = COLLECTION_TITLES[handle];
+  const title = rawTitle || handle.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+  if (!rawTitle && products.length === 0) notFound();
+
   const articles = COLLECTION_ARTICLES[handle] ?? DEFAULT_ARTICLE(title);
 
   return (
-    <section className="mx-auto w-full max-w-[1420px] px-3 py-7 sm:px-5 md:px-8 lg:px-10 md:py-9">
-      {/* Header section matching screenshots */}
+    <section className="mx-auto w-full max-w-[1420px] px-2.5 py-8 md:px-10">
       {isSale ? (
         <header className="mb-8 text-center">
           <h1 className="font-serif text-[26px] md:text-[32px] font-bold uppercase tracking-[0.08em] text-[#111111]">
             SILLHOUETE SALE
           </h1>
           <p className="mt-2 text-[14px] md:text-[15px] font-serif text-[#111111]">
-            Sales items will not be return , exchange or refunded.
+            Sales items will not be returned, exchanged, or refunded.
           </p>
         </header>
       ) : (
         <header className="mb-6 text-center">
-          <h1 className="font-serif text-[22px] sm:text-[25px] md:text-[28px] font-medium uppercase tracking-[0.08em] text-[#111111]">
+          <h1 className="font-serif text-[24px] md:text-[28px] font-bold uppercase tracking-[0.06em] text-[#111111]">
             {title.toUpperCase()}
           </h1>
-          <nav
-            aria-label="Breadcrumb"
-            className="mt-3 flex items-center justify-center gap-1.5 text-[12px] text-black/70 font-serif"
-          >
+          <nav aria-label="Breadcrumb" className="mt-3 flex items-center justify-center gap-1.5 text-[12px] text-black/70 font-serif">
             <Link href="/" aria-label="Home" className="hover:text-black">
-              <svg
-                className="w-3.5 h-3.5 inline-block -mt-0.5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-              >
+              <svg className="w-3.5 h-3.5 inline-block -mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1V9.5z" />
               </svg>
             </Link>
-            <span aria-hidden="true" className="text-black/40">
-              /
-            </span>
+            <span aria-hidden="true" className="text-black/40">/</span>
             <span className="capitalize">{title}</span>
           </nav>
         </header>
       )}
 
       {products.length ? (
-        <CollectionViewer
-          title={title}
-          initialProducts={products}
-          isSalePage={isSale}
-        />
+        <CollectionViewer title={title} initialProducts={products} isSalePage={isSale} />
       ) : (
         <div className="py-20 text-center">
           <p>There are no products in this collection yet.</p>
-          <Link href="/" className="btn mt-6">
-            Continue shopping
-          </Link>
+          <Link href="/" className="btn mt-6">Continue shopping</Link>
         </div>
       )}
 
@@ -99,19 +146,11 @@ export default async function CollectionPage({ params }: Props) {
         {articles.map((a) => (
           <article key={a.heading} className="mb-8">
             <h2 className="heading mb-3 text-[17px]">{a.heading}</h2>
-            {a.paragraphs.map((t) => (
-              <p key={t} className="mb-3">
-                {t}
-              </p>
-            ))}
+            {a.paragraphs.map((t) => <p key={t} className="mb-3">{t}</p>)}
             {a.sub?.map((x) => (
               <div key={x.heading} className="mt-4">
                 <h3 className="mb-2 text-[14px] font-semibold">{x.heading}</h3>
-                {x.paragraphs.map((t) => (
-                  <p key={t} className="mb-3">
-                    {t}
-                  </p>
-                ))}
+                {x.paragraphs.map((t) => <p key={t} className="mb-3">{t}</p>)}
               </div>
             ))}
           </article>

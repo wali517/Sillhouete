@@ -1,8 +1,6 @@
-import React, { useId } from "react";
+import React from "react";
 
 export function AmexBadge({ className = "h-5 w-8" }: { className?: string }) {
-  const uid = useId().replace(/:/g, "");
-  const titleId = `pi-american_express-${uid}`;
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -11,10 +9,10 @@ export function AmexBadge({ className = "h-5 w-8" }: { className?: string }) {
       width="38"
       height="24"
       fill="none"
-      aria-labelledby={titleId}
+      aria-labelledby="pi-american_express"
       className={`${className} rounded-[3px] shadow-2xs border border-neutral-200 shrink-0`}
     >
-      <title id={titleId}>American Express</title>
+      <title id="pi-american_express">American Express</title>
       <rect x=".5" y=".5" width="37" height="23" rx="2.5" stroke="#000" strokeOpacity=".07" fill="none" />
       <path d="M35 0H3C1.3 0 0 1.3 0 3V21C0 22.7 1.4 24 3 24H35C36.7 24 38 22.7 38 21V3C38 1.3 36.6 0 35 0Z" fill="#0071CE" />
       <path d="M3 0.5H35C36.3348 0.5 37.5 1.58692 37.5 3V21C37.5 22.4239 36.4239 23.5 35 23.5H3C1.66524 23.5 0.5 22.4131 0.5 21V3C0.5 1.57614 1.57614 0.5 3 0.5Z" stroke="black" strokeOpacity="0.07" />
@@ -24,8 +22,6 @@ export function AmexBadge({ className = "h-5 w-8" }: { className?: string }) {
 }
 
 export function DinersBadge({ className = "h-5 w-8" }: { className?: string }) {
-  const uid = useId().replace(/:/g, "");
-  const titleId = `pi-diners_club-${uid}`;
   return (
     <svg
       viewBox="0 0 38 24"
@@ -33,10 +29,10 @@ export function DinersBadge({ className = "h-5 w-8" }: { className?: string }) {
       role="img"
       width="38"
       height="24"
-      aria-labelledby={titleId}
+      aria-labelledby="pi-diners_club"
       className={`${className} rounded-[3px] shadow-2xs border border-neutral-200 shrink-0`}
     >
-      <title id={titleId}>Diners Club</title>
+      <title id="pi-diners_club">Diners Club</title>
       <path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" />
       <path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32" />
       <path d="M12 12v3.7c0 .3-.2.3-.5.2-1.9-.8-3-3.3-2.3-5.4.4-1.1 1.2-2 2.3-2.4.4-.2.5-.1.5.2V12zm2 0V8.3c0-.3 0-.3.3-.2 2.1.8 3.2 3.3 2.4 5.4-.4 1.1-1.2 2-2.3 2.4-.4.2-.4.1-.4-.2V12zm7.2-7H13c3.8 0 6.8 3.1 6.8 7s-3 7-6.8 7h8.2c3.8 0 6.8-3.1 6.8-7s-3-7-6.8-7z" fill="#3086C8" />
@@ -45,30 +41,28 @@ export function DinersBadge({ className = "h-5 w-8" }: { className?: string }) {
 }
 
 export function DiscoverBadge({ className = "h-5 w-8" }: { className?: string }) {
-  const uid = useId().replace(/:/g, "");
-  const titleId = `pi-discover-${uid}`;
   return (
     <svg
       viewBox="0 0 38 24"
       width="38"
       height="24"
       role="img"
-      aria-labelledby={titleId}
+      aria-labelledby="pi-discover"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={`${className} rounded-[3px] shadow-2xs border border-neutral-200 shrink-0`}
     >
-      <title id={titleId}>Discover</title>
+      <title id="pi-discover">Discover</title>
       <path fill="#000" opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" />
       <path d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32z" fill="#fff" />
       <path d="M3.57 7.16H2v5.5h1.57c.83 0 1.43-.2 1.96-.63.63-.52 1-1.3 1-2.11-.01-1.63-1.22-2.76-2.96-2.76zm1.26 4.14c-.34.3-.77.44-1.47.44h-.29V8.1h.29c.69 0 1.11.12 1.47.44.37.33.59.84.59 1.37 0 .53-.22 1.06-.59 1.39zm2.19-4.14h1.07v5.5H7.02v-5.5zm3.69 2.11c-.64-.24-.83-.4-.83-.69 0-.35.34-.61.8-.61.32 0 .59.13.86.45l.56-.73c-.46-.4-1.01-.61-1.62-.61-.97 0-1.72.68-1.72 1.58 0 .76.35 1.15 1.35 1.51.42.15.63.25.74.31.21.14.32.34.32.57 0 .45-.35.78-.83.78-.51 0-.92-.26-1.17-.73l-.69.67c.49.73 1.09 1.05 1.9 1.05 1.11 0 1.9-.74 1.9-1.81.02-.89-.35-1.29-1.57-1.74zm1.92.65c0 1.62 1.27 2.87 2.9 2.87.46 0 .86-.09 1.34-.32v-1.26c-.43.43-.81.6-1.29.6-1.08 0-1.85-.78-1.85-1.9 0-1.06.79-1.89 1.8-1.89.51 0 .9.18 1.34.62V7.38c-.47-.24-.86-.34-1.32-.34-1.61 0-2.92 1.28-2.92 2.88zm12.76.94l-1.47-3.7h-1.17l2.33 5.64h.58l2.37-5.64h-1.16l-1.48 3.7zm3.13 1.8h3.04v-.93h-1.97v-1.48h1.9v-.93h-1.9V8.1h1.97v-.94h-3.04v5.5zm7.29-3.87c0-1.03-.71-1.62-1.95-1.62h-1.59v5.5h1.07v-2.21h.14l1.48 2.21h1.32l-1.73-2.32c.81-.17 1.26-.72 1.26-1.56zm-2.16.91h-.31V8.03h.33c.67 0 1.03.28 1.03.82 0 .55-.36.85-1.05.85z" fill="#231F20" />
-      <path d="M20.16 12.86a2.931 2.931 0 100-5.862 2.931 2.931 0 000 5.862z" fill={`url(#${uid}-p0)`} />
-      <path opacity=".65" d="M20.16 12.86a2.931 2.931 0 100-5.862 2.931 2.931 0 000 5.862z" fill={`url(#${uid}-p1)`} />
+      <path d="M20.16 12.86a2.931 2.931 0 100-5.862 2.931 2.931 0 000 5.862z" fill="url(#pi-paint0_linear)" />
+      <path opacity=".65" d="M20.16 12.86a2.931 2.931 0 100-5.862 2.931 2.931 0 000 5.862z" fill="url(#pi-paint1_linear)" />
       <path d="M36.57 7.506c0-.1-.07-.15-.18-.15h-.16v.48h.12v-.19l.14.19h.14l-.16-.2c.06-.01.1-.06.1-.13zm-.2.07h-.02v-.13h.02c.06 0 .09.02.09.06 0 .05-.03.07-.09.07z" fill="#231F20" />
       <path d="M36.41 7.176c-.23 0-.42.19-.42.42 0 .23.19.42.42.42.23 0 .42-.19.42-.42 0-.23-.19-.42-.42-.42zm0 .77c-.18 0-.34-.15-.34-.35 0-.19.15-.35.34-.35.18 0 .33.16.33.35 0 .19-.15.35-.33.35z" fill="#231F20" />
       <path d="M37 12.984S27.09 19.873 8.976 23h26.023a2 2 0 002-1.984l.024-3.02L37 12.985z" fill="#F48120" />
       <defs>
-        <linearGradient id={`${uid}-p0`} x1="21.657" y1="12.275" x2="19.632" y2="9.104" gradientUnits="userSpaceOnUse">
+        <linearGradient id="pi-paint0_linear" x1="21.657" y1="12.275" x2="19.632" y2="9.104" gradientUnits="userSpaceOnUse">
           <stop stopColor="#F89F20" />
           <stop offset=".25" stopColor="#F79A20" />
           <stop offset=".533" stopColor="#F68D20" />
@@ -76,7 +70,7 @@ export function DiscoverBadge({ className = "h-5 w-8" }: { className?: string })
           <stop offset=".723" stopColor="#F48120" />
           <stop offset="1" stopColor="#F37521" />
         </linearGradient>
-        <linearGradient id={`${uid}-p1`} x1="21.338" y1="12.232" x2="18.378" y2="6.446" gradientUnits="userSpaceOnUse">
+        <linearGradient id="pi-paint1_linear" x1="21.338" y1="12.232" x2="18.378" y2="6.446" gradientUnits="userSpaceOnUse">
           <stop stopColor="#F58720" />
           <stop offset=".359" stopColor="#E16F27" />
           <stop offset=".703" stopColor="#D4602C" />
@@ -88,19 +82,17 @@ export function DiscoverBadge({ className = "h-5 w-8" }: { className?: string })
 }
 
 export function JcbBadge({ className = "h-5 w-8" }: { className?: string }) {
-  const uid = useId().replace(/:/g, "");
-  const titleId = `pi-jcb-${uid}`;
   return (
     <svg
       width="38"
       height="24"
       role="img"
-      aria-labelledby={titleId}
+      aria-labelledby="pi-jcb"
       viewBox="0 0 38 24"
       xmlns="http://www.w3.org/2000/svg"
       className={`${className} rounded-[3px] shadow-2xs border border-neutral-200 shrink-0`}
     >
-      <title id={titleId}>JCB</title>
+      <title id="pi-jcb">JCB</title>
       <g fill="none" fillRule="evenodd">
         <g fillRule="nonzero">
           <path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#000" opacity=".07" />
@@ -116,8 +108,6 @@ export function JcbBadge({ className = "h-5 w-8" }: { className?: string }) {
 }
 
 export function MastercardBadge({ className = "h-5 w-8" }: { className?: string }) {
-  const uid = useId().replace(/:/g, "");
-  const titleId = `pi-master-${uid}`;
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -126,10 +116,10 @@ export function MastercardBadge({ className = "h-5 w-8" }: { className?: string 
       width="38"
       height="24"
       fill="none"
-      aria-labelledby={titleId}
+      aria-labelledby="pi-master"
       className={`${className} rounded-[3px] shadow-2xs border border-neutral-200 shrink-0`}
     >
-      <title id={titleId}>Mastercard</title>
+      <title id="pi-master">Mastercard</title>
       <rect x=".5" y=".5" width="37" height="23" rx="2.5" stroke="#000" strokeOpacity=".07" fill="none" />
       <path d="M35 0H3C1.3 0 0 1.3 0 3V21C0 22.7 1.4 24 3 24H35C36.7 24 38 22.7 38 21V3C38 1.3 36.6 0 35 0Z" fill="#1C1C1C" />
       <path d="M35 1C36.1 1 37 1.9 37 3V21C37 22.1 36.1 23 35 23H3C1.9 23 1 22.1 1 21V3C1 1.9 1.9 1 3 1H35Z" fill="#232323" />
@@ -141,8 +131,6 @@ export function MastercardBadge({ className = "h-5 w-8" }: { className?: string 
 }
 
 export function VisaBadge({ className = "h-5 w-8" }: { className?: string }) {
-  const uid = useId().replace(/:/g, "");
-  const titleId = `pi-visa-${uid}`;
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -151,10 +139,10 @@ export function VisaBadge({ className = "h-5 w-8" }: { className?: string }) {
       width="38"
       height="24"
       fill="none"
-      aria-labelledby={titleId}
+      aria-labelledby="pi-visa"
       className={`${className} rounded-[3px] shadow-2xs border border-neutral-200 shrink-0`}
     >
-      <title id={titleId}>Visa</title>
+      <title id="pi-visa">Visa</title>
       <rect x=".5" y=".5" width="37" height="23" rx="2.5" stroke="#000" strokeOpacity=".07" fill="none" />
       <path d="M35 0H3C1.3 0 0 1.3 0 3V21C0 22.7 1.4 24 3 24H35C36.7 24 38 22.7 38 21V3C38 1.3 36.6 0 35 0Z" fill="#142FBD" />
       <path d="M35 1C36.1 1 37 1.9 37 3V21C37 22.1 36.1 23 35 23H3C1.9 23 1 22.1 1 21V3C1 1.9 1.9 1 3 1H35Z" fill="#1532CB" />
@@ -165,7 +153,7 @@ export function VisaBadge({ className = "h-5 w-8" }: { className?: string }) {
 
 export function UnionPayBadge({ className = "h-5 w-8" }: { className?: string }) {
   return (
-    <svg role="img" aria-label="UnionPay" className={`${className} rounded-[3px] shadow-2xs border border-neutral-200 shrink-0`} viewBox="0 0 38 24" fill="none">
+    <svg className={`${className} rounded-[3px] shadow-2xs border border-neutral-200 shrink-0`} viewBox="0 0 38 24" fill="none">
       <rect width="38" height="24" rx="3" fill="#FFFFFF" />
       <rect x="6" y="5" width="8" height="14" rx="2" fill="#E21B23" />
       <rect x="15" y="5" width="8" height="14" rx="2" fill="#004A97" />
