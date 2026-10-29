@@ -31,10 +31,10 @@ export default function Flag({ code, size = 24 }: { code: FlagKey; size?: number
       <g clipPath={`url(#${id})`}>
         {(code === "PKR" || code === "AUTO") && (
           <>
-            <rect width="32" height="32" fill="#1a7a3e" />
+            <rect width="32" height="32" fill="#52ad5a" />
             <rect width="8" height="32" fill="#fff" />
             <circle cx="20" cy="16" r="6.2" fill="#fff" />
-            <circle cx="22" cy="14.6" r="5.4" fill="#1a7a3e" />
+            <circle cx="22" cy="14.6" r="5.4" fill="#52ad5a" />
             <Star cx={23.6} cy={12.4} r={2.4} fill="#fff" />
           </>
         )}

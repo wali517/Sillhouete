@@ -85,9 +85,9 @@ export default function HeroSlider({ slides }: { slides: HeroSlide[] }) {
       </div>
 
       {/* Slide dots: small translucent dots, the active one larger and solid */}
-      <ol className="absolute bottom-6 left-0 right-0 z-20 flex items-center justify-center gap-[10px] md:bottom-7">
+      <ol className="absolute bottom-6 left-0 right-0 z-20 flex items-center justify-center md:bottom-7">
         {slides.map((s, i) => (
-          <li key={s.id} className="flex h-5 w-5 items-center justify-center">
+          <li key={s.id} className="flex h-3 w-4 items-center justify-center">
             <button
               type="button"
               onClick={() => goToSlide(i)}
@@ -95,8 +95,8 @@ export default function HeroSlider({ slides }: { slides: HeroSlide[] }) {
               aria-current={i === current}
               className="hero-dot rounded-full bg-white transition-[width,height,opacity] duration-300"
               style={{
-                width: i === current ? 11 : 7,
-                height: i === current ? 11 : 7,
+                width: i === current ? 7 : 7,
+                height: i === current ? 7 : 7,
                 opacity: i === current ? 1 : 0.55,
                 padding: 0,
                 border: 0,

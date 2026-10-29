@@ -68,7 +68,7 @@ export default function Header() {
                   <Link
                     href={item.href}
                     className={`relative flex items-center gap-1 px-1.5 py-1 text-[15px] uppercase tracking-wide font-normal transition-colors hover:text-black after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:origin-center ${
-                      item.sale ? "text-[red] font-bold animate-blinks sale-menu" : "text-black/90"
+                      item.sale ? "!text-[red] font-bold animate-blinks sale-menu" : ""
                     }`}
                   >
                     <span>{item.label}</span>
@@ -108,10 +108,10 @@ export default function Header() {
               const hasDropdown = Boolean(item.children && item.children.length > 0);
 
               return (
-                <li key={item.label} className="relative group">
+                <li key={item.label} className="mt-2 relative group">
                   <Link
                     href={item.href}
-                    className="relative flex items-center gap-1 px-2.5 py-0.5 text-[15px] uppercase tracking-wide font-normal text-black/90 hover:text-black transition-colors after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:origin-center"
+                    className="relative flex items-center gap-1 px-2.5 py-0.5 text-[15px] uppercase tracking-wide font-normal text-black hover:text-black transition-colors after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:origin-center"
                   >
                     <span>{item.label}</span>
                     {hasDropdown && (
@@ -193,7 +193,7 @@ export default function Header() {
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label="Site navigation"
-            className="grid h-10 w-10 place-items-center lg:hidden text-black hover:text-black/70 cursor-pointer"
+            className="grid h-10 w-10 place-items-center lg:hidden text-black hover:text-black/90 cursor-pointer"
           >
             <svg
               aria-hidden="true"
@@ -214,7 +214,7 @@ export default function Header() {
             type="button"
             onClick={() => setCartOpen(true)}
             aria-label={`Cart, ${count} items`}
-            className="relative grid h-10 w-10 place-items-center text-black hover:text-black/70 transition-colors cursor-pointer"
+            className="relative grid h-10 w-10 place-items-center text-black hover:text-black/90 transition-colors cursor-pointer"
           >
             <svg
               aria-hidden="true"

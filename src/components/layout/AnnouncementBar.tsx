@@ -27,7 +27,7 @@ export default function AnnouncementBar() {
 
   return (
     <div
-      className="relative z-[45] select-none overflow-hidden bg-[#0f0f0f] py-2 text-white"
+      className="relative z-[45] select-none overflow-hidden bg-[#0f0f0f] py-[11.5px] text-white"
       role="region"
       aria-label="Announcements"
     >

@@ -19,10 +19,10 @@ function Chevron({ up }: { up: boolean }) {
     <svg
       aria-hidden="true"
       viewBox="0 0 16 16"
-      className={`h-3.5 w-3.5 text-neutral-500 transition-transform duration-200 ${up ? "rotate-180" : ""}`}
+      className={`h-3.5 w-3.5 text-[#b4b4b4] transition-transform duration-200 ${up ? "rotate-180" : ""}`}
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.4"
+      strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -34,7 +34,7 @@ function Chevron({ up }: { up: boolean }) {
 export default function FloatingWidgets() {
   const { currency, setCurrency } = useStore();
   const [currencyOpen, setCurrencyOpen] = useState(false);
-  const [showDiscountPill, setShowDiscountPill] = useState(true);
+  const [showDiscountPill, setShowDiscountPill] = useState(true); // not shown on the reference storefront
   const wrapRef = useRef<HTMLDivElement>(null);
 
   const currentFlag: FlagKey = CURRENCY_LIST.find((c) => c.code === currency)?.code ?? "PKR";
@@ -61,7 +61,7 @@ export default function FloatingWidgets() {
   return (
     <>
       {/* Bottom-Left Floating Controls */}
-      <div className="fixed bottom-4 left-4 z-40 flex flex-col items-start gap-2.5 md:left-[30px]">
+      <div className="fixed bottom-2 left-4 z-40 flex flex-col items-start gap-2.5 md:left-[45px]">
         {/* Get 5% Off Box */}
         {showDiscountPill && (
           <div className="group relative flex items-center overflow-hidden rounded border border-white/10 bg-black text-[11px] font-semibold uppercase tracking-wider text-white shadow-2xl">
@@ -93,9 +93,9 @@ export default function FloatingWidgets() {
             aria-haspopup="listbox"
             aria-expanded={currencyOpen}
             aria-label="Change currency"
-            className="flex h-10 items-center gap-2.5 rounded-md bg-white px-3 shadow-[0_2px_10px_rgba(0,0,0,0.18)] transition-shadow hover:shadow-[0_3px_14px_rgba(0,0,0,0.24)]"
+            className="flex h-12 items-center gap-2.5 rounded-md bg-white px-3 shadow-[0_0_14px_rgba(255,255,255,0.8)] transition-shadow hover:shadow-[0_0_18px_rgba(255,255,255,0.95)]"
           >
-            <Flag code={currentFlag} size={24} />
+            <Flag code={currentFlag} size={28} />
             <span className="text-[13px] tracking-wide text-neutral-800">{currency}</span>
             <Chevron up={currencyOpen} />
           </button>
