@@ -4,58 +4,46 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { HeroSlide } from "@/types";
+import { useStore } from "@/components/providers/StoreProvider";
 
+/**
+ * Hero slideshow, timed to match the reference storefront:
+ *  - advances every 5s, in lock-step with the announcement bar (shared `tick`)
+ *  - the previous slide disappears at once; the next one fades in from black while drifting
+ *    in from the right (~0.65s, ease-out) — see `.hero-slide-active` in globals.css
+ */
 export default function HeroSlider({ slides }: { slides: HeroSlide[] }) {
-  // Append first slide to end for seamless continuous forward loop
-  const extendedSlides = [...slides, slides[0]];
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [withTransition, setWithTransition] = useState(true);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const { tick, resetTick } = useStore();
+  const [current, setCurrent] = useState(0);
+  const [hasChanged, setHasChanged] = useState(false); // no entrance animation on first paint
+  const lastTick = useRef(tick);
 
+  // Advance whenever the shared 5s heartbeat ticks.
   useEffect(() => {
-    timerRef.current = setInterval(() => {
-      setWithTransition(true);
-      setCurrentIndex((prev) => prev + 1);
-    }, 5000);
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, []);
-
-  const handleTransitionEnd = () => {
-    // When finished sliding into the duplicated first slide, immediately jump to slide 0 without backward rewind
-    if (currentIndex >= slides.length) {
-      setWithTransition(false);
-      setCurrentIndex(0);
-    }
-  };
-
-  const activeIndicatorIndex = currentIndex >= slides.length ? 0 : currentIndex;
+    if (tick === lastTick.current) return;
+    lastTick.current = tick;
+    setHasChanged(true);
+    setCurrent((c) => (c + 1) % slides.length);
+  }, [tick, slides.length]);
 
   const goToSlide = (i: number) => {
-    setWithTransition(true);
-    setCurrentIndex(i);
+    if (i === current) return;
+    setHasChanged(true);
+    setCurrent(i);
+    resetTick(); // restart the 5s countdown from this click
   };
 
   return (
     <section
       aria-roledescription="carousel"
       aria-label="Campaigns"
-      className="relative w-full overflow-hidden select-none"
+      className="relative w-full select-none overflow-hidden bg-black"
     >
-      {/* Continuous One-Way Right-to-Left Sliding Track */}
-      <div
-        onTransitionEnd={handleTransitionEnd}
-        className="flex w-full"
-        style={{
-          transform: `translateX(-${currentIndex * 100}%)`,
-          transition: withTransition ? "transform 700ms cubic-bezier(0.25, 1, 0.5, 1)" : "none",
-        }}
-      >
-        {extendedSlides.map((s, i) => {
+      <div className="relative aspect-[4/5] w-full md:aspect-[2400/987.5]">
+        {slides.map((s, i) => {
+          const active = i === current;
           const content = (
-            <div className="relative aspect-[4/5] w-full overflow-hidden md:aspect-[2400/987.5]">
+            <div className="relative h-full w-full">
               <Image
                 src={s.mobile}
                 alt={s.mobileAlt}
@@ -77,14 +65,15 @@ export default function HeroSlider({ slides }: { slides: HeroSlide[] }) {
 
           return (
             <div
-              key={`${s.id}-${i}`}
+              key={s.id}
               role="group"
               aria-roledescription="slide"
-              aria-label={`${(i % slides.length) + 1} of ${slides.length}`}
-              className="w-full shrink-0 relative"
+              aria-label={`${i + 1} of ${slides.length}`}
+              aria-hidden={!active}
+              className={`absolute inset-0 ${active ? (hasChanged ? "hero-slide-active" : "") : "invisible pointer-events-none"}`}
             >
               {s.href ? (
-                <Link href={s.href} className="block w-full">
+                <Link href={s.href} tabIndex={active ? 0 : -1} className="block h-full w-full">
                   {content}
                 </Link>
               ) : (
@@ -95,18 +84,23 @@ export default function HeroSlider({ slides }: { slides: HeroSlide[] }) {
         })}
       </div>
 
-      {/* Slide Indicators matching real site */}
-      <ol className="absolute bottom-4 left-0 right-0 z-20 flex justify-center gap-2">
+      {/* Slide dots: small translucent dots, the active one larger and solid */}
+      <ol className="absolute bottom-6 left-0 right-0 z-20 flex items-center justify-center gap-[10px] md:bottom-7">
         {slides.map((s, i) => (
-          <li key={s.id}>
+          <li key={s.id} className="flex h-5 w-5 items-center justify-center">
             <button
               type="button"
               onClick={() => goToSlide(i)}
               aria-label={`Go to slide ${i + 1}`}
-              aria-current={i === activeIndicatorIndex}
-              className={`h-2.5 rounded-full transition-all duration-300 ${
-                i === activeIndicatorIndex ? "w-8 bg-white shadow" : "w-2.5 bg-white/50 hover:bg-white/80"
-              }`}
+              aria-current={i === current}
+              className="hero-dot rounded-full bg-white transition-[width,height,opacity] duration-300"
+              style={{
+                width: i === current ? 11 : 7,
+                height: i === current ? 11 : 7,
+                opacity: i === current ? 1 : 0.55,
+                padding: 0,
+                border: 0,
+              }}
             />
           </li>
         ))}

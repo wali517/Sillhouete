@@ -4,14 +4,6 @@ const F = "https://sillhouete.com/cdn/shop/files/";
 
 export const HERO_SLIDES: HeroSlide[] = [
   {
-    id: "sale",
-    desktop: `${F}wb-1.jpg?v=1777274033`,
-    mobile: `${F}wb-mbl.jpg-1.jpg?v=1777274033`,
-    alt: "Sale up to 70% off banner",
-    mobileAlt: "Sale up to 70% off banner",
-    href: "/collections/sale-1",
-  },
-  {
     id: "lumiere",
     desktop: `${F}web-banner_jpg.jpg?v=1778078549`,
     mobile: `${F}wb-mbl.jpg_1.jpg?v=1778078547`,
@@ -20,12 +12,28 @@ export const HERO_SLIDES: HeroSlide[] = [
     href: "/collections/lumiere-luxury-formals26",
   },
   {
+    id: "sale",
+    desktop: `${F}wb-1.jpg?v=1777274033`,
+    mobile: `${F}wb-mbl.jpg-1.jpg?v=1777274033`,
+    alt: "Sale up to 70% off banner",
+    mobileAlt: "Sale up to 70% off banner",
+    href: "/collections/sale-1",
+  },
+  {
     id: "red",
     desktop: `${F}wb-3_bd931670-6ab7-4d15-ad52-a5ee3d462be7.jpg?v=1777274033`,
     mobile: `${F}wb-mbl-3_4d28cc37-ba9d-4515-be45-f208efe0942b.jpg?v=1777274033`,
     alt: "Buy 4 Dress Get 1 Free - Festive Collection",
     mobileAlt: "Buy 4 Dress Get 1 Free",
     href: "/collections/formal-dresses",
+  },
+  {
+    id: "maahi",
+    desktop: `${F}IMG_4249_JPG.jpg?v=1776413159`,
+    mobile: `${F}IMG_4250.JPG_1.jpg?v=1776413159`,
+    alt: "Maahi II Luxury Eid Pret - Shop now",
+    mobileAlt: "Maahi II Luxury Eid Pret",
+    href: "/collections/maahi-ii-luxury-eid-pret",
   },
 ];
 

@@ -37,11 +37,32 @@ export default async function SearchPage({ searchParams }: Props) {
 
   return (
     <section className="mx-auto w-full max-w-[1420px] px-2.5 py-10 md:px-10">
-      <h1 className="heading mb-8 text-center text-[25px]">Search</h1>
-      {term && (
-        <p className="mb-6 text-center text-sm text-black/70">
-          {results.length} results for “{q}”
-        </p>
+      <h1 className="mb-10 text-center text-[24px] font-bold uppercase tracking-[0.08em]">Search</h1>
+
+      <form action="/search" role="search" className="mx-auto mb-10 max-w-[1000px] border-b border-black/10 pb-10">
+        <div className="relative">
+          <input
+            type="search"
+            name="q"
+            defaultValue={q}
+            aria-label="Search"
+            autoComplete="off"
+            className="search-input h-12 w-full px-3 pr-12 text-[15px] transition-colors"
+          />
+          <button
+            type="submit"
+            aria-label="Submit search"
+            className="plain-btn absolute inset-y-0 right-0 flex w-12 items-center justify-center"
+          >
+            <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2.5" strokeMiterlimit="10">
+              <path d="M47.16 28.58A18.58 18.58 0 1 1 28.58 10a18.58 18.58 0 0 1 18.58 18.58ZM54 54 41.94 42" />
+            </svg>
+          </button>
+        </div>
+      </form>
+
+      {term && results.length > 0 && (
+        <p className="mb-6 text-center text-sm text-black/70">{results.length} results</p>
       )}
 
       {results.length > 0 ? (

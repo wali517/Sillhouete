@@ -40,7 +40,7 @@ export default function CartDrawer() {
         <>
           <motion.div
             key="backdrop"
-            className="fixed inset-0 z-[90] bg-black/40 backdrop-blur-[1px]"
+            className="fixed inset-0 z-[90] bg-[rgba(223,223,223,0.38)]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -51,28 +51,28 @@ export default function CartDrawer() {
             role="dialog"
             aria-modal="true"
             aria-label="Your Cart"
-            className="fixed bottom-0 right-0 top-0 z-[100] flex w-full max-w-md flex-col bg-white shadow-2xl"
+            className="fixed bottom-0 right-0 top-0 z-[100] flex w-full max-w-full flex-col bg-white shadow-[-12px_0_40px_rgba(0,0,0,0.14)] sm:w-[440px] lg:w-[34vw] lg:min-w-[500px] lg:max-w-[660px]"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "tween", duration: 0.3 }}
           >
             {/* Header matching Image 4 */}
-            <div className="flex items-center justify-between border-b border-black/10 px-6 py-4">
-              <h2 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#111111]">
+            <div className="flex items-center justify-between border-b border-black/10 px-5 py-5 md:px-6">
+              <h2 className="text-[17px] font-bold uppercase tracking-[0.12em] text-[#111111]">
                 CART
               </h2>
               <button
                 type="button"
                 onClick={close}
                 aria-label="Close cart"
-                className="p-1 text-black/70 hover:text-black transition-colors cursor-pointer"
+                className="p-1 text-black transition-opacity hover:opacity-60 cursor-pointer"
               >
                 <svg
                   aria-hidden="true"
                   focusable="false"
                   role="presentation"
-                  className="h-5 w-5"
+                  className="h-6 w-6"
                   viewBox="0 0 64 64"
                   fill="none"
                   stroke="currentColor"
@@ -84,16 +84,8 @@ export default function CartDrawer() {
             </div>
 
             {items.length === 0 ? (
-              <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center">
-                <p className="text-base font-normal tracking-wide text-neutral-800">Your cart is currently empty.</p>
-                <p className="mt-1 text-xs text-neutral-500">Discover our handcrafted Pakistani luxury collections.</p>
-                <Link
-                  href="/collections/1"
-                  onClick={close}
-                  className="mt-6 bg-[#111111] hover:bg-black text-white px-6 py-3 text-xs font-bold uppercase tracking-[0.24em] transition-colors"
-                >
-                  Start Shopping
-                </Link>
+              <div className="flex-1 px-5 py-5 md:px-6">
+                <p className="text-[15px] font-normal text-black">Your cart is currently empty.</p>
               </div>
             ) : (
               <>

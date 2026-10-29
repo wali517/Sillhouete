@@ -6,6 +6,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, ShieldCheck } from "lucide-react";
 import { useStore } from "@/components/providers/StoreProvider";
+import {
+  AmexBadge,
+  DinersBadge,
+  DiscoverBadge,
+  JcbBadge,
+  MastercardBadge,
+  VisaBadge,
+} from "@/components/ui/CardBadges";
 import ProductCard from "@/components/products/ProductCard";
 import type { Product } from "@/types";
 
@@ -272,6 +280,15 @@ export default function CartPage() {
               <ShieldCheck className="h-4 w-4 text-black/70" />
               <span>Safe &amp; Secure Direct Card Checkout</span>
             </div>
+
+            <ul className="flex flex-wrap items-center justify-center gap-1.5 pt-1" aria-label="Accepted cards">
+              <li><AmexBadge className="h-5 w-8" /></li>
+              <li><DinersBadge className="h-5 w-8" /></li>
+              <li><DiscoverBadge className="h-5 w-8" /></li>
+              <li><JcbBadge className="h-5 w-8" /></li>
+              <li><MastercardBadge className="h-5 w-8" /></li>
+              <li><VisaBadge className="h-5 w-8" /></li>
+            </ul>
           </div>
         </div>
       )}
