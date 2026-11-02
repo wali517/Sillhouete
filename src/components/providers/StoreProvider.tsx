@@ -51,8 +51,12 @@ interface Store {
   currency: CurrencyCode;
   setCurrency: (currency: CurrencyCode) => void;
   formatPrice: (amountInPkr: number) => string;
-  heroIndex: number;
-  setHeroIndex: (index: number) => void;
+  settings: Partial<SiteSettings> | null;
+  announcements: string[];
+  /** Shared 5s heartbeat: the announcement bar and the hero slider both advance on every tick. */
+  tick: number;
+  /** Restart the 5s countdown (used when a visitor picks a slide manually). */
+  resetTick: () => void;
 }
 
 const StoreContext = createContext<Store | null>(null);
@@ -68,9 +72,27 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [orderNote, setOrderNote] = useState("");
   const [currency, setCurrencyState] = useState<CurrencyCode>("PKR");
   const [mounted, setMounted] = useState(false);
-  const [heroIndex, setHeroIndex] = useState(0);
+  const [tick, setTick] = useState(0);
+  const [tickEpoch, setTickEpoch] = useState(0);
+  const [siteSettings, setSiteSettings] = useState<Partial<SiteSettings> | null>(null);
+  const [announcements, setAnnouncements] = useState<string[]>(DEFAULT_ANNOUNCEMENTS);
 
-  // Synchronized horizontal right-to-left slider timer for Announcement Bar & Hero Slider
+  // Fetch dynamic settings from database on mount
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.settings) {
+          setSiteSettings(d.settings);
+          if (Array.isArray(d.settings.announcements) && d.settings.announcements.length > 0) {
+            setAnnouncements(d.settings.announcements);
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // One timer for the announcement bar and the hero slider so they always change together (every 5s).
   useEffect(() => {
     const timer = setInterval(() => setTick((t) => t + 1), 5000);
     return () => clearInterval(timer);
@@ -227,8 +249,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       currency,
       setCurrency,
       formatPrice,
-      heroIndex,
-      setHeroIndex,
+      settings: siteSettings,
+      announcements,
+      tick,
+      resetTick,
     }),
     [
       items,
@@ -243,7 +267,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       currency,
       setCurrency,
       formatPrice,
-      heroIndex,
+      siteSettings,
+      announcements,
+      tick,
+      resetTick,
     ],
   );
 
