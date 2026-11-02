@@ -66,8 +66,8 @@ export default function Header() {
                 <li key={item.label} className="relative group">
                   <Link
                     href={item.href}
-                    className={`relative flex items-center gap-1 px-1.5 py-1 text-[15px] uppercase tracking-wide font-normal transition-colors hover:text-black after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out after:origin-left ${
-                      item.sale ? "!text-[#ff0000] font-normal animate-blinks sale-menu" : "text-black"
+                    className={`relative flex items-center gap-1 px-1.5 py-1 text-[15px] uppercase tracking-wide font-normal transition-colors hover:text-black after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:origin-center ${
+                      item.sale ? "text-[red] font-bold animate-blinks sale-menu" : "text-black/90"
                     }`}
                   >
                     <span>{item.label}</span>
@@ -128,10 +128,10 @@ export default function Header() {
               const hasDropdown = Boolean(item.children && item.children.length > 0);
 
               return (
-                <li key={item.label} className="relative group">
+                <li key={item.label} className="mt-2 relative group">
                   <Link
                     href={item.href}
-                    className="relative flex items-center gap-1 px-2.5 py-0.5 text-[15px] uppercase tracking-wide font-normal text-black hover:text-black transition-colors after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out after:origin-left"
+                    className="relative flex items-center gap-1 px-2.5 py-0.5 text-[15px] uppercase tracking-wide font-normal text-black/90 hover:text-black transition-colors after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:origin-center"
                   >
                     <span>{item.label}</span>
                     {hasDropdown && (
@@ -293,65 +293,60 @@ export default function Header() {
             onClick={() => setSearchOpen(false)}
           />
 
-          <div className="search-panel absolute inset-0 z-50 flex flex-col justify-center bg-[#efefef] shadow-[0_12px_24px_-12px_rgba(0,0,0,0.18)]">
-            <div className="relative">
-              <form
-                onSubmit={submit}
-                role="search"
-                className="flex items-center gap-4 px-4 py-4 md:gap-8 md:px-[12vw]"
-              >
-                <div className="relative flex-1">
-                  <input
-                    id="header-search"
-                    autoFocus
-                    type="search"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search"
-                    autoComplete="off"
-                    className="search-input h-12 w-full px-3 pr-14 text-[15px] text-black transition-colors placeholder:text-neutral-400"
-                  />
-                  <button
-                    type="submit"
-                    aria-label="Submit search"
-                    className="plain-btn absolute bottom-0 right-0 top-0 flex items-center justify-center px-4"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      focusable="false"
-                      role="presentation"
-                      className="h-6 w-6"
-                      viewBox="0 0 64 64"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeMiterlimit="10"
-                    >
-                      <path d="M47.16 28.58A18.58 18.58 0 1 1 28.58 10a18.58 18.58 0 0 1 18.58 18.58ZM54 54 41.94 42" />
-                    </svg>
-                  </button>
-                </div>
-
+          <div className="relative z-40 border-b border-[#e8e8e1] bg-white px-4 py-4 md:px-10 shadow-xs">
+            <form onSubmit={submit} role="search" className="mx-auto flex max-w-3xl items-center gap-3">
+              <div className="relative flex-1">
+                <input
+                  id="header-search"
+                  autoFocus
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search"
+                  autoComplete="off"
+                  className="w-full h-11 border border-neutral-400 bg-white px-4 pr-11 text-sm text-black placeholder:text-neutral-500 outline-none focus:border-black transition-colors"
+                />
                 <button
-                  type="button"
-                  aria-label="Close search"
-                  onClick={() => setSearchOpen(false)}
-                  className="-mr-1 grid h-10 w-10 shrink-0 place-items-center text-black transition-opacity hover:opacity-60 md:mr-0"
+                  type="submit"
+                  aria-label="Submit search"
+                  className="absolute right-0 top-0 bottom-0 px-3.5 flex items-center justify-center text-neutral-600 hover:text-black transition-colors"
                 >
                   <svg
                     aria-hidden="true"
                     focusable="false"
                     role="presentation"
-                    className="h-7 w-7"
+                    className="h-4 w-4"
                     viewBox="0 0 64 64"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2.5"
+                    strokeMiterlimit="10"
                   >
-                    <path d="m19 17.61 27.12 27.13m0-27.12L19 44.74" />
+                    <path d="M47.16 28.58A18.58 18.58 0 1 1 28.58 10a18.58 18.58 0 0 1 18.58 18.58ZM54 54 41.94 42" />
                   </svg>
                 </button>
-              </form>
+              </div>
+
+              <button
+                type="button"
+                aria-label="Close search"
+                onClick={() => setSearchOpen(false)}
+                className="p-1.5 text-neutral-800 hover:text-black transition-colors cursor-pointer"
+              >
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  role="presentation"
+                  className="h-6 w-6"
+                  viewBox="0 0 64 64"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <path d="m19 17.61 27.12 27.13m0-27.12L19 44.74" />
+                </svg>
+              </button>
+            </form>
 
               <PredictivePanel query={query} onNavigate={() => setSearchOpen(false)} />
             </div>

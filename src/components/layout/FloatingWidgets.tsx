@@ -34,8 +34,7 @@ function Chevron({ up }: { up: boolean }) {
 export default function FloatingWidgets() {
   const { currency, setCurrency } = useStore();
   const [currencyOpen, setCurrencyOpen] = useState(false);
-  const [showDiscountPill, setShowDiscountPill] = useState(false); // not shown on the reference storefront
-  const wrapRef = useRef<HTMLDivElement>(null);
+  const [showDiscountPill, setShowDiscountPill] = useState(true);
 
   const currentFlag: FlagKey = CURRENCY_LIST.find((c) => c.code === currency)?.code ?? "PKR";
 
