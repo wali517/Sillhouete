@@ -195,25 +195,15 @@ let seeded = false;
 
 export async function runSeedIfEmpty() {
   if (seeded) return;
+  seeded = true;
 
-  try {
-    await connectDB();
-    const count = await ProductModel.countDocuments();
-    if (count > 0) {
-      seeded = true;
-      return;
-    }
-
-    await Promise.allSettled([
-      seedProducts(),
-      seedOrders(),
-      seedCustomers(),
-      seedMessages(),
-      seedBlogs(),
-      seedSettings(),
-    ]);
-    seeded = true;
-  } catch (err) {
-    console.warn("⚠️ runSeedIfEmpty notice:", err);
-  }
+  await connectDB();
+  await Promise.all([
+    seedProducts(),
+    seedOrders(),
+    seedCustomers(),
+    seedMessages(),
+    seedBlogs(),
+    seedSettings(),
+  ]);
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getProducts, saveProduct } from "@/lib/db";
+import { getProducts, saveProduct, searchProducts } from "@/lib/db";
 import { runSeedIfEmpty } from "@/lib/seed";
 
 export async function GET(req: Request) {
@@ -13,11 +13,10 @@ export async function GET(req: Request) {
 
     let products;
 
-    products = await getProducts();
-
     if (search) {
-      const query = search.toLowerCase();
-      products = products.filter((p) => p.title.toLowerCase().includes(query));
+      products = await searchProducts(search);
+    } else {
+      products = await getProducts();
     }
 
     if (category && category !== "All") {
