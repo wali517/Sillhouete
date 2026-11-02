@@ -2,7 +2,7 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { Minus, Plus, MessageCircle } from "lucide-react";
+import { Minus, Plus, Ruler, X } from "lucide-react";
 import type { Product } from "@/types";
 import { useStore } from "@/components/providers/StoreProvider";
 
@@ -13,7 +13,6 @@ const WITH_SLEEVES = "With sleeves";
 
 const isNone = (v?: string | null) => !v || v.trim().toLowerCase() === "none";
 
-/** Unique, non-"None" option values for a variant slot, in product order. */
 function optionValues(product: Product, slot: "option2" | "option3", fallback?: string[]) {
   const fromVariants = (product.variants ?? [])
     .map((v) => v[slot])
@@ -22,8 +21,6 @@ function optionValues(product: Product, slot: "option2" | "option3", fallback?: 
   if (unique.length > 0) return unique;
   return (fallback ?? []).filter((v) => !isNone(v));
 }
-
-const labelCls = "mb-2 font-serif text-[13px] font-bold uppercase tracking-[0.22em] text-black";
 
 export default function AddToCart({ product, children }: { product: Product; children?: ReactNode }) {
   const router = useRouter();
@@ -39,8 +36,8 @@ export default function AddToCart({ product, children }: { product: Product; chi
   const [extra, setExtra] = useState(SAME_AS_SAMPLE);
   const [qty, setQty] = useState(1);
   const [addedNotice, setAddedNotice] = useState(false);
+  const [showSizeChart, setShowSizeChart] = useState(false);
 
-  /** Price of the exact variant for a size/dupatta/add-on combination (falls back to base price). */
   const variantPrice = (sz: string, d: string, a: string) => {
     const match = product.variants?.find(
       (v) =>
@@ -79,17 +76,19 @@ export default function AddToCart({ product, children }: { product: Product; chi
   const dynamicSku = `${product.sku || product.handle.toUpperCase()}-${size}`;
 
   const optionButton = (selected: boolean) =>
-    `h-[38px] px-4 text-[13px] transition-colors cursor-pointer flex items-center justify-center border-2 ${
-      selected ? "border-black text-black font-bold" : "border-neutral-300 text-neutral-500 font-bold hover:border-neutral-500"
+    `h-[36px] min-w-[48px] px-3.5 text-[13px] transition-colors cursor-pointer flex items-center justify-center border ${
+      selected ? "border-black text-black font-bold" : "border-neutral-300 text-neutral-600 hover:border-black"
     }`;
 
+  const isSleeveless = product.description?.toLowerCase().includes("sleeveless") || product.handle === "camilla";
+
   return (
-    <div className="space-y-5">
-      {/* Price (updates with the chosen variant) */}
+    <div className="space-y-4">
+      {/* Price matching live site */}
       <div className="flex items-baseline gap-3">
-        <span className="text-[22px] font-bold text-black">{formatPrice(unitPrice)}</span>
+        <span className="text-[20px] font-bold text-black font-sans">{formatPrice(unitPrice)}</span>
         {product.originalPrice && (
-          <span className="text-sm text-neutral-400 line-through">{formatPrice(product.originalPrice)}</span>
+          <span className="text-sm text-neutral-400 line-through font-sans">{formatPrice(product.originalPrice)}</span>
         )}
       </div>
 
@@ -97,15 +96,19 @@ export default function AddToCart({ product, children }: { product: Product; chi
 
       {/* SIZE */}
       <div>
-        <div className={labelCls}>Size</div>
-        <div className="flex flex-wrap gap-3">
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-black font-sans">
+            S I Z E
+          </span>
+        </div>
+        <div className="flex flex-wrap gap-2.5">
           {SIZES.map((s) => (
             <button
               key={s}
               type="button"
               onClick={() => setSize(s)}
               aria-pressed={size === s}
-              className={`${optionButton(size === s)} min-w-[52px] font-sans`}
+              className={`${optionButton(size === s)} font-sans`}
             >
               {s}
             </button>
@@ -116,8 +119,8 @@ export default function AddToCart({ product, children }: { product: Product; chi
       {/* DUPATTA — only for products that really have the option */}
       {dupattaValues.length > 0 && (
         <div>
-          <div className={labelCls}>Dupatta</div>
-          <div className="flex flex-wrap gap-3">
+          <div className="mb-2 text-[12px] font-bold uppercase tracking-wider text-black font-sans">Dupatta</div>
+          <div className="flex flex-wrap gap-2.5">
             {["None", ...dupattaValues].map((opt) => {
               const diff = isNone(opt) ? 0 : priceDiff(opt, adOn) - priceDiff("None", adOn);
               return (
@@ -140,8 +143,8 @@ export default function AddToCart({ product, children }: { product: Product; chi
       {/* AD ONS — only for products that really have the option */}
       {adOnValues.length > 0 && (
         <div>
-          <div className={labelCls}>Ad Ons</div>
-          <div className="flex flex-wrap gap-3">
+          <div className="mb-2 text-[12px] font-bold uppercase tracking-wider text-black font-sans">Ad Ons</div>
+          <div className="flex flex-wrap gap-2.5">
             {["None", ...adOnValues].map((opt) => {
               const diff = isNone(opt) ? 0 : priceDiff(dupatta, opt) - priceDiff(dupatta, "None");
               return (
@@ -161,104 +164,95 @@ export default function AddToCart({ product, children }: { product: Product; chi
         </div>
       )}
 
-      {/* EXPEDITE ORDER */}
-      <div>
-        <div className={labelCls}>Expedite Order</div>
-        <label className="flex items-start gap-3 border border-neutral-200 bg-white px-3.5 py-3 cursor-pointer select-none">
+      {/* EXPEDITE ORDER - Exactly matching live screenshot */}
+      <div className="pt-1">
+        <div className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.25em] text-black font-sans">
+          E X P E D I T E &nbsp; O R D E R
+        </div>
+        <label className="flex items-center gap-3 border border-neutral-300 bg-white px-3.5 py-3 cursor-pointer select-none">
           <input
             type="checkbox"
             checked={expedite}
             onChange={(e) => setExpedite(e.target.checked)}
-            className="mt-1 h-4 w-4 accent-black cursor-pointer"
+            className="h-4 w-4 rounded-none accent-black cursor-pointer"
           />
-          <span className="font-serif text-[13px] font-bold uppercase tracking-[0.2em] text-black leading-relaxed">
-            Express-Shipping (5-6 Working Days) [+PKR {EXPEDITE_FEE}]
+          <span className="text-[12px] font-bold uppercase tracking-wide text-black font-sans">
+            EXPRESS - SHIPPING (5 - 6 WORKING DAYS) [+PKR {EXPEDITE_FEE}]
           </span>
         </label>
       </div>
 
-      {/* YOU MAY ALSO ADD */}
-      <div>
-        <div className={labelCls}>You may also add:</div>
-        <div className="space-y-2">
-          {[SAME_AS_SAMPLE, WITH_SLEEVES].map((opt) => (
-            <label key={opt} className="flex items-center gap-3 cursor-pointer select-none">
-              <input
-                type="radio"
-                name="extra_option"
-                checked={extra === opt}
-                onChange={() => setExtra(opt)}
-                className="h-4 w-4 accent-[#0b72ff] cursor-pointer"
-              />
-              <span className="font-serif text-[13px] font-bold uppercase tracking-[0.22em] text-black">{opt}</span>
-            </label>
-          ))}
+      {/* YOU MAY ALSO ADD - Only for sleeveless dresses like Camilla */}
+      {isSleeveless && (
+        <div className="pt-1">
+          <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-black font-sans">
+            You may also add:
+          </div>
+          <div className="space-y-2 text-[13px] font-sans">
+            {[SAME_AS_SAMPLE, WITH_SLEEVES].map((opt) => (
+              <label key={opt} className="flex items-center gap-2.5 cursor-pointer select-none">
+                <input
+                  type="radio"
+                  name="extra_option"
+                  checked={extra === opt}
+                  onChange={() => setExtra(opt)}
+                  className="h-4 w-4 accent-black cursor-pointer"
+                />
+                <span className="text-[12.5px] font-bold uppercase tracking-wide text-black font-sans">
+                  {opt}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Quantity matching live_top.png */}
+      <div className="flex items-center gap-3 pt-2">
+        <div className="inline-flex items-center border border-neutral-300 rounded-full px-2 py-1">
+          <button
+            type="button"
+            aria-label="Reduce quantity"
+            onClick={() => setQty((q) => Math.max(1, q - 1))}
+            className="grid h-6 w-6 place-items-center text-neutral-600 hover:text-black cursor-pointer"
+          >
+            <Minus className="h-3 w-3" />
+          </button>
+          <span className="w-8 text-center text-[13px] font-bold text-black font-sans" aria-live="polite">
+            {qty}
+          </span>
+          <button
+            type="button"
+            aria-label="Increase quantity"
+            onClick={() => setQty((q) => q + 1)}
+            className="grid h-6 w-6 place-items-center text-neutral-600 hover:text-black cursor-pointer"
+          >
+            <Plus className="h-3 w-3" />
+          </button>
         </div>
       </div>
 
-      {/* Quantity */}
-      <div className="flex items-center gap-1 pl-5">
-        <button
-          type="button"
-          aria-label="Reduce quantity"
-          onClick={() => setQty((q) => Math.max(1, q - 1))}
-          className="grid h-9 w-9 place-items-center rounded-full border border-neutral-300 text-neutral-600 hover:text-black hover:border-black transition-colors"
-        >
-          <Minus className="h-4 w-4" />
-        </button>
-        <span className="w-8 text-center text-xs text-black" aria-live="polite">
-          {qty}
-        </span>
-        <button
-          type="button"
-          aria-label="Increase quantity"
-          onClick={() => setQty((q) => q + 1)}
-          className="grid h-9 w-9 place-items-center rounded-full border border-neutral-300 text-neutral-600 hover:text-black hover:border-black transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-        </button>
-      </div>
-
-      {/* Actions */}
-      <div className="space-y-3">
+      {/* 3 Full-width CTAs exactly matching Image 3 */}
+      <div className="space-y-2.5 pt-2">
+        {/* ADD TO CART (Solid Black, White Text) */}
         <button
           type="button"
           onClick={handleAddToCart}
-          className="w-full bg-black py-4 font-sans text-[15px] font-bold uppercase text-white transition-opacity hover:opacity-85 cursor-pointer"
+          className="w-full bg-black hover:bg-neutral-900 py-3.5 text-center font-sans text-[13px] font-bold uppercase tracking-wider text-white transition-colors cursor-pointer"
         >
-          {addedNotice ? "✓ Added to cart" : "Add to cart"}
+          {addedNotice ? "✓ ADDED TO CART" : "ADD TO CART"}
         </button>
 
+        {/* BUY IT NOW (Solid Light Grey #e8e8e8, Black Text matching Image 3) */}
         <button
           type="button"
           onClick={handleBuyNow}
-          className="w-full border border-black bg-white py-4 font-sans text-[15px] font-bold uppercase text-black transition-colors hover:bg-neutral-100 cursor-pointer"
+          className="w-full bg-[#e8e8e8] hover:bg-[#dedede] py-3.5 text-center font-sans text-[13px] font-bold uppercase tracking-wider text-black border-0 transition-colors cursor-pointer"
         >
-          Buy it now
+          BUY IT NOW
         </button>
 
-        <div className="flex items-center justify-center gap-2 py-1 font-serif text-xs text-neutral-700">
-          <span className="text-[13px] text-neutral-600">We accept</span>
-          {/* Real Google Pay SVG badge */}
-          <span className="inline-flex items-center justify-center border border-neutral-300 rounded-none px-2 py-0.5 bg-white text-[10px] font-bold tracking-wider text-black shadow-xs">
-            <svg className="h-3.5 w-8 mr-1" viewBox="0 0 38 15" fill="none">
-              <path d="M5.9 7.4v4.4H4.5V.2h3.8c1 0 1.9.3 2.6 1 .7.7 1.1 1.6 1.1 2.6s-.4 1.9-1.1 2.6c-.7.7-1.6 1-2.6 1H5.9zm0-5.9v4.5h2.4c.7 0 1.2-.2 1.6-.6.4-.4.7-1 .7-1.6s-.3-1.2-.7-1.6c-.4-.4-1-.7-1.6-.7H5.9z" fill="#3c4043"/>
-              <path d="M15.3 11.8c-.8 0-1.5-.2-2.1-.7-.6-.5-.9-1.1-.9-1.9 0-.8.3-1.5.9-2 .6-.5 1.4-.8 2.3-.8.7 0 1.4.1 1.9.4v-.4c0-.6-.2-1-.6-1.3-.4-.3-1-.5-1.5-.5-.7 0-1.3.2-1.7.5l-.5-1c.6-.4 1.4-.7 2.4-.7 1.1 0 2 .3 2.6.9.6.6.9 1.4.9 2.5v4.9h-1.3v-1.1h-.1c-.6.8-1.4 1.2-2.3 1.2zm.3-1.2c.6 0 1.1-.2 1.6-.7.4-.4.7-1 .7-1.6-.5-.4-1.1-.6-1.8-.6-.6 0-1.1.1-1.5.4-.4.3-.6.7-.6 1.2 0 .4.2.8.5 1 .3.2.7.3 1.1.3z" fill="#3c4043"/>
-              <path d="M26.2 4.7l-4.5 10.4h-1.5l1.7-3.7-3-6.7h1.6l2.1 5.1h.1l2.1-5.1h1.4z" fill="#3c4043"/>
-              <path d="M36.1 7.2c0-.4 0-.8-.1-1.2H31v2.3h2.9c-.1.7-.5 1.3-1.1 1.7v1.4h1.8c1-1 1.5-2.4 1.5-4.2z" fill="#4285F4"/>
-              <path d="M31 12.4c1.4 0 2.5-.5 3.4-1.3l-1.8-1.4c-.5.3-1 .5-1.6.5-1.2 0-2.3-.8-2.7-2h-1.8v1.4c.9 1.8 2.7 2.8 4.5 2.8z" fill="#34A853"/>
-              <path d="M28.3 8.2c-.1-.3-.2-.7-.2-1s.1-.7.2-1V4.8h-1.8c-.4.7-.6 1.5-.6 2.4s.2 1.7.6 2.4l1.8-1.4z" fill="#FBBC04"/>
-              <path d="M31 3.8c.8 0 1.4.3 1.9.8l1.4-1.4C33.4 2.4 32.3 2 31 2c-1.8 0-3.6 1-4.5 2.8l1.8 1.4c.4-1.2 1.5-2.4 2.7-2.4z" fill="#EA4335"/>
-            </svg>
-          </span>
-          {/* Real Apple Pay SVG badge */}
-          <span className="inline-flex items-center justify-center border border-neutral-300 rounded-none px-2 py-0.5 bg-white text-[10px] font-bold tracking-wider text-black shadow-xs">
-            <svg className="h-3.5 w-8" viewBox="0 0 50 20" fill="currentColor">
-              <path d="M8.5 3.2c-.6.8-1.6 1.4-2.6 1.3-.1-1 .4-2 1-2.6.6-.7 1.7-1.2 2.6-1.2.1 1-.4 1.9-1 2.5zm1 1.4c-1.5-.1-2.7.9-3.4.9-.7 0-1.7-.8-2.9-.8-1.5 0-2.8.9-3.6 2.2-1.6 2.7-.4 6.7 1.1 8.9.7 1.1 1.6 2.3 2.8 2.2 1.1 0 1.6-.7 2.9-.7 1.3 0 1.7.7 2.8.7 1.2 0 2-1.1 2.7-2.2.9-1.3 1.2-2.5 1.3-2.6-.1 0-2.4-.9-2.4-3.6 0-2.3 1.9-3.3 2-3.5-1.1-1.6-2.8-1.5-3.3-1.5zm10.7-.7c-2.8 0-4.6 2-4.6 5s1.8 5 4.6 5c1.4 0 2.5-.5 3.2-1.5v1.3h2.3V.5h-2.3v3.7c-.8-.9-1.8-1.3-3.2-1.3zm.5 8.1c-1.7 0-2.8-1.2-2.8-3.1s1.1-3.1 2.8-3.1c1.7 0 2.8 1.2 2.8 3.1 0 1.8-1.1 3.1-2.8 3.1zm12.3-4.5c0-.8-.7-1.4-1.8-1.4-1 0-1.8.6-1.9 1.4h3.7zm-3.8 2.2c.1 1.3 1.2 2.1 2.6 2.1 1.1 0 1.9-.4 2.3-1.2h2.2c-.6 1.9-2.3 3.1-4.5 3.1-2.8 0-4.8-2-4.8-5 0-3 2-5 4.8-5 2.9 0 4.7 2 4.7 4.9v1.1h-7.3zm12.5-3.7l-2.7 6.9h-2.4l2.8-6.9v-.1l-2.6-6.4h2.5l1.4 4.3 1.4-4.3h2.4l-2.8 6.5z"/>
-            </svg>
-          </span>
-        </div>
-
+        {/* CHAT WITH FASHION CONSULTANT (Solid Green #0a8f2e with WhatsApp icon matching Image 3) */}
         <a
           href={`https://wa.me/923310397865?text=${encodeURIComponent(
             `Hi Sillhouete, I am interested in ${product.title} (SKU: ${dynamicSku}, Size: ${size}${
@@ -267,12 +261,170 @@ export default function AddToCart({ product, children }: { product: Product; chi
           )}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex w-full items-center justify-center gap-2 bg-[#0a8f2e] hover:bg-[#087a27] text-white py-3.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+          className="flex items-center justify-center gap-2.5 w-full bg-[#0a8f2e] hover:bg-[#087a27] text-white py-3.5 text-center font-sans text-[13px] font-bold uppercase tracking-wider border-0 transition-colors cursor-pointer"
         >
-          <MessageCircle className="h-4 w-4 fill-white text-white" />
-          <span>Chat with fashion consultant</span>
+          <svg className="h-4.5 w-4.5 fill-current shrink-0" viewBox="0 0 24 24">
+            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.693.076-1.996-.464-1.667-.69-2.73-2.39-2.813-2.501-.083-.11-1.328-1.767-1.328-3.37 0-1.603.837-2.39 1.135-2.716.298-.327.65-.409.867-.409.217 0 .434.002.625.011.201.01.47-.077.734.558.274.66.936 2.288.936 2.288s.078.156.012.333c-.066.177-.145.289-.289.456-.145.167-.305.372-.435.5-.145.144-.297.3-.128.589.17.29 1.054 1.74 2.264 2.817 1.558 1.388 2.87 1.818 3.277 2.02.408.201.646.168.887-.11.242-.277 1.036-1.207 1.313-1.623.276-.416.552-.347.93-.207.378.14 2.393 1.127 2.802 1.332.409.205.681.307.781.478.1.171.1.992-.044 1.397z" />
+          </svg>
+          <span>CHAT WITH FASHION CONSULTANT</span>
         </a>
+
+        {/* Payment badges matching Image 3 */}
+        <div className="flex items-center justify-center gap-2 pt-1 text-[11px] text-neutral-600 font-sans">
+          <span>We accept</span>
+          {/* GPay badge */}
+          <span className="inline-flex items-center border border-neutral-200 px-1.5 py-0.5 bg-white text-[10px] font-bold text-black">
+            GPay
+          </span>
+          {/* ApplePay badge */}
+          <span className="inline-flex items-center border border-neutral-200 px-1.5 py-0.5 bg-white text-[10px] font-bold text-black">
+            ApplePay
+          </span>
+        </div>
       </div>
+
+      {/* Size Chart Modal */}
+      {showSizeChart && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Size Chart"
+          className="fixed inset-0 z-[120] grid place-items-center bg-black/60 backdrop-blur-[2px] p-4 animate-fade-in"
+          onClick={() => setShowSizeChart(false)}
+        >
+          <div
+            className="relative max-h-[90vh] w-full max-w-[680px] overflow-y-auto bg-white p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-black/10 pb-3 mb-4">
+              <div>
+                <span className="font-serif text-[12px] text-neutral-500 uppercase tracking-widest block">
+                  Sillhouete Size Guide
+                </span>
+                <h3 className="font-serif text-[18px] font-bold uppercase tracking-wider text-black">
+                  Standard Measurement Chart
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSizeChart(false)}
+                className="grid h-8 w-8 place-items-center rounded-full bg-neutral-100 hover:bg-neutral-200 text-black cursor-pointer transition-colors"
+                aria-label="Close size chart"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Camilla's exact Size Chart Table matching live_top.png */}
+            <div className="space-y-4 text-center font-sans">
+              <div className="flex flex-col items-center justify-center">
+                <span className="font-serif text-[18px] leading-none text-black select-none">سلوٹ</span>
+                <span className="font-serif text-[22px] font-bold tracking-wider text-black">Sillhouete</span>
+              </div>
+
+              <div className="bg-black text-white py-1.5 text-[14px] font-bold uppercase tracking-wider">
+                Size Chart
+              </div>
+              <div className="text-[12px] font-bold uppercase tracking-wider text-neutral-800">
+                CAMILLA &bull; ARTICLE CODE: (RM-02)
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse border border-neutral-300 text-[12px]">
+                  <thead>
+                    <tr className="bg-neutral-100 text-black font-bold">
+                      <th className="border border-neutral-300 px-3 py-2 text-left">Details</th>
+                      <th className="border border-neutral-300 px-3 py-2">Ex Small</th>
+                      <th className="border border-neutral-300 px-3 py-2">Small</th>
+                      <th className="border border-neutral-300 px-3 py-2">Medium</th>
+                      <th className="border border-neutral-300 px-3 py-2">Large</th>
+                      <th className="border border-neutral-300 px-3 py-2">Ex Large</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Bust</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">18</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">19</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">20.5</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">22</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">23.5</td>
+                    </tr>
+                    <tr>
+                      <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Hip</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">18.5</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">19.5</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">22</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">23</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">24.5</td>
+                    </tr>
+                    <tr>
+                      <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Arm Hole</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">8</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">8.5</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">9.5</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">10.5</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">12</td>
+                    </tr>
+                    <tr>
+                      <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Shirt Length</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">56</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">56</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">56</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">56</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">56</td>
+                    </tr>
+                    <tr>
+                      <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">HEM</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">42</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">42</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">42</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">42</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">42</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="bg-black text-white py-1.5 text-[14px] font-bold uppercase tracking-wider mt-4">
+                Trouser Size
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse border border-neutral-300 text-[12px]">
+                  <thead>
+                    <tr className="bg-neutral-100 text-black font-bold">
+                      <th className="border border-neutral-300 px-3 py-2 text-left">Details</th>
+                      <th className="border border-neutral-300 px-3 py-2">Ex Small</th>
+                      <th className="border border-neutral-300 px-3 py-2">Small</th>
+                      <th className="border border-neutral-300 px-3 py-2">Medium</th>
+                      <th className="border border-neutral-300 px-3 py-2">Large</th>
+                      <th className="border border-neutral-300 px-3 py-2">Ex Large</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Waist</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">14</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">15</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">17</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">19</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">19.5</td>
+                    </tr>
+                    <tr>
+                      <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Sharara Length</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">45</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">45</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">45</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">46</td>
+                      <td className="border border-neutral-300 px-3 py-1.5">46</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

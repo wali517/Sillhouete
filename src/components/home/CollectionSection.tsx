@@ -9,17 +9,26 @@ interface Props {
   totalCount?: number;
   showViewAll?: boolean;
   showNewBadge?: boolean;
+  viewAllRed?: boolean;
 }
 
-export default function CollectionSection({ title, products, href, totalCount, showViewAll = false, showNewBadge = false }: Props) {
+export default function CollectionSection({
+  title,
+  products,
+  href,
+  totalCount,
+  showViewAll = false,
+  showNewBadge = false,
+  viewAllRed = false,
+}: Props) {
   const actualCount = totalCount !== undefined ? totalCount : products.length;
   const hasMoreThanEight = actualCount > 8 || products.length > 8 || showViewAll;
   const displayedProducts = products.slice(0, 8);
 
   return (
-    <section className="mx-auto w-full max-w-[1440px] px-3 py-8 sm:px-5 sm:py-9 md:px-8 md:py-12 lg:px-10 lg:py-14">
-      <div className="mb-5 text-center sm:mb-6 md:mb-8">
-        <h2 className="font-serif text-[20px] font-medium uppercase tracking-[0.07em] text-[#111111] sm:text-[22px] md:text-[26px] lg:text-[28px]">
+    <section className="mx-auto w-full max-w-355 px-3.5 py-8 sm:px-6 sm:py-10 md:px-10 md:py-12">
+      <div className="mb-6 text-center md:mb-8">
+        <h2 className="text-[16px] font-semibold uppercase leading-none tracking-wider text-[#111111] sm:text-[17px] md:text-[20px]">
           {title}
         </h2>
       </div>
@@ -27,10 +36,12 @@ export default function CollectionSection({ title, products, href, totalCount, s
       <ProductGrid products={displayedProducts} showNewBadge={showNewBadge} />
 
       {hasMoreThanEight && href && (
-        <div className="mt-10 text-center">
+        <div className="mt-10 md:mt-12 mb-2 text-center">
           <Link
             href={href}
-            className="inline-block border border-black bg-black px-8 py-3.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-all hover:bg-neutral-800 shadow-sm"
+            className={`btn inline-flex items-center justify-center bg-[#111111] px-6 py-[11px] text-[11px] font-bold uppercase tracking-[0.25em] rounded-none border border-[#111111] hover:bg-[#222222] transition-colors shadow-none ${
+              viewAllRed ? "view-all-red !text-[#ff0000]" : "!text-white"
+            }`}
           >
             View all
           </Link>

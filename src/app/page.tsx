@@ -42,6 +42,7 @@ export default function HomePage() {
         href="/collections/raha-eid-pret26"
         totalCount={8}
         showViewAll
+        viewAllRed
       />
 
       <CollectionSection
@@ -49,6 +50,7 @@ export default function HomePage() {
         products={bestSellers}
         href="/collections/best-sellers"
         totalCount={17}
+        showViewAll
       />
 
       <CollectionSection
@@ -56,6 +58,7 @@ export default function HomePage() {
         products={formals}
         href="/collections/formal-dresses"
         totalCount={67}
+        showViewAll
       />
 
       <MediaGrid />

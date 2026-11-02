@@ -31,14 +31,14 @@ export default function MobileMenu({ open, onClose }: { open: boolean; onClose: 
             role="dialog"
             aria-modal="true"
             aria-label="Navigation Menu"
-            className="fixed bottom-0 right-0 top-0 z-[100] flex w-[85%] max-w-sm flex-col overflow-y-auto bg-white shadow-2xl"
+            className="fixed bottom-0 right-0 top-0 z-[100] flex w-[85%] max-w-sm flex-col overflow-y-auto bg-white shadow-2xl font-serif"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "tween", duration: 0.3 }}
           >
             <div className="flex items-center justify-between border-b border-[#e8e8e1] px-5 py-4">
-              <span className="text-sm font-bold uppercase tracking-wider">Navigation</span>
+              <span className="text-[13px] font-normal uppercase tracking-[0.15em] text-black/70">Navigation</span>
               <button
                 type="button"
                 onClick={onClose}
@@ -67,8 +67,8 @@ export default function MobileMenu({ open, onClose }: { open: boolean; onClose: 
                     <Link
                       href={item.href}
                       onClick={onClose}
-                      className={`flex-1 py-3 text-[16px] uppercase tracking-wide font-semibold ${
-                        item.sale ? "text-[red] animate-blinks sale-menu font-bold" : "text-black"
+                      className={`flex-1 py-3 text-[15px] uppercase tracking-wide font-normal ${
+                        item.sale ? "!text-[#ff0000] animate-blinks sale-menu font-normal" : "text-black"
                       }`}
                     >
                       {item.label}
@@ -79,19 +79,19 @@ export default function MobileMenu({ open, onClose }: { open: boolean; onClose: 
                         aria-expanded={expanded === item.label}
                         aria-label={`Toggle ${item.label}`}
                         onClick={() => setExpanded(expanded === item.label ? null : item.label)}
-                        className="grid h-10 w-10 place-items-center"
+                        className="grid h-10 w-10 place-items-center cursor-pointer"
                       >
                         <svg
                           aria-hidden="true"
                           focusable="false"
                           role="presentation"
-                          className={`h-3 w-3.5 transition-transform ${
+                          className={`w-[9px] h-[5px] opacity-70 transition-transform duration-200 ${
                             expanded === item.label ? "rotate-180" : ""
                           }`}
                           viewBox="0 0 28 16"
                           fill="none"
                           stroke="currentColor"
-                          strokeWidth="2.5"
+                          strokeWidth="2"
                         >
                           <path d="m1.57 1.59 12.76 12.77L27.1 1.59" />
                         </svg>
@@ -100,17 +100,28 @@ export default function MobileMenu({ open, onClose }: { open: boolean; onClose: 
                   </div>
                   {item.children && expanded === item.label && (
                     <ul className="pb-3 pl-4 space-y-1 bg-soft/50 rounded p-2 mb-2">
-                      {item.children.map((c) => (
-                        <li key={c.label}>
-                          <Link
-                            href={c.href}
-                            onClick={onClose}
-                            className="block py-1.5 text-xs text-black/80 hover:text-black hover:underline"
-                          >
-                            {c.label}
-                          </Link>
-                        </li>
-                      ))}
+                      {item.children.map((c) => {
+                        const isMeeras = c.blink || c.label.toLowerCase() === "meeras";
+                        const isHighlight = c.highlight || c.label.includes("Raha Eid Pret");
+
+                        return (
+                          <li key={c.label}>
+                            <Link
+                              href={c.href}
+                              onClick={onClose}
+                              className={`block py-1.5 text-[14px] font-normal hover:underline ${
+                                isMeeras
+                                  ? "!text-[#ff0000] font-normal blink-meeras"
+                                  : isHighlight
+                                  ? "!text-[#ff0000] font-normal highlight-red"
+                                  : "text-black/80 hover:text-black"
+                              }`}
+                            >
+                              {c.label}
+                            </Link>
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
                 </li>
@@ -128,7 +139,7 @@ export default function MobileMenu({ open, onClose }: { open: boolean; onClose: 
                 >
                   <path d="M35 39.84v-2.53c3.3-1.91 6-6.66 6-11.41 0-7.63 0-13.82-9-13.82s-9 6.19-9 13.82c0 4.75 2.7 9.51 6 11.41v2.53c-10.18.85-18 6-18 12.16h42c0-6.19-7.82-11.31-18-12.16Z" />
                 </svg>
-                <Link href="/account" onClick={onClose} className="text-sm uppercase font-semibold">
+                <Link href="/account" onClick={onClose} className="text-[14px] uppercase font-normal text-black">
                   Customer Account
                 </Link>
               </li>
@@ -136,7 +147,7 @@ export default function MobileMenu({ open, onClose }: { open: boolean; onClose: 
 
             {/* Currency Selector on Mobile */}
             <div className="border-t border-line px-5 py-4">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-black/60 mb-2 flex items-center gap-1.5">
+              <label className="block text-xs font-normal uppercase tracking-wider text-black/60 mb-2 flex items-center gap-1.5">
                 <Globe className="h-3.5 w-3.5" />
                 <span>Select Currency</span>
               </label>
@@ -146,7 +157,7 @@ export default function MobileMenu({ open, onClose }: { open: boolean; onClose: 
                     key={c}
                     type="button"
                     onClick={() => setCurrency(c)}
-                    className={`rounded border py-1.5 text-xs font-semibold uppercase ${
+                    className={`rounded border py-1.5 text-xs font-normal uppercase ${
                       currency === c
                         ? "border-black bg-black text-white"
                         : "border-line bg-soft text-black/70"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,6 +13,17 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("admin123");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/auth")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.adminEmail) {
+          setEmail(d.adminEmail);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -63,13 +74,13 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
-        {/* Demo Credentials Box */}
+        {/* Administrator Credentials Hint */}
         <div className="rounded-lg bg-blue-50 border border-blue-200 p-3 text-xs text-blue-900 space-y-1">
           <p className="font-bold flex items-center gap-1.5">
             <ShieldCheck className="h-4 w-4 text-blue-700" />
             <span>Administrator Credentials</span>
           </p>
-          <p><strong>Email:</strong> admin@sillhouete.com</p>
+          <p><strong>Email:</strong> {email || "admin@sillhouete.com"}</p>
           <p><strong>Password:</strong> admin123</p>
         </div>
 

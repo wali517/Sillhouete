@@ -59,25 +59,29 @@ export default function NewsletterPopup() {
 
     setStatus("loading");
     try {
-      await fetch("/api/contact", {
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: "Newsletter Subscriber",
           email: cleanEmail,
-          subject: "Newsletter 5% Off Subscription",
+          isDiscount: true,
+          subject: "Newsletter Discount Voucher",
           message: `Subscribed on ${new Date().toLocaleDateString()}`,
         }),
       });
+      const data = await res.json();
+      const code = data.discountCode || "WELCOME5";
+      const percent = data.percent || 5;
       setStatus("done");
-      setMessage("Thank you! Use code SILLHOUETE5 for 5% off.");
+      setMessage(`Thank you! Your ${percent}% discount code (${code}) has been emailed to you.`);
       setEmail("");
-      setTimeout(() => close(), 2500);
+      setTimeout(() => close(), 4000);
     } catch {
       setStatus("done");
-      setMessage("Thank you for subscribing!");
+      setMessage("Thank you! Your discount code has been emailed to you.");
       setEmail("");
-      setTimeout(() => close(), 2500);
+      setTimeout(() => close(), 3000);
     }
   };
 
@@ -107,7 +111,7 @@ export default function NewsletterPopup() {
 
         {/* Left Content Column matching Image 1 */}
         <div className="flex flex-1 flex-col items-center justify-center p-8 md:p-10 text-center">
-          <h2 className="font-serif text-[20px] md:text-[23px] font-bold uppercase tracking-[0.05em] text-[#111111] leading-snug">
+          <h2 className="font-serif text-[20px] md:text-[23px] font-bold uppercase tracking-wider text-[#111111] leading-snug">
             SUBSCRIBE OUR NEWSLETTER TO GET 5% OFF
           </h2>
           <p className="mt-3 text-xs md:text-sm text-neutral-600 max-w-sm leading-relaxed">

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Save, Plus, Trash2, Settings, CreditCard, Truck, Bell, Store, Lock } from "lucide-react";
+import { Save, Plus, Trash2, Settings, CreditCard, Truck, Bell, Store, Lock, ShieldCheck } from "lucide-react";
 import type { SiteSettings } from "@/types";
 
-type Tab = "store" | "shipping" | "announcements" | "payment" | "discounts" | "password";
+type Tab = "store" | "shipping" | "announcements" | "payment" | "discounts" | "security";
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Partial<SiteSettings & { bankName?: string; bankAccountTitle?: string; bankIban?: string; discountCodes?: Array<{ code: string; percent: number; active: boolean }> }>>({});
@@ -15,19 +15,26 @@ export default function AdminSettingsPage() {
   const [newAnnouncement, setNewAnnouncement] = useState("");
   const [newDiscountCode, setNewDiscountCode] = useState("");
   const [newDiscountPercent, setNewDiscountPercent] = useState("10");
+  const [adminEmailInput, setAdminEmailInput] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [credentialUpdating, setCredentialUpdating] = useState(false);
 
   useEffect(() => {
     fetch("/api/settings")
       .then((r) => r.json())
-      .then((d) => setSettings(d.settings || {}))
+      .then((d) => {
+        if (d.settings) {
+          setSettings(d.settings);
+          setAdminEmailInput(d.settings.adminEmail || "admin@sillhouete.com");
+        }
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
-  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3500); };
 
   const saveSection = async (tab: Tab, data: Partial<SiteSettings>) => {
     setSaving(tab);
@@ -37,35 +44,68 @@ export default function AdminSettingsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error();
       const d = await res.json();
-      setSettings(d.settings || settings);
-      showToast("Settings saved successfully");
-    } catch {
-      showToast("Failed to save settings");
+      if (!res.ok) throw new Error(d.error || "Failed to save settings");
+      if (d.settings) {
+        setSettings((prev) => ({ ...prev, ...d.settings }));
+      }
+      showToast("Settings saved successfully and synced with live store!");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to save settings";
+      showToast(msg);
     } finally {
       setSaving(null);
     }
   };
 
-  const handlePasswordChange = async () => {
-    if (newPassword !== confirmPassword) { showToast("Passwords do not match"); return; }
-    if (newPassword.length < 6) { showToast("Password must be at least 6 characters"); return; }
+  const handleAdminCredentialsChange = async () => {
+    if (!oldPassword) {
+      showToast("Please enter your current admin password to verify changes");
+      return;
+    }
+    if (!adminEmailInput.trim()) {
+      showToast("Admin email cannot be empty");
+      return;
+    }
+    if (newPassword && newPassword !== confirmPassword) {
+      showToast("New passwords do not match");
+      return;
+    }
+    if (newPassword && newPassword.length < 6) {
+      showToast("New password must be at least 6 characters");
+      return;
+    }
+
+    setCredentialUpdating(true);
     try {
       const res = await fetch("/api/admin/auth", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ currentPassword: oldPassword, newPassword }),
+        body: JSON.stringify({
+          currentPassword: oldPassword,
+          newAdminEmail: adminEmailInput.trim(),
+          newPassword: newPassword || undefined,
+        }),
       });
+
+      const d = await res.json();
       if (!res.ok) {
-        const d = await res.json();
-        showToast(d.error || "Failed to change password");
+        showToast(d.error || "Failed to update admin credentials");
         return;
       }
-      showToast("Password changed successfully");
-      setOldPassword(""); setNewPassword(""); setConfirmPassword("");
+
+      showToast(d.message || "Admin credentials updated successfully!");
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      if (d.adminEmail) {
+        setSettings((prev) => ({ ...prev, adminEmail: d.adminEmail }));
+        setAdminEmailInput(d.adminEmail);
+      }
     } catch {
-      showToast("Failed to change password");
+      showToast("Failed to update admin credentials");
+    } finally {
+      setCredentialUpdating(false);
     }
   };
 
@@ -75,7 +115,7 @@ export default function AdminSettingsPage() {
     { key: "announcements", label: "Announcements", icon: Bell },
     { key: "payment", label: "Payment", icon: CreditCard },
     { key: "discounts", label: "Discounts", icon: Settings },
-    { key: "password", label: "Admin Password", icon: Lock },
+    { key: "security", label: "Admin Account & Security", icon: ShieldCheck },
   ];
 
   if (loading) return <div className="flex items-center justify-center min-h-[60vh] text-gray-400">Loading settings...</div>;
@@ -130,7 +170,17 @@ export default function AdminSettingsPage() {
               onChange={(e) => setSettings({ ...settings, description: e.target.value })}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400 resize-none" />
           </div>
-          <button onClick={() => saveSection("store", settings as Partial<SiteSettings>)} disabled={saving === "store"}
+          <button onClick={() => saveSection("store", {
+            storeName: settings.storeName,
+            title: settings.title,
+            email: settings.email,
+            phone: settings.phone,
+            whatsapp: settings.whatsapp,
+            studioAddress: settings.studioAddress,
+            officeAddress: settings.officeAddress,
+            usaOfficeAddress: settings.usaOfficeAddress,
+            description: settings.description,
+          })} disabled={saving === "store"}
             className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50">
             <Save className="h-4 w-4" /> {saving === "store" ? "Saving..." : "Save Store Info"}
           </button>
@@ -196,7 +246,7 @@ export default function AdminSettingsPage() {
               <Plus className="h-4 w-4 text-gray-700" />
             </button>
           </div>
-          <button onClick={() => saveSection("announcements", { announcements: settings.announcements } as Partial<SiteSettings>)} disabled={saving === "announcements"}
+          <button onClick={() => saveSection("announcements", { announcements: settings.announcements || [] })} disabled={saving === "announcements"}
             className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50">
             <Save className="h-4 w-4" /> {saving === "announcements" ? "Saving..." : "Save Announcements"}
           </button>
@@ -241,7 +291,14 @@ export default function AdminSettingsPage() {
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400" />
             </div>
           ))}
-          <button onClick={() => saveSection("payment", settings as Partial<SiteSettings>)} disabled={saving === "payment"}
+          <button onClick={() => saveSection("payment", {
+            stripeEnabled: settings.stripeEnabled ?? true,
+            stripePublishableKey: settings.stripePublishableKey || "",
+            stripeSecretKey: settings.stripeSecretKey || "",
+            bankName: settings.bankName || "",
+            bankAccountTitle: settings.bankAccountTitle || "",
+            bankIban: settings.bankIban || "",
+          })} disabled={saving === "payment"}
             className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50">
             <Save className="h-4 w-4" /> {saving === "payment" ? "Saving..." : "Save Payment Settings"}
           </button>
@@ -297,32 +354,100 @@ export default function AdminSettingsPage() {
               <Plus className="h-4 w-4" />
             </button>
           </div>
-          <button onClick={() => saveSection("discounts", { discountCodes: settings.discountCodes } as unknown as Partial<SiteSettings>)} disabled={saving === "discounts"}
+          <button onClick={() => saveSection("discounts", { discountCodes: settings.discountCodes || [] })} disabled={saving === "discounts"}
             className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50">
             <Save className="h-4 w-4" /> {saving === "discounts" ? "Saving..." : "Save Discount Codes"}
           </button>
         </div>
       )}
 
-      {/* Password */}
-      {activeTab === "password" && (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-4">
-          <h2 className="font-semibold text-gray-900">Change Admin Password</h2>
-          {[
-            { label: "Current Password", value: oldPassword, set: setOldPassword },
-            { label: "New Password", value: newPassword, set: setNewPassword },
-            { label: "Confirm New Password", value: confirmPassword, set: setConfirmPassword },
-          ].map(({ label, value, set }) => (
-            <div key={label}>
-              <label className="text-xs font-semibold text-gray-600 block mb-1">{label}</label>
-              <input type="password" value={value} onChange={(e) => set(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400" />
+      {/* Admin Account & Security */}
+      {activeTab === "security" && (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-6">
+          <div>
+            <h2 className="font-semibold text-gray-900 text-lg flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-gray-700" />
+              <span>Admin Account &amp; Credentials</span>
+            </h2>
+            <p className="text-xs text-gray-500 mt-1">
+              You can update your administrator login email address and change your store administration password here. All changes save live into the database.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wider text-gray-700 block mb-1.5">
+                Administrator Login Email *
+              </label>
+              <input
+                type="email"
+                required
+                value={adminEmailInput}
+                onChange={(e) => setAdminEmailInput(e.target.value)}
+                placeholder="admin@sillhouete.com"
+                className="w-full border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+              />
+              <p className="text-[11px] text-gray-500 mt-1">
+                You will use this email address to sign into the store administration panel.
+              </p>
             </div>
-          ))}
-          <button onClick={handlePasswordChange}
-            className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors">
-            <Lock className="h-4 w-4" /> Update Password
-          </button>
+
+            <div className="border-t border-gray-100 pt-4 space-y-4">
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wider text-gray-700 block mb-1.5">
+                  Current Password * <span className="text-gray-400 font-normal">(Required to verify changes)</span>
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  placeholder="Enter current password"
+                  className="w-full border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+                />
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-gray-700 block mb-1.5">
+                    New Password <span className="text-gray-400 font-normal">(Leave blank to keep unchanged)</span>
+                  </label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Min 6 characters"
+                    className="w-full border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-gray-700 block mb-1.5">
+                    Confirm New Password
+                  </label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm new password"
+                    className="w-full border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={handleAdminCredentialsChange}
+                disabled={credentialUpdating}
+                className="flex items-center gap-2 bg-black text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50"
+              >
+                <Save className="h-4 w-4" />
+                <span>{credentialUpdating ? "Updating..." : "Save Admin Credentials"}</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

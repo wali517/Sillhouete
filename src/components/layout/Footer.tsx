@@ -18,45 +18,27 @@ import {
 function Column({ title, children }: { title: string; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-b border-line py-4 md:border-0 md:py-0">
-      <h2 className="hidden text-[13px] font-bold uppercase tracking-[0.12em] text-black md:block">
+    <div className="border-b border-[#e8e8e1] py-4 text-center md:border-0 md:py-0 md:text-left">
+      <h2 className="hidden text-[13px] font-bold uppercase tracking-[0.2em] text-black md:block mb-4">
         {title}
       </h2>
       <button
         type="button"
         aria-expanded={open}
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between text-[13px] font-bold uppercase tracking-[0.12em] text-black md:hidden"
+        className="relative flex w-full items-center justify-center text-[13px] font-bold uppercase tracking-[0.2em] text-black md:hidden"
       >
         <span>{title}</span>
         <ChevronDown
-          className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`absolute right-0 h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
-      <div className={`${open ? "mt-3 block" : "hidden"} md:mt-4 md:block`}>
+      <div className={`${open ? "mt-3 block" : "hidden"} md:block`}>
         {children}
       </div>
     </div>
   );
 }
-
-const Badge = ({
-  label,
-  bg,
-  fg = "#fff",
-}: {
-  label: string;
-  bg: string;
-  fg?: string;
-}) => (
-  <li
-    aria-label={label}
-    className="grid h-6 w-[38px] place-items-center rounded-[3px] border border-black/10 text-[8px] font-bold shadow-xs select-none"
-    style={{ background: bg, color: fg }}
-  >
-    {label}
-  </li>
-);
 
 export default function Footer() {
   const [footerEmail, setFooterEmail] = useState("");
@@ -72,7 +54,8 @@ export default function Footer() {
         body: JSON.stringify({
           name: "Footer Subscriber",
           email: footerEmail.trim(),
-          subject: "Newsletter Subscription",
+          isDiscount: true,
+          subject: "Newsletter Discount Voucher",
           message: "Subscribed via footer form",
         }),
       });
@@ -87,31 +70,31 @@ export default function Footer() {
   };
 
   return (
-    <footer className="border-t border-line bg-white text-black text-[12px] leading-[1.6]">
-      {/* 4 Columns matching Image 2 */}
-      <div className="mx-auto grid max-w-[1420px] gap-0 px-5 py-8 md:grid-cols-4 md:gap-8 md:px-10 md:py-12">
+    <footer className="site-footer border-t border-[#e8e8e1] bg-white text-black text-[12px] leading-[1.6] py-10 md:py-16">
+      {/* 4 Columns matching Image 2 & live site */}
+      <div className="mx-auto grid max-w-355 gap-0 px-4 md:grid-cols-4 md:gap-10 md:px-10">
         {/* Col 1: ABOUT US */}
         <Column title="ABOUT US">
-          <div className="relative mb-3 h-14 w-[130px]">
+          <div className="relative mx-auto mb-4 aspect-[2.2/1] w-full max-w-[90%] md:mx-0 md:aspect-auto md:h-12 md:w-[140px] md:max-w-none">
             <Image
               src={SITE.logo}
               alt="Sillhouete Calligraphic Logo"
               fill
-              sizes="130px"
-              className="object-contain object-left"
+              sizes="(min-width: 768px) 140px, 90vw"
+              className="object-contain object-center md:object-left"
             />
           </div>
-          <p className="text-[12.75px]px] text-black/85 leading-relaxed">
+          <p className="text-[12.75px] text-[#222222] leading-relaxed">
             {ABOUT_TEXT}
           </p>
         </Column>
 
         {/* Col 2: HELP & INFO */}
         <Column title="HELP & INFO">
-          <ul className="space-y-1.5 text-[12.75px]px] uppercase tracking-wide text-black/90">
+          <ul className="space-y-2 text-[12.75px] uppercase tracking-wide text-[#222222]">
             {FOOTER_LINKS.map((l) => (
               <li key={l.label}>
-                <Link href={l.href} className="hover:underline">
+                <Link href={l.href} className="hover:underline hover:text-black transition-colors">
                   {l.label}
                 </Link>
               </li>
@@ -121,17 +104,17 @@ export default function Footer() {
 
         {/* Col 3: CONTACT INFO */}
         <Column title="CONTACT INFO">
-          <div className="space-y-3 text-[12.75px]px] text-black/85 leading-relaxed">
+          <div className="space-y-3 text-[12.75px] text-[#222222] leading-relaxed">
             <div>
               <strong className="block font-semibold text-black">
                 Pakistan (Office &amp; Studio):
               </strong>
               <p>
-                <strong>Office Address:</strong> 327-B, Street 7, Lane 15,
+                <strong>Office Address: </strong>327-B, Street 7, Lane 15,
                 Cavalry Ground, Lahore
               </p>
               <p>
-                <strong>Studio Address:</strong> Sillhouete, Almas Tower, MM
+                <strong>Studio Address: </strong>Sillhouete, Almas Tower, MM
                 Alam Rd, Block T, Gulberg 2, Lahore
               </p>
               <p>
@@ -146,7 +129,7 @@ export default function Footer() {
               <strong className="block font-semibold text-black">
                 USA Office:
               </strong>
-              <p className="font-semibold text-black/90">
+              <p className="font-semibold text-black">
                 ADVENT BUSINESS CONSULTAX LLC
               </p>
               <p>
@@ -174,32 +157,31 @@ export default function Footer() {
 
         {/* Col 4: SIGN UP AND SAVE */}
         <Column title="SIGN UP AND SAVE">
-          <p className="mb-3 text-[12.75px]px] text-black/85 leading-relaxed">
-            Subscribe to get special offers, free giveaways, and
-            once-in-a-lifetime deals.
+          <p className="mb-3 text-[12.75px] text-[#222222] leading-relaxed">
+            Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.
           </p>
 
-          <form onSubmit={handleSubscribe} className="mt-3">
-            <div className="flex items-center border-b pb-1.5 focus-within:outline-none focus-within:ring-0">
+          <form onSubmit={handleSubscribe} className="mt-4">
+            <div className="footer__newsletter relative max-w-[300px] border-b-2 border-black pb-1">
               <input
                 type="email"
                 value={footerEmail}
                 onChange={(e) => setFooterEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
-                className="min-w-0 flex-1 border-0 bg-transparent text-xs text-black outline-none ring-0 shadow-none focus:border-0 focus:outline-none focus:ring-0 focus:shadow-none placeholder:text-neutral-500"
+                className="w-full bg-transparent pr-10 text-[13px] text-black placeholder:text-[#222222]/70 outline-none border-0 focus:outline-none"
               />
 
               <button
                 type="submit"
                 aria-label="Subscribe"
-                className="p-1 text-black hover:opacity-75 transition-opacity cursor-pointer"
+                className="footer__newsletter-btn absolute right-0 top-0 bottom-0 flex items-center justify-end text-black cursor-pointer bg-transparent border-0 p-1"
               >
                 <svg
                   aria-hidden="true"
                   focusable="false"
                   role="presentation"
-                  className="h-5 w-5"
+                  className="h-4 w-4"
                   viewBox="0 0 64 64"
                   fill="none"
                   stroke="currentColor"
@@ -210,53 +192,56 @@ export default function Footer() {
               </button>
             </div>
             {subscribed && (
-              <p className="mt-1 text-[12px] text-emerald-700 font-medium">
+              <p className="mt-2 text-[12px] text-emerald-700 font-medium">
                 Thank you for subscribing!
               </p>
             )}
           </form>
 
-          <Socials className="mt-4" />
+          <Socials className="mt-5 justify-center md:justify-start" />
         </Column>
       </div>
 
       {/* Centered Payment Badges Row matching real site SVGs */}
-      <div className="mx-auto max-w-[1420px] px-5 pt-1 pb-3 md:px-10">
-        <ul className="mb-2 flex items-center justify-center gap-1.5 flex-wrap">
-          <li><AmexBadge className="h-5 w-8" /></li>
-          <li><DinersBadge className="h-5 w-8" /></li>
-          <li><DiscoverBadge className="h-5 w-8" /></li>
-          <li><JcbBadge className="h-5 w-8" /></li>
-          <li><MastercardBadge className="h-5 w-8" /></li>
-          <li><VisaBadge className="h-5 w-8" /></li>
+      <div className="mx-auto max-w-355 px-4 pt-8 pb-3 md:px-10">
+        <ul className="mb-4 flex items-center justify-center gap-2 flex-wrap">
+          <li><AmexBadge className="h-6 w-[38px]" /></li>
+          <li><DinersBadge className="h-6 w-[38px]" /></li>
+          <li><DiscoverBadge className="h-6 w-[38px]" /></li>
+          <li><JcbBadge className="h-6 w-[38px]" /></li>
+          <li><MastercardBadge className="h-6 w-[38px]" /></li>
+          <li><VisaBadge className="h-6 w-[38px]" /></li>
         </ul>
 
         {/* Bottom Bar: Currency + Powered By on Left, Card Badges on Right matching Image 2 */}
-        <div className="flex flex-col items-center justify-between gap-2 pt-1 md:flex-row">
-          <div className="flex items-center gap-4">
-            <p className="text-[12px] text-black/75">
-              <Link href="/" className="hover:underline">
-                Powered by Sillhouete
-              </Link>
-            </p>
-          </div>
+        <div className="footer-end flex flex-col items-center justify-between gap-3 pt-3 md:flex-row">
+          <p className="footer__small-text text-[12px] text-black/75">
+            <Link href="/" className="hover:underline">
+              Powered by Sillhouete
+            </Link>
+          </p>
 
-          <div className="flex items-center gap-2">
-            {PAYMENT_IMAGES.map((p) => (
-              <div
-                key={p.alt}
-                className="grid h-7 w-11 place-items-center rounded border border-neutral-200 bg-white shadow-2xs"
-              >
-                <Image
-                  src={p.src}
-                  alt={p.alt}
-                  width={34}
-                  height={22}
-                  unoptimized
-                  className="h-[18px] w-auto object-contain"
-                />
-              </div>
-            ))}
+          <div className="payment-icon flex items-center gap-1.5">
+            <div className="img-pay">
+              <Image
+                src="https://cdn.shopify.com/s/files/1/0709/7755/2627/files/mastercard.png?v=1742200774"
+                alt="master-card"
+                width={50}
+                height={30}
+                unoptimized
+                className="h-[26px] w-auto rounded-[5px] border border-[#dddddd94] object-contain p-[2px]"
+              />
+            </div>
+            <div className="img-pay">
+              <Image
+                src="https://cdn.shopify.com/s/files/1/0709/7755/2627/files/visa_484e9393-90e0-4d52-8eae-51193a00143d.png?v=1742200775"
+                alt="visa-card"
+                width={50}
+                height={30}
+                unoptimized
+                className="h-[26px] w-auto rounded-[5px] border border-[#dddddd94] object-contain p-[2px]"
+              />
+            </div>
           </div>
         </div>
       </div>

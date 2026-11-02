@@ -65,6 +65,8 @@ export interface NavLink {
   href: string;
   children?: NavLink[];
   sale?: boolean;
+  blink?: boolean;
+  highlight?: boolean;
 }
 
 export interface HeroSlide {
@@ -99,10 +101,9 @@ export interface OrderItem {
   size: string;
   quantity: number;
   image: string;
+  /** Optional product customization selections saved with the order. */
   dupatta?: string;
   adOn?: string;
-  expedite?: boolean;
-  slip?: string;
 }
 
 export interface OrderShippingAddress {
@@ -120,7 +121,7 @@ export interface OrderShippingAddress {
 
 export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
-export type PaymentMethod = "stripe" | "cod" | "bank_transfer" | "payfast" | "bank_deposit";
+export type PaymentMethod = "stripe" | "cod" | "bank_transfer";
 
 export interface Order {
   id: string;
@@ -153,6 +154,9 @@ export interface Customer {
   name: string;
   email: string;
   phone: string;
+  password?: string;
+  resetToken?: string;
+  resetTokenExpiry?: string;
   createdAt: string;
   ordersCount: number;
   totalSpent: number;
@@ -202,5 +206,10 @@ export interface SiteSettings {
   stripeSecretKey: string;
   stripeEnabled: boolean;
   currency: string;
+  adminEmail?: string;
   adminPasswordHash?: string;
+  bankName?: string;
+  bankAccountTitle?: string;
+  bankIban?: string;
+  discountCodes?: Array<{ code: string; percent: number; active: boolean }>;
 }

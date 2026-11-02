@@ -1,19 +1,77 @@
 import { notFound } from "next/navigation";
-import { FOOTER_LINKS } from "@/data/site";
+import Link from "next/link";
 import ContactFormSection from "./ContactFormSection";
 import FaqAccordion from "./FaqAccordion";
+import livePagesData from "@/data/live-pages-content.json";
+
+const livePages = livePagesData as Record<string, { title: string; html: string }>;
 
 type Props = { params: Promise<{ slug: string }> };
 
 const SLUGS = [
-  "privacy-policy",
+  "locations",
   "policies",
-  "terms-and-conditions",
   "brand-story",
+  "terms-and-conditions",
+  "size-chart",
   "shipping-policy",
   "contact-us",
+  "privacy-policy",
   "faqs",
   "spot",
+  "spotted",
+  "shipping-returns-exchange-refund-policy",
+];
+
+const SPOTTED_ITEMS = [
+  {
+    name: "Rida Khawar",
+    handle: "nargis-rb-06",
+    image: "https://sillhouete.com/cdn/shop/files/Untitled-1_0012_IMG-20251015-WA0040.jpg?v=1760528497&width=600",
+    alt: "Rida Khawar",
+  },
+  {
+    name: "Momina Iqbal",
+    handle: "orange",
+    image: "https://sillhouete.com/cdn/shop/files/Don_t_lose_that_sparkle_that_makes_you___Styling__daniiyah05__Makeup__haseebkhan_4540__Dress__sillhouete.official__Jewellery__ayeshaccessories__7_46f0fbb8-adaf-47f6-91e3-b9cee95ef639.jpg?v=1758789708&width=600",
+    alt: "Momina Iqbal",
+  },
+  {
+    name: "Hina Niazi",
+    handle: "slx-5",
+    image: "https://sillhouete.com/cdn/shop/files/WhatsApp_Image_2025-04-22_at_15.16.00_d01f29aa.webp?v=1758789816&width=600",
+    alt: "Hina Niazi",
+  },
+  {
+    name: "Abeera Riaz",
+    handle: "grey",
+    image: "https://sillhouete.com/cdn/shop/files/web_images_0000_2.jpg?v=1758812672&width=600",
+    alt: "Abeera Riaz",
+  },
+  {
+    name: "Sophia ch",
+    handle: "slx-5",
+    image: "https://sillhouete.com/cdn/shop/files/1_af93ee57-224a-4ebb-af63-11eaaa371e90.jpg?v=1759820897&width=600",
+    alt: "Sophia ch",
+  },
+  {
+    name: "Sophia ch",
+    handle: "orange",
+    image: "https://sillhouete.com/cdn/shop/files/WhatsApp_Image_2025-03-24_at_10.55.48_9d6827e0.webp?v=1758789837&width=600",
+    alt: "Sophia ch",
+  },
+  {
+    name: "Fiza Ali",
+    handle: "noor-jahan-d-8",
+    image: "https://sillhouete.com/cdn/shop/files/IMG_5194.webp?v=1758789837&width=600",
+    alt: "Fiza Ali",
+  },
+  {
+    name: "Fiza Ali",
+    handle: "jacket-1-sj-3",
+    image: "https://sillhouete.com/cdn/shop/files/WhatsApp_Image_2025-03-14_at_14.09.28_7eb91c72.webp?v=1758789817&width=600",
+    alt: "Fiza Ali",
+  },
 ];
 
 export function generateStaticParams() {
@@ -23,14 +81,19 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const titles: Record<string, string> = {
+    locations: "Store Locations – Flagship Studios & Stockists",
     "privacy-policy": "Privacy Policy",
     policies: "Made-to-Order, Exchange & Refund Policy",
     "terms-and-conditions": "Terms and Conditions",
+    "size-chart": "Size Chart & Measurement Guide",
     "brand-story": "Brand Story – Luxury Pret Fashion Heritage",
     "shipping-policy": "Shipping Policy – Delivery & Worldwide Shipping",
     "contact-us": "Contact Us – Customer Support & Studio Inquiries",
     faqs: "Frequently Asked Questions (FAQs)",
-    spot: "Spotted – Celebrities in Sillhouete",
+    spot: "check out the celebrities`s spotts in the dresses – Sillhouete",
+    spotted: "check out the celebrities`s spotts in the dresses – Sillhouete",
+    "shipping-returns-exchange-refund-policy":
+      "Shipping, Returns, Exchange & Refund Policy",
   };
   return { title: `${titles[slug] || "Information"} – Sillhouete` };
 }
@@ -42,8 +105,16 @@ export default async function InfoPage({ params }: Props) {
     notFound();
   }
 
+  const normalizedSlug = slug === "spotted" ? "spot" : slug;
+  const liveData = livePages[normalizedSlug];
+
   return (
-    <article className="mx-auto w-full max-w-[1000px] px-5 py-12 md:py-16">
+    <article
+      className={`mx-auto w-full ${
+        normalizedSlug === "spot" ? "max-w-[1240px]" : "max-w-[1050px]"
+      } px-4 py-8 md:px-8 md:py-14`}
+    >
+      {/* 1. Contact Us Page */}
       {slug === "contact-us" && (
         <div>
           <h1 className="heading mb-3 text-center text-[28px] md:text-[36px]">Contact Us</h1>
@@ -108,232 +179,7 @@ export default async function InfoPage({ params }: Props) {
         </div>
       )}
 
-      {slug === "brand-story" && (
-        <div className="space-y-8 text-[15px] leading-relaxed text-black/85">
-          <header className="text-center border-b border-line pb-8">
-            <p className="text-xs uppercase tracking-widest text-black/60">Our Heritage &amp; Craft</p>
-            <h1 className="heading mt-2 text-[30px] md:text-[40px]">Brand Story</h1>
-          </header>
-
-          <div className="mx-auto max-w-2xl space-y-6">
-            <div className="bg-soft p-6 border-l-2 border-black italic text-black/90">
-              &ldquo;SILLHOUETE was born out of a passion for preserving the rich heritage of Pakistani bridal wear while catering to the evolving needs of modern women.&rdquo;
-            </div>
-
-            <section className="space-y-3">
-              <h2 className="heading text-[20px] text-black">Understanding The Brand</h2>
-              <ul className="list-disc pl-5 space-y-2 text-sm">
-                <li><strong>Niche:</strong> Bridal wear, high formal, formal, luxury pret, and festive occasion wear.</li>
-                <li><strong>Target Audience:</strong> Modern women, discerning brides, and families seeking refined elegance.</li>
-                <li><strong>Brand Values:</strong> Exquisite craftsmanship, authentic Pakistani heritage, contemporary cuts, and unmatched convenience.</li>
-                <li><strong>Unique Selling Proposition (USP):</strong> Affordable, modern cuts and ready-to-wear bridal dresses delivered globally on short notices for busy brides.</li>
-                <li><strong>Brand Personality:</strong> Luxury, elegance, and tradition with an innovative modern twist.</li>
-              </ul>
-            </section>
-
-            <section className="space-y-3">
-              <h2 className="heading text-[20px] text-black">The Storyline</h2>
-              <p>
-                Founded in 2005, SILLHOUETE has become synonymous with exquisite craftsmanship, luxurious fabrics, and innovative designs. Each creation represents an ode to timeless South Asian couture, revitalized for contemporary women worldwide.
-              </p>
-              <p>
-                In a world where time is often of the essence, our commitment to providing ready-to-wear bridal and luxury formal dresses has revolutionized the industry. By offering a diverse range of silhouettes—from traditional Angrakhas and peshwas to sleek modern tunics—SILLHOUETE empowers women to discover their dream look without compromising on quality or schedule.
-              </p>
-              <p>
-                Each SILLHOUETE creation is a testament to our dedication to excellence. From intricate handmade Ada work and costly zardozi threadwork to flawless master tailoring, every detail is meticulously handcrafted in our Lahore studio to ensure the wearer feels regal, confident, and unforgettable.
-              </p>
-            </section>
-
-            <section className="space-y-3">
-              <h2 className="heading text-[20px] text-black">Our Core Pillars</h2>
-              <div className="grid gap-4 sm:grid-cols-3 pt-2 text-xs">
-                <div className="border border-line p-4 bg-soft">
-                  <strong className="block text-sm mb-1 text-black">Heritage &amp; Innovation</strong>
-                  Seamlessly blending centuries-old Pakistani aesthetics with modern cuts and comfortable fabrics.
-                </div>
-                <div className="border border-line p-4 bg-soft">
-                  <strong className="block text-sm mb-1 text-black">Convenience &amp; Quality</strong>
-                  Ready-to-wear bridal dresses available with rapid worldwide delivery to save busy brides valuable time.
-                </div>
-                <div className="border border-line p-4 bg-soft">
-                  <strong className="block text-sm mb-1 text-black">Empowerment &amp; Poise</strong>
-                  Crafting ensembles that allow women to celebrate their most sacred moments with effortless confidence.
-                </div>
-              </div>
-            </section>
-          </div>
-        </div>
-      )}
-
-      {slug === "shipping-policy" && (
-        <div className="space-y-8 text-[15px] leading-relaxed text-black/85">
-          <header className="text-center border-b border-line pb-8">
-            <h1 className="heading text-[30px] md:text-[38px]">Shipping Policy</h1>
-            <p className="mt-2 text-xs text-black/60 uppercase tracking-widest">
-              Worldwide Delivery &amp; Transit Timelines
-            </p>
-          </header>
-
-          <div className="mx-auto max-w-2xl space-y-6 text-sm">
-            <p>
-              We are committed to ensuring a seamless shopping experience for all our patrons across Pakistan and around the world. Below are the details of our shipping policies:
-            </p>
-
-            <div className="border border-line p-5 bg-soft space-y-2">
-              <h2 className="heading text-[16px]">Processing Time</h2>
-              <ul className="list-disc pl-5 space-y-1 text-xs">
-                <li><strong>Ready-to-wear orders:</strong> Processed and dispatched within 1–3 business days (excluding weekends and official holidays).</li>
-                <li><strong>Custom or Made-to-Order items:</strong> Require bespoke production time (typically 2–4 weeks for formals and 4–8 weeks for bridals), as conveyed by our concierge team upon booking.</li>
-              </ul>
-            </div>
-
-            <div className="border border-line p-5 bg-soft space-y-2">
-              <h2 className="heading text-[16px]">Shipping Options &amp; Delivery Timelines</h2>
-              <ul className="list-disc pl-5 space-y-1 text-xs">
-                <li><strong>Domestic Shipping (Pakistan):</strong> Delivery within 3–5 business days via trusted couriers (TCS / Call Courier). Standard flat rate of Rs. 250 (Free for orders Rs. 140,000+).</li>
-                <li><strong>International Shipping:</strong> Delivery within 7–14 business days depending on destination via DHL Express or FedEx. Tracking is provided upon dispatch.</li>
-              </ul>
-            </div>
-
-            <div className="border border-line p-5 bg-soft space-y-2">
-              <h2 className="heading text-[16px]">Tracking &amp; Customs Duties</h2>
-              <ul className="list-disc pl-5 space-y-1 text-xs">
-                <li>Once your order ships, an active tracking number is sent to your registered email and WhatsApp.</li>
-                <li>For international shipments, customs duties or local taxes (if applicable) are determined by destination country authorities and remain the responsibility of the recipient.</li>
-                <li>Please ensure your shipping address and contact telephone are accurate to prevent delivery delays.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {slug === "policies" && (
-        <div className="space-y-8 text-[15px] leading-relaxed text-black/85">
-          <header className="text-center border-b border-line pb-8">
-            <h1 className="heading text-[30px] md:text-[38px]">Policies</h1>
-            <p className="mt-2 text-xs text-black/60 uppercase tracking-widest">
-              Made-to-Order, Exchange, Refund &amp; Cancellation Terms
-            </p>
-          </header>
-
-          <div className="mx-auto max-w-2xl space-y-6 text-sm">
-            <section className="border border-line p-6 bg-soft space-y-3">
-              <h2 className="heading text-[17px]">Order Cancellation &amp; Refund Policy</h2>
-              <p className="text-xs">
-                <strong>For Made-to-Order Purchases:</strong> You can cancel your order within 24 hours of purchase without deduction, and your amount will be refunded to your given bank account. After 24 hours, raw materials and artisanal work are allocated, so paid advance deposits are non-refundable.
-              </p>
-              <p className="text-xs">
-                <strong>For Ready-to-Wear Purchases:</strong> Orders can be cancelled within 24 hours of purchase subject to a 10% administrative processing fee. The remainder will be credited back to your original payment method. After 24 hours, orders cannot be cancelled once processed for dispatch.
-              </p>
-              <p className="text-xs">
-                To cancel, contact customer care via email at <strong>info@sillhouete.com</strong> or WhatsApp at <strong>+92 331 0397865</strong>.
-              </p>
-            </section>
-
-            <section className="border border-line p-6 bg-soft space-y-3">
-              <h2 className="heading text-[17px]">Exchanges Policy</h2>
-              <ul className="list-disc pl-5 space-y-1 text-xs">
-                <li>Products cannot be exchanged at our physical retail locations.</li>
-                <li>We offer exchanges strictly if the article delivered is faulty, damaged in transit, or different from the ordered specifications.</li>
-                <li>Discounted and sale items are final sale and non-exchangeable unless incorrect goods were delivered.</li>
-                <li>To initiate an exchange, provide your order number and photographs within 48 hours of receiving the parcel.</li>
-              </ul>
-            </section>
-
-            <section className="border border-line p-6 bg-soft space-y-3">
-              <h2 className="heading text-[17px]">Made-to-Order Terms</h2>
-              <ul className="list-disc pl-5 space-y-1 text-xs">
-                <li>A 50% advance deposit is required to process bespoke formal wear, and 100% full payment for ready-to-wear articles.</li>
-                <li>No design, color, or measurement modifications can be accommodated after 24 hours of placing the order.</li>
-                <li>Full payment settlement is required prior to parcel dispatch from our Lahore facility.</li>
-              </ul>
-            </section>
-          </div>
-        </div>
-      )}
-
-      {slug === "terms-and-conditions" && (
-        <div className="space-y-8 text-[15px] leading-relaxed text-black/85">
-          <header className="text-center border-b border-line pb-8">
-            <h1 className="heading text-[30px] md:text-[38px]">Terms &amp; Conditions</h1>
-            <p className="mt-2 text-xs text-black/60 uppercase tracking-widest">
-              Website Usage, Pricing &amp; Service Agreement
-            </p>
-          </header>
-
-          <div className="mx-auto max-w-2xl space-y-6 text-sm">
-            <section className="space-y-2">
-              <h2 className="heading text-[16px]">1. General Overview</h2>
-              <p className="text-xs text-black/80">
-                This website is operated by Sillhouete. Throughout the site, the terms &ldquo;we&rdquo;, &ldquo;us&rdquo; and &ldquo;our&rdquo; refer to Sillhouete. By visiting our site or purchasing from us, you engage in our &ldquo;Service&rdquo; and agree to be bound by the following terms and conditions.
-              </p>
-            </section>
-
-            <section className="space-y-2">
-              <h2 className="heading text-[16px]">2. Accuracy of Product Colors &amp; Craftsmanship</h2>
-              <p className="text-xs text-black/80">
-                We make every effort to display the colors, textures, and embroidery details of our apparel as accurately as possible. However, because computer monitors and mobile displays vary, slight tonal nuances may occur. Each handcrafted outfit features hand-embroidery (Ada work) which naturally exhibits unique artisanal charm.
-              </p>
-            </section>
-
-            <section className="space-y-2">
-              <h2 className="heading text-[16px]">3. Pricing &amp; Currency</h2>
-              <p className="text-xs text-black/80">
-                Prices for our products are subject to change without notice. All transactions are billed in PKR or converted dynamically according to standard daily bank exchange rates. We reserve the right at any time to modify or discontinue any product line.
-              </p>
-            </section>
-
-            <section className="space-y-2">
-              <h2 className="heading text-[16px]">4. Intellectual Property</h2>
-              <p className="text-xs text-black/80">
-                All designs, logos, images, graphics, and textual content on this website are the intellectual property of Sillhouete. Unauthorized duplication, re-sale, or reproduction is strictly prohibited.
-              </p>
-            </section>
-          </div>
-        </div>
-      )}
-
-      {slug === "privacy-policy" && (
-        <div className="space-y-8 text-[15px] leading-relaxed text-black/85">
-          <header className="text-center border-b border-line pb-8">
-            <h1 className="heading text-[30px] md:text-[38px]">Privacy Policy</h1>
-            <p className="mt-2 text-xs text-black/60 uppercase tracking-widest">
-              Data Protection &amp; Customer Privacy
-            </p>
-          </header>
-
-          <div className="mx-auto max-w-2xl space-y-6 text-sm">
-            <p>
-              At Sillhouete, we take the confidentiality of your personal data with the utmost responsibility. This Privacy Policy details how your personal information is gathered, utilized, and safeguarded.
-            </p>
-
-            <section className="border border-line p-5 bg-soft space-y-2">
-              <h2 className="heading text-[16px]">Information We Collect</h2>
-              <p className="text-xs text-black/80">
-                When you make a purchase or create an account, we collect necessary information including your name, billing address, shipping address, payment information (encrypted via Stripe), email address, and phone number.
-              </p>
-            </section>
-
-            <section className="border border-line p-5 bg-soft space-y-2">
-              <h2 className="heading text-[16px]">How We Use Your Personal Data</h2>
-              <ul className="list-disc pl-5 space-y-1 text-xs text-black/80">
-                <li>To fulfill orders, process payments, and coordinate delivery with couriers.</li>
-                <li>To communicate with you regarding order milestones, tracking, and inquiries.</li>
-                <li>To detect and prevent fraudulent transactions.</li>
-                <li>With your consent, to provide curated announcements and festive collection previews.</li>
-              </ul>
-            </section>
-
-            <section className="border border-line p-5 bg-soft space-y-2">
-              <h2 className="heading text-[16px]">Payment Security</h2>
-              <p className="text-xs text-black/80">
-                All credit and debit card payments are handled securely through PCI-DSS compliant direct payment gateways (Stripe). Your card credentials are never stored on our servers.
-              </p>
-            </section>
-          </div>
-        </div>
-      )}
-
+      {/* 2. FAQs Page */}
       {slug === "faqs" && (
         <div>
           <header className="text-center border-b border-line pb-8 mb-8">
@@ -348,72 +194,141 @@ export default async function InfoPage({ params }: Props) {
         </div>
       )}
 
-      {slug === "spot" && (
-        <div className="space-y-10">
-          <header className="text-center border-b border-line pb-8">
-            <h1 className="heading text-[30px] md:text-[40px]">Spotted In Sillhouete</h1>
-            <p className="mt-2 text-xs text-black/60 uppercase tracking-widest">
-              Celebrities, Influencers &amp; Real Brides Dressed in Our Signature Coutures
-            </p>
-          </header>
+      {/* 3. Spotted Page */}
+      {(normalizedSlug === "spot") && (
+        <div className="spotted-section">
+          <h2 className="spotted-title">Spotted</h2>
 
-          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-            {[
-              {
-                title: "Maya Ali in Iris Royal Blue",
-                event: "Hum Style Awards",
-                image: "https://sillhouete.com/cdn/shop/files/sillhouete-formal-iris-royal-blue-intricate-embroidery.jpg?v=1776742287",
-                quote: "The intricate threadwork and regal silhouette made me feel completely divine.",
-              },
-              {
-                title: "Sajal Aly in Freya Sublime Lilac",
-                event: "Festive Eid Gala",
-                image: "https://sillhouete.com/cdn/shop/files/sillhouete-formal-dress-sublime-Lilac-intricate-embroidery.jpg?v=1776332402",
-                quote: "Pure effortless glamour. The hand embroidery on the sleeves is pure poetry.",
-              },
-              {
-                title: "Hania Aamir in Camilla Mocha Brown",
-                event: "Celebrity Dinner Lahore",
-                image: "https://sillhouete.com/cdn/shop/files/sillhouete-formal-dress-chamilla-mocha-brown-intricate-embroidery-front.jpg?v=1776332401",
-                quote: "Sillhouete knows how to drape the modern woman with understated royalty.",
-              },
-              {
-                title: "Yumna Zaidi in Maraki Light Grey",
-                event: "Award Night Red Carpet",
-                image: "https://sillhouete.com/cdn/shop/files/sillhouete-formal-dress-meraki-light-grey-sequins.jpg?v=1769691351",
-                quote: "The subtle shimmer and flawless cut made this my favorite outfit of the season.",
-              },
-              {
-                title: "Dur-e-Fishan in Ayzel Ivory",
-                event: "Nikkah Ceremony",
-                image: "https://sillhouete.com/cdn/shop/files/sillhouete-formal-dress-ayzel-ivory-delicate-embroidery.jpg?v=1768978410",
-                quote: "The silver detailing on pure ivory is unmatched. Timeless elegance at its finest.",
-              },
-              {
-                title: "Ayeza Khan in Layl Festive Red",
-                event: "Bridal Couture Showcase",
-                image: "https://sillhouete.com/cdn/shop/files/sillhouete-formal-dress-layal-red-exquisite-embroidery-front.jpg?v=1768978807",
-                quote: "Classic bridal heritage crafted with such modern comfort and poise.",
-              },
-            ].map((spot) => (
-              <div key={spot.title} className="border border-line bg-soft overflow-hidden group">
-                <div className="relative aspect-[3/4] w-full overflow-hidden">
+          <div className="spotted-grid">
+            {SPOTTED_ITEMS.map((item, idx) => (
+              <div key={idx} className="spotted-item">
+                <Link href={`/products/${item.handle}`} className="spotted-image-link">
                   <img
-                    src={spot.image}
-                    alt={spot.title}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    src={item.image}
+                    alt={item.alt}
+                    loading={idx < 4 ? "eager" : "lazy"}
                   />
-                  <div className="absolute bottom-2 left-2 rounded bg-black/80 px-2.5 py-1 text-[11px] font-semibold text-white">
-                    {spot.event}
-                  </div>
-                </div>
-                <div className="p-4 space-y-2">
-                  <h3 className="font-semibold text-sm uppercase tracking-wide">{spot.title}</h3>
-                  <p className="text-xs text-black/70 italic">&ldquo;{spot.quote}&rdquo;</p>
+                </Link>
+                <div className="spotted-content">
+                  <h3>{item.name}</h3>
+                  <Link href={`/products/${item.handle}`} className="shop-now-btn">
+                    Shop Now
+                  </Link>
                 </div>
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* 4. Locations Page */}
+      {slug === "locations" && (
+        <div className="space-y-8">
+          <header className="text-center border-b border-line pb-8">
+            <h1 className="heading text-[30px] md:text-[38px]">Our Locations</h1>
+            <p className="mt-2 text-xs text-black/60 uppercase tracking-widest">
+              Flagship Studio, Retail Outlets &amp; Stockists
+            </p>
+          </header>
+
+          <div className="grid gap-8 md:grid-cols-2">
+            <div className="space-y-6">
+              <div className="border border-line p-6 bg-soft space-y-2">
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#9b8065]">Flagship Studio</span>
+                <h2 className="heading text-[18px]">Lahore Flagship Studio</h2>
+                <p className="text-sm text-black/80">
+                  📍 327 B, Street 7, Cavalry Ground, Lahore, Pakistan.
+                </p>
+                <p className="text-xs text-black/60 pt-2">
+                  For appointments &amp; bespoke consultations: <a href="tel:+923310397865" className="underline font-semibold">+92 331 0397865</a>
+                </p>
+              </div>
+
+              <div className="border border-line p-6 space-y-4 text-sm">
+                <h3 className="heading text-[15px] border-b border-line pb-2">Authorized Stockists</h3>
+                
+                <div>
+                  <strong className="block text-black">LAHORE – PFDC</strong>
+                  <p className="text-black/75">Mall-1, 94-D/1, Main Boulevard, Block D-1 Gulberg III, Lahore.</p>
+                </div>
+
+                <div>
+                  <strong className="block text-black">LAHORE – FPL</strong>
+                  <p className="text-black/75">165-P College Road, Block P, Gulberg II, Lahore. 📞 042-35762884</p>
+                </div>
+
+                <div>
+                  <strong className="block text-black">KARACHI – FPL</strong>
+                  <p className="text-black/75">Mezzanine Floor, Inside Allure Beauty, next to LAMA &amp; Walkeaze, Dolmen Mall Clifton. 📞 021-35293967</p>
+                </div>
+
+                <div>
+                  <strong className="block text-black">RAWALPINDI – FPL</strong>
+                  <p className="text-black/75">30-A Giga Mall Rawalpindi. 📞 051-2725624</p>
+                </div>
+
+                <div>
+                  <strong className="block text-black">MULTAN – FPL</strong>
+                  <p className="text-black/75">94-A, Gulgasht Colony, Pizza Hut Road, Opposite Punjab College, Multan. 📞 061-6510386-7</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="border border-line overflow-hidden bg-soft flex flex-col items-center justify-center min-h-[350px]">
+              <iframe
+                loading="lazy"
+                title="Sillhouete Lahore Studio Map"
+                style={{ border: 0, width: "100%", height: "100%", minHeight: "420px" }}
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29946.235449935975!2d74.34133967848776!3d31.50564512196947!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x391905c9f519fe6d%3A0x52e02dc912ab5e8c!2s327b%20Street%207%2C%20Cavalry%20Ground%2C%20Lahore%2C%20Punjab%2C%20Pakistan!5e0!3m2!1sen!2s!4v1722237002682!5m2!1sen!2s"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5. Size Chart Page */}
+      {slug === "size-chart" && (
+        <div className="space-y-8">
+          <header className="text-center border-b border-line pb-8">
+            <h1 className="heading text-[30px] md:text-[38px]">Size Chart</h1>
+            <p className="mt-2 text-xs text-black/60 uppercase tracking-widest">
+              Standard Measurements in Inches &amp; Custom Sizing Guidelines
+            </p>
+          </header>
+
+          {liveData?.html ? (
+            <div
+              className="page-rte overflow-x-auto"
+              dangerouslySetInnerHTML={{ __html: liveData.html }}
+            />
+          ) : null}
+        </div>
+      )}
+
+      {/* 6. Comprehensive Policies and Other Information Pages */}
+      {normalizedSlug !== "contact-us" && normalizedSlug !== "faqs" && normalizedSlug !== "spot" && normalizedSlug !== "locations" && normalizedSlug !== "size-chart" && (
+        <div className="space-y-8">
+          <header className="text-center border-b border-line pb-8">
+            <h1 className="heading text-[30px] md:text-[38px] capitalize">
+              {liveData?.title || slug.replace(/-/g, " ")}
+            </h1>
+            <p className="mt-2 text-xs text-black/60 uppercase tracking-widest">
+              Sillhouete Customer Information &amp; Official Policies
+            </p>
+          </header>
+
+          {liveData?.html ? (
+            <div
+              className="page-rte leading-[1.7] text-[#222222]"
+              dangerouslySetInnerHTML={{ __html: liveData.html }}
+            />
+          ) : (
+            <p className="text-center text-sm text-black/70">
+              Information for this page is being updated.
+            </p>
+          )}
         </div>
       )}
     </article>

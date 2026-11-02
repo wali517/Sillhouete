@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import ProductCard from "@/components/products/ProductCard";
 import type { Product } from "@/types";
 import { SlidersHorizontal, X, ChevronDown, RotateCcw } from "lucide-react";
@@ -53,29 +53,18 @@ export default function CollectionViewer({
   title,
   initialProducts,
   isSalePage = false,
+  initialPage = 1,
 }: {
   title: string;
   initialProducts: Product[];
   isSalePage?: boolean;
+  initialPage?: number;
 }) {
   const [productsList, setProductsList] = useState<Product[]>(initialProducts);
-
-  useEffect(() => {
-    // Fetch live products from DB in case admin created or edited items
-    fetch("/api/products")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data && data.products && Array.isArray(data.products)) {
-          // Merge newly created products from admin into the list
-          const existingIds = new Set(initialProducts.map((p) => p.id));
-          const newFromAdmin = data.products.filter((p: Product) => !existingIds.has(p.id));
-          if (newFromAdmin.length > 0) {
-            setProductsList([...newFromAdmin, ...initialProducts]);
-          }
-        }
-      })
-      .catch(() => {});
-  }, [initialProducts]);
+  const gridTopRef = useRef<HTMLDivElement>(null);
+  // Pagination state (28 products per page on Sale page, 60 per page on other collections matching live)
+  const [currentPage, setCurrentPage] = useState<number>(initialPage || 1);
+  const itemsPerPage = isSalePage ? 28 : 60;
 
   // Sort state
   const [sort, setSort] = useState<SortOption>(isSalePage ? "featured" : "relevant");
@@ -87,7 +76,7 @@ export default function CollectionViewer({
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 
-  // Accordion open states (default closed, click to open, compact spacing)
+  // Accordion open states (default closed, click to open)
   const [openSections, setOpenSections] = useState({
     price: false,
     size: false,
@@ -130,6 +119,11 @@ export default function CollectionViewer({
     selectedSizes.length > 0 ||
     selectedStyles.length > 0;
 
+  // Reset to page 1 whenever filters or sorting change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [sort, maxPrice, selectedColors, selectedSizes, selectedStyles]);
+
   // Lock body scroll when drawer is open
   useEffect(() => {
     if (filterDrawerOpen) {
@@ -152,7 +146,6 @@ export default function CollectionViewer({
       const sizes = p.sizes || [];
       for (const opt of SIZE_OPTIONS) {
         if (opt.key === "0") {
-          // Default variant count
           counts["0"] += 1;
         } else if (
           sizes.some((s) => s.toLowerCase() === opt.key.toLowerCase()) ||
@@ -187,10 +180,8 @@ export default function CollectionViewer({
   // Filter products
   const filteredProducts = useMemo(() => {
     return productsList.filter((p) => {
-      // Price
       if (p.price > maxPrice) return false;
 
-      // Color filter
       if (selectedColors.length > 0) {
         const textToSearch = `${p.title} ${p.description || ""} ${p.color || ""}`.toLowerCase();
         const matchesAnyColor = selectedColors.some((c) =>
@@ -199,7 +190,6 @@ export default function CollectionViewer({
         if (!matchesAnyColor) return false;
       }
 
-      // Size filter
       if (selectedSizes.length > 0) {
         const productSizes = p.sizes || [];
         const matchesSize = selectedSizes.some(
@@ -211,7 +201,6 @@ export default function CollectionViewer({
         if (!matchesSize) return false;
       }
 
-      // Style filter
       if (selectedStyles.length > 0) {
         const text = `${p.title} ${p.description || ""} ${p.category || ""}`.toLowerCase();
         const matchesStyle = selectedStyles.some(
@@ -222,7 +211,7 @@ export default function CollectionViewer({
 
       return true;
     });
-  }, [initialProducts, maxPrice, selectedColors, selectedSizes, selectedStyles]);
+  }, [productsList, maxPrice, selectedColors, selectedSizes, selectedStyles]);
 
   // Sort products
   const sortedProducts = useMemo(() => {
@@ -247,19 +236,44 @@ export default function CollectionViewer({
     }
   }, [filteredProducts, sort]);
 
-  // Reusable Filter Sections matching uploaded screenshots exactly (compact spacing)
+  // Pagination calculation
+  const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
+  const activePage = Math.min(Math.max(currentPage, 1), totalPages || 1);
+
+  const paginatedProducts = useMemo(() => {
+    const start = (activePage - 1) * itemsPerPage;
+    return sortedProducts.slice(start, start + itemsPerPage);
+  }, [sortedProducts, activePage, itemsPerPage]);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (newPage === 1) {
+        url.searchParams.delete("page");
+      } else {
+        url.searchParams.set("page", String(newPage));
+      }
+      window.history.pushState(null, "", url.toString());
+    }
+    if (gridTopRef.current) {
+      gridTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  // Reusable Filter Sections (matching Image 3 & live site)
   const FilterAccordionContent = (
-    <div className="divide-y divide-[#e5e5e5] text-sm">
+    <div className="divide-y divide-[#e8e8e1] text-sm">
       {/* 1. PRICE */}
-      <div className="py-2.5">
+      <div className="py-3">
         <button
           type="button"
           onClick={() => toggleSection("price")}
-          className="flex w-full items-center justify-between text-[13px] font-serif uppercase tracking-[0.25em] text-[#111111] hover:text-black py-0.5"
+          className="flex w-full items-center justify-between text-[12px] font-serif uppercase tracking-[0.22em] text-[#111111] hover:text-black py-0.5"
         >
           <span>P R I C E</span>
           <ChevronDown
-            className={`h-3.5 w-3.5 text-[#111111] transition-transform duration-200 ${
+            className={`h-3 w-3 text-[#111111] transition-transform duration-200 ${
               openSections.price ? "rotate-180" : ""
             }`}
           />
@@ -267,7 +281,7 @@ export default function CollectionViewer({
 
         {openSections.price && (
           <div className="mt-3 space-y-2">
-            <div className="flex items-center justify-between font-serif text-[14px] text-[#111111]">
+            <div className="flex items-center justify-between font-serif text-[13px] text-[#111111]">
               <span>Rs.0</span>
               <span>Rs.{maxPrice.toLocaleString()}</span>
             </div>
@@ -288,15 +302,15 @@ export default function CollectionViewer({
       </div>
 
       {/* 2. SIZE */}
-      <div className="py-2.5">
+      <div className="py-3">
         <button
           type="button"
           onClick={() => toggleSection("size")}
-          className="flex w-full items-center justify-between text-[13px] font-serif uppercase tracking-[0.25em] text-[#111111] hover:text-black py-0.5"
+          className="flex w-full items-center justify-between text-[12px] font-serif uppercase tracking-[0.22em] text-[#111111] hover:text-black py-0.5"
         >
           <span>S I Z E</span>
           <ChevronDown
-            className={`h-3.5 w-3.5 text-[#111111] transition-transform duration-200 ${
+            className={`h-3 w-3 text-[#111111] transition-transform duration-200 ${
               openSections.size ? "rotate-180" : ""
             }`}
           />
@@ -310,13 +324,13 @@ export default function CollectionViewer({
               return (
                 <label
                   key={s.key}
-                  className="flex items-center gap-3 text-[14px] font-serif text-[#111111] cursor-pointer select-none group py-0.5"
+                  className="flex items-center gap-2.5 text-[13px] font-serif text-[#111111] cursor-pointer select-none group py-0.5"
                 >
                   <input
                     type="checkbox"
                     checked={isChecked}
                     onChange={() => toggleSize(s.key)}
-                    className="h-4 w-4 rounded-none border border-black/40 accent-black cursor-pointer"
+                    className="h-3.5 w-3.5 rounded-none border border-black/40 accent-black cursor-pointer"
                   />
                   <span className="group-hover:text-black">
                     {s.label} ({count})
@@ -329,15 +343,15 @@ export default function CollectionViewer({
       </div>
 
       {/* 3. COLOR */}
-      <div className="py-2.5">
+      <div className="py-3">
         <button
           type="button"
           onClick={() => toggleSection("color")}
-          className="flex w-full items-center justify-between text-[13px] font-serif uppercase tracking-[0.25em] text-[#111111] hover:text-black py-0.5"
+          className="flex w-full items-center justify-between text-[12px] font-serif uppercase tracking-[0.22em] text-[#111111] hover:text-black py-0.5"
         >
           <span>C O L O R</span>
           <ChevronDown
-            className={`h-3.5 w-3.5 text-[#111111] transition-transform duration-200 ${
+            className={`h-3 w-3 text-[#111111] transition-transform duration-200 ${
               openSections.color ? "rotate-180" : ""
             }`}
           />
@@ -351,11 +365,10 @@ export default function CollectionViewer({
                 <div
                   key={c.name}
                   onClick={() => toggleColor(c.name)}
-                  className="flex items-center gap-3 cursor-pointer group select-none py-0.5"
+                  className="flex items-center gap-2.5 cursor-pointer group select-none py-0.5"
                 >
-                  {/* Outer circle with gap matching screenshot */}
                   <div
-                    className={`w-6 h-6 rounded-full p-[2px] flex items-center justify-center transition-all ${
+                    className={`w-5 h-5 rounded-full p-[2px] flex items-center justify-center transition-all ${
                       isSelected
                         ? "border border-black"
                         : "border border-neutral-300 group-hover:border-neutral-500"
@@ -371,9 +384,8 @@ export default function CollectionViewer({
                     />
                   </div>
 
-                  {/* Label - underlined when selected matching screenshot */}
                   <span
-                    className={`text-[14px] md:text-[15px] font-serif text-[#111111] transition-all ${
+                    className={`text-[13px] font-serif text-[#111111] transition-all ${
                       isSelected
                         ? "underline underline-offset-4 decoration-1 font-semibold"
                         : "group-hover:text-black"
@@ -389,15 +401,15 @@ export default function CollectionViewer({
       </div>
 
       {/* 4. DRESS STYLE */}
-      <div className="py-2.5">
+      <div className="py-3">
         <button
           type="button"
           onClick={() => toggleSection("dressStyle")}
-          className="flex w-full items-center justify-between text-[13px] font-serif uppercase tracking-[0.25em] text-[#111111] hover:text-black py-0.5"
+          className="flex w-full items-center justify-between text-[12px] font-serif uppercase tracking-[0.22em] text-[#111111] hover:text-black py-0.5"
         >
           <span>D R E S S &nbsp; S T Y L E</span>
           <ChevronDown
-            className={`h-3.5 w-3.5 text-[#111111] transition-transform duration-200 ${
+            className={`h-3 w-3 text-[#111111] transition-transform duration-200 ${
               openSections.dressStyle ? "rotate-180" : ""
             }`}
           />
@@ -411,13 +423,13 @@ export default function CollectionViewer({
               return (
                 <label
                   key={st.key}
-                  className="flex items-center gap-3 text-[14px] font-serif text-[#111111] cursor-pointer select-none group py-0.5"
+                  className="flex items-center gap-2.5 text-[13px] font-serif text-[#111111] cursor-pointer select-none group py-0.5"
                 >
                   <input
                     type="checkbox"
                     checked={isChecked}
                     onChange={() => toggleStyle(st.key)}
-                    className="h-4 w-4 rounded-none border border-black/40 accent-black cursor-pointer"
+                    className="h-3.5 w-3.5 rounded-none border border-black/40 accent-black cursor-pointer"
                   />
                   <span className="group-hover:text-black">
                     {st.label} ({count})
@@ -431,11 +443,11 @@ export default function CollectionViewer({
 
       {/* Reset button if active filters */}
       {hasActiveFilters && (
-        <div className="pt-4">
+        <div className="pt-3">
           <button
             type="button"
             onClick={clearAllFilters}
-            className="flex items-center gap-2 text-xs font-serif uppercase tracking-widest text-black underline hover:text-black/70"
+            className="flex items-center gap-1.5 text-[11px] font-serif uppercase tracking-widest text-black underline hover:text-black/70"
           >
             <RotateCcw className="h-3 w-3" />
             <span>Reset All Filters</span>
@@ -445,36 +457,111 @@ export default function CollectionViewer({
     </div>
   );
 
+  // Pagination Controls matching Image 1 & Image 2 and live Shopify site exactly
+  const PaginationControls = totalPages > 1 ? (
+    <div className="py-[60px] text-center select-none flex items-center justify-center">
+      <div className="flex items-center justify-center">
+        {/* Prev button: square black box with white chevron (hidden on page 1) */}
+        {activePage > 1 ? (
+          <span className="inline-block align-middle mx-[10px] w-[35px] md:w-[43px] h-[35px] md:h-[43px] bg-black text-white">
+            <button
+              type="button"
+              onClick={() => handlePageChange(activePage - 1)}
+              aria-label="Previous page"
+              className="w-full h-full flex items-center justify-center text-white hover:opacity-85 cursor-pointer"
+            >
+              <svg
+                aria-hidden="true"
+                focusable="false"
+                role="presentation"
+                className="w-[12px] md:w-[13px] h-[12px] md:h-[14px] fill-current"
+                viewBox="0 0 284.49 498.98"
+              >
+                <path d="M249.49 0a35 35 0 0 1 24.75 59.75L84.5 249.49l189.74 189.74a35.002 35.002 0 0 1-49.5 49.5L10.25 274.24a35 35 0 0 1 0-49.5L224.74 10.25A34.89 34.89 0 0 1 249.49 0Z" />
+              </svg>
+            </button>
+          </span>
+        ) : null}
+
+        {/* Page numbers */}
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
+          const isCurrent = p === activePage;
+          return isCurrent ? (
+            <span
+              key={p}
+              className="inline-block align-middle px-[12px] py-[8px] font-serif text-[16px] md:text-[18px] opacity-30 cursor-default select-none text-black"
+              aria-current="page"
+            >
+              {p}
+            </span>
+          ) : (
+            <span key={p} className="inline-block align-middle">
+              <button
+                type="button"
+                onClick={() => handlePageChange(p)}
+                className="inline-block px-[12px] py-[8px] font-serif text-[16px] md:text-[18px] text-[#111111] hover:text-[#0056b3] transition-colors cursor-pointer"
+              >
+                {p}
+              </button>
+            </span>
+          );
+        })}
+
+        {/* Next button: square black box with white chevron (hidden on last page) */}
+        {activePage < totalPages ? (
+          <span className="inline-block align-middle mx-[10px] w-[35px] md:w-[43px] h-[35px] md:h-[43px] bg-black text-white">
+            <button
+              type="button"
+              onClick={() => handlePageChange(activePage + 1)}
+              aria-label="Next page"
+              className="w-full h-full flex items-center justify-center text-white hover:opacity-85 cursor-pointer"
+            >
+              <svg
+                aria-hidden="true"
+                focusable="false"
+                role="presentation"
+                className="w-[12px] md:w-[13px] h-[12px] md:h-[14px] fill-current"
+                viewBox="0 0 284.49 498.98"
+              >
+                <path d="M35 498.98a35 35 0 0 1-24.75-59.75l189.74-189.74L10.25 59.75a35.002 35.002 0 0 1 49.5-49.5l214.49 214.49a35 35 0 0 1 0 49.5L59.75 488.73A34.89 34.89 0 0 1 35 498.98Z" />
+              </svg>
+            </button>
+          </span>
+        ) : null}
+      </div>
+    </div>
+  ) : null;
+
   return (
-    <div>
+    <div ref={gridTopRef}>
       {/* ---------------------------------------------------- */}
-      {/* CASE 1: SILLHOUETE SALE PAGE (media_1792667744429)  */}
+      {/* CASE 1: SILLHOUETE SALE PAGE (Image 3)               */}
       {/* ---------------------------------------------------- */}
       {isSalePage ? (
         <div>
           {/* Main Sale Layout: Persistent Left Sidebar + Right Products Grid */}
-          <div className="flex items-start gap-8 lg:gap-12">
-            {/* Desktop Persistent Left Sidebar */}
-            <aside className="hidden md:block w-64 shrink-0 sticky top-28 self-start pr-4">
+          <div className="flex items-start gap-6 lg:gap-10">
+            {/* Desktop Persistent Left Sidebar matching Image 3 */}
+            <aside className="hidden md:block w-[205px] lg:w-[225px] shrink-0 sticky top-24 self-start pr-2">
               {FilterAccordionContent}
             </aside>
 
             {/* Right Product Grid Area */}
             <div className="flex-1 min-w-0">
-              {/* Top Subheader: Products Count on Left, Sort on Right */}
-              <div className="mb-6 flex items-center justify-between border-b border-[#e5e5e5] pb-4">
+              {/* Top Subheader: Products Count on Left, Sort on Right (Image 3) */}
+              <div className="mb-6 flex items-center justify-between pb-3">
                 <div className="flex items-center gap-3">
                   {/* Mobile Filter Button for Sale Page */}
                   <button
                     type="button"
                     onClick={() => setFilterDrawerOpen(true)}
-                    className="flex md:hidden items-center gap-2 border border-black/30 bg-white px-3.5 py-1.5 text-xs font-serif uppercase tracking-wider text-black hover:border-black transition-colors"
+                    className="flex md:hidden items-center gap-2 border border-[#e8e8e1] bg-white px-3.5 py-1.5 text-xs font-serif uppercase tracking-wider text-black hover:border-black transition-colors"
                   >
                     <SlidersHorizontal className="h-3.5 w-3.5" />
                     <span>Filter</span>
                   </button>
 
-                  <span className="font-serif text-[15px] text-[#111111]">
+                  <span className="font-serif text-[13px] md:text-[14px] text-[#111111]">
                     {sortedProducts.length} products
                   </span>
                 </div>
@@ -484,7 +571,7 @@ export default function CollectionViewer({
                   <select
                     value={sort}
                     onChange={(e) => setSort(e.target.value as SortOption)}
-                    className="appearance-none border border-black/30 bg-white pl-4 pr-9 py-2 text-xs font-serif tracking-wider text-black outline-none cursor-pointer focus:border-black"
+                    className="appearance-none border border-[#e8e8e1] bg-white pl-3.5 pr-8 py-1.5 text-xs font-serif tracking-wider text-[#111111] outline-none cursor-pointer focus:border-black"
                   >
                     <option value="featured">Featured</option>
                     <option value="best-selling">Best selling</option>
@@ -494,15 +581,15 @@ export default function CollectionViewer({
                     <option value="price-desc">Price, high to low</option>
                     <option value="newest">Date, new to old</option>
                   </select>
-                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-black/70" />
+                  <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-black/70" />
                 </div>
               </div>
 
-              {/* 4-Column Product Grid */}
-              {sortedProducts.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                  {sortedProducts.map((p) => (
-                    <ProductCard key={p.id} product={p} isSale={true} />
+              {/* 4-Column Product Grid (Image 3) */}
+              {paginatedProducts.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 md:gap-x-4 md:gap-y-8">
+                  {paginatedProducts.map((p, i) => (
+                    <ProductCard key={p.id} product={p} isSale={true} index={i} />
                   ))}
                 </div>
               ) : (
@@ -519,32 +606,35 @@ export default function CollectionViewer({
                   </button>
                 </div>
               )}
+
+              {/* Pagination matching Image 1 & 2 */}
+              {PaginationControls}
             </div>
           </div>
         </div>
       ) : (
         /* ----------------------------------------------------------------- */
-        /* CASE 2: OTHER COLLECTION PAGES (media_1792667804753_86fd33b0.png) */
+        /* CASE 2: OTHER COLLECTION PAGES (Image 4)                          */
         /* ----------------------------------------------------------------- */
         <div>
-          {/* Top Controls Bar: [ ⊶ Filter ] on Left, [ Most relevant ∨ ] on Right */}
-          <div className="mb-6 flex items-center justify-between border-b border-[#e5e5e5] pb-4">
+          {/* Top Controls Bar: [ ⊶ Filter ] on Left, [ Most relevant ∨ ] on Right (Image 4) */}
+          <div className="mb-6 flex items-center justify-between pb-3">
             {/* Filter Drawer Trigger Button */}
             <button
               type="button"
               onClick={() => setFilterDrawerOpen(true)}
-              className="flex items-center gap-2.5 border border-black/30 bg-white px-4 py-2 text-xs font-serif uppercase tracking-wider text-black hover:border-black transition-colors"
+              className="flex items-center gap-2 border border-[#e8e8e1] bg-white px-4 py-2 text-xs font-serif uppercase tracking-wider text-[#111111] hover:border-black transition-colors"
             >
               <SlidersHorizontal className="h-3.5 w-3.5" />
               <span>Filter</span>
             </button>
 
-            {/* Sort Dropdown */}
+            {/* Sort Dropdown (Image 4) */}
             <div className="relative">
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortOption)}
-                className="appearance-none border border-black/30 bg-white pl-4 pr-9 py-2 text-xs font-serif tracking-wider text-black outline-none cursor-pointer focus:border-black"
+                className="appearance-none border border-[#e8e8e1] bg-white pl-4 pr-8 py-2 text-xs font-serif tracking-wider text-[#111111] outline-none cursor-pointer focus:border-black"
               >
                 <option value="relevant">Most relevant</option>
                 <option value="featured">Featured</option>
@@ -555,15 +645,15 @@ export default function CollectionViewer({
                 <option value="price-desc">Price, high to low</option>
                 <option value="newest">Date, new to old</option>
               </select>
-              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-black/70" />
+              <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-black/70" />
             </div>
           </div>
 
-          {/* Product Grid */}
-          {sortedProducts.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {sortedProducts.map((p) => (
-                <ProductCard key={p.id} product={p} />
+          {/* Product Grid (Full Width 4 columns, Image 4) */}
+          {paginatedProducts.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-x-5 md:gap-y-8">
+              {paginatedProducts.map((p, i) => (
+                <ProductCard key={p.id} product={p} index={i} />
               ))}
             </div>
           ) : (
@@ -580,11 +670,14 @@ export default function CollectionViewer({
               </button>
             </div>
           )}
+
+          {/* Pagination matching Image 1 & 2 */}
+          {PaginationControls}
         </div>
       )}
 
       {/* ----------------------------------------------------------------- */}
-      {/* SLIDE-OUT FILTER DRAWER (media_1792667838611_12805c2f.png)         */}
+      {/* SLIDE-OUT FILTER DRAWER FOR ALL OTHER PAGES                        */}
       {/* ----------------------------------------------------------------- */}
       {filterDrawerOpen && (
         <div
@@ -595,18 +688,18 @@ export default function CollectionViewer({
         >
           {/* Drawer Panel Sliding from Left */}
           <div
-            className="relative h-full w-[340px] max-w-[85vw] flex flex-col bg-white shadow-2xl animate-fade-in"
+            className="relative h-full w-[320px] max-w-[85vw] flex flex-col bg-white shadow-2xl animate-fade-in"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Drawer Top Header matching screenshot */}
-            <div className="flex items-center justify-between border-b border-[#e5e5e5] px-6 py-5">
-              <h2 className="font-serif text-[17px] font-bold uppercase tracking-[0.15em] text-[#111111]">
+            {/* Drawer Top Header */}
+            <div className="flex items-center justify-between border-b border-[#e8e8e1] px-6 py-4">
+              <h2 className="font-serif text-[15px] font-bold uppercase tracking-[0.18em] text-[#111111]">
                 FILTER
               </h2>
               <button
                 type="button"
                 onClick={() => setFilterDrawerOpen(false)}
-                className="p-1 text-black/70 hover:text-black transition-colors"
+                className="p-1 text-black/70 hover:text-black transition-colors cursor-pointer"
                 aria-label="Close filter"
               >
                 <X className="h-5 w-5" />
@@ -619,11 +712,11 @@ export default function CollectionViewer({
             </div>
 
             {/* Bottom Action Button */}
-            <div className="border-t border-[#e5e5e5] p-5">
+            <div className="border-t border-[#e8e8e1] p-4">
               <button
                 type="button"
                 onClick={() => setFilterDrawerOpen(false)}
-                className="w-full bg-black py-3.5 text-center text-xs font-bold uppercase tracking-[0.25em] text-white hover:bg-neutral-800 transition-colors shadow-sm"
+                className="w-full bg-black py-3 text-center text-xs font-bold uppercase tracking-[0.25em] text-white hover:bg-neutral-800 transition-colors shadow-sm cursor-pointer"
               >
                 Show {sortedProducts.length} Results
               </button>

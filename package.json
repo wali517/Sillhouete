@@ -4,17 +4,19 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint ."
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^7.0.1",
     "@stripe/stripe-js": "^10.1.0",
+    "@types/nodemailer": "^8.0.2",
     "lucide-react": "^1.59.0",
     "mongoose": "^9.11.4",
     "motion": "^14.3.0",
     "next": "^16.4.2",
+    "nodemailer": "^10.3.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "stripe": "^23.0.0"

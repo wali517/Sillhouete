@@ -1,52 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown } from "lucide-react";
 import { NAV, SITE } from "@/data/site";
-import { allProducts } from "@/data/products";
 import { useStore } from "@/components/providers/StoreProvider";
 import MobileMenu from "./MobileMenu";
-import type { Product } from "@/types";
+import PredictivePanel from "@/components/search/PredictivePanel";
 
 export default function Header() {
   const router = useRouter();
-  const { count, setCartOpen, formatPrice } = useStore();
+  const { count, setCartOpen } = useStore();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
-
-  const [results, setResults] = useState<Product[]>([]);
-
-  useEffect(() => {
-    const q = query.trim();
-    if (!q) {
-      setResults([]);
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      fetch(`/api/products?search=${encodeURIComponent(q)}&limit=6`)
-        .then((r) => r.json())
-        .then((d) => {
-          if (d.products && d.products.length > 0) {
-            setResults(d.products.slice(0, 6));
-          } else {
-            // Fallback to client-side filtering of initial data
-            const lower = q.toLowerCase();
-            setResults(allProducts.filter((p) => p.title.toLowerCase().includes(lower)).slice(0, 6));
-          }
-        })
-        .catch(() => {
-          const lower = q.toLowerCase();
-          setResults(allProducts.filter((p) => p.title.toLowerCase().includes(lower)).slice(0, 6));
-        });
-    }, 200);
-
-    return () => clearTimeout(timer);
-  }, [query]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -69,12 +37,12 @@ export default function Header() {
   const NAV_ROW2 = NAV.slice(8);
 
   return (
-    <header className="relative z-40 border-b border-[#e8e8e1] bg-white">
-      <div className="mx-auto flex w-full max-w-[1920px] items-center justify-between gap-4 px-4 py-3 md:px-10">
+    <header className="relative z-40 border-b border-[#e8e8e1] bg-white font-serif">
+      <div className="mx-auto flex w-full max-w-[1920px] items-center justify-between gap-2 px-3 py-2.5 sm:gap-3 sm:px-4 md:px-6 lg:gap-4 lg:px-10 lg:py-3">
         {/* Left Logo */}
         <Link
           href="/"
-          className="relative block h-[52px] w-[140px] shrink-0 md:h-[48px] md:w-[130px]"
+          className="relative block h-[44px] w-[112px] shrink-0 sm:h-[48px] sm:w-[126px] lg:h-[48px] lg:w-[130px]"
           aria-label="Sillhouete home"
         >
           <Image
@@ -88,7 +56,7 @@ export default function Header() {
         </Link>
 
         {/* Primary Desktop Navigation: 2 Rows Centered */}
-        <nav aria-label="Primary" className="hidden flex-1 flex-col items-center justify-center md:flex">
+        <nav aria-label="Primary" className="hidden flex-1 flex-col items-center justify-center lg:flex">
           {/* Row 1 */}
           <ul className="flex flex-wrap items-center justify-center gap-0.5">
             {NAV_ROW1.map((item) => {
@@ -98,33 +66,54 @@ export default function Header() {
                 <li key={item.label} className="relative group">
                   <Link
                     href={item.href}
-                    className={`relative flex items-center gap-1 px-1.5 py-1 text-[15px] uppercase tracking-wide font-normal transition-colors hover:text-black after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:origin-center ${
-                      item.sale ? "text-[red] font-bold animate-blinks sale-menu" : "text-black/90"
+                    className={`relative flex items-center gap-1 px-1.5 py-1 text-[15px] uppercase tracking-wide font-normal transition-colors hover:text-black after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out after:origin-left ${
+                      item.sale ? "!text-[#ff0000] font-normal animate-blinks sale-menu" : "text-black"
                     }`}
                   >
                     <span>{item.label}</span>
                     {hasDropdown && (
-                      <ChevronDown
-                        className="h-3 w-3 opacity-60 transition-transform duration-200 group-hover:rotate-180"
+                      <svg
                         aria-hidden="true"
-                      />
+                        focusable="false"
+                        role="presentation"
+                        className="w-[9px] h-[5px] opacity-70 transition-transform duration-200 group-hover:rotate-180 ml-0.5"
+                        viewBox="0 0 28 16"
+                      >
+                        <path
+                          d="m1.57 1.59 12.76 12.77L27.1 1.59"
+                          strokeWidth="2"
+                          stroke="currentColor"
+                          fill="none"
+                        />
+                      </svg>
                     )}
                   </Link>
 
                   {/* Vertical Dropdown on Hover */}
                   {hasDropdown && (
-                    <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-150 absolute left-0 top-full pt-1.5 z-50 pointer-events-none group-hover:pointer-events-auto">
-                      <ul className="min-w-[210px] bg-white border border-black/10 shadow-xl py-2 text-left">
-                        {item.children!.map((child) => (
-                          <li key={child.label}>
-                            <Link
-                              href={child.href}
-                              className="block px-5 py-2 text-[15px] text-black/85 hover:text-black hover:bg-neutral-50 transition-colors font-medium whitespace-nowrap"
-                            >
-                              {child.label}
-                            </Link>
-                          </li>
-                        ))}
+                    <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full pt-1.5 z-50 pointer-events-none group-hover:pointer-events-auto">
+                      <ul className="min-w-[220px] bg-white border border-black/[0.08] shadow-[0_10px_24px_rgba(0,0,0,0.08)] py-2.5 text-left font-serif">
+                        {item.children!.map((child) => {
+                          const isMeeras = child.blink || child.label.toLowerCase() === "meeras";
+                          const isHighlight = child.highlight || child.label.includes("Raha Eid Pret");
+
+                          return (
+                            <li key={child.label}>
+                              <Link
+                                href={child.href}
+                                className={`block px-5 py-2 text-[15px] transition-colors whitespace-nowrap hover:bg-neutral-50 ${
+                                  isMeeras
+                                    ? "text-[#ff0000] font-normal blink-meeras"
+                                    : isHighlight
+                                    ? "text-[#ff0000] font-normal highlight-red hover:text-[#ff0000]"
+                                    : "text-black/85 hover:text-black font-normal"
+                                }`}
+                              >
+                                {child.label}
+                              </Link>
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
                   )}
@@ -134,7 +123,7 @@ export default function Header() {
           </ul>
 
           {/* Row 2 */}
-          <ul className="flex flex-wrap items-center justify-center gap-2 mt-0.5">
+          <ul className="flex flex-wrap items-center justify-center gap-1.5 mt-1">
             {NAV_ROW2.map((item) => {
               const hasDropdown = Boolean(item.children && item.children.length > 0);
 
@@ -142,31 +131,52 @@ export default function Header() {
                 <li key={item.label} className="relative group">
                   <Link
                     href={item.href}
-                    className="relative flex items-center gap-1 px-2.5 py-0.5 text-[15px] uppercase tracking-wide font-normal text-black/90 hover:text-black transition-colors after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:origin-center"
+                    className="relative flex items-center gap-1 px-2.5 py-0.5 text-[15px] uppercase tracking-wide font-normal text-black hover:text-black transition-colors after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out after:origin-left"
                   >
                     <span>{item.label}</span>
                     {hasDropdown && (
-                      <ChevronDown
-                        className="h-3 w-3 opacity-60 transition-transform duration-200 group-hover:rotate-180"
+                      <svg
                         aria-hidden="true"
-                      />
+                        focusable="false"
+                        role="presentation"
+                        className="w-[9px] h-[5px] opacity-70 transition-transform duration-200 group-hover:rotate-180 ml-0.5"
+                        viewBox="0 0 28 16"
+                      >
+                        <path
+                          d="m1.57 1.59 12.76 12.77L27.1 1.59"
+                          strokeWidth="2"
+                          stroke="currentColor"
+                          fill="none"
+                        />
+                      </svg>
                     )}
                   </Link>
 
                   {/* Vertical Dropdown on Hover */}
                   {hasDropdown && (
-                    <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-150 absolute left-0 top-full pt-1.5 z-50 pointer-events-none group-hover:pointer-events-auto">
-                      <ul className="min-w-[210px] bg-white border border-black/10 shadow-xl py-2 text-left">
-                        {item.children!.map((child) => (
-                          <li key={child.label}>
-                            <Link
-                              href={child.href}
-                              className="block px-5 py-2 text-[15px] text-black/85 hover:text-black hover:bg-neutral-50 transition-colors font-medium whitespace-nowrap"
-                            >
-                              {child.label}
-                            </Link>
-                          </li>
-                        ))}
+                    <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full pt-1.5 z-50 pointer-events-none group-hover:pointer-events-auto">
+                      <ul className="min-w-[220px] bg-white border border-black/[0.08] shadow-[0_10px_24px_rgba(0,0,0,0.08)] py-2.5 text-left font-serif">
+                        {item.children!.map((child) => {
+                          const isMeeras = child.blink || child.label.toLowerCase() === "meeras";
+                          const isHighlight = child.highlight || child.label.includes("Raha Eid Pret");
+
+                          return (
+                            <li key={child.label}>
+                              <Link
+                                href={child.href}
+                                className={`block px-5 py-2 text-[15px] transition-colors whitespace-nowrap hover:bg-neutral-50 ${
+                                  isMeeras
+                                    ? "text-[#ff0000] font-normal blink-meeras"
+                                    : isHighlight
+                                    ? "text-[#ff0000] font-normal highlight-red hover:text-[#ff0000]"
+                                    : "text-black/85 hover:text-black font-normal"
+                                }`}
+                              >
+                                {child.label}
+                              </Link>
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
                   )}
@@ -177,10 +187,10 @@ export default function Header() {
         </nav>
 
         {/* Right Icons: Account, Search, Cart */}
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex shrink-0 items-center gap-0 sm:gap-1">
           <Link
             href="/account"
-            className="hidden h-10 w-10 place-items-center md:grid text-black hover:text-black/70 transition-colors"
+            className="hidden h-10 w-10 place-items-center lg:grid text-black hover:text-black/70 transition-colors"
             aria-label="Customer Account"
           >
             <svg
@@ -203,7 +213,7 @@ export default function Header() {
             onClick={() => setSearchOpen((o) => !o)}
             aria-expanded={searchOpen}
             aria-label="Search"
-            className="grid h-10 w-10 place-items-center text-black hover:text-black/70 transition-colors cursor-pointer"
+            className="grid h-9 w-9 place-items-center text-black hover:text-black/70 transition-colors cursor-pointer sm:h-10 sm:w-10"
           >
             <svg
               aria-hidden="true"
@@ -224,7 +234,7 @@ export default function Header() {
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label="Site navigation"
-            className="grid h-10 w-10 place-items-center md:hidden text-black hover:text-black/70 cursor-pointer"
+            className="grid h-10 w-10 place-items-center lg:hidden text-black hover:text-black/90 cursor-pointer"
           >
             <svg
               aria-hidden="true"
@@ -245,7 +255,7 @@ export default function Header() {
             type="button"
             onClick={() => setCartOpen(true)}
             aria-label={`Cart, ${count} items`}
-            className="relative grid h-10 w-10 place-items-center text-black hover:text-black/70 transition-colors cursor-pointer"
+            className="relative grid h-10 w-10 place-items-center text-black hover:text-black/90 transition-colors cursor-pointer"
           >
             <svg
               aria-hidden="true"
@@ -273,126 +283,78 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Search Drawer matching Image 3 */}
+      {/* Search: replaces the header bar (light-gray strip, wide input, X outside) */}
       {searchOpen && (
         <>
-          {/* Dimmed backdrop overlay covering page content underneath */}
+          {/* Light veil over the page content underneath */}
           <div
-            className="fixed inset-x-0 bottom-0 top-[110px] md:top-[115px] z-30 bg-black/45 backdrop-blur-[1px] transition-opacity"
+            aria-hidden="true"
+            className="search-veil fixed inset-0 -z-10 bg-[rgba(239,239,239,0.82)]"
             onClick={() => setSearchOpen(false)}
           />
 
-          <div className="relative z-40 border-b border-[#e8e8e1] bg-white px-4 py-3 md:px-10 shadow-xs">
-            <form onSubmit={submit} role="search" className="mx-auto flex max-w-3xl items-center gap-3">
-              <div className="relative flex flex-1 items-stretch border border-black bg-white">
-                <input
-                  id="header-search"
-                  autoFocus
-                  type="search"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search"
-                  autoComplete="off"
-                  className="w-full h-11 bg-transparent px-4 pr-3 text-[14px] text-black placeholder:text-neutral-500 outline-none"
-                />
+          <div className="search-panel absolute inset-0 z-50 flex flex-col justify-center bg-[#efefef] shadow-[0_12px_24px_-12px_rgba(0,0,0,0.18)]">
+            <div className="relative">
+              <form
+                onSubmit={submit}
+                role="search"
+                className="flex items-center gap-4 px-4 py-4 md:gap-8 md:px-[12vw]"
+              >
+                <div className="relative flex-1">
+                  <input
+                    id="header-search"
+                    autoFocus
+                    type="search"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search"
+                    autoComplete="off"
+                    className="search-input h-12 w-full px-3 pr-14 text-[15px] text-black transition-colors placeholder:text-neutral-400"
+                  />
+                  <button
+                    type="submit"
+                    aria-label="Submit search"
+                    className="plain-btn absolute bottom-0 right-0 top-0 flex items-center justify-center px-4"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      focusable="false"
+                      role="presentation"
+                      className="h-6 w-6"
+                      viewBox="0 0 64 64"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeMiterlimit="10"
+                    >
+                      <path d="M47.16 28.58A18.58 18.58 0 1 1 28.58 10a18.58 18.58 0 0 1 18.58 18.58ZM54 54 41.94 42" />
+                    </svg>
+                  </button>
+                </div>
+
                 <button
-                  type="submit"
-                  aria-label="Submit search"
-                  className="w-12 h-11 bg-black text-white flex items-center justify-center shrink-0 hover:bg-neutral-800 transition-colors cursor-pointer"
+                  type="button"
+                  aria-label="Close search"
+                  onClick={() => setSearchOpen(false)}
+                  className="-mr-1 grid h-10 w-10 shrink-0 place-items-center text-black transition-opacity hover:opacity-60 md:mr-0"
                 >
                   <svg
                     aria-hidden="true"
                     focusable="false"
                     role="presentation"
-                    className="h-4 w-4"
+                    className="h-7 w-7"
                     viewBox="0 0 64 64"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="3"
-                    strokeMiterlimit="10"
+                    strokeWidth="2.5"
                   >
-                    <path d="M47.16 28.58A18.58 18.58 0 1 1 28.58 10a18.58 18.58 0 0 1 18.58 18.58ZM54 54 41.94 42" />
+                    <path d="m19 17.61 27.12 27.13m0-27.12L19 44.74" />
                   </svg>
                 </button>
-              </div>
+              </form>
 
-              <button
-                type="button"
-                aria-label="Close search"
-                onClick={() => setSearchOpen(false)}
-                className="p-1.5 text-neutral-800 hover:text-black transition-colors cursor-pointer"
-              >
-                <svg
-                  aria-hidden="true"
-                  focusable="false"
-                  role="presentation"
-                  className="h-5 w-5"
-                  viewBox="0 0 64 64"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeMiterlimit="10"
-                >
-                  <path d="M16 16 48 48M48 16 16 48" />
-                </svg>
-              </button>
-            </form>
-
-            {/* Live Search Results Dropdown when query is entered */}
-            {query.trim() && (
-              <div className="mx-auto max-w-3xl mt-4 border-t border-neutral-200 pt-4">
-                {results.length > 0 ? (
-                  <div>
-                    <div className="flex items-center justify-between pb-2 mb-3">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-black/60">
-                        Products ({results.length})
-                      </span>
-                      <Link
-                        href={`/search?q=${encodeURIComponent(query.trim())}`}
-                        onClick={() => setSearchOpen(false)}
-                        className="text-xs font-semibold uppercase tracking-wider text-black hover:underline"
-                      >
-                        View all results &rarr;
-                      </Link>
-                    </div>
-
-                    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
-                      {results.map((p) => (
-                        <li key={p.id}>
-                          <Link
-                            href={`/products/${p.handle}`}
-                            onClick={() => setSearchOpen(false)}
-                            className="group block"
-                          >
-                            <div className="relative aspect-[2/3] w-full overflow-hidden bg-neutral-100 border border-black/10">
-                              <Image
-                                src={p.image}
-                                alt={p.title}
-                                fill
-                                sizes="(min-width: 768px) 150px, 50vw"
-                                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                              />
-                            </div>
-                            <div className="mt-2 text-left">
-                              <h4 className="text-xs font-semibold uppercase text-black truncate group-hover:underline">
-                                {p.title}
-                              </h4>
-                              <p className="text-xs font-medium text-black/80 mt-0.5">
-                                {formatPrice(p.price)}
-                              </p>
-                            </div>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : (
-                  <p className="text-xs text-black/60 py-2">
-                    No products found matching &ldquo;{query}&rdquo;. Press Enter to view all search results.
-                  </p>
-                )}
-              </div>
-            )}
+              <PredictivePanel query={query} onNavigate={() => setSearchOpen(false)} />
+            </div>
           </div>
         </>
       )}

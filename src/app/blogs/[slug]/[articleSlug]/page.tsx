@@ -146,8 +146,8 @@ export default async function BlogPostPage({ params }: Props) {
             <h2 className="heading text-[22px] text-black">Featured In This Story</h2>
           </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {featuredProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
+            {featuredProducts.map((p, i) => (
+              <ProductCard key={p.id} product={p} index={i} />
             ))}
           </div>
         </section>

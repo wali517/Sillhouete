@@ -1,277 +1,242 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback, useEffect, type TouchEvent } from "react";
 import Image from "next/image";
 import type { Product } from "@/types";
-import { ZoomIn, Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 export default function ProductGallery({ product }: { product: Product }) {
-  const images =
-    product.images && product.images.length > 0
-      ? product.images
-      : [product.image, product.hoverImage].filter(Boolean);
+  const rawList = [
+    ...(product.images || []),
+    product.image,
+    product.hoverImage,
+  ].filter(Boolean) as string[];
+  const images = Array.from(new Set(rawList));
 
-  const [activeIndex, setActiveIndex] = useState(0); // 0+ for images, -1 for video
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  const isVideoActive = activeIndex === -1;
-  const activeImage = !isVideoActive ? images[activeIndex] || product.image : product.image;
+  const thumbsContainerRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isVideoActive) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setZoomPos({ x, y });
+  const totalSlides = images.length;
+
+  const goToSlide = useCallback(
+    (index: number) => {
+      const nextIdx = Math.max(0, Math.min(totalSlides - 1, index));
+      setCurrentIndex(nextIdx);
+
+      // Scroll thumbnail into view smoothly
+      if (thumbsContainerRef.current) {
+        const activeThumb = thumbsContainerRef.current.children[nextIdx] as HTMLElement | undefined;
+        if (activeThumb) {
+          activeThumb.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+        }
+      }
+    },
+    [totalSlides]
+  );
+
+  // Strictly stops at first image and last image ("image bi ruk jati ha slide karna sa")
+  const nextSlide = useCallback(() => {
+    if (currentIndex < totalSlides - 1) {
+      goToSlide(currentIndex + 1);
+    }
+  }, [currentIndex, totalSlides, goToSlide]);
+
+  const prevSlide = useCallback(() => {
+    if (currentIndex > 0) {
+      goToSlide(currentIndex - 1);
+    }
+  }, [currentIndex, goToSlide]);
+
+  // Touch swipe handling on mobile
+  const handleTouchStart = (e: TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchEndX.current = e.touches[0].clientX;
   };
 
-  const handleScroll = () => {
-    if (!scrollRef.current) return;
-    const { scrollLeft, clientWidth } = scrollRef.current;
-    const newIdx = Math.round(scrollLeft / clientWidth);
-    if (newIdx !== activeIndex && newIdx >= 0 && newIdx < images.length) {
-      setActiveIndex(newIdx);
+  const handleTouchMove = (e: TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const diff = touchStartX.current - touchEndX.current;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0 && currentIndex < totalSlides - 1) {
+        nextSlide();
+      } else if (diff < 0 && currentIndex > 0) {
+        prevSlide();
+      }
     }
   };
 
-  const scrollToSlide = (idx: number) => {
-    setActiveIndex(idx);
-    if (scrollRef.current) {
-      scrollRef.current.scrollTo({
-        left: idx * scrollRef.current.clientWidth,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  const videoId = product.videoId || "SK1-CnWBQpo";
-  const galleryEmbedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=0&controls=1&loop=1&playlist=${videoId}&playsinline=1&modestbranding=1&rel=0`;
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft" && currentIndex > 0) prevSlide();
+      if (e.key === "ArrowRight" && currentIndex < totalSlides - 1) nextSlide();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentIndex, totalSlides, nextSlide, prevSlide]);
 
   return (
-    <div className="w-full">
-      {/* ─── MOBILE & TABLET: Swipeable Horizontal Scroll Snap Gallery (visible up to md) ─── */}
-      <div className="md:hidden relative w-full">
+    <div className="flex flex-col md:flex-row gap-4 md:gap-8 w-full select-none">
+      {/* Thumbnails Column (Desktop Only: Vertical strip on left) */}
+      <div className="hidden md:flex flex-col items-center shrink-0">
+        {/* UP ARROW (Desktop only: Hidden on the first image, visible when currentIndex > 0) */}
+        <div className="h-7 w-full flex items-center justify-center">
+          {currentIndex > 0 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                prevSlide();
+              }}
+              className="flex h-7 w-full items-center justify-center text-neutral-500 hover:text-black cursor-pointer transition-colors py-1 hover:bg-neutral-100/50"
+              aria-label="Previous image (Up)"
+            >
+              <ChevronUp className="h-4 w-4 stroke-[1.8]" />
+            </button>
+          )}
+        </div>
+
+        {/* Thumbnails Scroll Container:
+            - Active thumbnail: crisp 1px black border
+            - Inactive thumbnails: border-transparent (0 border opacity) & opacity-100 (full clarity, no dimmed look)
+        */}
         <div
-          ref={scrollRef}
-          onScroll={handleScroll}
-          className="flex w-full overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar touch-pan-x"
-          style={{ aspectRatio: `1 / ${product.ratio || 1.35}` }}
+          ref={thumbsContainerRef}
+          className="flex w-[68px] max-h-[540px] flex-col overflow-y-auto scrollbar-none py-1 px-0.5 gap-2.5"
         >
           {images.map((img, idx) => (
-            <div
+            <button
               key={img + idx}
-              className="relative w-full h-full shrink-0 snap-center bg-[#f9f9f9]"
+              type="button"
+              onClick={() => goToSlide(idx)}
+              className={`relative h-[96px] w-[64px] transition-all overflow-hidden cursor-pointer shrink-0 opacity-100 ${
+                currentIndex === idx
+                  ? "border border-black"
+                  : "border border-transparent hover:border-neutral-300"
+              }`}
+              aria-label={`View photo ${idx + 1}`}
             >
               <Image
                 src={img}
-                alt={`${product.title} view ${idx + 1}`}
+                alt={`${product.title} angle ${idx + 1}`}
                 fill
-                priority={idx === 0}
-                sizes="100vw"
+                sizes="64px"
                 className="object-cover"
               />
-            </div>
+            </button>
           ))}
-
-          {/* Video slide on mobile if present */}
-          {product.videoId && (
-            <div className="relative w-full h-full shrink-0 snap-center bg-black">
-              <iframe
-                src={galleryEmbedUrl}
-                title={`${product.title} fashion video`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="h-full w-full border-0"
-              />
-            </div>
-          )}
         </div>
 
-        {/* Badges on mobile */}
-        {product.isNew && (
-          <span className="absolute left-3 top-3 z-10 bg-black px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow">
-            NEW
-          </span>
-        )}
-        {product.originalPrice && (
-          <span className="absolute right-3 top-3 z-10 bg-[#ff4f33] px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow">
-            SALE
-          </span>
-        )}
-
-        {/* Swipe arrow controls (subtle) */}
-        {images.length > 1 && (
-          <>
-            {activeIndex > 0 && (
-              <button
-                type="button"
-                onClick={() => scrollToSlide(activeIndex - 1)}
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm grid place-items-center shadow text-black"
-                aria-label="Previous image"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-            )}
-            {activeIndex < images.length - 1 && (
-              <button
-                type="button"
-                onClick={() => scrollToSlide(activeIndex + 1)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm grid place-items-center shadow text-black"
-                aria-label="Next image"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            )}
-          </>
-        )}
-
-        {/* Slide Counter / Dots Pill matching real Shopify store */}
-        {images.length > 1 && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-sm">
-            {images.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => scrollToSlide(i)}
-                className={`transition-all rounded-full ${
-                  activeIndex === i ? "w-5 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/50"
-                }`}
-                aria-label={`Go to slide ${i + 1}`}
-              />
-            ))}
-          </div>
-        )}
+        {/* DOWN ARROW (Desktop only: Hidden on the last image, visible when currentIndex < totalSlides - 1) */}
+        <div className="h-7 w-full flex items-center justify-center">
+          {currentIndex < totalSlides - 1 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                nextSlide();
+              }}
+              className="flex h-7 w-full items-center justify-center text-neutral-500 hover:text-black cursor-pointer transition-colors py-1 hover:bg-neutral-100/50"
+              aria-label="Next image (Down)"
+            >
+              <ChevronDown className="h-4 w-4 stroke-[1.8]" />
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* ─── DESKTOP: Thumbnails + High-res Zoom Display (visible on md+) ─── */}
-      <div className="hidden md:flex gap-4">
-        {/* Thumbnails list */}
-        {(images.length > 1 || product.videoId) && (
-          <div className="flex flex-col gap-2 w-20 shrink-0">
-            {images.map((img, idx) => (
-              <button
-                key={img + idx}
-                type="button"
-                onClick={() => setActiveIndex(idx)}
-                className={`relative h-24 w-full border transition-all overflow-hidden ${
-                  activeIndex === idx
-                    ? "border-black ring-1 ring-black"
-                    : "border-black/10 hover:border-black/40 opacity-70 hover:opacity-100"
-                }`}
-                aria-label={`View photo ${idx + 1}`}
+      {/* Main Image Slider Frame + Mobile Dots */}
+      <div className="relative flex-1 bg-white overflow-hidden">
+        {/* Main Image Aspect Container */}
+        <div
+          className="relative w-full aspect-[2/3] overflow-hidden bg-neutral-50"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Horizontal Slide Track:
+              Translates smoothly along X-axis with cubic-bezier easing matching Flickity
+          */}
+          <div
+            className="flex h-full w-full transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]"
+            style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+          >
+            {images.map((src, idx) => (
+              <div
+                key={src + idx}
+                className="relative h-full w-full shrink-0 aspect-[2/3] overflow-hidden select-none"
               >
                 <Image
-                  src={img}
-                  alt={`${product.title} angle ${idx + 1}`}
+                  src={src}
+                  alt={`${product.title} view ${idx + 1}`}
                   fill
-                  sizes="80px"
-                  className="object-cover"
+                  priority={idx === 0}
+                  sizes="(min-width: 1024px) 60vw, 100vw"
+                  className="object-cover pointer-events-none select-none"
                 />
-              </button>
-            ))}
-
-            {/* Video Thumbnail Button */}
-            {product.videoId && (
-              <button
-                type="button"
-                onClick={() => setActiveIndex(-1)}
-                className={`relative h-24 w-full border transition-all overflow-hidden bg-black flex flex-col items-center justify-center text-white ${
-                  isVideoActive
-                    ? "border-black ring-2 ring-black"
-                    : "border-black/20 hover:border-black/60 opacity-80 hover:opacity-100"
-                }`}
-                aria-label="View product video reel"
-              >
-                <Image
-                  src={product.image}
-                  alt={`${product.title} video preview`}
-                  fill
-                  sizes="80px"
-                  className="object-cover opacity-50"
-                />
-                <div className="relative z-10 flex flex-col items-center gap-1">
-                  <span className="grid h-7 w-7 place-items-center rounded-full bg-white/90 text-black shadow">
-                    <Play className="h-3.5 w-3.5 fill-black ml-0.5" />
-                  </span>
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-white drop-shadow">
-                    Video
-                  </span>
-                </div>
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Main Media Display */}
-        <div className="relative flex-1 bg-[#f9f9f9] border border-black/10 overflow-hidden">
-          {product.isNew && (
-            <span className="absolute left-3 top-3 z-10 bg-black px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow">
-              NEW
-            </span>
-          )}
-          {product.originalPrice && (
-            <span className="absolute right-3 top-3 z-10 bg-[#ff4f33] px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow">
-              SALE
-            </span>
-          )}
-
-          {isVideoActive ? (
-            <div
-              className="relative w-full bg-black overflow-hidden"
-              style={{ aspectRatio: `1 / ${product.ratio || 1.35}` }}
-            >
-              {product.videoUrl ? (
-                <video
-                  src={product.videoUrl}
-                  autoPlay
-                  controls
-                  playsInline
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <iframe
-                  src={galleryEmbedUrl}
-                  title={`${product.title} fashion video`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="h-full w-full border-0"
-                />
-              )}
-            </div>
-          ) : (
-            <div
-              className="relative w-full cursor-zoom-in overflow-hidden"
-              style={{ aspectRatio: `1 / ${product.ratio || 1.35}` }}
-              onMouseEnter={() => setIsZoomed(true)}
-              onMouseLeave={() => setIsZoomed(false)}
-              onMouseMove={handleMouseMove}
-            >
-              <Image
-                src={activeImage}
-                alt={product.alt || product.title}
-                fill
-                priority
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                className={`object-cover transition-transform duration-300 ${
-                  isZoomed ? "scale-150" : "scale-100"
-                }`}
-                style={
-                  isZoomed
-                    ? {
-                        transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
-                      }
-                    : undefined
-                }
-              />
-
-              <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-white/80 p-1.5 text-black shadow backdrop-blur-sm">
-                <ZoomIn className="h-4 w-4" />
               </div>
-            </div>
+            ))}
+          </div>
+
+          {/* Interactive Left & Right Click-to-Slide Zones:
+              - Left half: active ONLY when currentIndex > 0 (stops sliding on first image)
+              - Right half: active ONLY when currentIndex < totalSlides - 1 (stops sliding on last image)
+          */}
+          {currentIndex > 0 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                prevSlide();
+              }}
+              className="absolute inset-y-0 left-0 w-1/2 z-20 cursor-pointer md:cursor-w-resize outline-none bg-transparent hover:bg-transparent"
+              aria-label="Previous slide"
+              title="Click left to view previous image"
+            />
+          )}
+
+          {currentIndex < totalSlides - 1 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                nextSlide();
+              }}
+              className="absolute inset-y-0 right-0 w-1/2 z-20 cursor-pointer md:cursor-e-resize outline-none bg-transparent hover:bg-transparent"
+              aria-label="Next slide"
+              title="Click right to view next image"
+            />
           )}
         </div>
+
+        {/* Mobile Pagination Dots ("mobile pa image gallery nahi dot show hota ha") */}
+        {totalSlides > 1 && (
+          <div className="flex md:hidden items-center justify-center gap-2 pt-3 pb-1">
+            {images.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => goToSlide(idx)}
+                className={`h-2 rounded-full transition-all cursor-pointer ${
+                  currentIndex === idx
+                    ? "w-6 bg-black"
+                    : "w-2 bg-neutral-300 hover:bg-neutral-400"
+                }`}
+                aria-label={`Go to photo ${idx + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

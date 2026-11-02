@@ -1,169 +1,314 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback, type TouchEvent } from "react";
 import Image from "next/image";
-import { Star, CheckCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Testimonial {
   name: string;
-  location: string;
   rating: number;
-  date: string;
+  title?: string;
   text: string;
   image?: string;
-  productName: string;
 }
 
+// Exactly matching Image 1 from user screenshot & authentic Sillhouete customer reviews
 const TESTIMONIALS: Testimonial[] = [
   {
-    name: "Israt Sufian",
-    location: "London, UK",
+    name: "Salma Jabeen",
     rating: 5,
-    date: "1 week ago",
-    text: "I got so many compliments on my dress! The quality and details are amazing. Thank you Sillhouete for the timely delivery and excellent customer service.",
-    image: "https://sillhouete.com/cdn/shop/files/7_a8eeb295-8bc2-4eeb-b6ae-222a009ecfa3.jpg?v=1778077595",
-    productName: "Aurene Luxury Formal",
+    title: "Great experience",
+    text: "Great experience, good quality,...",
+    image:
+      "https://cdn.shopify.com/s/files/1/0709/7755/2627/files/sillhouete-formal-dress-ayzel-ivory-delicate-embroidery_70x70.jpg?v=1768978410",
   },
   {
-    name: "Bibi Fatima Hedari",
-    location: "Toronto, Canada",
+    name: "ISRAT SUFIAN",
     rating: 5,
-    date: "2 weeks ago",
-    text: "The packaging, fabric, and handwork were absolutely stunning. Delivered right on time for the wedding event. The fit was true to size and the colors were so rich.",
-    image: "https://sillhouete.com/cdn/shop/files/1000x1500_0006_052A6061.jpg?v=1758177457",
-    productName: "Iris Royal Blue Sharara",
+    title: "Beautiful",
+    text: "Beautiful outfit",
+    image:
+      "https://cdn.shopify.com/s/files/1/0709/7755/2627/files/sillhouete-formal-dress-layal-red-exquisite-embroidery-front_70x70.jpg?v=1768978807",
+  },
+  {
+    name: "bibi fatima hedari",
+    rating: 5,
+    title: "🥰 🫰",
+    text: "🤩 🌸",
+    image:
+      "https://cdn.shopify.com/s/files/1/0709/7755/2627/files/sillhouete-formal-iris-royal-blue-intricate-embroidery_70x70.jpg?v=1776742287",
+  },
+  {
+    name: "Laiba",
+    rating: 5,
+    title: "Loved my dress",
+    text: "I loved my dress, the quality of the fabric and work was to the point. Will definitely order again for my family as well.",
+    image:
+      "https://cdn.shopify.com/s/files/1/0709/7755/2627/files/webimages_0038_DSC07835_70x70.jpg?v=1767273372",
+  },
+  {
+    name: "Anonymous",
+    rating: 5,
+    title: "Beautiful dress",
+    text: "Beautiful dress. They have great customer service",
+  },
+  {
+    name: "Anu",
+    rating: 5,
+    title: "Gorgeous outfit !",
+    text: "Gorgeous outfit ! Such a beautiful soothing colour. The stitching and hand embellishments are so refined and exquisite.",
+    image:
+      "https://cdn.shopify.com/s/files/1/0709/7755/2627/files/sillhouete-formal-dress-Noah-mint-green-Sequins-front_70x70.jpg?v=1769436697",
   },
   {
     name: "Jovaria Naeem",
-    location: "Lahore, Pakistan",
     rating: 5,
-    date: "3 weeks ago",
-    text: "Exceeded my expectations! Sillhouete is now my go-to brand for Pakistani luxury wear. The zardozi embroidery and custom slip fit were perfection.",
-    image: "https://sillhouete.com/cdn/shop/files/DSC01646_00a12cf2-4bc0-4e12-b5e1-5dbd8a1db560.jpg?v=1778077594",
-    productName: "Solara Embroidered Formal",
+    title: "Very chic outfit",
+    text: "Loved the outfit, very chic, looks exactly like in picture! Sillhouete customer care on WhatsApp was super supportive.",
+    image:
+      "https://cdn.shopify.com/s/files/1/0709/7755/2627/files/web_images_0006_2_70x70.jpg?v=1758812672",
   },
   {
     name: "Caitlin Hartley",
-    location: "Manchester, UK",
     rating: 5,
-    date: "1 month ago",
-    text: "Ordered from the UK and received it in 4 days via DHL Express. Absolutely gorgeous outfit, fits impeccably! Everyone at the party was asking where I got it.",
-    image: "https://sillhouete.com/cdn/shop/files/DSC01736.jpg?v=1778077594",
-    productName: "Nyah Mint Green Ensemble",
+    title: "Excellent fit",
+    text: "Beautifully made with an excellent fit! The delivery was fast and hassle-free, and I can't wait to wear it to my sister's wedding.",
+    image:
+      "https://cdn.shopify.com/s/files/1/0709/7755/2627/files/webimages_0077_DSC07132_70x70.jpg?v=1767278193",
+  },
+  {
+    name: "Rida Aslam",
+    rating: 5,
+    title: "Premium velvet finish",
+    text: "The dress colour is nice with beautiful embellishments. Premium velvet finish and top tier craftsmanship. Thank you!",
+    image:
+      "https://cdn.shopify.com/s/files/1/0709/7755/2627/files/5_70x70.jpg?v=1758105373",
   },
 ];
 
 export default function CustomerTestimonials() {
-  const [startIndex, setStartIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
-  const prev = () => {
-    setStartIndex((i) => (i === 0 ? TESTIMONIALS.length - 1 : i - 1));
+  const total = TESTIMONIALS.length;
+
+  // Manual Click: Slides ONE by ONE ("wo jab slide karta ha to slide hoti ha one by one")
+  const nextOne = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % total);
+  }, [total]);
+
+  const prevOne = useCallback(() => {
+    setCurrentIndex((prev) => (prev === 0 ? total - 1 : prev - 1));
+  }, [total]);
+
+  // Auto Timer: After some time, slides THREE by THREE ("wasa kuch time bad tino slide ho jati ha")
+  const nextThree = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 3) % total);
+  }, [total]);
+
+  // Auto slide interval: on mobile advances by 1, on desktop advances by 3
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      if (typeof window !== "undefined" && window.innerWidth < 768) {
+        nextOne();
+      } else {
+        nextThree();
+      }
+    }, 5500);
+    return () => clearInterval(timer);
+  }, [isPaused, nextOne, nextThree]);
+
+  // Touch Swipe on mobile
+  const handleTouchStart = (e: TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
   };
 
-  const next = () => {
-    setStartIndex((i) => (i + 1) % TESTIMONIALS.length);
+  const handleTouchMove = (e: TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
   };
 
-  // Visible items (up to 3 on desktop)
-  const visible = [
-    TESTIMONIALS[startIndex],
-    TESTIMONIALS[(startIndex + 1) % TESTIMONIALS.length],
-    TESTIMONIALS[(startIndex + 2) % TESTIMONIALS.length],
-  ];
+  const handleTouchEnd = () => {
+    const diff = touchStartX.current - touchEndX.current;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        nextOne();
+      } else {
+        prevOne();
+      }
+    }
+  };
+
+  // We render 3 items visible at a time on desktop, 1 on mobile
+  // Creating circular triple array for seamless wrap-around rendering
+  const extendedList = [...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS];
+  const activeOffset = total + currentIndex;
 
   return (
-    <section className="my-16 border-t border-black/10 pt-12">
-      <div className="mx-auto max-w-[1300px] px-4">
-        {/* Header matching real site */}
+    <section
+      className="my-16 pt-10 bg-white select-none overflow-hidden"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      <div className="mx-auto max-w-[1240px] px-4">
+        {/* Title & Overall Rating matching Screenshot 1 */}
         <div className="text-center mb-10">
-          <h2 className="heading text-[22px] md:text-[28px] uppercase tracking-[0.2em] text-[#111111]">
-            Let Customers Speak For Us
+          <h2 className="font-serif text-[20px] md:text-[24px] uppercase tracking-[0.2em] font-bold text-[#111111]">
+            LET CUSTOMERS SPEAK FOR US
           </h2>
-          <div className="mt-3 flex items-center justify-center gap-2">
-            <div className="flex text-[#108474]">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star key={star} className="h-4 w-4 fill-current stroke-none" />
-              ))}
-            </div>
-            <span className="text-xs font-semibold text-black/80">
-              4.9 out of 5 stars based on 85 reviews
-            </span>
+
+          <div className="mt-2.5 flex items-center justify-center gap-1.5 text-[#108474]">
+            {[1, 2, 3, 4, 5].map((s) => (
+              <Star key={s} className="h-4 w-4 fill-[#108474] stroke-none" />
+            ))}
+          </div>
+
+          <div className="mt-1.5 flex items-center justify-center gap-1.5 text-[12.5px] font-sans text-neutral-700">
+            <span>from 62 reviews</span>
+            {/* Teal checkmark in square icon matching Screenshot 1 */}
+            <svg
+              className="h-3.5 w-3.5 text-[#108474] fill-current"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-9 14-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
+            </svg>
           </div>
         </div>
 
-        {/* Carousel Slider */}
-        <div className="relative">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {visible.map((t, idx) => (
+        {/* Sliding Carousel Track (Smooth horizontal slide transition) */}
+        <div
+          className="relative w-full overflow-hidden"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Track on Desktop (shifts by 33.333% per step) */}
+          <div
+            className="hidden md:flex transition-transform duration-600 ease-[cubic-bezier(0.25,1,0.5,1)]"
+            style={{
+              transform: `translateX(-${(activeOffset * 100) / 3}%)`,
+            }}
+          >
+            {extendedList.map((item, idx) => (
               <div
-                key={t.name + idx}
-                className="flex flex-col justify-between border border-black/10 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
+                key={`desk-${idx}-${item.name}`}
+                className="w-1/3 shrink-0 px-6 flex flex-col items-center justify-start text-center"
               >
-                <div>
-                  {/* Stars and Verified */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex text-[#108474]">
-                      {[...Array(t.rating)].map((_, i) => (
-                        <Star key={i} className="h-3.5 w-3.5 fill-current stroke-none" />
-                      ))}
-                    </div>
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
-                      <CheckCircle className="h-2.5 w-2.5" />
-                      Verified Buyer
-                    </span>
-                  </div>
-
-                  {/* Customer quote */}
-                  <p className="text-xs md:text-sm text-black/80 leading-relaxed italic mb-4">
-                    &ldquo;{t.text}&rdquo;
-                  </p>
+                {/* 5 solid teal stars */}
+                <div className="flex items-center justify-center gap-1 text-[#108474] mb-2.5">
+                  {[...Array(item.rating)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-[#108474] stroke-none" />
+                  ))}
                 </div>
 
-                {/* Bottom author with thumbnail */}
-                <div className="pt-4 border-t border-black/5 flex items-center gap-3">
-                  {t.image && (
-                    <div className="relative h-12 w-12 rounded-full overflow-hidden shrink-0 border border-black/10">
-                      <Image
-                        src={t.image}
-                        alt={t.name}
-                        fill
-                        sizes="48px"
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
-                  <div>
-                    <strong className="block text-xs font-bold uppercase tracking-wider text-black">
-                      {t.name}
-                    </strong>
-                    <span className="block text-[11px] text-black/55">
-                      {t.location} · {t.productName}
-                    </span>
+                {/* Review Title (bold) */}
+                {item.title && (
+                  <h3 className="font-bold text-[14px] text-black mb-1.5 font-serif min-h-[22px]">
+                    {item.title}
+                  </h3>
+                )}
+
+                {/* Review Body */}
+                <p className="text-[13px] text-neutral-700 leading-relaxed max-w-[300px] mx-auto font-sans mb-3 min-h-[40px]">
+                  {item.text}
+                </p>
+
+                {/* Author Name */}
+                <span className="text-[12px] text-neutral-500 font-serif mb-2.5">
+                  {item.name}
+                </span>
+
+                {/* Product Dress Thumbnail (Centered below author, clean rectangular frame) */}
+                {item.image ? (
+                  <div className="relative h-[56px] w-[38px] border border-neutral-200 overflow-hidden shrink-0 mt-1 shadow-2xs">
+                    <Image
+                      src={item.image}
+                      alt={`${item.name} dress`}
+                      fill
+                      sizes="38px"
+                      className="object-cover"
+                    />
                   </div>
-                </div>
+                ) : (
+                  <div className="h-[56px] w-[38px] mt-1" />
+                )}
               </div>
             ))}
           </div>
 
-          {/* Carousel Arrows */}
-          <div className="mt-8 flex justify-center items-center gap-3">
-            <button
-              type="button"
-              onClick={prev}
-              className="grid h-10 w-10 place-items-center rounded-full border border-black/20 hover:border-black hover:bg-neutral-100 transition-colors"
-              aria-label="Previous review"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={next}
-              className="grid h-10 w-10 place-items-center rounded-full border border-black/20 hover:border-black hover:bg-neutral-100 transition-colors"
-              aria-label="Next review"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
+          {/* Track on Mobile (shifts by 100% per step) */}
+          <div
+            className="flex md:hidden transition-transform duration-600 ease-[cubic-bezier(0.25,1,0.5,1)]"
+            style={{
+              transform: `translateX(-${activeOffset * 100}%)`,
+            }}
+          >
+            {extendedList.map((item, idx) => (
+              <div
+                key={`mob-${idx}-${item.name}`}
+                className="w-full shrink-0 px-4 flex flex-col items-center justify-start text-center"
+              >
+                {/* 5 solid teal stars */}
+                <div className="flex items-center justify-center gap-1 text-[#108474] mb-2.5">
+                  {[...Array(item.rating)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-[#108474] stroke-none" />
+                  ))}
+                </div>
+
+                {/* Review Title */}
+                {item.title && (
+                  <h3 className="font-bold text-[14px] text-black mb-1.5 font-serif">
+                    {item.title}
+                  </h3>
+                )}
+
+                {/* Review Body */}
+                <p className="text-[13px] text-neutral-700 leading-relaxed max-w-[300px] mx-auto font-sans mb-3">
+                  {item.text}
+                </p>
+
+                {/* Author Name */}
+                <span className="text-[12px] text-neutral-500 font-serif mb-2.5">
+                  {item.name}
+                </span>
+
+                {/* Product Dress Thumbnail */}
+                {item.image && (
+                  <div className="relative h-[56px] w-[38px] border border-neutral-200 overflow-hidden shrink-0 mt-1 shadow-2xs">
+                    <Image
+                      src={item.image}
+                      alt={`${item.name} dress`}
+                      fill
+                      sizes="38px"
+                      className="object-cover"
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
+        </div>
+
+        {/* Centered Chevron Arrows matching Screenshot 1 */}
+        <div className="mt-8 flex justify-center items-center gap-4 text-neutral-300">
+          <button
+            type="button"
+            onClick={prevOne}
+            className="p-1.5 text-neutral-400 hover:text-black transition-colors cursor-pointer"
+            aria-label="Previous customer review"
+          >
+            <ChevronLeft className="h-6 w-6 stroke-[1.8]" />
+          </button>
+          <button
+            type="button"
+            onClick={nextOne}
+            className="p-1.5 text-neutral-400 hover:text-black transition-colors cursor-pointer"
+            aria-label="Next customer review"
+          >
+            <ChevronRight className="h-6 w-6 stroke-[1.8]" />
+          </button>
         </div>
       </div>
     </section>

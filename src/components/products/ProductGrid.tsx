@@ -1,11 +1,23 @@
 import type { Product } from "@/types";
 import ProductCard from "./ProductCard";
 
-export default function ProductGrid({ products }: { products: Product[] }) {
+/**
+ * Live-site behaviour: below 768px the products sit in one horizontal swipeable row with the next card
+ * peeking in (~2.3 cards on a phone / tablet) and the browser's own scrollbar underneath; from 768px up
+ * it is a 4-column grid.
+ */
+export default function ProductGrid({ products, showNewBadge = false }: { products: Product[]; showNewBadge?: boolean }) {
   return (
-    <div className="grid grid-cols-2 gap-x-[10px] gap-y-8 md:grid-cols-4 md:gap-x-[17px] md:gap-y-10">
+    <div className="flex snap-x gap-3 overflow-x-auto pb-3 md:grid md:snap-none md:grid-cols-4 md:gap-x-[17px] md:gap-y-10 md:overflow-visible md:pb-0">
       {products.map((p, i) => (
-        <ProductCard key={p.id} product={p} priority={i < 4} />
+        <ProductCard
+          key={p.id}
+          product={p}
+          index={i}
+          priority={true}
+          isNew={showNewBadge}
+          className="w-[43vw] shrink-0 snap-start sm:w-[37.6vw] md:w-auto"
+        />
       ))}
     </div>
   );

@@ -17,6 +17,7 @@ export interface ISiteSettings extends Document {
   stripeSecretKey: string;
   stripeEnabled: boolean;
   currency: string;
+  adminEmail?: string;
   adminPasswordHash?: string;
   bankName?: string;
   bankAccountTitle?: string;
@@ -42,6 +43,7 @@ const SiteSettingsSchema = new Schema<ISiteSettings>(
     stripeSecretKey: { type: String, default: "" },
     stripeEnabled: { type: Boolean, default: true },
     currency: { type: String, default: "PKR" },
+    adminEmail: { type: String, default: "admin@sillhouete.com" },
     adminPasswordHash: { type: String, default: "admin123" },
     bankName: { type: String, default: "Meezan Bank" },
     bankAccountTitle: { type: String, default: "SILLHOUETE" },

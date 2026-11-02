@@ -4,12 +4,10 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, ShieldCheck } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import { useStore } from "@/components/providers/StoreProvider";
 import ProductCard from "@/components/products/ProductCard";
 import type { Product } from "@/types";
-
-const FREE_SHIPPING_THRESHOLD = 14000;
 
 export default function CartPage() {
   const router = useRouter();
@@ -22,37 +20,35 @@ export default function CartPage() {
     orderNote,
     setOrderNote,
   } = useStore();
-  const [agree, setAgree] = useState(true);
+  const [agree, setAgree] = useState(false);
   const [error, setError] = useState("");
   const [recentProducts, setRecentProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    fetch("/api/products?limit=4")
+    fetch("/api/products?limit=5")
       .then((r) => r.json())
-      .then((d) => setRecentProducts(d.products?.slice(0, 4) ?? []))
+      .then((d) => setRecentProducts(d.products?.slice(0, 5) ?? []))
       .catch(() => {});
   }, []);
 
   const handleCheckout = () => {
     if (!agree) {
-      setError("Please accept the terms and conditions to proceed.");
+      setError("You must agree with the terms and conditions of sales to check out");
       return;
     }
     router.push("/checkout");
   };
 
-  const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
-  const progress = Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100));
-
   return (
-    <div className="mx-auto max-w-[1200px] px-4 py-12 md:px-8">
-      <div className="mb-8 flex items-baseline justify-between border-b border-black/10 pb-4">
-        <h1 className="heading text-[26px] md:text-[32px] uppercase tracking-wider text-black">
-          Cart
+    <div className="mx-auto max-w-[1240px] px-4 sm:px-6 md:px-8 py-10 md:py-14">
+      {/* ─── Centered Title & Continue Shopping Link (Matching sillhouete.com) ─── */}
+      <div className="text-center mb-10 md:mb-14">
+        <h1 className="font-serif text-[26px] md:text-[32px] uppercase tracking-[0.15em] text-[#111111]">
+          CART
         </h1>
         <Link
-          href="/collections/1"
-          className="text-xs uppercase tracking-wider text-black/70 hover:text-black underline underline-offset-4"
+          href="/collections/new-arrivals"
+          className="inline-block mt-2 font-serif text-[13px] md:text-[14px] text-[#111111] underline underline-offset-4 hover:opacity-75 transition-opacity"
         >
           Continue shopping
         </Link>
@@ -60,181 +56,158 @@ export default function CartPage() {
 
       {items.length === 0 ? (
         <div className="py-16 text-center">
-          <div className="mx-auto mb-4 grid h-20 w-20 place-items-center rounded-full bg-soft">
-            <ShoppingBag className="h-10 w-10 text-black/40" />
-          </div>
-          <p className="text-lg font-medium">Your cart is currently empty.</p>
-          <p className="mt-2 text-sm text-black/60">
+          <p className="font-serif text-[18px] text-[#1a1a1a] mb-2">
+            Your cart is currently empty.
+          </p>
+          <p className="text-[13.5px] text-[#707070] mb-6">
             Explore our latest bridal, formal, and luxury pret collections.
           </p>
-          <Link href="/collections/1" className="btn mt-6">
-            Continue Shopping
+          <Link
+            href="/collections/new-arrivals"
+            className="inline-block bg-[#111111] hover:bg-black text-white font-serif text-[12px] uppercase tracking-[0.2em] py-3.5 px-8 transition-colors"
+          >
+            Continue shopping
           </Link>
         </div>
       ) : (
-        <div className="grid gap-10 lg:grid-cols-[1fr_380px]">
-          {/* Items Section */}
-          <div className="space-y-6">
-            {/* Free shipping bar */}
-            <div className="border border-line bg-soft p-4">
-              <p className="text-sm">
-                {remaining > 0 ? (
-                  <>
-                    Add <strong className="text-black">{formatPrice(remaining)}</strong> more to get{" "}
-                    <strong>FREE Worldwide Delivery!</strong>
-                  </>
-                ) : (
-                  <strong className="text-emerald-700">
-                    You have qualified for FREE Worldwide Delivery!
-                  </strong>
-                )}
-              </p>
-              <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-black/10">
+        /* ─── Main Cart Two-Column Grid ─── */
+        <div className="grid gap-8 lg:grid-cols-[1fr_360px] xl:grid-cols-[1fr_390px] items-start">
+          {/* ════════════════════════════════════════
+              LEFT COLUMN — Cart Items List
+          ════════════════════════════════════════ */}
+          <div className="divide-y divide-[#ebebeb]">
+            {items.map((item) => {
+              const itemPrice = item.unitPrice ?? item.product.price;
+              return (
                 <div
-                  className="h-full bg-black transition-all duration-300"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Items Table / Cards */}
-            <div className="border border-line divide-y divide-line">
-              {items.map((item) => {
-                const itemPrice = item.unitPrice ?? item.product.price;
-                return (
-                  <div key={item.key} className="flex gap-4 p-4 md:gap-6 md:p-6">
+                  key={item.key}
+                  className="py-6 first:pt-0 last:pb-0 flex gap-4 sm:gap-6 items-start justify-between"
+                >
+                  <div className="flex gap-4 sm:gap-6 items-start min-w-0">
+                    {/* Product Thumbnail (vertical dress framing) */}
                     <Link
                       href={`/products/${item.product.handle}`}
-                      className="relative h-32 w-24 shrink-0 overflow-hidden border border-line bg-soft"
+                      className="relative w-[78px] sm:w-[92px] aspect-[3/4] shrink-0 overflow-hidden bg-[#f4f4f4]"
                     >
                       <Image
                         src={item.product.image}
-                        alt={item.product.alt}
+                        alt={item.product.title}
                         fill
-                        sizes="96px"
+                        sizes="92px"
                         className="object-cover"
                       />
                     </Link>
 
-                    <div className="flex flex-1 flex-col justify-between">
-                      <div>
-                        <div className="flex items-start justify-between gap-4">
-                          <Link
-                            href={`/products/${item.product.handle}`}
-                            className="font-semibold uppercase tracking-wide hover:underline text-sm md:text-base"
-                          >
-                            {item.product.title}
-                          </Link>
-                          <button
-                            type="button"
-                            onClick={() => removeItem(item.key)}
-                            className="text-black/50 hover:text-sale p-1"
-                            aria-label="Remove item"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
+                    {/* Product Details */}
+                    <div className="min-w-0">
+                      <Link
+                        href={`/products/${item.product.handle}`}
+                        className="font-serif text-[15px] sm:text-[16px] text-[#1a1a1a] hover:underline block leading-snug"
+                      >
+                        {item.product.title}
+                      </Link>
 
-                        <div className="mt-1 space-y-0.5 text-xs text-black/70">
+                      <div className="mt-1 space-y-0.5 text-[12.5px] sm:text-[13px] text-[#555555]">
+                        <p>
+                          <span className="font-semibold text-[#1a1a1a]">Size:</span> {item.size}
+                        </p>
+                        {item.dupatta && (
                           <p>
-                            Size: <strong className="text-black">{item.size}</strong>
+                            <span className="font-semibold text-[#1a1a1a]">Sleeves:</span> {item.dupatta}
                           </p>
-                          {item.dupatta && (
-                            <p>
-                              Dupatta: <strong className="text-black">{item.dupatta}</strong>
-                            </p>
-                          )}
-                          {item.adOn && (
-                            <p>
-                              Ad Ons: <strong className="text-black">{item.adOn}</strong>
-                            </p>
-                          )}
-                          {item.expedite && (
-                            <p className="text-amber-700 font-semibold">
-                              Express Shipping (5-6 Days)
-                            </p>
-                          )}
-                          {item.slip && (
-                            <p>
-                              Slip: <strong className="text-black">{item.slip}</strong>
-                            </p>
-                          )}
-                        </div>
-
-                        <p className="mt-2 text-sm font-semibold">{formatPrice(itemPrice)}</p>
+                        )}
+                        {item.adOn && (
+                          <p>
+                            <span className="font-semibold text-[#1a1a1a]">Add-on:</span> {item.adOn}
+                          </p>
+                        )}
+                        {item.expedite && (
+                          <p className="text-amber-800 font-medium">
+                            Express Shipping (5-6 Days)
+                          </p>
+                        )}
+                        {item.slip && (
+                          <p>
+                            <span className="font-semibold text-[#1a1a1a]">Slip:</span> {item.slip}
+                          </p>
+                        )}
                       </div>
 
-                      <div className="mt-4 flex items-center justify-between">
-                        <div className="flex items-center border border-line bg-white">
-                          <button
-                            type="button"
-                            onClick={() => setQuantity(item.key, item.quantity - 1)}
-                            className="grid h-8 w-8 place-items-center hover:bg-soft"
-                          >
-                            <Minus className="h-3 w-3" />
-                          </button>
-                          <span className="w-8 text-center text-xs font-semibold">
-                            {item.quantity}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => setQuantity(item.key, item.quantity + 1)}
-                            className="grid h-8 w-8 place-items-center hover:bg-soft"
-                          >
-                            <Plus className="h-3 w-3" />
-                          </button>
-                        </div>
-
-                        <span className="font-semibold text-sm">
-                          Total: {formatPrice(itemPrice * item.quantity)}
+                      {/* Quantity Selector: [ -  1  + ] */}
+                      <div className="mt-3.5 inline-flex items-center border border-[#d9d9d9] bg-white">
+                        <button
+                          type="button"
+                          onClick={() => setQuantity(item.key, item.quantity - 1)}
+                          className="w-7 h-7 flex items-center justify-center text-[#707070] hover:text-black transition-colors"
+                          aria-label="Decrease quantity"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="w-8 text-center text-[12px] font-medium text-[#1a1a1a] select-none">
+                          {item.quantity}
                         </span>
+                        <button
+                          type="button"
+                          onClick={() => setQuantity(item.key, item.quantity + 1)}
+                          className="w-7 h-7 flex items-center justify-center text-[#707070] hover:text-black transition-colors"
+                          aria-label="Increase quantity"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                      </div>
+
+                      {/* Remove text link */}
+                      <div>
+                        <button
+                          type="button"
+                          onClick={() => removeItem(item.key)}
+                          className="block text-[12px] text-[#707070] hover:text-black underline underline-offset-2 mt-2 cursor-pointer transition-colors"
+                        >
+                          Remove
+                        </button>
                       </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
 
-            {/* Order Note */}
-            <div className="border border-line p-5">
-              <label htmlFor="order-note" className="block text-sm font-semibold uppercase tracking-wide">
-                Special Instructions or Custom Measurements
-              </label>
-              <p className="mt-1 text-xs text-black/60">
-                Provide custom height, sleeve length, or specific delivery instructions.
-              </p>
-              <textarea
-                id="order-note"
-                rows={3}
-                value={orderNote}
-                onChange={(e) => setOrderNote(e.target.value)}
-                placeholder="Write your note here..."
-                className="mt-3 w-full border border-line p-3 text-sm outline-none focus:border-black"
-              />
-            </div>
+                  {/* Line Price on right */}
+                  <div className="text-right shrink-0 pt-0.5 pl-3">
+                    <span className="font-serif text-[14px] sm:text-[15px] text-[#1a1a1a] whitespace-nowrap">
+                      {formatPrice(itemPrice * item.quantity)}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          {/* Summary Section */}
-          <div className="h-fit border border-line bg-soft p-6 space-y-5">
-            <h2 className="heading text-[20px] border-b border-line pb-3">Order Summary</h2>
-
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span className="font-semibold">{formatPrice(subtotal)}</span>
-              </div>
-              <div className="flex justify-between text-black/70 text-xs">
-                <span>Shipping</span>
-                <span>{subtotal >= FREE_SHIPPING_THRESHOLD ? "FREE" : "Calculated at checkout"}</span>
-              </div>
+          {/* ════════════════════════════════════════
+              RIGHT COLUMN — ORDER NOTE & Summary Box
+              (#f7f7f7 card matching screenshot)
+          ════════════════════════════════════════ */}
+          <div className="bg-[#f7f7f7] p-6 sm:p-7 space-y-4">
+            {/* ORDER NOTE */}
+            <div>
+              <h3 className="font-serif uppercase tracking-[0.2em] text-[12px] font-medium text-[#1a1a1a] mb-2.5">
+                ORDER NOTE
+              </h3>
+              <textarea
+                rows={4}
+                value={orderNote}
+                onChange={(e) => setOrderNote(e.target.value)}
+                className="w-full bg-white border border-[#e1e1e1] p-3 text-[13px] text-[#1a1a1a] outline-none focus:border-black resize-y"
+              />
             </div>
 
-            <div className="border-t border-line pt-4 flex justify-between text-lg font-bold">
-              <span>Estimated Total</span>
-              <span>{formatPrice(subtotal)}</span>
+            {/* Subtotal */}
+            <div className="flex items-center justify-between text-[13.5px] pt-1">
+              <span className="text-[#333333]">Subtotal</span>
+              <span className="font-serif text-[#1a1a1a] font-medium">
+                {formatPrice(subtotal)}
+              </span>
             </div>
 
-            <label className="flex items-start gap-2 text-xs text-black/80 cursor-pointer">
+            {/* Terms and conditions checkbox */}
+            <label className="flex items-center gap-2.5 cursor-pointer select-none pt-1">
               <input
                 type="checkbox"
                 checked={agree}
@@ -242,48 +215,42 @@ export default function CartPage() {
                   setAgree(e.target.checked);
                   setError("");
                 }}
-                className="mt-0.5"
+                className="w-4 h-4 rounded-[2px] border-[#b5b5b5] text-black focus:ring-0 cursor-pointer"
               />
-              <span>
-                I agree to the{" "}
-                <Link href="/pages/terms-and-conditions" className="underline font-semibold">
-                  Terms & Conditions
-                </Link>{" "}
-                and{" "}
-                <Link href="/pages/policies" className="underline font-semibold">
-                  Refund Policy
-                </Link>
-                .
+              <span className="font-serif uppercase tracking-[0.14em] text-[10.5px] sm:text-[11px] text-[#333333] leading-tight">
+                I AGREE WITH THE TERMS AND CONDITIONS
               </span>
             </label>
 
-            {error && <p className="text-xs text-sale font-medium">{error}</p>}
+            {error && (
+              <p className="text-[12px] text-red-600 font-medium">{error}</p>
+            )}
 
+            {/* Solid Black CHECK OUT Button */}
             <button
               type="button"
               onClick={handleCheckout}
-              className="btn w-full py-4 text-xs font-bold uppercase tracking-[0.25em] bg-black text-white hover:bg-black/85 flex items-center justify-center gap-2"
+              className="w-full bg-[#111111] hover:bg-black active:bg-neutral-900 text-white py-4 text-center font-serif text-[12px] md:text-[13px] uppercase tracking-[0.2em] font-medium transition-colors cursor-pointer"
             >
-              <span>Check Out</span>
-              <ArrowRight className="h-4 w-4" />
+              CHECK OUT
             </button>
 
-            <div className="flex items-center justify-center gap-2 text-xs text-black/60 pt-2">
-              <ShieldCheck className="h-4 w-4 text-black/70" />
-              <span>Safe &amp; Secure Direct Card Checkout</span>
-            </div>
+            {/* Disclaimer */}
+            <p className="text-center text-[11px] text-[#707070] pt-1 leading-snug">
+              Shipping, taxes, and discount codes calculated at checkout.
+            </p>
           </div>
         </div>
       )}
 
-      {/* Recently Viewed Section matching real site */}
-      <section className="mt-20 border-t border-black/10 pt-12">
-        <h2 className="heading mb-8 text-center text-[22px] md:text-[26px] uppercase tracking-[0.2em] text-[#111111]">
-          Recently Viewed
+      {/* ─── RECENTLY VIEWED (5 Columns matching screenshot) ─── */}
+      <section className="mt-20 md:mt-24 border-t border-[#e8e8e1] pt-12 md:pt-16">
+        <h2 className="font-serif mb-8 text-center text-[18px] md:text-[20px] uppercase tracking-[0.2em] text-[#111111]">
+          RECENTLY VIEWED
         </h2>
-        <div className="grid grid-cols-2 gap-[10px] md:grid-cols-4 md:gap-[17px]">
-          {recentProducts.map((p) => (
-            <ProductCard key={p.id} product={p} />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5 md:gap-4">
+          {recentProducts.map((p, i) => (
+            <ProductCard key={p.id} product={p} index={i} />
           ))}
         </div>
       </section>

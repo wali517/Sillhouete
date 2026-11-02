@@ -5,6 +5,9 @@ export interface ICustomer extends Document {
   name: string;
   email: string;
   phone: string;
+  password?: string;
+  resetToken?: string;
+  resetTokenExpiry?: Date;
   createdAt: Date;
   ordersCount: number;
   totalSpent: number;
@@ -28,6 +31,9 @@ const CustomerSchema = new Schema<ICustomer>(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, index: true },
     phone: { type: String, default: "" },
+    password: { type: String, default: "" },
+    resetToken: { type: String },
+    resetTokenExpiry: { type: Date },
     ordersCount: { type: Number, default: 0 },
     totalSpent: { type: Number, default: 0 },
     addresses: [

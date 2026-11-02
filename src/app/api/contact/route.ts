@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { getContactMessages, saveContactMessage } from "@/lib/db";
+import { getContactMessages, saveContactMessage, getSettings } from "@/lib/db";
 import { runSeedIfEmpty } from "@/lib/seed";
+import { sendDiscountCodeEmail } from "@/lib/email";
 
 export async function GET() {
   try {
@@ -22,14 +23,50 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
     const message = await saveContactMessage({
       name: body.name,
-      email: body.email,
+      email: body.email.toLowerCase().trim(),
       phone: body.phone || "",
       subject: body.subject || "General Inquiry",
       message: body.message,
     });
-    return NextResponse.json({ success: true, message });
+
+    // Check if this inquiry is for a newsletter subscription or discount
+    const isDiscountRequest =
+      body.isDiscount ||
+      (body.subject &&
+        (body.subject.toLowerCase().includes("newsletter") ||
+          body.subject.toLowerCase().includes("discount") ||
+          body.subject.toLowerCase().includes("5% off") ||
+          body.subject.toLowerCase().includes("10% off")));
+
+    let activeDiscount = { code: "WELCOME5", percent: 5 };
+
+    if (isDiscountRequest) {
+      try {
+        const settings = await getSettings();
+        const found = (settings.discountCodes || []).find((d) => d.active);
+        if (found) {
+          activeDiscount = { code: found.code, percent: found.percent };
+        }
+        // Send the discount code email via nodemailer
+        await sendDiscountCodeEmail({
+          email: body.email.toLowerCase().trim(),
+          code: activeDiscount.code,
+          percent: activeDiscount.percent,
+        });
+      } catch (emailErr) {
+        console.warn("Discount email dispatch error:", emailErr);
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      message,
+      discountCode: isDiscountRequest ? activeDiscount.code : undefined,
+      percent: isDiscountRequest ? activeDiscount.percent : undefined,
+    });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Failed to save message";
     return NextResponse.json({ error: msg }, { status: 500 });

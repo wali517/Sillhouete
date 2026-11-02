@@ -82,13 +82,13 @@ export default function KeyActives() {
   ];
 
   return (
-    <section className="my-16 border-t border-b border-black/10 py-14 bg-white font-serif">
+    <section className="my-16 py-10 bg-white font-serif">
       <div className="mx-auto max-w-[1300px] px-4">
         <h2 className="text-center font-serif text-[22px] md:text-[26px] uppercase tracking-[0.2em] text-[#111111] mb-12 font-semibold">
           Key Actives
         </h2>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center items-start">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center items-start">
           {blocks.map((b) => (
             <div key={b.title} className="flex flex-col items-center px-2">
               <div className="flex h-16 w-16 items-center justify-center mb-4 text-black">
