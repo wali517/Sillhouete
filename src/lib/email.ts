@@ -27,7 +27,7 @@ export function isValidEmail(email: string = ""): boolean {
 /* ──────────────── NODEMAILER TRANSPORTER ──────────────── */
 
 async function getTransporter() {
-  let host = process.env.SMTP_HOST;
+  let host = process.env.SMTP_HOST || "smtp.gmail.com";
   let port = Number(process.env.SMTP_PORT) || 465;
   let user = process.env.SMTP_USER;
   let pass = process.env.SMTP_PASS;
@@ -39,8 +39,8 @@ async function getTransporter() {
       if (settings?.smtpUser && settings?.smtpPass) {
         user = settings.smtpUser;
         pass = settings.smtpPass;
-        host = settings.smtpHost || "smtp.gmail.com";
-        port = Number(settings.smtpPort) || 465;
+        host = settings.smtpHost || host;
+        port = Number(settings.smtpPort) || port;
       }
     } catch {
       // fallback
@@ -97,73 +97,23 @@ export async function sendEmail({
     };
   }
 
-  const emailMode = (process.env.EMAIL_MODE || "preview").toLowerCase();
-  const testRecipient = process.env.EMAIL_TEST_RECIPIENT?.trim();
-  const from = process.env.SMTP_FROM || `"${SITE.name}" <${SITE.email}>`;
   const transporter = await getTransporter();
 
-  // ── STRICT SAFETY: PREVIEW MODE (Default) ──────────────────────────────
-  if (emailMode === "preview") {
-    // If a dedicated test recipient is configured and SMTP is active, dispatch exclusively to test recipient
-    if (testRecipient && isValidEmail(testRecipient) && transporter) {
-      try {
-        const previewHeaderHtml = `
-          <div style="background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 10px 14px; border-radius: 4px; font-family: sans-serif; font-size: 12px; margin-bottom: 16px;">
-            <strong>[SILLHOUETE TEST MODE EMAIL]</strong><br/>
-            This email was generated in <code>EMAIL_MODE=preview</code>.<br/>
-            Intended Customer: <strong>${escapeHtml(cleanTo)}</strong>
-          </div>
-        `;
-        const info = await transporter.sendMail({
-          from,
-          to: testRecipient,
-          subject: `[TEST PREVIEW] ${cleanSubject}`,
-          text: `[TEST PREVIEW - Intended for: ${cleanTo}]\n\n${text || html.replace(/<[^>]*>?/gm, " ").trim()}`,
-          html: previewHeaderHtml + html,
-        });
-        return {
-          success: true,
-          status: "simulated",
-          messageId: info.messageId,
-          error: `Dispatched to test recipient (${testRecipient}) in preview mode`,
-        };
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Failed to deliver preview to test recipient";
-        console.warn("📧 [EMAIL TEST RECIPIENT FAILURE]:", msg);
-      }
-    }
-
-    // Default Preview Console Output
-    console.log(`\n======================================================`);
-    console.log(`📧 [EMAIL PREVIEW - EMAIL_MODE=preview]`);
-    console.log(`Intended Recipient: ${cleanTo}`);
-    console.log(`Subject: ${cleanSubject}`);
-    console.log(`Content:\n${text || html.replace(/<[^>]*>?/gm, " ").trim().slice(0, 300)}...`);
-    console.log(`Notice: Live customer emails are disabled by safety policy.`);
-    console.log(`======================================================\n`);
-    return {
-      success: false,
-      status: "simulated",
-      messageId: `preview-${Date.now()}`,
-      error: "Email generated in Preview Mode (EMAIL_MODE=preview). Real customer emails are disabled.",
-    };
-  }
-
-  // If EMAIL_MODE is not "preview" (e.g. future live mode)
   if (!transporter) {
-    console.log(`\n======================================================`);
-    console.log(`📧 [EMAIL SIMULATED - NO SMTP CONFIGURED]`);
-    console.log(`To: ${cleanTo}`);
-    console.log(`Subject: ${cleanSubject}`);
-    console.log(`Content:\n${text || html.replace(/<[^>]*>?/gm, " ").trim().slice(0, 300)}...`);
-    console.log(`======================================================\n`);
+    console.warn(`📧 [EMAIL SIMULATED - NO SMTP CONFIGURED] Intended Recipient: ${cleanTo}`);
     return {
       success: false,
       status: "simulated",
       messageId: `simulated-${Date.now()}`,
-      error: "SMTP not configured (Simulated in development console)",
+      error: "SMTP not configured. Please configure SMTP credentials.",
     };
   }
+
+  const from =
+    process.env.SMTP_FROM ||
+    (process.env.SMTP_USER
+      ? `"SILLHOUETE" <${process.env.SMTP_USER}>`
+      : `"SILLHOUETE" <saleemalbala18@gmail.com>`);
 
   try {
     const info = await transporter.sendMail({
@@ -173,6 +123,8 @@ export async function sendEmail({
       text: text || html.replace(/<[^>]*>?/gm, " ").trim(),
       html,
     });
+
+    console.log(`📧 [EMAIL DELIVERED] To: ${cleanTo} | Subject: ${cleanSubject} | ID: ${info.messageId}`);
     return {
       success: true,
       status: "sent",
@@ -435,7 +387,7 @@ export async function sendPaymentFailureEmail(order: Order, failureReason?: stri
       </div>
 
       <p style="font-size: 13px; color: #666; text-align: center;">
-        Alternatively, you can choose Bank Deposit or contact our team via WhatsApp at +${SITE.whatsapp} for personalized checkout assistance.
+        Alternatively, you can contact our team via WhatsApp at +${SITE.whatsapp} for personalized checkout assistance.
       </p>
 
       <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 30px 0 20px;" />
