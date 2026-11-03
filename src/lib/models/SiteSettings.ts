@@ -23,6 +23,10 @@ export interface ISiteSettings extends Document {
   bankAccountTitle?: string;
   bankIban?: string;
   discountCodes?: Array<{ code: string; percent: number; active: boolean }>;
+  smtpHost?: string;
+  smtpPort?: number;
+  smtpUser?: string;
+  smtpPass?: string;
 }
 
 const SiteSettingsSchema = new Schema<ISiteSettings>(
@@ -48,6 +52,10 @@ const SiteSettingsSchema = new Schema<ISiteSettings>(
     bankName: { type: String, default: "Meezan Bank" },
     bankAccountTitle: { type: String, default: "SILLHOUETE" },
     bankIban: { type: String, default: "PK80MEZN0002160109517881" },
+    smtpHost: { type: String, default: "" },
+    smtpPort: { type: Number, default: 465 },
+    smtpUser: { type: String, default: "" },
+    smtpPass: { type: String, default: "" },
     discountCodes: [
       {
         code: { type: String },

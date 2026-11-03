@@ -281,4 +281,8 @@ export interface SiteSettings {
   bankAccountTitle?: string;
   bankIban?: string;
   discountCodes?: Array<{ code: string; percent: number; active: boolean }>;
+  smtpHost?: string;
+  smtpPort?: number;
+  smtpUser?: string;
+  smtpPass?: string;
 }

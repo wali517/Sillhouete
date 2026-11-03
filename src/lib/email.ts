@@ -26,18 +26,34 @@ export function isValidEmail(email: string = ""): boolean {
 
 /* ──────────────── NODEMAILER TRANSPORTER ──────────────── */
 
-function getTransporter() {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT) || 587;
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+async function getTransporter() {
+  let host = process.env.SMTP_HOST;
+  let port = Number(process.env.SMTP_PORT) || 465;
+  let user = process.env.SMTP_USER;
+  let pass = process.env.SMTP_PASS;
+
+  if (!user || !pass) {
+    try {
+      const { getSettings } = await import("./db");
+      const settings = await getSettings();
+      if (settings?.smtpUser && settings?.smtpPass) {
+        user = settings.smtpUser;
+        pass = settings.smtpPass;
+        host = settings.smtpHost || "smtp.gmail.com";
+        port = Number(settings.smtpPort) || 465;
+      }
+    } catch {
+      // fallback
+    }
+  }
 
   if (host && user && pass) {
+    const cleanPass = pass.replace(/\s+/g, "");
     return nodemailer.createTransport({
       host,
       port,
       secure: port === 465,
-      auth: { user, pass },
+      auth: { user: user.trim(), pass: cleanPass },
     });
   }
 
@@ -84,7 +100,7 @@ export async function sendEmail({
   const emailMode = (process.env.EMAIL_MODE || "preview").toLowerCase();
   const testRecipient = process.env.EMAIL_TEST_RECIPIENT?.trim();
   const from = process.env.SMTP_FROM || `"${SITE.name}" <${SITE.email}>`;
-  const transporter = getTransporter();
+  const transporter = await getTransporter();
 
   // ── STRICT SAFETY: PREVIEW MODE (Default) ──────────────────────────────
   if (emailMode === "preview") {

@@ -7,7 +7,7 @@ import type { SiteSettings } from "@/types";
 type Tab = "store" | "shipping" | "announcements" | "payment" | "discounts" | "security";
 
 export default function AdminSettingsPage() {
-  const [settings, setSettings] = useState<Partial<SiteSettings & { bankName?: string; bankAccountTitle?: string; bankIban?: string; discountCodes?: Array<{ code: string; percent: number; active: boolean }> }>>({});
+  const [settings, setSettings] = useState<Partial<SiteSettings & { discountCodes?: Array<{ code: string; percent: number; active: boolean }> }>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<Tab | null>(null);
   const [toast, setToast] = useState("");
@@ -277,27 +277,10 @@ export default function AdminSettingsPage() {
               placeholder="sk_test_..."
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono outline-none focus:border-gray-400" />
           </div>
-          <hr className="border-gray-100" />
-          <h3 className="font-semibold text-gray-900 text-sm">Bank Deposit Details</h3>
-          {[
-            { label: "Bank Name", key: "bankName" },
-            { label: "Account Title", key: "bankAccountTitle" },
-            { label: "IBAN", key: "bankIban" },
-          ].map(({ label, key }) => (
-            <div key={key}>
-              <label className="text-xs font-semibold text-gray-600 block mb-1">{label}</label>
-              <input type="text" value={(settings as Record<string, string>)[key] || ""}
-                onChange={(e) => setSettings({ ...settings, [key]: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400" />
-            </div>
-          ))}
           <button onClick={() => saveSection("payment", {
             stripeEnabled: settings.stripeEnabled ?? true,
             stripePublishableKey: settings.stripePublishableKey || "",
             stripeSecretKey: settings.stripeSecretKey || "",
-            bankName: settings.bankName || "",
-            bankAccountTitle: settings.bankAccountTitle || "",
-            bankIban: settings.bankIban || "",
           })} disabled={saving === "payment"}
             className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50">
             <Save className="h-4 w-4" /> {saving === "payment" ? "Saving..." : "Save Payment Settings"}
