@@ -66,7 +66,7 @@ export function validateStripeTestConfig(): { valid: boolean; error?: string } {
  * where environment variables might not yet be configured).
  */
 export async function resolveStripeSecretKey(): Promise<string> {
-  if (process.env.STRIPE_SECRET_KEY) {
+  if (process.env.STRIPE_SECRET_KEY && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
     return process.env.STRIPE_SECRET_KEY;
   }
   try {
@@ -74,12 +74,15 @@ export async function resolveStripeSecretKey(): Promise<string> {
     const settings = await getSettings();
     if (settings.stripeSecretKey) {
       process.env.STRIPE_SECRET_KEY = settings.stripeSecretKey;
-      return settings.stripeSecretKey;
     }
+    if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && settings.stripePublishableKey) {
+      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = settings.stripePublishableKey;
+    }
+    return process.env.STRIPE_SECRET_KEY || "";
   } catch (err) {
     console.warn("[Stripe] Failed to fallback to MongoDB settings for secret key:", err);
   }
-  return "";
+  return process.env.STRIPE_SECRET_KEY || "";
 }
 
 /**

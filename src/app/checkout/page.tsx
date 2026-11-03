@@ -446,7 +446,7 @@ function CheckoutForm() {
           setIsGatewayConfigError(true);
           setConfigErrorType("secret");
           setErrorMessage(
-            "Card payment service is temporarily unavailable due to a server payment gateway check. Please select Cash on Delivery or Bank Deposit, or contact store support."
+            "Card payment service is temporarily unavailable due to a server payment gateway check. Please contact store support."
           );
           setIsProcessing(false);
           return;
@@ -550,7 +550,7 @@ function CheckoutForm() {
           rawMsg
         );
         setErrorMessage(
-          "Card payment service is temporarily unavailable due to a gateway configuration check. Please select Cash on Delivery or Bank Deposit, or contact store support."
+          "Card payment service is temporarily unavailable due to a gateway configuration check. Please contact store support."
         );
       } else {
         setIsGatewayConfigError(false);
