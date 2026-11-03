@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { getOrderById, validateAndCalculateOrder, recordOrderPaymentAttempt } from "@/lib/db";
-import { getStripeServer, toStripeAmount, validateStripeTestConfig } from "@/lib/stripe";
+import { getStripeServer, toStripeAmount, validateStripeTestConfig, resolveStripeSecretKey } from "@/lib/stripe";
 
 export async function POST(req: Request) {
   try {
+    // Resolve secret key: checks process.env first, falls back to MongoDB settings if on Vercel
+    await resolveStripeSecretKey();
+
     const configCheck = validateStripeTestConfig();
     if (!configCheck.valid) {
       console.error("[Stripe Test Mode Policy Violation]:", configCheck.error);

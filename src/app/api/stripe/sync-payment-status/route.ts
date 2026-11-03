@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getOrderById, markOrderPaidByStripe } from "@/lib/db";
-import { getStripeServer, fromStripeAmount, toStripeAmount } from "@/lib/stripe";
+import { getStripeServer, fromStripeAmount, toStripeAmount, resolveStripeSecretKey } from "@/lib/stripe";
 
 /**
  * POST /api/stripe/sync-payment-status
@@ -14,6 +14,7 @@ import { getStripeServer, fromStripeAmount, toStripeAmount } from "@/lib/stripe"
  */
 export async function POST(req: Request) {
   try {
+    await resolveStripeSecretKey();
     const body = await req.json();
     const { orderId, paymentIntentId } = body;
 

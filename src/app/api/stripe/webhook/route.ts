@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStripeServer, getStripeWebhookSecret, fromStripeAmount, toStripeAmount } from "@/lib/stripe";
+import { getStripeServer, getStripeWebhookSecret, fromStripeAmount, toStripeAmount, resolveStripeSecretKey } from "@/lib/stripe";
 import {
   getOrderById,
   getOrderByStripeSessionId,
@@ -34,6 +34,7 @@ export async function POST(req: Request) {
 
   let event: Stripe.Event;
   try {
+    await resolveStripeSecretKey();
     const stripe = getStripeServer();
     const webhookSecret = getStripeWebhookSecret();
     event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);

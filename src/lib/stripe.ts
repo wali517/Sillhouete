@@ -49,6 +49,29 @@ export function validateStripeTestConfig(): { valid: boolean; error?: string } {
 }
 
 /**
+ * Resolves the server-side Stripe secret key.
+ * Checks process.env.STRIPE_SECRET_KEY first, and falls back to
+ * MongoDB SiteSettings if not defined (crucial for live Vercel deployments
+ * where environment variables might not yet be configured).
+ */
+export async function resolveStripeSecretKey(): Promise<string> {
+  if (process.env.STRIPE_SECRET_KEY) {
+    return process.env.STRIPE_SECRET_KEY;
+  }
+  try {
+    const { getSettings } = await import("./db");
+    const settings = await getSettings();
+    if (settings.stripeSecretKey) {
+      process.env.STRIPE_SECRET_KEY = settings.stripeSecretKey;
+      return settings.stripeSecretKey;
+    }
+  } catch (err) {
+    console.warn("[Stripe] Failed to fallback to MongoDB settings for secret key:", err);
+  }
+  return "";
+}
+
+/**
  * Returns a configured server-side Stripe SDK instance.
  * Throws an explicit error if STRIPE_SECRET_KEY is missing, invalid, or violates Test Mode.
  */
@@ -58,7 +81,7 @@ export function getStripeServer(): Stripe {
 
   if (!secretKey) {
     throw new Error(
-      "STRIPE_SECRET_KEY is not defined in environment variables. Please configure it in .env.local."
+      "STRIPE_SECRET_KEY is not defined. Please set STRIPE_SECRET_KEY in Vercel Environment Variables or in .env.local."
     );
   }
 

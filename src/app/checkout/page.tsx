@@ -200,11 +200,12 @@ const STRIPE_ELEMENT_BASE_STYLE = {
   invalid: { color: "#e74c3c" },
 };
 
-// disableLink: true completely removes the green "Save with ->" Stripe Link button
-// so the user types/pastes their card directly into the field without any popup modal.
+// Stripe Card Element options
+// showIcon: true displays the card brand (Visa, Mastercard, etc.) directly in the field
+// Stripe Link is enabled so the popup modal ("Update card" / "Add a card") works for validation
 const STRIPE_CARD_NUMBER_OPTIONS = {
   style: STRIPE_ELEMENT_BASE_STYLE,
-  disableLink: true,
+  showIcon: true,
 };
 
 const STRIPE_CARD_EXPIRY_OPTIONS = {
@@ -299,6 +300,9 @@ function CheckoutForm() {
 
   // Card details
   const [cardName, setCardName] = useState("");
+  const [cardFieldError, setCardFieldError] = useState("");
+  const [expiryFieldError, setExpiryFieldError] = useState("");
+  const [cvcFieldError, setCvcFieldError] = useState("");
 
   // Submit / processing state
   const [isProcessing, setIsProcessing] = useState(false);
@@ -999,23 +1003,53 @@ function CheckoutForm() {
                     {paymentMethod === "credit_card" && (
                       <div className="border-t border-[#d9d9d9] bg-[#f7f7f7] p-4 space-y-3">
 
-                        <StripeFloatingField
-                          label="Card number"
-                          endIcon={<Lock className="w-4 h-4 text-[#707070]" />}
-                        >
-                          <CardNumberElement options={STRIPE_CARD_NUMBER_OPTIONS} />
-                        </StripeFloatingField>
+                        <div>
+                          <StripeFloatingField
+                            label="Card number"
+                            endIcon={<Lock className="w-4 h-4 text-[#707070]" />}
+                          >
+                            <CardNumberElement
+                              options={STRIPE_CARD_NUMBER_OPTIONS}
+                              onChange={(e) => {
+                                setCardFieldError(e.error ? e.error.message : "");
+                              }}
+                            />
+                          </StripeFloatingField>
+                          {cardFieldError && (
+                            <p className="text-[12px] text-red-600 mt-1 pl-1">{cardFieldError}</p>
+                          )}
+                        </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                          <StripeFloatingField label="Expiration date (MM / YY)">
-                            <CardExpiryElement options={STRIPE_CARD_EXPIRY_OPTIONS} />
-                          </StripeFloatingField>
-                          <StripeFloatingField
-                            label="Security code"
-                            endIcon={<HelpCircle className="w-4.5 h-4.5 text-[#737373]" />}
-                          >
-                            <CardCvcElement options={STRIPE_CARD_CVC_OPTIONS} />
-                          </StripeFloatingField>
+                          <div>
+                            <StripeFloatingField label="Expiration date (MM / YY)">
+                              <CardExpiryElement
+                                options={STRIPE_CARD_EXPIRY_OPTIONS}
+                                onChange={(e) => {
+                                  setExpiryFieldError(e.error ? e.error.message : "");
+                                }}
+                              />
+                            </StripeFloatingField>
+                            {expiryFieldError && (
+                              <p className="text-[12px] text-red-600 mt-1 pl-1">{expiryFieldError}</p>
+                            )}
+                          </div>
+                          <div>
+                            <StripeFloatingField
+                              label="Security code"
+                              endIcon={<HelpCircle className="w-4.5 h-4.5 text-[#737373]" />}
+                            >
+                              <CardCvcElement
+                                options={STRIPE_CARD_CVC_OPTIONS}
+                                onChange={(e) => {
+                                  setCvcFieldError(e.error ? e.error.message : "");
+                                }}
+                              />
+                            </StripeFloatingField>
+                            {cvcFieldError && (
+                              <p className="text-[12px] text-red-600 mt-1 pl-1">{cvcFieldError}</p>
+                            )}
+                          </div>
                         </div>
 
                         <FloatingInput
@@ -1361,37 +1395,21 @@ function CheckoutForm() {
                         {configErrorType === "secret" ? (
                           <>
                             <p className="break-words [overflow-wrap:anywhere] font-mono text-[11px] bg-white/70 p-1.5 rounded border border-red-200 text-red-900">
-                              Server Error: STRIPE_SECRET_KEY in .env.local is being rejected by Stripe API (Invalid / Expired Key).
+                              Server Error: STRIPE_SECRET_KEY is invalid, expired, or missing in Vercel Environment Variables (or .env.local locally).
                             </p>
                             <p>
-                              Please visit your{" "}
-                              <a
-                                href="https://dashboard.stripe.com/apikeys"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="underline font-semibold hover:text-red-950"
-                              >
-                                Stripe Dashboard &rarr; Developers &rarr; API Keys
-                              </a>{" "}
-                              and copy your active <strong>Secret key (sk_live_... or sk_test_...)</strong> into <strong>STRIPE_SECRET_KEY</strong> in <strong>.env.local</strong>.
+                              If running on <strong>Vercel (Live)</strong>: go to <strong>Vercel Dashboard &rarr; Settings &rarr; Environment Variables</strong>, add <strong>STRIPE_SECRET_KEY</strong> and <strong>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</strong>, then redeploy.
+                              <br />
+                              If running <strong>locally</strong>: update <strong>STRIPE_SECRET_KEY</strong> in <strong>.env.local</strong>.
                             </p>
                           </>
                         ) : (
                           <>
                             <p className="break-words [overflow-wrap:anywhere] font-mono text-[11px] bg-white/70 p-1.5 rounded border border-red-200 text-red-900">
-                              Client Error: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY in .env.local is invalid or expired in your Stripe Dashboard.
+                              Client Error: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is invalid or missing.
                             </p>
                             <p>
-                              Please visit your{" "}
-                              <a
-                                href="https://dashboard.stripe.com/apikeys"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="underline font-semibold hover:text-red-950"
-                              >
-                                Stripe Dashboard &rarr; Developers &rarr; API Keys
-                              </a>{" "}
-                              and update <strong>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</strong> in <strong>.env.local</strong> or in Admin Settings.
+                              Please ensure <strong>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</strong> is set in Vercel Environment Variables (live) or .env.local (locally).
                             </p>
                           </>
                         )}
@@ -1592,14 +1610,7 @@ function CheckoutPageInner() {
   }, [stripeKey]);
 
   return (
-    <Elements
-      stripe={dynamicStripePromise}
-      options={{
-        // loader:"never" hides the Stripe loading animation
-        // This also prevents Stripe Link modal from auto-activating
-        loader: "never",
-      }}
-    >
+    <Elements stripe={dynamicStripePromise}>
       <CheckoutForm />
     </Elements>
   );
