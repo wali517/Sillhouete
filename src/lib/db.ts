@@ -8,7 +8,17 @@ import { SiteSettingsModel } from "./models/SiteSettings";
 import { allProducts as initialProducts } from "@/data/products";
 import { SEED_BLOGS } from "@/data/seed-blogs";
 import { ANNOUNCEMENTS, SITE } from "@/data/site";
-import { sendOrderConfirmationEmail, sendContactFormNotification } from "./email";
+import {
+  sendOrderConfirmationEmail,
+  sendPaymentFailureEmail,
+  sendOrderCancellationEmail,
+  sendRefundInitiatedEmail,
+  sendRefundSuccessfulEmail,
+  sendRefundFailedEmail,
+  sendShippingUpdateEmail,
+  sendContactFormNotification,
+} from "./email";
+import { getStripeServer, toStripeAmount, fromStripeAmount } from "./stripe";
 import type {
   Product,
   Order,
@@ -166,116 +176,173 @@ export async function deleteProduct(id: string): Promise<boolean> {
   }
 }
 
+/* ──────────────── ORDER VALIDATION & PRICING ──────────────── */
+
+export interface CartInputItem {
+  id?: string;
+  handle?: string;
+  size?: string;
+  quantity?: number;
+  dupatta?: string;
+  adOn?: string;
+}
+
+export interface ValidatedCartCalculation {
+  items: Array<{
+    id: string;
+    handle: string;
+    title: string;
+    price: number;
+    size: string;
+    quantity: number;
+    image: string;
+    dupatta?: string;
+    adOn?: string;
+  }>;
+  subtotal: number;
+  shipping: number;
+  discount: number;
+  discountCode?: string;
+  total: number;
+  currency: string;
+}
+
+/**
+ * Server-side trusted calculation of order total, prices, stock, and discounts.
+ * NEVER trusts frontend prices, subtotals, discounts, shipping fees, or totals.
+ */
+export async function validateAndCalculateOrder(
+  rawItems: CartInputItem[],
+  discountCodeInput?: string
+): Promise<ValidatedCartCalculation> {
+  if (!Array.isArray(rawItems) || rawItems.length === 0) {
+    throw new Error("Cart must contain at least one item.");
+  }
+
+  const settings = await getSettings();
+  const validatedItems: ValidatedCartCalculation["items"] = [];
+  let subtotal = 0;
+
+  for (const item of rawItems) {
+    const lookupId = item.id || item.handle;
+    if (!lookupId) {
+      throw new Error("Invalid cart item: missing product identifier.");
+    }
+
+    const product = (await getProductById(lookupId)) || (await getProductByHandle(lookupId));
+    if (!product) {
+      throw new Error(`Product not found or no longer available: ${lookupId}`);
+    }
+
+    if (product.inStock === false) {
+      throw new Error(`Item "${product.title}" is currently out of stock.`);
+    }
+
+    const quantity = Math.max(1, Math.min(50, Math.floor(Number(item.quantity) || 1)));
+    const size = (item.size || "M").trim();
+
+    // Check size validity if defined on product
+    if (product.sizes && product.sizes.length > 0 && !product.sizes.includes(size)) {
+      // Allow custom size only if size customization is allowed
+      const isCustomAllowed = product.customization?.sizeCustomization?.toLowerCase().includes("yes");
+      if (!isCustomAllowed && !product.sizes.includes(size)) {
+        throw new Error(`Selected size "${size}" is not available for "${product.title}".`);
+      }
+    }
+
+    // Always fetch trusted price from database / product record
+    const trustedUnitPrice = Number(product.price);
+    if (isNaN(trustedUnitPrice) || trustedUnitPrice <= 0) {
+      throw new Error(`Invalid catalog price for item "${product.title}".`);
+    }
+
+    subtotal += trustedUnitPrice * quantity;
+
+    validatedItems.push({
+      id: product.id,
+      handle: product.handle,
+      title: product.title,
+      price: trustedUnitPrice,
+      size,
+      quantity,
+      image: product.image || product.images?.[0] || "",
+      dupatta: item.dupatta,
+      adOn: item.adOn,
+    });
+  }
+
+  // Validate discount code against server-stored active codes
+  let discount = 0;
+  let validCode: string | undefined = undefined;
+
+  if (discountCodeInput && discountCodeInput.trim()) {
+    const code = discountCodeInput.trim().toUpperCase();
+    let discountPercent = 0;
+
+    const availableCodes = settings.discountCodes || [
+      { code: "WELCOME5", percent: 5, active: true },
+      { code: "EID2026", percent: 10, active: true },
+    ];
+
+    const match = availableCodes.find((c) => c.code.toUpperCase() === code && c.active);
+    if (match) {
+      discountPercent = match.percent;
+      validCode = match.code;
+    } else if (code === "WELCOME5") {
+      discountPercent = 5;
+      validCode = "WELCOME5";
+    } else if (code === "EID2026") {
+      discountPercent = 10;
+      validCode = "EID2026";
+    }
+
+    if (discountPercent > 0) {
+      discount = Math.round((subtotal * discountPercent) / 100);
+    }
+  }
+
+  // Calculate shipping charges server-side
+  const freeThreshold = Number(settings.freeShippingThreshold) || 140000;
+  const standardFee = Number(settings.standardShippingFee) || 250;
+  const shipping = subtotal >= freeThreshold ? 0 : standardFee;
+
+  const total = Math.max(0, subtotal - discount + shipping);
+
+  return {
+    items: validatedItems,
+    subtotal,
+    shipping,
+    discount,
+    discountCode: validCode,
+    total,
+    currency: "PKR",
+  };
+}
+
 /* ──────────────── ORDERS ──────────────── */
 
-const INITIAL_ORDERS: Order[] = [
-  {
-    id: "ord-1001",
-    orderNumber: "SLH-10480",
-    createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-    customer: {
-      name: "Ayesha Khan",
-      email: "ayesha.khan@example.com",
-      phone: "+92 300 1234567",
-    },
-    shippingAddress: {
-      firstName: "Ayesha",
-      lastName: "Khan",
-      email: "ayesha.khan@example.com",
-      phone: "+92 300 1234567",
-      address: "House 42, Block C, Phase 5 DHA",
-      city: "Lahore",
-      state: "Punjab",
-      postalCode: "54000",
-      country: "Pakistan",
-    },
-    items: [
-      {
-        id: "iris-rm-03",
-        handle: "iris-rm-03",
-        title: "Iris",
-        price: 44900,
-        size: "M",
-        quantity: 1,
-        image: "https://sillhouete.com/cdn/shop/files/sillhouete-formal-iris-royal-blue-intricate-embroidery.jpg?v=1776742287",
-      },
-    ],
-    subtotal: 44900,
-    shipping: 0,
-    discount: 0,
-    total: 44900,
-    currency: "PKR",
-    paymentMethod: "stripe",
-    paymentStatus: "paid",
-    status: "processing",
-    trackingNumber: "TCS-98421049",
-    courier: "TCS Express",
-  },
-  {
-    id: "ord-1002",
-    orderNumber: "SLH-10481",
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-    customer: {
-      name: "Fatima Zahra",
-      email: "fatima.z@example.com",
-      phone: "+92 321 9876543",
-    },
-    shippingAddress: {
-      firstName: "Fatima",
-      lastName: "Zahra",
-      email: "fatima.z@example.com",
-      phone: "+92 321 9876543",
-      address: "Apt 4B, Clifton Block 2",
-      city: "Karachi",
-      state: "Sindh",
-      postalCode: "75600",
-      country: "Pakistan",
-    },
-    items: [
-      {
-        id: "maraki",
-        handle: "maraki",
-        title: "Maraki",
-        price: 32900,
-        size: "S",
-        quantity: 1,
-        image: "https://sillhouete.com/cdn/shop/files/sillhouete-formal-dress-meraki-light-grey-sequins.jpg?v=1769691351",
-      },
-    ],
-    subtotal: 32900,
-    shipping: 250,
-    discount: 0,
-    total: 33150,
-    currency: "PKR",
-    paymentMethod: "cod",
-    paymentStatus: "pending",
-    status: "pending",
-  },
-];
-
 export async function getOrders(): Promise<Order[]> {
-  try {
-    await connectDB();
-    const docs = await OrderModel.find({}).sort({ createdAt: -1 }).lean();
-    if (docs && docs.length > 0) {
-      return toPlainArray<Order>(docs);
-    }
-  } catch (err) {
-    console.warn("MongoDB getOrders fallback:", err);
-  }
-  return INITIAL_ORDERS;
+  await connectDB();
+  const docs = await OrderModel.find({}).sort({ createdAt: -1 }).lean();
+  return toPlainArray<Order>(docs);
 }
 
 export async function getOrderById(id: string): Promise<Order | undefined> {
-  try {
-    await connectDB();
-    const doc = await OrderModel.findOne({ $or: [{ id }, { orderNumber: id }] }).lean();
-    const o = toPlain<Order>(doc);
-    if (o) return o;
-  } catch (err) {
-    console.warn("MongoDB getOrderById fallback:", err);
-  }
-  return INITIAL_ORDERS.find((o) => o.id === id || o.orderNumber === id);
+  await connectDB();
+  const doc = await OrderModel.findOne({ $or: [{ id }, { orderNumber: id }] }).lean();
+  return toPlain<Order>(doc);
+}
+
+export async function getOrderByStripeSessionId(sessionId: string): Promise<Order | undefined> {
+  await connectDB();
+  const doc = await OrderModel.findOne({ stripeSessionId: sessionId }).lean();
+  return toPlain<Order>(doc);
+}
+
+export async function getOrderByStripePaymentIntentId(piId: string): Promise<Order | undefined> {
+  await connectDB();
+  const doc = await OrderModel.findOne({ stripePaymentIntentId: piId }).lean();
+  return toPlain<Order>(doc);
 }
 
 export async function createOrder(
@@ -290,19 +357,420 @@ export async function createOrder(
     createdAt: new Date().toISOString(),
   };
 
-  try {
-    await connectDB();
-    await OrderModel.create(newOrder);
-    await recordCustomerFromOrder(newOrder);
-    // Send Order Confirmation via nodemailer
-    sendOrderConfirmationEmail(newOrder).catch((err) =>
-      console.warn("Nodemailer order confirmation notice:", err)
+  await connectDB();
+  await OrderModel.create(newOrder);
+  await recordCustomerFromOrder(newOrder);
+
+  // For card / Stripe orders, NEVER send confirmation email at creation (order is unpaid/pending).
+  // Confirmation emails for card orders are triggered strictly when payment is verified by the Stripe webhook.
+  if (
+    newOrder.paymentMethod === "bank_transfer" ||
+    newOrder.paymentMethod === "bank_deposit" ||
+    newOrder.paymentMethod === "cod"
+  ) {
+    sendOrderConfirmationEmail(newOrder, newOrder.paymentMethod === "cod").catch((err) =>
+      console.warn("[Email Notification Error] Order confirmation dispatch:", err)
     );
-  } catch (err) {
-    console.warn("MongoDB createOrder error:", err);
   }
 
   return newOrder;
+}
+
+export async function recordOrderStripeSession(orderId: string, stripeSessionId: string): Promise<Order | null> {
+  await connectDB();
+  const doc = await OrderModel.findOneAndUpdate(
+    { $or: [{ id: orderId }, { orderNumber: orderId }] },
+    { $set: { stripeSessionId } },
+    { new: true }
+  ).lean();
+  return toPlain<Order>(doc) || null;
+}
+
+export async function recordOrderPaymentAttempt(orderId: string, paymentIntentId: string): Promise<void> {
+  await connectDB();
+  const now = new Date().toISOString();
+  await OrderModel.findOneAndUpdate(
+    { $or: [{ id: orderId }, { orderNumber: orderId }] },
+    {
+      $set: { stripePaymentIntentId: paymentIntentId },
+      $push: {
+        paymentTimeline: {
+          title: "Payment Intent Created",
+          date: now,
+          details: `Stripe PaymentIntent ${paymentIntentId} created for verified order amount.`,
+        },
+      },
+    }
+  );
+}
+
+export async function markOrderPaidByStripe(params: {
+  orderId?: string;
+  sessionId?: string;
+  paymentIntentId?: string;
+  customerId?: string;
+  amountPaid: number;
+  currency: string;
+  eventId?: string;
+  paymentDetails?: {
+    brand?: string;
+    last4?: string;
+    expMonth?: number;
+    expYear?: number;
+    funding?: string;
+  };
+}): Promise<Order | null> {
+  await connectDB();
+
+  const query: Record<string, unknown> = {};
+  if (params.orderId) {
+    query.$or = [{ id: params.orderId }, { orderNumber: params.orderId }];
+  } else if (params.sessionId) {
+    query.stripeSessionId = params.sessionId;
+  } else if (params.paymentIntentId) {
+    query.stripePaymentIntentId = params.paymentIntentId;
+  } else {
+    throw new Error("markOrderPaidByStripe requires orderId, sessionId, or paymentIntentId");
+  }
+
+  const existing = await OrderModel.findOne(query);
+  if (!existing) {
+    return null;
+  }
+
+  const alreadyPaid = existing.paymentStatus === "paid" || existing.paymentStatus === "succeeded";
+
+  existing.paymentStatus = "paid";
+  if (existing.status === "pending") {
+    existing.status = "processing";
+  }
+  if (params.sessionId) existing.stripeSessionId = params.sessionId;
+  if (params.paymentIntentId) existing.stripePaymentIntentId = params.paymentIntentId;
+  if (params.customerId) existing.stripeCustomerId = params.customerId;
+  if (params.amountPaid) existing.amountPaid = params.amountPaid;
+  existing.paidAt = new Date();
+  if (params.paymentDetails) existing.paymentDetails = params.paymentDetails;
+  if (params.eventId) {
+    existing.stripeEventIds = existing.stripeEventIds || [];
+    if (!existing.stripeEventIds.includes(params.eventId)) {
+      existing.stripeEventIds.push(params.eventId);
+    }
+  }
+
+  existing.paymentTimeline = existing.paymentTimeline || [];
+  existing.paymentTimeline.push({
+    title: "Payment Succeeded & Verified",
+    date: new Date().toISOString(),
+    details: `Stripe verified payment of Rs. ${params.amountPaid.toLocaleString()} (${params.currency.toUpperCase()}). Card: ${
+      params.paymentDetails?.brand ? params.paymentDetails.brand.toUpperCase() : "Card"
+    } •••• ${params.paymentDetails?.last4 || "****"}.`,
+  });
+
+  await existing.save();
+  const plain = toPlain<Order>(existing.toObject())!;
+
+  // Send confirmation email upon first verified successful payment
+  if (!alreadyPaid) {
+    sendOrderConfirmationEmail(plain).catch((err) =>
+      console.warn("Nodemailer payment confirmation email notice:", err)
+    );
+  }
+
+  return plain;
+}
+
+export async function markOrderPaymentFailed(params: {
+  orderId?: string;
+  paymentIntentId?: string;
+  reason: string;
+  eventId?: string;
+}): Promise<Order | null> {
+  await connectDB();
+  const query: Record<string, unknown> = {};
+  if (params.orderId) query.$or = [{ id: params.orderId }, { orderNumber: params.orderId }];
+  else if (params.paymentIntentId) query.stripePaymentIntentId = params.paymentIntentId;
+  else return null;
+
+  const order = await OrderModel.findOne(query);
+  if (!order) return null;
+
+  order.paymentStatus = "failed";
+  order.failureReason = params.reason;
+  order.paymentTimeline = order.paymentTimeline || [];
+  order.paymentTimeline.push({
+    title: "Payment Failed / Declined",
+    date: new Date().toISOString(),
+    details: params.reason,
+  });
+
+  if (params.eventId) {
+    order.stripeEventIds = order.stripeEventIds || [];
+    if (!order.stripeEventIds.includes(params.eventId)) {
+      order.stripeEventIds.push(params.eventId);
+    }
+  }
+
+  await order.save();
+  const plain = toPlain<Order>(order.toObject()) || null;
+  if (plain) {
+    sendPaymentFailureEmail(plain, params.reason).catch((err) =>
+      console.warn("[Email Notification Error] Payment failure notice:", err)
+    );
+  }
+  return plain;
+}
+
+export async function cancelOrderAndProcessRefund(params: {
+  orderId: string;
+  reason?: string;
+  cancelledBy?: string;
+}): Promise<Order | null> {
+  await connectDB();
+  const order = await OrderModel.findOne({
+    $or: [{ id: params.orderId }, { orderNumber: params.orderId }],
+  });
+  if (!order) return null;
+
+  const now = new Date();
+  const isoNow = now.toISOString();
+  const reasonText = params.reason || `Cancelled by ${params.cancelledBy || "admin"}`;
+
+  order.cancellationReason = reasonText;
+  order.cancelledAt = now;
+  order.status = "cancelled";
+
+  // Scenario B: Order is PAID -> Process automatic refund via Stripe
+  if (order.paymentStatus === "paid" || order.paymentStatus === "succeeded") {
+    const totalPaid = Number(order.amountPaid || order.total || 0);
+    const alreadyRefunded = Number(order.refundAmount || 0);
+    const refundableAmount = Math.max(0, totalPaid - alreadyRefunded);
+
+    if (refundableAmount > 0 && order.stripePaymentIntentId) {
+      try {
+        const stripe = getStripeServer();
+        const currency = (order.currency || "PKR").toLowerCase();
+        const stripeUnitAmount = toStripeAmount(refundableAmount, currency);
+
+        // Safe idempotency key to prevent duplicate refunds
+        const idempotencyKey = `refund_auto_${order.id}_${Math.round(refundableAmount * 100)}`;
+
+        const refund = await stripe.refunds.create(
+          {
+            payment_intent: order.stripePaymentIntentId,
+            amount: stripeUnitAmount,
+            reason: "requested_by_customer",
+          },
+          { idempotencyKey }
+        );
+
+        order.refundAmount = alreadyRefunded + refundableAmount;
+        order.refundId = refund.id;
+        order.refundedAt = now;
+        order.refundStatus = "refunded";
+        order.paymentStatus = "refunded";
+
+        order.refundTimeline = order.refundTimeline || [];
+        order.refundTimeline.push({
+          title: "Automatic Refund Initiated",
+          date: isoNow,
+          details: `Automatic full refund of Rs. ${refundableAmount.toLocaleString()} initiated via Stripe (Refund ID: ${
+            refund.id
+          }). Note: Funds will reflect in customer's bank account in 5-10 business days.`,
+          amount: refundableAmount,
+          refundId: refund.id,
+        });
+      } catch (refundErr: unknown) {
+        const errMsg = refundErr instanceof Error ? refundErr.message : "Stripe refund creation failed";
+        console.error(`[Auto-Refund Error for Order ${order.id}]:`, errMsg);
+        order.refundStatus = "refund_failed";
+        order.refundFailureReason = errMsg;
+        order.refundTimeline = order.refundTimeline || [];
+        order.refundTimeline.push({
+          title: "Automatic Refund Failed",
+          date: isoNow,
+          details: `Automatic refund could not be completed by Stripe: ${errMsg}. An authorized administrator can review and retry.`,
+          amount: refundableAmount,
+        });
+      }
+    } else {
+      order.refundStatus = alreadyRefunded > 0 ? "refunded" : "none";
+    }
+  } else {
+    // Scenario A: Order cancelled before payment
+    if (order.stripePaymentIntentId) {
+      try {
+        const stripe = getStripeServer();
+        const pi = await stripe.paymentIntents.retrieve(order.stripePaymentIntentId);
+        if (
+          pi.status === "requires_payment_method" ||
+          pi.status === "requires_confirmation" ||
+          pi.status === "requires_action" ||
+          pi.status === "requires_capture"
+        ) {
+          await stripe.paymentIntents.cancel(order.stripePaymentIntentId, {
+            cancellation_reason: "requested_by_customer",
+          });
+        }
+      } catch (cancelErr) {
+        console.warn("[PaymentIntent Cancel Warning]:", cancelErr);
+      }
+    }
+
+    order.paymentStatus = "cancelled";
+    order.paymentTimeline = order.paymentTimeline || [];
+    order.paymentTimeline.push({
+      title: "Order & Payment Cancelled",
+      date: isoNow,
+      details: "Order cancelled before payment completion. No refund required.",
+    });
+  }
+
+  await order.save();
+  const plain = toPlain<Order>(order.toObject()) || null;
+  if (plain) {
+    sendOrderCancellationEmail(plain, reasonText).catch((err) =>
+      console.warn("[Email Notification Error] Order cancellation notice:", err)
+    );
+    if (order.refundAmount && order.refundAmount > 0) {
+      sendRefundInitiatedEmail(plain, order.refundAmount, true, order.refundId).catch((err) =>
+        console.warn("[Email Notification Error] Refund initiated notice:", err)
+      );
+    }
+  }
+  return plain;
+}
+
+export async function processPartialRefund(params: {
+  orderId: string;
+  amount: number;
+  reason?: string;
+  initiatedBy?: string;
+}): Promise<Order | null> {
+  await connectDB();
+  const order = await OrderModel.findOne({
+    $or: [{ id: params.orderId }, { orderNumber: params.orderId }],
+  });
+  if (!order) throw new Error("Order not found.");
+
+  if (!order.stripePaymentIntentId) {
+    throw new Error("No Stripe PaymentIntent associated with this order.");
+  }
+
+  const totalPaid = Number(order.amountPaid || order.total || 0);
+  const alreadyRefunded = Number(order.refundAmount || 0);
+  const remainingRefundable = Math.max(0, totalPaid - alreadyRefunded);
+
+  if (params.amount <= 0) {
+    throw new Error("Refund amount must be greater than zero.");
+  }
+
+  if (params.amount > remainingRefundable) {
+    throw new Error(
+      `Cannot refund Rs. ${params.amount}. Maximum remaining refundable amount is Rs. ${remainingRefundable}.`
+    );
+  }
+
+  const now = new Date();
+  const isoNow = now.toISOString();
+  const stripe = getStripeServer();
+  const currency = (order.currency || "PKR").toLowerCase();
+  const stripeUnitAmount = toStripeAmount(params.amount, currency);
+
+  const idempotencyKey = `refund_part_${order.id}_${Math.round(params.amount * 100)}_${Date.now()}`;
+
+  const refund = await stripe.refunds.create(
+    {
+      payment_intent: order.stripePaymentIntentId,
+      amount: stripeUnitAmount,
+      reason: "requested_by_customer",
+    },
+    { idempotencyKey }
+  );
+
+  const newTotalRefunded = alreadyRefunded + params.amount;
+  const isFull = newTotalRefunded >= totalPaid;
+
+  order.refundAmount = newTotalRefunded;
+  order.refundId = refund.id;
+  order.refundedAt = now;
+  order.refundStatus = isFull ? "refunded" : "partially_refunded";
+  order.paymentStatus = isFull ? "refunded" : "partially_refunded";
+
+  order.refundTimeline = order.refundTimeline || [];
+  order.refundTimeline.push({
+    title: isFull ? "Full Refund Completed" : "Partial Refund Issued",
+    date: isoNow,
+    details: `${isFull ? "Full" : "Partial"} refund of Rs. ${params.amount.toLocaleString()} processed via Stripe (Refund ID: ${
+      refund.id
+    }). Reason: ${params.reason || "Customer request"}.`,
+    amount: params.amount,
+    refundId: refund.id,
+  });
+
+  await order.save();
+  const plain = toPlain<Order>(order.toObject()) || null;
+  if (plain) {
+    sendRefundInitiatedEmail(plain, params.amount, isFull, refund.id).catch((err) =>
+      console.warn("[Email Notification Error] Partial refund notice:", err)
+    );
+  }
+  return plain;
+}
+
+export async function recordOrderRefund(params: {
+  orderId?: string;
+  paymentIntentId?: string;
+  refundId: string;
+  refundAmount: number;
+  isFullRefund: boolean;
+  eventId?: string;
+}): Promise<Order | null> {
+  await connectDB();
+
+  const query: Record<string, unknown> = {};
+  if (params.orderId) {
+    query.$or = [{ id: params.orderId }, { orderNumber: params.orderId }];
+  } else if (params.paymentIntentId) {
+    query.stripePaymentIntentId = params.paymentIntentId;
+  } else {
+    throw new Error("recordOrderRefund requires orderId or paymentIntentId");
+  }
+
+  const order = await OrderModel.findOne(query);
+  if (!order) return null;
+
+  order.refundId = params.refundId;
+  order.refundAmount = (order.refundAmount || 0) + params.refundAmount;
+  order.refundStatus = params.isFullRefund ? "refunded" : "partially_refunded";
+  order.paymentStatus = params.isFullRefund ? "refunded" : "partially_refunded";
+  order.refundedAt = new Date();
+
+  order.refundTimeline = order.refundTimeline || [];
+  order.refundTimeline.push({
+    title: params.isFullRefund ? "Full Refund Verified via Webhook" : "Partial Refund Verified via Webhook",
+    date: new Date().toISOString(),
+    details: `Stripe webhook confirmed refund of Rs. ${params.refundAmount.toLocaleString()} (Refund ID: ${
+      params.refundId
+    }).`,
+    amount: params.refundAmount,
+    refundId: params.refundId,
+  });
+
+  if (params.eventId) {
+    order.stripeEventIds = order.stripeEventIds || [];
+    if (!order.stripeEventIds.includes(params.eventId)) {
+      order.stripeEventIds.push(params.eventId);
+    }
+  }
+
+  await order.save();
+  const plain = toPlain<Order>(order.toObject()) || null;
+  if (plain) {
+    sendRefundSuccessfulEmail(plain, params.refundAmount, params.isFullRefund, params.refundId).catch((err) =>
+      console.warn("[Email Notification Error] Refund confirmation notice:", err)
+    );
+  }
+  return plain;
 }
 
 export async function deleteOrder(id: string): Promise<boolean> {
@@ -318,8 +786,21 @@ export async function deleteOrder(id: string): Promise<boolean> {
 
 export async function updateOrderStatus(
   id: string,
-  updates: { status?: OrderStatus; paymentStatus?: PaymentStatus; trackingNumber?: string; courier?: string },
+  updates: {
+    status?: OrderStatus;
+    paymentStatus?: PaymentStatus;
+    trackingNumber?: string;
+    courier?: string;
+    trackingUrl?: string;
+    shippingDate?: Date;
+    estimatedDeliveryDate?: string;
+  },
 ): Promise<Order | null> {
+  // If order is transitioning to cancelled, execute complete automatic cancellation & refund logic!
+  if (updates.status === "cancelled") {
+    return cancelOrderAndProcessRefund({ orderId: id, reason: "Order cancelled by administrator" });
+  }
+
   try {
     await connectDB();
     const doc = await OrderModel.findOneAndUpdate(
@@ -327,7 +808,16 @@ export async function updateOrderStatus(
       { $set: updates },
       { new: true }
     ).lean();
-    if (doc) return toPlain<Order>(doc)!;
+    if (doc) {
+      const plainOrder = toPlain<Order>(doc)!;
+      // Send shipping / tracking update email via nodemailer
+      if (updates.status || updates.trackingNumber || updates.trackingUrl) {
+        sendShippingUpdateEmail(plainOrder).catch((err) =>
+          console.warn("[Email Notification Error] Shipping update notice:", err)
+        );
+      }
+      return plainOrder;
+    }
   } catch (err) {
     console.warn("MongoDB updateOrderStatus error:", err);
   }

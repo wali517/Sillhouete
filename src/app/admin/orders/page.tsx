@@ -10,7 +10,7 @@ import { formatPrice } from "@/lib/format";
 import type { Order } from "@/types";
 
 const STATUS_OPTIONS = ["pending", "processing", "shipped", "delivered", "cancelled"];
-const PAYMENT_OPTIONS = ["pending", "paid", "failed", "refunded"];
+const PAYMENT_OPTIONS = ["pending", "processing", "paid", "failed", "partially_refunded", "refunded"];
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-amber-100 text-amber-800",
@@ -22,8 +22,10 @@ const STATUS_COLORS: Record<string, string> = {
 
 const PAYMENT_COLORS: Record<string, string> = {
   pending: "bg-amber-100 text-amber-800",
+  processing: "bg-blue-100 text-blue-800",
   paid: "bg-emerald-100 text-emerald-800",
   failed: "bg-red-100 text-red-800",
+  partially_refunded: "bg-purple-100 text-purple-800",
   refunded: "bg-gray-100 text-gray-800",
 };
 
@@ -208,9 +210,19 @@ export default function AdminOrdersPage() {
                       </td>
                       <td className="px-4 py-3 text-right font-semibold">{formatPrice(order.total)}</td>
                       <td className="px-4 py-3 hidden lg:table-cell">
-                        <span className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase ${PAYMENT_COLORS[order.paymentStatus] || "bg-gray-100 text-gray-700"}`}>
-                          {order.paymentStatus}
-                        </span>
+                        <div className="flex flex-col gap-1 items-start">
+                          <span className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase ${PAYMENT_COLORS[order.paymentStatus] || "bg-gray-100 text-gray-700"}`}>
+                            {order.paymentStatus.replace("_", " ")}
+                          </span>
+                          <span className="text-[11px] text-gray-500 capitalize">
+                            {order.paymentMethod === "stripe" ? "Stripe Card" : order.paymentMethod.replace("_", " ")}
+                          </span>
+                          {order.refundAmount && order.refundAmount > 0 ? (
+                            <span className="text-[10px] text-purple-700 font-semibold">
+                              Refunded: {formatPrice(order.refundAmount)}
+                            </span>
+                          ) : null}
+                        </div>
                       </td>
                       <td className="px-4 py-3">
                         <span className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase ${STATUS_COLORS[order.status] || "bg-gray-100 text-gray-700"}`}>

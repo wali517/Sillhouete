@@ -15,13 +15,14 @@ import {
   LogOut,
   Menu,
   X,
-  ShieldAlert,
+  CreditCard,
 } from "lucide-react";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Products", href: "/admin/products", icon: ShoppingBag },
   { label: "Orders", href: "/admin/orders", icon: Package },
+  { label: "Payments", href: "/admin/payments", icon: CreditCard },
   { label: "Customers", href: "/admin/customers", icon: Users },
   { label: "Inquiries", href: "/admin/messages", icon: MessageSquare },
   { label: "Blogs", href: "/admin/blogs", icon: FileText },

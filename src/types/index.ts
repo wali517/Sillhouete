@@ -120,8 +120,39 @@ export interface OrderShippingAddress {
 }
 
 export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
-export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
-export type PaymentMethod = "stripe" | "cod" | "bank_transfer";
+export type PaymentStatus =
+  | "pending"
+  | "processing"
+  | "succeeded"
+  | "paid"
+  | "failed"
+  | "cancelled"
+  | "partially_refunded"
+  | "refunded";
+export type RefundStatus =
+  | "none"
+  | "pending"
+  | "processing"
+  | "partially_refunded"
+  | "refunded"
+  | "refund_failed";
+export type PaymentMethod = "stripe" | "cod" | "bank_transfer" | "bank_deposit" | "credit_card" | "payfast" | "pay_by_card";
+
+export interface StripePaymentDetails {
+  brand?: string;
+  last4?: string;
+  expMonth?: number;
+  expYear?: number;
+  funding?: string;
+}
+
+export interface OrderTimelineEvent {
+  title: string;
+  date: string;
+  details?: string;
+  amount?: number;
+  refundId?: string;
+}
 
 export interface Order {
   id: string;
@@ -133,6 +164,7 @@ export interface Order {
     phone: string;
   };
   shippingAddress: OrderShippingAddress;
+  billingAddress?: OrderShippingAddress;
   items: OrderItem[];
   subtotal: number;
   shipping: number;
@@ -146,7 +178,44 @@ export interface Order {
   notes?: string;
   trackingNumber?: string;
   courier?: string;
+  trackingUrl?: string;
+  shippingDate?: string;
+  estimatedDeliveryDate?: string;
+
+  // Stripe Payment Details
+  stripeSessionId?: string;
   stripePaymentIntentId?: string;
+  stripeCustomerId?: string;
+  stripeEventIds?: string[];
+  amountPaid?: number;
+  paidAt?: string;
+  paymentDetails?: StripePaymentDetails;
+  failureReason?: string;
+  cancellationReason?: string;
+  cancelledAt?: string;
+  refundAmount?: number;
+  remainingRefundable?: number;
+  refundStatus?: RefundStatus;
+  refundId?: string;
+  refundedAt?: string;
+  refundFailureReason?: string;
+  paymentTimeline?: OrderTimelineEvent[];
+  refundTimeline?: OrderTimelineEvent[];
+}
+
+export interface NotificationRecord {
+  id: string;
+  orderId?: string;
+  orderNumber?: string;
+  type: string;
+  recipient: string;
+  subject: string;
+  status: "sent" | "failed" | "simulated" | "queued";
+  messageId?: string;
+  attempts: number;
+  lastError?: string;
+  sentAt?: string;
+  createdAt: string;
 }
 
 export interface Customer {

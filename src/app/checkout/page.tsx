@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState, useMemo, useRef, type FormEvent, type ChangeEvent } from "react";
+import { useEffect, useState, useMemo, type FormEvent, type ChangeEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Script from "next/script";
 import { useRouter } from "next/navigation";
 import {
   ChevronDown,
@@ -13,6 +12,7 @@ import {
   HelpCircle,
   Check,
   ArrowLeft,
+  AlertCircle,
 } from "lucide-react";
 import {
   VisaBadge as SharedVisa,
@@ -20,7 +20,7 @@ import {
   AmexBadge as SharedAmex,
   UnionPayBadge as SharedUnionPay,
 } from "@/components/ui/CardBadges";
-import { loadStripe, type Stripe as StripeType } from "@stripe/stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
   CardNumberElement,
@@ -55,22 +55,22 @@ function formatPricePkr(amt: number) {
   return `Rs ${Math.round(amt).toLocaleString("en-US")}.00`;
 }
 
-/* ─── Card badges ─── */
+/* ──────── Card badges ──────── */
 const BADGE_CLASS = "h-5 w-8 shrink-0";
 const VisaBadge = () => <SharedVisa className={BADGE_CLASS} />;
 const MastercardBadge = () => <SharedMaster className={BADGE_CLASS} />;
 const AmexBadge = () => <SharedAmex className={BADGE_CLASS} />;
 const UnionPayBadge = () => <SharedUnionPay className={BADGE_CLASS} />;
 
-function PlusOneBadge() {
+function PlusThreeBadge() {
   return (
     <span className="inline-flex items-center justify-center h-5 px-1.5 rounded-[3px] bg-white border border-[#d9d9d9] text-[#707070] font-semibold text-[10px] select-none shrink-0">
-      +1
+      +3
     </span>
   );
 }
 
-/* ─── Floating Label Input ─── */
+/* ──────── Floating Label Input ──────── */
 function FloatingInput({
   id,
   label,
@@ -97,9 +97,9 @@ function FloatingInput({
   const [focused, setFocused] = useState(false);
   const raised = focused || value.length > 0;
   return (
-    <div className={`relative ${className ?? ""}`}>
+    <div className={`relative w-full min-w-0 ${className ?? ""}`}>
       <div
-        className={`relative border rounded-[5px] bg-white transition-all ${
+        className={`relative w-full min-w-0 border rounded-[5px] bg-white transition-all ${
           focused
             ? "border-[#005bd3] ring-1 ring-[#005bd3] shadow-[0_0_0_1px_#005bd3]"
             : "border-[#d9d9d9] hover:border-[#707070]"
@@ -125,7 +125,9 @@ function FloatingInput({
           onChange={onChange}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          className="w-full bg-transparent outline-none pt-5 pb-1.5 px-3.5 pr-10 text-[14px] text-[#1a1a1a] leading-tight"
+          className={`w-full min-w-0 bg-transparent outline-none pt-5 pb-1.5 px-3.5 text-[14px] text-[#1a1a1a] leading-tight ${
+            endIcon ? "pr-10" : "pr-3.5"
+          }`}
         />
         {endIcon && (
           <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#707070] pointer-events-none">
@@ -137,7 +139,7 @@ function FloatingInput({
   );
 }
 
-/* ─── Floating Label Select ─── */
+/* ──────── Floating Label Select ──────── */
 function FloatingSelect({
   id,
   label,
@@ -156,7 +158,7 @@ function FloatingSelect({
   const [focused, setFocused] = useState(false);
   return (
     <div
-      className={`relative border rounded-[5px] bg-white transition-all ${
+      className={`relative w-full min-w-0 border rounded-[5px] bg-white transition-all ${
         focused
           ? "border-[#005bd3] ring-1 ring-[#005bd3] shadow-[0_0_0_1px_#005bd3]"
           : "border-[#d9d9d9] hover:border-[#707070]"
@@ -175,7 +177,7 @@ function FloatingSelect({
         autoComplete={autoComplete}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        className="w-full bg-transparent outline-none pt-5 pb-1.5 px-3.5 pr-8 text-[14px] text-[#1a1a1a] appearance-none cursor-pointer leading-tight"
+        className="w-full min-w-0 bg-transparent outline-none pt-5 pb-1.5 px-3.5 pr-8 text-[14px] text-[#1a1a1a] appearance-none cursor-pointer leading-tight"
       >
         {children}
       </select>
@@ -186,18 +188,31 @@ function FloatingSelect({
   );
 }
 
-/* ─── Stripe Card Element wrapper with floating label style ─── */
-const STRIPE_ELEMENT_STYLE = {
-  style: {
-    base: {
-      fontSize: "14px",
-      color: "#1a1a1a",
-      fontFamily:
-        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-      "::placeholder": { color: "transparent" },
-    },
-    invalid: { color: "#e74c3c" },
+/* ──────── Stripe Card Element wrapper with floating label style ──────── */
+const STRIPE_ELEMENT_BASE_STYLE = {
+  base: {
+    fontSize: "14px",
+    color: "#1a1a1a",
+    fontFamily:
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    "::placeholder": { color: "#9ca3af" },
   },
+  invalid: { color: "#e74c3c" },
+};
+
+// disableLink: true completely removes the green "Save with ->" Stripe Link button
+// so the user types/pastes their card directly into the field without any popup modal.
+const STRIPE_CARD_NUMBER_OPTIONS = {
+  style: STRIPE_ELEMENT_BASE_STYLE,
+  disableLink: true,
+};
+
+const STRIPE_CARD_EXPIRY_OPTIONS = {
+  style: STRIPE_ELEMENT_BASE_STYLE,
+};
+
+const STRIPE_CARD_CVC_OPTIONS = {
+  style: STRIPE_ELEMENT_BASE_STYLE,
 };
 
 function StripeFloatingField({
@@ -212,7 +227,7 @@ function StripeFloatingField({
   const [focused, setFocused] = useState(false);
   return (
     <div
-      className={`relative border rounded-[5px] bg-white transition-all ${
+      className={`relative w-full min-w-0 border rounded-[5px] bg-white transition-all ${
         focused
           ? "border-[#005bd3] ring-1 ring-[#005bd3] shadow-[0_0_0_1px_#005bd3]"
           : "border-[#d9d9d9] hover:border-[#707070]"
@@ -223,7 +238,7 @@ function StripeFloatingField({
       <label className="absolute left-3.5 top-1.5 text-[10.5px] text-[#707070] pointer-events-none select-none">
         {label}
       </label>
-      <div className="pt-5 pb-1.5 px-3.5 pr-10">{children}</div>
+      <div className={`pt-5 pb-1.5 px-3.5 ${endIcon ? "pr-10" : "pr-3.5"}`}>{children}</div>
       {endIcon && (
         <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#707070] pointer-events-none">
           {endIcon}
@@ -233,7 +248,7 @@ function StripeFloatingField({
   );
 }
 
-/* ─── Main Checkout Form ─── */
+/* ──────── Main Checkout Form Component ──────── */
 function CheckoutForm() {
   const router = useRouter();
   const { items, subtotal, clearCart, orderNote, settings } = useStore();
@@ -253,11 +268,25 @@ function CheckoutForm() {
     country: "Pakistan",
   });
 
-  type PayMethod = "bank_deposit" | "payfast" | "pay_by_card";
-  const [paymentMethod, setPaymentMethod] = useState<PayMethod>("bank_deposit");
+  type PayMethod = "credit_card" | "payfast" | "pay_by_card" | "bank_deposit";
+  const [paymentMethod, setPaymentMethod] = useState<PayMethod>("credit_card");
   const [emailOffers, setEmailOffers] = useState(true);
   const [saveInfo, setSaveInfo] = useState(false);
+  const [useShippingAsBilling, setUseShippingAsBilling] = useState(true);
   const [billingSame, setBillingSame] = useState(true);
+
+  const [billingForm, setBillingForm] = useState<OrderShippingAddress>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+    apartment: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "Pakistan",
+  });
 
   // Discount
   const [discountCode, setDiscountCode] = useState("");
@@ -270,17 +299,20 @@ function CheckoutForm() {
 
   // Card details
   const [cardName, setCardName] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardExpiry, setCardExpiry] = useState("");
-  const [cardCvc, setCardCvc] = useState("");
 
-  // Submit
+  // Submit / processing state
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isGatewayConfigError, setIsGatewayConfigError] = useState(false);
+  const [configErrorType, setConfigErrorType] = useState<"secret" | "publishable" | null>(null);
 
-  // Stripe Dahlia Embedded Form state
-  const [embeddedFormMounted, setEmbeddedFormMounted] = useState(false);
-  const checkoutInstanceRef = useRef<any>(null);
+  const discountAmount = appliedDiscount
+    ? Math.round((subtotal * appliedDiscount.percent) / 100)
+    : 0;
+  const freeThreshold = settings?.freeShippingThreshold ?? 140000;
+  const standardFee = settings?.standardShippingFee ?? 250;
+  const shippingFee = subtotal >= freeThreshold ? 0 : standardFee;
+  const totalAmount = Math.max(0, subtotal - discountAmount + shippingFee);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -292,127 +324,6 @@ function CheckoutForm() {
       })
       .catch(() => {});
   }, []);
-
-  const discountAmount = appliedDiscount
-    ? Math.round((subtotal * appliedDiscount.percent) / 100)
-    : 0;
-  const freeThreshold = settings?.freeShippingThreshold ?? 140000;
-  const standardFee = settings?.standardShippingFee ?? 250;
-  const shippingFee = subtotal >= freeThreshold ? 0 : standardFee;
-  const totalAmount = Math.max(0, subtotal - discountAmount + shippingFee);
-
-  // Initialize Dahlia Embedded Checkout Form SDK when card option is chosen
-  useEffect(() => {
-    if (paymentMethod !== "pay_by_card") return;
-    if (embeddedFormMounted) return;
-
-    const pubKey =
-      settings?.stripePublishableKey ||
-      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
-      "";
-
-    // Only proceed if a real live/test publishable key is present (starts with pk_test_ or pk_live_)
-    const isRealPubKey =
-      typeof pubKey === "string" &&
-      pubKey.length >= 40 &&
-      (pubKey.startsWith("pk_test_") || pubKey.startsWith("pk_live_"));
-
-    if (!isRealPubKey) {
-      setEmbeddedFormMounted(false);
-      return;
-    }
-
-    let active = true;
-
-    const initDahlia = async () => {
-      const win = typeof window !== "undefined" ? (window as any) : null;
-      if (!win?.Stripe) return;
-
-      try {
-        const stripeInstance = win.Stripe(pubKey);
-        if (typeof stripeInstance?.initCheckoutFormSdk !== "function") return;
-
-        const res = await fetch("/api/stripe/create-checkout-session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            amount: totalAmount,
-            currency: "pkr",
-            items: items.map((i) => ({ title: i.product.title, quantity: i.quantity })),
-            customerEmail: form.email,
-          }),
-        });
-        const data = await res.json();
-        const clientSecret = data?.client_secret;
-
-        // Only mount Dahlia if the session was successfully created on Stripe's live API
-        if (!data?.isLiveOrTestKey || !clientSecret || !active) {
-          setEmbeddedFormMounted(false);
-          return;
-        }
-
-        const appearance = {
-          theme: "stripe",
-          inputs: "spaced",
-          labels: "auto",
-          variables: {
-            borderRadius: "4px",
-            colorBackground: "#ffffff",
-            colorDanger: "#df1b41",
-            colorPrimary: "#0570de",
-            colorSuccess: "#00c853",
-            colorText: "#30313d",
-            fontFamily: "default",
-            fontSizeBase: "16px",
-            spacingUnit: "4px",
-          },
-        };
-
-        const checkout = stripeInstance.initCheckoutFormSdk({
-          clientSecret,
-          appearance,
-        });
-        checkoutInstanceRef.current = checkout;
-
-        const container = document.getElementById("checkout-form");
-        if (container && active) {
-          container.innerHTML = "";
-          const checkoutForm = checkout.createForm({ layout: "expanded" });
-
-          checkoutForm.on("loaderror", (err: any) => {
-            console.warn("Stripe Dahlia form load error:", err);
-            setEmbeddedFormMounted(false);
-          });
-
-          checkoutForm.mount("#checkout-form");
-
-          try {
-            const loadActionsResult = await checkout.loadActions();
-            if (loadActionsResult?.type === "success" && active) {
-              setEmbeddedFormMounted(true);
-              checkoutForm.on("confirm", (event: any) => {
-                loadActionsResult.actions.confirm({ formConfirmEvent: event });
-              });
-            } else {
-              setEmbeddedFormMounted(false);
-            }
-          } catch (loadErr) {
-            console.warn("checkout.loadActions catch:", loadErr);
-            setEmbeddedFormMounted(false);
-          }
-        }
-      } catch (e) {
-        console.warn("Dahlia embedded form notice:", e);
-        setEmbeddedFormMounted(false);
-      }
-    };
-
-    const timer = setTimeout(initDahlia, 400);
-    return () => {
-      active = false;
-      clearTimeout(timer);
-    };
-  }, [paymentMethod, embeddedFormMounted, settings, totalAmount, items, form.email]);
 
   const field = (key: keyof OrderShippingAddress) => ({
     value: String(form[key] ?? ""),
@@ -435,110 +346,213 @@ function CheckoutForm() {
     }
   };
 
+  /**
+   * Handles checkout form submission.
+   * If Credit Card is chosen, validates form, creates pending order on server,
+   * creates PaymentIntent on server, and confirms payment directly using Stripe Elements.
+   */
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErrorMessage("");
+    setIsGatewayConfigError(false);
+    setConfigErrorType(null);
 
     if (!form.email || !form.firstName || !form.lastName || !form.address || !form.city || !form.phone) {
       setErrorMessage("Please complete all required fields.");
       return;
     }
 
-    setIsProcessing(true);
-    let stripePaymentIntentId: string | undefined;
-
-    if (paymentMethod === "pay_by_card") {
-      try {
-        const res = await fetch("/api/stripe/create-payment-intent", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            amount: totalAmount,
-            currency: "pkr",
-            items: items.map((i) => ({ title: i.product.title, quantity: i.quantity })),
-            customerEmail: form.email,
-          }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Card processing failed");
-        const { clientSecret, isLiveOrTestKey, id: piId } = data;
-
-        if (isLiveOrTestKey && stripe && elements) {
-          const cardEl = elements.getElement(CardNumberElement);
-          if (cardEl) {
-            const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-              payment_method: {
-                card: cardEl,
-                billing_details: { name: cardName || form.email, email: form.email },
-              },
-            });
-            if (error) {
-              console.warn("Card processing notice:", error.message);
-              stripePaymentIntentId = piId || `pi_slh_${Date.now()}`;
-            } else {
-              stripePaymentIntentId = paymentIntent?.id;
-            }
-          } else {
-            stripePaymentIntentId = piId;
-          }
-        } else {
-          stripePaymentIntentId = piId;
-        }
-      } catch (err: unknown) {
-        console.warn("Card step notice:", err);
-        stripePaymentIntentId = `pi_slh_${Date.now()}`;
-      }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email.trim())) {
+      setErrorMessage("Please enter a valid email address.");
+      return;
     }
 
+    setIsProcessing(true);
+
     try {
+      // 1. Create pending order on the server
+      // The server recalculates and validates product prices, stock, discounts, and shipping fee.
       const orderRes = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           shippingAddress: form,
+          billingAddress: useShippingAsBilling ? form : (billingSame ? form : billingForm),
           items: items.map((i) => ({
             id: i.product.id,
             handle: i.product.handle,
-            title: i.product.title,
-            price: i.unitPrice ?? i.product.price,
             size: i.size,
             quantity: i.quantity,
-            image: i.product.image,
             dupatta: i.dupatta,
             adOn: i.adOn,
           })),
-          subtotal,
-          shipping: shippingFee,
-          discount: discountAmount,
           discountCode: appliedDiscount?.code || "",
-          total: totalAmount,
-          currency: "PKR",
           paymentMethod:
-            paymentMethod === "bank_deposit"
+            paymentMethod === "credit_card"
+              ? "stripe"
+              : paymentMethod === "bank_deposit"
               ? "bank_transfer"
               : paymentMethod === "payfast"
               ? "payfast"
-              : "stripe",
-          paymentStatus:
-            paymentMethod === "bank_deposit" || paymentMethod === "payfast"
-              ? "pending"
-              : "paid",
+              : "pay_by_card",
           notes: orderNote,
-          stripePaymentIntentId,
         }),
       });
+
       const orderData = await orderRes.json();
-      if (!orderRes.ok) throw new Error(orderData.error || "Failed to create order");
-      clearCart();
-      router.push(`/order-confirmation/${orderData.order.id}`);
+      if (!orderRes.ok) {
+        throw new Error(orderData.error || "Failed to create order on server.");
+      }
+
+      const createdOrder = orderData.order;
+
+      // 2. If Bank Deposit or manual payment, finish immediately
+      if (paymentMethod !== "credit_card") {
+        clearCart();
+        router.push(`/order-confirmation/${createdOrder.id}`);
+        return;
+      }
+
+      // 3. Credit Card Payment via Stripe Elements
+      if (!stripe || !elements) {
+        throw new Error("Stripe payment components are not ready. Please refresh the page.");
+      }
+
+      const cardEl = elements.getElement(CardNumberElement);
+      if (!cardEl) {
+        throw new Error("Card input field not found. Please refresh the page.");
+      }
+
+      // 4. Create Stripe PaymentIntent for this verified order on the server
+      const piRes = await fetch("/api/stripe/create-payment-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: createdOrder.id }),
+      });
+
+      const piData = await piRes.json();
+      if (!piRes.ok) {
+        if (piData?.keyType === "secret" || piData?.isConfigError) {
+          setIsGatewayConfigError(true);
+          setConfigErrorType("secret");
+          setErrorMessage(
+            "Card payment service is temporarily unavailable due to a server payment gateway check. Please select Cash on Delivery or Bank Deposit, or contact store support."
+          );
+          setIsProcessing(false);
+          return;
+        }
+        throw new Error(piData.error || "Failed to initialize Stripe payment.");
+      }
+
+      const { clientSecret } = piData;
+      if (!clientSecret) {
+        throw new Error("Did not receive a valid client secret from payment processor.");
+      }
+
+      // 5. Confirm card payment securely directly on the page via Stripe.js
+      const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: cardEl,
+          billing_details: {
+            name: cardName.trim() || `${form.firstName} ${form.lastName}`.trim(),
+            email: form.email.trim(),
+            phone: form.phone.trim(),
+            address: {
+              line1: (useShippingAsBilling ? form.address : billingForm.address) || "",
+              line2: (useShippingAsBilling ? form.apartment : billingForm.apartment) || "",
+              city: (useShippingAsBilling ? form.city : billingForm.city) || "",
+              postal_code: (useShippingAsBilling ? form.postalCode : billingForm.postalCode) || "",
+              country: "PK",
+            },
+          },
+        },
+      });
+
+      if (stripeError) {
+        const rawMsg = stripeError.message || "Card payment could not be completed.";
+        const isAuthError =
+          rawMsg.toLowerCase().includes("invalid api key") ||
+          rawMsg.toLowerCase().includes("unauthorized") ||
+          (stripeError.type === "invalid_request_error" && rawMsg.toLowerCase().includes("key"));
+
+        if (isAuthError) {
+          console.error(
+            "[Stripe Setup Error] Your Stripe Publishable Key is invalid or expired in Stripe Dashboard:",
+            rawMsg
+          );
+          setIsGatewayConfigError(true);
+          setConfigErrorType("publishable");
+          setErrorMessage(
+            "Card payment service is temporarily unavailable due to a gateway configuration check. Please select Cash on Delivery or Bank Deposit, or contact store support."
+          );
+        } else {
+          setIsGatewayConfigError(false);
+          setErrorMessage(rawMsg);
+        }
+        setIsProcessing(false);
+        return;
+      }
+
+      if (paymentIntent && (paymentIntent.status === "succeeded" || paymentIntent.status === "processing")) {
+        // Immediately sync verified payment status with backend before redirecting
+        // so MongoDB marks the order PAID and order-confirmation immediately shows "Paid" (Green)
+        try {
+          await fetch("/api/stripe/sync-payment-status", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              orderId: createdOrder.id,
+              paymentIntentId: paymentIntent.id,
+            }),
+          });
+        } catch (syncErr) {
+          console.warn("[Stripe] Pre-redirect sync warning:", syncErr);
+        }
+
+        clearCart();
+        router.push(`/order-confirmation/${createdOrder.id}`);
+        return;
+      }
+
+      throw new Error("Payment status unconfirmed. Please check your bank or contact support.");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "An error occurred";
-      setErrorMessage(msg);
+      const rawMsg = err instanceof Error ? err.message : "An error occurred during checkout.";
+      const isSecretKeyError =
+        rawMsg.includes("sk_live_") ||
+        rawMsg.includes("sk_test_") ||
+        rawMsg.includes("STRIPE_SECRET_KEY") ||
+        rawMsg.toLowerCase().includes("server payment gateway");
+      const isPublishableKeyError =
+        rawMsg.includes("pk_live_") ||
+        rawMsg.includes("pk_test_") ||
+        rawMsg.includes("wallet-config");
+      const isAuthError =
+        isSecretKeyError ||
+        isPublishableKeyError ||
+        rawMsg.toLowerCase().includes("invalid api key") ||
+        rawMsg.toLowerCase().includes("unauthorized");
+
+      if (isAuthError) {
+        setIsGatewayConfigError(true);
+        setConfigErrorType(isSecretKeyError ? "secret" : "publishable");
+        console.error(
+          `[Stripe Setup Error] Stripe credentials rejected (${isSecretKeyError ? "STRIPE_SECRET_KEY" : "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"}):`,
+          rawMsg
+        );
+        setErrorMessage(
+          "Card payment service is temporarily unavailable due to a gateway configuration check. Please select Cash on Delivery or Bank Deposit, or contact store support."
+        );
+      } else {
+        setIsGatewayConfigError(false);
+        setErrorMessage(rawMsg);
+      }
       setIsProcessing(false);
     }
   };
 
   const displayItems = items.length > 0 ? items : [];
+  const showBillingSection = paymentMethod !== "credit_card" || !useShippingAsBilling;
 
   /* If cart is empty, show clean message */
   if (items.length === 0) {
@@ -551,7 +565,7 @@ function CheckoutForm() {
         }}
       >
         <header className="border-b border-[#e1e1e1] px-4 py-6">
-          <div className="max-w-[1240px] mx-auto relative flex items-center justify-center">
+          <div className="max-w-[1140px] mx-auto relative flex items-center justify-center">
             <Link href="/" className="inline-block" aria-label="Sillhouete Home">
               <Image
                 src={SITE.logo}
@@ -559,6 +573,7 @@ function CheckoutForm() {
                 width={200}
                 height={62}
                 priority
+                unoptimized
                 className="h-[46px] md:h-[56px] w-auto object-contain"
               />
             </Link>
@@ -590,12 +605,9 @@ function CheckoutForm() {
         </div>
 
         <footer className="border-t border-[#e1e1e1] py-4 px-4 text-center text-[12px] text-[#707070]">
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/pages/policies" className="hover:underline">Refund policy</Link>
-            <Link href="/pages/shipping-policy" className="hover:underline">Shipping policy</Link>
-            <Link href="/pages/privacy-policy" className="hover:underline">Privacy policy</Link>
-            <Link href="/pages/terms-and-conditions" className="hover:underline">Terms of service</Link>
-          </div>
+          <Link href="/pages/policies" className="text-[#005bd3] underline hover:no-underline">
+            Terms and policies
+          </Link>
         </footer>
       </div>
     );
@@ -603,20 +615,15 @@ function CheckoutForm() {
 
   return (
     <div
-      className="min-h-screen bg-white"
+      className="min-h-screen bg-white w-full overflow-x-hidden"
       style={{
         fontFamily:
           '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
       }}
     >
-      {/* ══════════════════════════════════════════════════════════════════════
-          TOP HEADER — Exactly matching sillhouete.com screenshot
-          - Centered official Urdu & English logo
-          - Blue Shopping Bag icon on the far right
-          - Pure white background spanning the entire top
-      ══════════════════════════════════════════════════════════════════════ */}
-      <header className="w-full bg-white border-b border-[#ebebeb] md:border-b-0 py-5 md:py-7 px-4 sm:px-8">
-        <div className="max-w-[1240px] mx-auto relative flex items-center justify-center">
+      {/* ──────── TOP HEADER: Exactly matching sillhouete.com screenshot ──────── */}
+      <header className="w-full bg-white border-b border-[#e1e1e1] py-5 md:py-6 px-4 sm:px-6">
+        <div className="max-w-[1140px] mx-auto relative flex items-center justify-center">
           {/* Centered Brand Logo */}
           <Link
             href="/"
@@ -629,7 +636,8 @@ function CheckoutForm() {
               width={220}
               height={70}
               priority
-              className="h-[46px] md:h-[58px] w-auto object-contain"
+              unoptimized
+              className="h-[46px] md:h-[54px] w-auto object-contain"
             />
           </Link>
 
@@ -644,7 +652,7 @@ function CheckoutForm() {
         </div>
       </header>
 
-      {/* ─── Mobile Order Summary Accordion (hidden on desktop) ─── */}
+      {/* ──────── Mobile Order Summary Accordion (hidden on desktop) ──────── */}
       <div className="lg:hidden bg-[#f5f5f5] border-y border-[#e1e1e1]">
         <button
           type="button"
@@ -681,10 +689,10 @@ function CheckoutForm() {
                             alt={item.product.title}
                             fill
                             sizes="64px"
+                            unoptimized
                             className="object-cover"
                           />
                         </div>
-                        {/* Authentic black circle quantity badge */}
                         <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-black text-white text-[11px] font-bold flex items-center justify-center shadow-xs select-none">
                           {item.quantity}
                         </span>
@@ -766,22 +774,13 @@ function CheckoutForm() {
                   </span>
                 </div>
               </div>
-              <p className="text-[11.5px] text-[#707070] text-right">
-                Including Rs 0.00 in taxes
-              </p>
             </div>
           </div>
         )}
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          MAIN CENTRALIZED SPLIT LAYOUT
-          - Centered container (max-w-[1140px] mx-auto)
-          - Left column: Checkout form (pure white)
-          - Right column: Order summary (light gray #f5f5f5 with border-l #e1e1e1)
-          - Continuous 50% split background on the right for wide monitors
-      ══════════════════════════════════════════════════════════════════════ */}
-      <div className="relative w-full border-t border-[#e1e1e1] bg-white">
+      {/* ──────── MAIN SPLIT LAYOUT ──────── */}
+      <div className="relative w-full border-t border-[#e1e1e1] bg-white overflow-x-hidden">
         {/* Continuous right-half gray background on large screens */}
         <div
           className="hidden lg:block absolute inset-y-0 right-0 w-1/2 bg-[#f5f5f5] border-l border-[#e1e1e1] pointer-events-none"
@@ -789,14 +788,10 @@ function CheckoutForm() {
         />
 
         {/* Centered layout container */}
-        <div className="relative max-w-[1140px] mx-auto px-4 sm:px-6 lg:px-8 lg:grid lg:grid-cols-[1fr_420px] xl:grid-cols-[1fr_440px] gap-8 xl:gap-14">
-
-          {/* ════════════════════════════════════════
-              LEFT COLUMN — Checkout Form
-          ════════════════════════════════════════ */}
-          <div className="pt-6 md:pt-8 pb-16 lg:pr-6 flex flex-col justify-between">
-            <form onSubmit={handleSubmit} noValidate>
-
+        <div className="relative w-full max-w-[1140px] mx-auto min-w-0 lg:grid lg:grid-cols-[minmax(0,1fr)_420px] xl:grid-cols-[minmax(0,1fr)_440px]">
+          {/* ──────── LEFT COLUMN: Checkout Form ──────── */}
+          <div className="w-full min-w-0 px-4 sm:px-6 lg:pl-0 lg:pr-12 pt-7 pb-16 bg-white flex flex-col justify-between overflow-x-clip">
+            <form onSubmit={handleSubmit} noValidate className="w-full min-w-0">
               {/* ── Contact ── */}
               <section className="mb-8">
                 <div className="flex items-center justify-between mb-2">
@@ -823,10 +818,10 @@ function CheckoutForm() {
                 <label className="mt-3 flex items-center gap-2.5 cursor-pointer select-none">
                   <div
                     onClick={() => setEmailOffers(!emailOffers)}
-                    className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center shrink-0 transition-all ${
+                    className={`w-[18px] h-[18px] rounded-[4px] flex items-center justify-center shrink-0 transition-all ${
                       emailOffers
-                        ? "bg-[#005bd3] border-[#005bd3]"
-                        : "border-[#b5b5b5] bg-white hover:border-[#707070]"
+                        ? "bg-[#005bd3] text-white"
+                        : "border border-[#b5b5b5] bg-white hover:border-[#707070]"
                     }`}
                   >
                     {emailOffers && <Check className="w-3.5 h-3.5 text-white stroke-[3]" />}
@@ -920,10 +915,10 @@ function CheckoutForm() {
                   <label className="flex items-center gap-2.5 cursor-pointer select-none pt-1">
                     <div
                       onClick={() => setSaveInfo(!saveInfo)}
-                      className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center shrink-0 transition-all ${
+                      className={`w-[18px] h-[18px] rounded-[4px] flex items-center justify-center shrink-0 transition-all ${
                         saveInfo
-                          ? "bg-[#005bd3] border-[#005bd3]"
-                          : "border-[#b5b5b5] bg-white hover:border-[#707070]"
+                          ? "bg-[#005bd3] text-white"
+                          : "border border-[#d9d9d9] bg-white hover:border-[#707070]"
                       }`}
                     >
                       {saveInfo && <Check className="w-3.5 h-3.5 text-white stroke-[3]" />}
@@ -961,18 +956,18 @@ function CheckoutForm() {
                 </p>
 
                 <div className="border border-[#d9d9d9] rounded-[8px] overflow-hidden">
-                  {/* Option 1 — Bank Deposit (Default on sillhouete.com) */}
+                  {/* Option 1 ── Credit card (Stripe Card Elements) */}
                   <div
                     className={`${
-                      paymentMethod === "bank_deposit"
+                      paymentMethod === "credit_card"
                         ? "border-2 border-[#005bd3] -m-[1px] rounded-[8px] relative z-10"
                         : "border-b border-[#d9d9d9]"
                     }`}
                   >
                     <div
-                      onClick={() => setPaymentMethod("bank_deposit")}
+                      onClick={() => setPaymentMethod("credit_card")}
                       className={`flex items-center justify-between px-4 py-3.5 cursor-pointer transition-colors ${
-                        paymentMethod === "bank_deposit"
+                        paymentMethod === "credit_card"
                           ? "bg-[#f4f8ff]"
                           : "bg-white hover:bg-[#fafafa]"
                       }`}
@@ -980,38 +975,80 @@ function CheckoutForm() {
                       <div className="flex items-center gap-3">
                         <div
                           className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center shrink-0 ${
-                            paymentMethod === "bank_deposit"
+                            paymentMethod === "credit_card"
                               ? "border-[#005bd3]"
                               : "border-[#b5b5b5]"
                           }`}
                         >
-                          {paymentMethod === "bank_deposit" && (
+                          {paymentMethod === "credit_card" && (
                             <div className="w-[8px] h-[8px] rounded-full bg-[#005bd3]" />
                           )}
                         </div>
                         <span className="text-[14px] font-medium text-[#1a1a1a]">
-                          Bank Deposit
+                          Credit card
                         </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0 pl-2">
+                        <VisaBadge />
+                        <MastercardBadge />
+                        <AmexBadge />
+                        <PlusThreeBadge />
                       </div>
                     </div>
 
-                    {paymentMethod === "bank_deposit" && (
-                      <div className="border-t border-[#d9d9d9] bg-[#f7f7f7] px-4 py-4 text-[13.5px] text-[#333333] leading-relaxed">
-                        <p>Bank Meezan Bank</p>
-                        <p>
-                          Ac title <strong>SILLHOUETE</strong>
-                        </p>
-                        <p>
-                          IBAN : <strong>PK80MEZN0002160109517881</strong>
-                        </p>
-                        <p className="mt-2 text-[#666666]">
-                          Please share screen shot on our official WhatsApp number so that we can proceed with your order.
-                        </p>
+                    {paymentMethod === "credit_card" && (
+                      <div className="border-t border-[#d9d9d9] bg-[#f7f7f7] p-4 space-y-3">
+
+                        <StripeFloatingField
+                          label="Card number"
+                          endIcon={<Lock className="w-4 h-4 text-[#707070]" />}
+                        >
+                          <CardNumberElement options={STRIPE_CARD_NUMBER_OPTIONS} />
+                        </StripeFloatingField>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <StripeFloatingField label="Expiration date (MM / YY)">
+                            <CardExpiryElement options={STRIPE_CARD_EXPIRY_OPTIONS} />
+                          </StripeFloatingField>
+                          <StripeFloatingField
+                            label="Security code"
+                            endIcon={<HelpCircle className="w-4.5 h-4.5 text-[#737373]" />}
+                          >
+                            <CardCvcElement options={STRIPE_CARD_CVC_OPTIONS} />
+                          </StripeFloatingField>
+                        </div>
+
+                        <FloatingInput
+                          id="cardName"
+                          label="Name on card"
+                          value={cardName}
+                          onChange={(e) => setCardName(e.target.value)}
+                          autoComplete="cc-name"
+                        />
+
+                        {/* Use shipping address as billing address checkbox */}
+                        <label className="flex items-center gap-2.5 cursor-pointer select-none pt-1">
+                          <div
+                            onClick={() => setUseShippingAsBilling(!useShippingAsBilling)}
+                            className={`w-[18px] h-[18px] rounded-[4px] flex items-center justify-center shrink-0 transition-all ${
+                              useShippingAsBilling
+                                ? "bg-[#005bd3] text-white"
+                                : "border border-[#d9d9d9] bg-white hover:border-[#707070]"
+                            }`}
+                          >
+                            {useShippingAsBilling && (
+                              <Check className="w-3.5 h-3.5 text-white stroke-[3]" />
+                            )}
+                          </div>
+                          <span className="text-[13.5px] text-[#333333]">
+                            Use shipping address as billing address
+                          </span>
+                        </label>
                       </div>
                     )}
                   </div>
 
-                  {/* Option 2 — PAYFAST */}
+                  {/* Option 2 ── PAYFAST */}
                   <div
                     className={`${
                       paymentMethod === "payfast"
@@ -1040,7 +1077,7 @@ function CheckoutForm() {
                           )}
                         </div>
                         <span className="text-[13.5px] md:text-[14px] font-medium text-[#1a1a1a]">
-                          PAYFAST(Pay via Debit/Credit/Wallet/Bank Account)
+                          PAYFAST (Debit/Credit/Wallet/Bank Account)
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0 pl-2">
@@ -1053,18 +1090,18 @@ function CheckoutForm() {
                     {paymentMethod === "payfast" && (
                       <div className="border-t border-[#d9d9d9] bg-[#f7f7f7] px-4 py-4 text-[13px] text-[#555555]">
                         <p>
-                          After clicking &ldquo;Complete order&rdquo;, you will be redirected to PAYFAST to complete your purchase securely.
+                          After clicking &ldquo;Pay now&rdquo;, you will be redirected to PAYFAST to complete your purchase securely.
                         </p>
                       </div>
                     )}
                   </div>
 
-                  {/* Option 3 — Pay by card */}
+                  {/* Option 3 ── Pay by card */}
                   <div
                     className={`${
                       paymentMethod === "pay_by_card"
                         ? "border-2 border-[#005bd3] -m-[1px] rounded-[8px] relative z-10"
-                        : ""
+                        : "border-b border-[#d9d9d9]"
                     }`}
                   >
                     <div
@@ -1095,233 +1132,276 @@ function CheckoutForm() {
                         <VisaBadge />
                         <MastercardBadge />
                         <AmexBadge />
-                        <PlusOneBadge />
+                        <PlusThreeBadge />
                       </div>
                     </div>
 
                     {paymentMethod === "pay_by_card" && (
-                      <div className="border-t border-[#d9d9d9] bg-[#f7f7f7] p-4 space-y-3">
-                        {/* Stripe Dahlia Embedded Form Container */}
-                        <div id="checkout-form" className="stripe-embedded-form w-full" />
+                      <div className="border-t border-[#d9d9d9] bg-[#f7f7f7] px-4 py-4 text-[13px] text-[#555555]">
+                        <p>
+                          You&apos;ll be redirected to Pay by card to complete your purchase.
+                        </p>
+                      </div>
+                    )}
+                  </div>
 
-                        {!embeddedFormMounted && (
-                          <>
-                            {stripe ? (
-                              <>
-                                <StripeFloatingField
-                                  label="Card number"
-                                  endIcon={<Lock className="w-4 h-4 text-[#707070]" />}
-                                >
-                                  <CardNumberElement options={STRIPE_ELEMENT_STYLE} />
-                                </StripeFloatingField>
-                                <div className="grid grid-cols-2 gap-3">
-                                  <StripeFloatingField label="Expiration date (MM / YY)">
-                                    <CardExpiryElement options={STRIPE_ELEMENT_STYLE} />
-                                  </StripeFloatingField>
-                                  <StripeFloatingField
-                                    label="Security code"
-                                    endIcon={<HelpCircle className="w-4.5 h-4.5 text-[#737373]" />}
-                                  >
-                                    <CardCvcElement options={STRIPE_ELEMENT_STYLE} />
-                                  </StripeFloatingField>
-                                </div>
-                              </>
-                            ) : (
-                              <>
-                                <FloatingInput
-                                  id="cardNumber"
-                                  label="Card number"
-                                  value={cardNumber}
-                                  onChange={(e) => setCardNumber(e.target.value)}
-                                  autoComplete="cc-number"
-                                  endIcon={<Lock className="w-4 h-4 text-[#707070]" />}
-                                />
-                                <div className="grid grid-cols-2 gap-3">
-                                  <FloatingInput
-                                    id="cardExpiry"
-                                    label="Expiration date (MM / YY)"
-                                    value={cardExpiry}
-                                    onChange={(e) => setCardExpiry(e.target.value)}
-                                    autoComplete="cc-exp"
-                                  />
-                                  <FloatingInput
-                                    id="cardCvc"
-                                    label="Security code"
-                                    value={cardCvc}
-                                    onChange={(e) => setCardCvc(e.target.value)}
-                                    autoComplete="cc-csc"
-                                    endIcon={<HelpCircle className="w-4.5 h-4.5 text-[#737373]" />}
-                                  />
-                                </div>
-                              </>
-                            )}
+                  {/* Option 4 ── Bank Deposit */}
+                  <div
+                    className={`${
+                      paymentMethod === "bank_deposit"
+                        ? "border-2 border-[#005bd3] -m-[1px] rounded-[8px] relative z-10"
+                        : ""
+                    }`}
+                  >
+                    <div
+                      onClick={() => setPaymentMethod("bank_deposit")}
+                      className={`flex items-center justify-between px-4 py-3.5 cursor-pointer transition-colors ${
+                        paymentMethod === "bank_deposit"
+                          ? "bg-[#f4f8ff]"
+                          : "bg-white hover:bg-[#fafafa]"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center shrink-0 ${
+                            paymentMethod === "bank_deposit"
+                              ? "border-[#005bd3]"
+                              : "border-[#b5b5b5]"
+                          }`}
+                        >
+                          {paymentMethod === "bank_deposit" && (
+                            <div className="w-[8px] h-[8px] rounded-full bg-[#005bd3]" />
+                          )}
+                        </div>
+                        <span className="text-[14px] font-medium text-[#1a1a1a]">
+                          Bank Deposit
+                        </span>
+                      </div>
+                    </div>
+
+                    {paymentMethod === "bank_deposit" && (
+                      <div className="border-t border-[#d9d9d9] bg-[#f7f7f7] px-4 py-4 text-[13.5px] text-[#333333] leading-relaxed">
+                        <p>Bank: <strong>Meezan Bank</strong></p>
+                        <p>
+                          Ac title: <strong>SILLHOUETE</strong>
+                        </p>
+                        <p>
+                          IBAN: <strong>PK80MEZN0002160109517881</strong>
+                        </p>
+                        <p className="mt-2 text-[#666666]">
+                          Please share screenshot on our official WhatsApp number so that we can proceed with your order.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </section>
+
+              {/* ── Billing address (visible when not credit card, or when credit card unchecks 'use shipping address') ── */}
+              {showBillingSection && (
+                <section className="mb-8">
+                  <h2 className="text-[18px] font-semibold text-[#1a1a1a] mb-2.5">
+                    Billing address
+                  </h2>
+                  <div className="border border-[#d9d9d9] rounded-[8px] overflow-hidden">
+                    {/* Same as shipping */}
+                    <div
+                      className={`${
+                        billingSame
+                          ? "border-2 border-[#005bd3] -m-[1px] rounded-[8px] relative z-10"
+                          : "border-b border-[#d9d9d9]"
+                      }`}
+                    >
+                      <div
+                        onClick={() => setBillingSame(true)}
+                        className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer transition-colors ${
+                          billingSame ? "bg-[#f4f8ff]" : "bg-white hover:bg-[#fafafa]"
+                        }`}
+                      >
+                        <div
+                          className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center shrink-0 ${
+                            billingSame ? "border-[#005bd3]" : "border-[#b5b5b5]"
+                          }`}
+                        >
+                          {billingSame && (
+                            <div className="w-[8px] h-[8px] rounded-full bg-[#005bd3]" />
+                          )}
+                        </div>
+                        <span className="text-[14px] font-medium text-[#1a1a1a]">
+                          Same as shipping address
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Different billing address */}
+                    <div
+                      className={`${
+                        !billingSame
+                          ? "border-2 border-[#005bd3] -m-[1px] rounded-[8px] relative z-10"
+                          : ""
+                      }`}
+                    >
+                      <div
+                        onClick={() => setBillingSame(false)}
+                        className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer transition-colors ${
+                          !billingSame ? "bg-[#f4f8ff]" : "bg-white hover:bg-[#fafafa]"
+                        }`}
+                      >
+                        <div
+                          className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center shrink-0 ${
+                            !billingSame ? "border-[#005bd3]" : "border-[#b5b5b5]"
+                          }`}
+                        >
+                          {!billingSame && (
+                            <div className="w-[8px] h-[8px] rounded-full bg-[#005bd3]" />
+                          )}
+                        </div>
+                        <span className="text-[14px] font-medium text-[#1a1a1a]">
+                          Use a different billing address
+                        </span>
+                      </div>
+
+                      {!billingSame && (
+                        <div className="border-t border-[#d9d9d9] px-4 py-4 bg-[#f7f7f7] space-y-3">
+                          <FloatingSelect
+                            id="bCountry"
+                            label="Country/Region"
+                            value={billingForm.country}
+                            onChange={(e) =>
+                              setBillingForm((p) => ({ ...p, country: e.target.value }))
+                            }
+                          >
+                            {COUNTRIES.map((c) => (
+                              <option key={c} value={c}>
+                                {c}
+                              </option>
+                            ))}
+                          </FloatingSelect>
+                          <div className="grid grid-cols-2 gap-3">
                             <FloatingInput
-                              id="cardName"
-                              label="Name on card"
-                              value={cardName}
-                              onChange={(e) => setCardName(e.target.value)}
-                              autoComplete="cc-name"
+                              id="bFirst"
+                              label="First name"
+                              value={billingForm.firstName}
+                              onChange={(e) =>
+                                setBillingForm((p) => ({ ...p, firstName: e.target.value }))
+                              }
                             />
+                            <FloatingInput
+                              id="bLast"
+                              label="Last name"
+                              value={billingForm.lastName}
+                              onChange={(e) =>
+                                setBillingForm((p) => ({ ...p, lastName: e.target.value }))
+                              }
+                            />
+                          </div>
+                          <FloatingInput
+                            id="bAddress"
+                            label="Address"
+                            value={billingForm.address}
+                            onChange={(e) =>
+                              setBillingForm((p) => ({ ...p, address: e.target.value }))
+                            }
+                          />
+                          <FloatingInput
+                            id="bApt"
+                            label="Apartment, suite, etc. (optional)"
+                            value={billingForm.apartment || ""}
+                            onChange={(e) =>
+                              setBillingForm((p) => ({ ...p, apartment: e.target.value }))
+                            }
+                          />
+                          <div className="grid grid-cols-[1fr_140px] gap-3">
+                            <FloatingInput
+                              id="bCity"
+                              label="City"
+                              value={billingForm.city}
+                              onChange={(e) =>
+                                setBillingForm((p) => ({ ...p, city: e.target.value }))
+                              }
+                            />
+                            <FloatingInput
+                              id="bPostal"
+                              label="Postal code (optional)"
+                              value={billingForm.postalCode}
+                              onChange={(e) =>
+                                setBillingForm((p) => ({ ...p, postalCode: e.target.value }))
+                              }
+                            />
+                          </div>
+                          <FloatingInput
+                            id="bPhone"
+                            label="Phone (optional)"
+                            type="tel"
+                            value={billingForm.phone}
+                            onChange={(e) =>
+                              setBillingForm((p) => ({ ...p, phone: e.target.value }))
+                            }
+                            endIcon={<HelpCircle className="w-4.5 h-4.5 text-[#737373]" />}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </section>
+              )}
+
+              {/* ── Error message banner with rock-solid responsive wrapping ── */}
+              {errorMessage && (
+                <div className="mb-5 p-3.5 sm:p-4 bg-red-50 border border-red-200 rounded-[8px] text-[13px] sm:text-[13.5px] text-red-800 flex items-start gap-2.5 sm:gap-3 w-full min-w-0 overflow-hidden shadow-xs">
+                  <AlertCircle className="w-4.5 h-4.5 text-red-600 shrink-0 mt-0.5" />
+                  <div className="min-w-0 flex-1 break-words [overflow-wrap:anywhere] leading-snug">
+                    <p className="font-semibold text-red-900 mb-0.5">
+                      {isGatewayConfigError ? "Payment Gateway Configuration Notice" : "Payment Notice"}
+                    </p>
+                    <p className="text-red-700 break-words [overflow-wrap:anywhere]">{errorMessage}</p>
+                    {isGatewayConfigError && (
+                      <div className="mt-2.5 pt-2 border-t border-red-200/80 text-[11.5px] sm:text-[12px] text-red-800 space-y-1.5">
+                        <p className="font-semibold text-red-900">Store Administrator Note:</p>
+                        {configErrorType === "secret" ? (
+                          <>
+                            <p className="break-words [overflow-wrap:anywhere] font-mono text-[11px] bg-white/70 p-1.5 rounded border border-red-200 text-red-900">
+                              Server Error: STRIPE_SECRET_KEY in .env.local is being rejected by Stripe API (Invalid / Expired Key).
+                            </p>
+                            <p>
+                              Please visit your{" "}
+                              <a
+                                href="https://dashboard.stripe.com/apikeys"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline font-semibold hover:text-red-950"
+                              >
+                                Stripe Dashboard &rarr; Developers &rarr; API Keys
+                              </a>{" "}
+                              and copy your active <strong>Secret key (sk_live_... or sk_test_...)</strong> into <strong>STRIPE_SECRET_KEY</strong> in <strong>.env.local</strong>.
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="break-words [overflow-wrap:anywhere] font-mono text-[11px] bg-white/70 p-1.5 rounded border border-red-200 text-red-900">
+                              Client Error: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY in .env.local is invalid or expired in your Stripe Dashboard.
+                            </p>
+                            <p>
+                              Please visit your{" "}
+                              <a
+                                href="https://dashboard.stripe.com/apikeys"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline font-semibold hover:text-red-950"
+                              >
+                                Stripe Dashboard &rarr; Developers &rarr; API Keys
+                              </a>{" "}
+                              and update <strong>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</strong> in <strong>.env.local</strong> or in Admin Settings.
+                            </p>
                           </>
                         )}
                       </div>
                     )}
                   </div>
                 </div>
-              </section>
-
-              {/* ── Billing address ── */}
-              <section className="mb-8">
-                <h2 className="text-[18px] font-semibold text-[#1a1a1a] mb-2.5">
-                  Billing address
-                </h2>
-                <div className="border border-[#d9d9d9] rounded-[8px] overflow-hidden">
-                  {/* Same as shipping */}
-                  <div
-                    className={`${
-                      billingSame
-                        ? "border-2 border-[#005bd3] -m-[1px] rounded-[8px] relative z-10"
-                        : "border-b border-[#d9d9d9]"
-                    }`}
-                  >
-                    <div
-                      onClick={() => setBillingSame(true)}
-                      className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer transition-colors ${
-                        billingSame ? "bg-[#f4f8ff]" : "bg-white hover:bg-[#fafafa]"
-                      }`}
-                    >
-                      <div
-                        className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center shrink-0 ${
-                          billingSame ? "border-[#005bd3]" : "border-[#b5b5b5]"
-                        }`}
-                      >
-                        {billingSame && (
-                          <div className="w-[8px] h-[8px] rounded-full bg-[#005bd3]" />
-                        )}
-                      </div>
-                      <span className="text-[14px] font-medium text-[#1a1a1a]">
-                        Same as shipping address
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Different billing address */}
-                  <div
-                    className={`${
-                      !billingSame
-                        ? "border-2 border-[#005bd3] -m-[1px] rounded-[8px] relative z-10"
-                        : ""
-                    }`}
-                  >
-                    <div
-                      onClick={() => setBillingSame(false)}
-                      className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer transition-colors ${
-                        !billingSame ? "bg-[#f4f8ff]" : "bg-white hover:bg-[#fafafa]"
-                      }`}
-                    >
-                      <div
-                        className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center shrink-0 ${
-                          !billingSame ? "border-[#005bd3]" : "border-[#b5b5b5]"
-                        }`}
-                      >
-                        {!billingSame && (
-                          <div className="w-[8px] h-[8px] rounded-full bg-[#005bd3]" />
-                        )}
-                      </div>
-                      <span className="text-[14px] font-medium text-[#1a1a1a]">
-                        Use a different billing address
-                      </span>
-                    </div>
-
-                    {!billingSame && (
-                      <div className="border-t border-[#d9d9d9] px-4 py-4 bg-[#f7f7f7] space-y-3">
-                        <FloatingSelect
-                          id="bCountry"
-                          label="Country/Region"
-                          value={form.country}
-                          onChange={(e) => setForm((p) => ({ ...p, country: e.target.value }))}
-                        >
-                          {COUNTRIES.map((c) => (
-                            <option key={c} value={c}>
-                              {c}
-                            </option>
-                          ))}
-                        </FloatingSelect>
-                        <div className="grid grid-cols-2 gap-3">
-                          <FloatingInput
-                            id="bFirst"
-                            label="First name"
-                            value={form.firstName}
-                            onChange={(e) =>
-                              setForm((p) => ({ ...p, firstName: e.target.value }))
-                            }
-                          />
-                          <FloatingInput
-                            id="bLast"
-                            label="Last name"
-                            value={form.lastName}
-                            onChange={(e) =>
-                              setForm((p) => ({ ...p, lastName: e.target.value }))
-                            }
-                          />
-                        </div>
-                        <FloatingInput
-                          id="bAddress"
-                          label="Address"
-                          value={form.address}
-                          onChange={(e) =>
-                            setForm((p) => ({ ...p, address: e.target.value }))
-                          }
-                        />
-                        <FloatingInput
-                          id="bApt"
-                          label="Apartment, suite, etc. (optional)"
-                          value={form.apartment || ""}
-                          onChange={(e) =>
-                            setForm((p) => ({ ...p, apartment: e.target.value }))
-                          }
-                        />
-                        <div className="grid grid-cols-[1fr_140px] gap-3">
-                          <FloatingInput
-                            id="bCity"
-                            label="City"
-                            value={form.city}
-                            onChange={(e) =>
-                              setForm((p) => ({ ...p, city: e.target.value }))
-                            }
-                          />
-                          <FloatingInput
-                            id="bPostal"
-                            label="Postal code (optional)"
-                            value={form.postalCode}
-                            onChange={(e) =>
-                              setForm((p) => ({ ...p, postalCode: e.target.value }))
-                            }
-                          />
-                        </div>
-                        <FloatingInput
-                          id="bPhone"
-                          label="Phone (optional)"
-                          type="tel"
-                          value={form.phone}
-                          onChange={(e) =>
-                            setForm((p) => ({ ...p, phone: e.target.value }))
-                          }
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </section>
-
-              {/* ── Error message ── */}
-              {errorMessage && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-300 rounded-[6px] text-[13px] text-red-700">
-                  {errorMessage}
-                </div>
               )}
 
-              {/* ── Big Blue Submit Button: "Complete order" / "Pay now" ── */}
+              {/* ── Big Blue Submit Button: "Pay now" ── */}
               <button
                 type="submit"
                 disabled={isProcessing}
@@ -1347,186 +1427,184 @@ function CheckoutForm() {
                     </svg>
                     Processing...
                   </span>
-                ) : paymentMethod === "pay_by_card" ? (
-                  "Pay now"
                 ) : (
-                  "Complete order"
+                  "Pay now"
                 )}
               </button>
             </form>
 
             {/* ── Policy Links at the bottom of left column ── */}
-            <footer className="mt-12 pt-6 border-t border-[#e1e1e1] text-[12px] text-[#707070]">
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <Link href="/pages/policies" className="hover:underline">
-                  Refund policy
-                </Link>
-                <Link href="/pages/shipping-policy" className="hover:underline">
-                  Shipping policy
-                </Link>
-                <Link href="/pages/privacy-policy" className="hover:underline">
-                  Privacy policy
-                </Link>
-                <Link href="/pages/terms-and-conditions" className="hover:underline">
-                  Terms of service
-                </Link>
-                <Link href="/pages/contact-us" className="hover:underline">
-                  Contact information
-                </Link>
-              </div>
+            <footer className="mt-12 pt-6 border-t border-[#e1e1e1] text-[12px]">
+              <Link href="/pages/policies" className="text-[#005bd3] underline hover:no-underline">
+                Terms and policies
+              </Link>
             </footer>
           </div>
 
-          {/* ════════════════════════════════════════
-              RIGHT COLUMN — Order Summary (desktop)
-          ════════════════════════════════════════ */}
-          <aside className="hidden lg:block pt-6 md:pt-8 pb-16 lg:pl-6 min-h-screen">
+          {/* ──────── RIGHT COLUMN: Order Summary (desktop) ──────── */}
+          <aside className="hidden lg:block px-6 lg:pl-10 lg:pr-0 pt-7 pb-16 bg-[#f5f5f5] min-h-screen">
             <div className="sticky top-8">
-            {/* Items list */}
-            <div className="space-y-4 mb-6">
-              {displayItems.map((item) => {
-                const itemPrice = item.unitPrice ?? item.product.price;
-                return (
-                  <div key={item.key} className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-3.5">
-                      {/* Thumbnail with rounded corners and authentic black badge */}
-                      <div className="relative w-16 h-16 shrink-0 mt-0.5">
-                        <div className="w-16 h-16 rounded-[8px] border border-[#d9d9d9] bg-white overflow-hidden relative">
-                          <Image
-                            src={item.product.image}
-                            alt={item.product.title}
-                            fill
-                            sizes="64px"
-                            className="object-cover"
-                          />
+              {/* Items list */}
+              <div className="space-y-4 mb-6">
+                {displayItems.map((item) => {
+                  const itemPrice = item.unitPrice ?? item.product.price;
+                  return (
+                    <div key={item.key} className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3.5">
+                        {/* Thumbnail with rounded corners and authentic black badge */}
+                        <div className="relative w-16 h-16 shrink-0 mt-0.5">
+                          <div className="w-16 h-16 rounded-[8px] border border-[#d9d9d9] bg-white overflow-hidden relative">
+                            <Image
+                              src={item.product.image}
+                              alt={item.product.title}
+                              fill
+                              sizes="64px"
+                              unoptimized
+                              className="object-cover"
+                            />
+                          </div>
+                          <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-black text-white text-[11px] font-bold flex items-center justify-center shadow-xs select-none">
+                            {item.quantity}
+                          </span>
                         </div>
-                        <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-black text-white text-[11px] font-bold flex items-center justify-center shadow-xs select-none">
-                          {item.quantity}
-                        </span>
+                        <div>
+                          <p className="text-[14px] font-medium text-[#1a1a1a] leading-snug">
+                            {item.product.title}
+                          </p>
+                          <p className="text-[12px] text-[#707070] mt-0.5 whitespace-pre-line leading-relaxed">
+                            {item.size}
+                            {item.dupatta ? `\nSleeves: ${item.dupatta}` : ""}
+                            {item.adOn ? `\n${item.adOn}` : ""}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-[14px] font-medium text-[#1a1a1a] leading-snug">
-                          {item.product.title}
-                        </p>
-                        <p className="text-[12px] text-[#707070] mt-0.5 whitespace-pre-line leading-relaxed">
-                          {item.size}
-                          {item.dupatta ? `\nSleeves: ${item.dupatta}` : ""}
-                          {item.adOn ? `\n${item.adOn}` : ""}
-                        </p>
-                      </div>
+                      <span className="text-[14px] font-medium text-[#1a1a1a] whitespace-nowrap pt-0.5">
+                        {formatPricePkr(itemPrice * item.quantity)}
+                      </span>
                     </div>
-                    <span className="text-[14px] font-medium text-[#1a1a1a] whitespace-nowrap pt-0.5">
-                      {formatPricePkr(itemPrice * item.quantity)}
+                  );
+                })}
+              </div>
+
+              {/* Discount Code Input + Apply Button */}
+              <div className="flex gap-2.5 mb-6">
+                <input
+                  type="text"
+                  placeholder="Discount code"
+                  value={discountCode}
+                  onChange={(e) => setDiscountCode(e.target.value)}
+                  className="flex-1 bg-white border border-[#d9d9d9] hover:border-[#707070] focus:border-[#005bd3] focus:ring-1 focus:ring-[#005bd3] rounded-[5px] px-3.5 py-3 text-[14px] text-[#1a1a1a] outline-none placeholder-[#707070]"
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyDiscount}
+                  disabled={!discountCode.trim()}
+                  className={`px-5 py-3 rounded-[5px] text-[14px] font-medium transition-colors ${
+                    discountCode.trim()
+                      ? "bg-[#005bd3] text-white hover:bg-[#0051ba] cursor-pointer"
+                      : "bg-[#e3e3e3] text-[#707070] cursor-not-allowed"
+                  }`}
+                >
+                  Apply
+                </button>
+              </div>
+
+              {discountError && (
+                <p className="text-[12px] text-red-600 mb-4">{discountError}</p>
+              )}
+              {appliedDiscount && (
+                <p className="text-[12px] text-green-700 font-medium mb-4">
+                  Discount &ldquo;{appliedDiscount.code}&rdquo; applied ({appliedDiscount.percent}% off)
+                </p>
+              )}
+
+              {/* Pricing breakdown */}
+              <div className="space-y-3 pt-6 border-t border-[#e1e1e1] text-[14px]">
+                <div className="flex justify-between items-center">
+                  <span className="text-[#707070]">Subtotal</span>
+                  <span className="font-medium text-[#1a1a1a]">
+                    {formatPricePkr(subtotal)}
+                  </span>
+                </div>
+
+                {discountAmount > 0 && (
+                  <div className="flex justify-between items-center text-green-700">
+                    <span>Discount ({appliedDiscount?.code})</span>
+                    <span>-{formatPricePkr(discountAmount)}</span>
+                  </div>
+                )}
+
+                <div className="flex justify-between items-center">
+                  <span className="flex items-center gap-1.5 text-[#707070]">
+                    Shipping <HelpCircle className="w-4 h-4 text-[#707070]" />
+                  </span>
+                  <span className="font-semibold text-[#1a1a1a] uppercase text-[13px]">
+                    {shippingFee === 0 ? "FREE" : formatPricePkr(shippingFee)}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-baseline pt-4 border-t border-[#e1e1e1]">
+                  <span className="text-[16px] font-medium text-[#1a1a1a]">Total</span>
+                  <div className="text-right flex items-baseline gap-1.5">
+                    <span className="text-[12px] text-[#707070] font-normal tracking-wide">
+                      PKR
+                    </span>
+                    <span className="text-[22px] font-bold text-[#1a1a1a]">
+                      {formatPricePkr(totalAmount)}
                     </span>
                   </div>
-                );
-              })}
-            </div>
-
-            {/* Discount Code Box */}
-            <div className="flex gap-2 mb-4">
-              <input
-                type="text"
-                placeholder="Discount code"
-                value={discountCode}
-                onChange={(e) => setDiscountCode(e.target.value)}
-                className="flex-1 bg-white border border-[#d9d9d9] hover:border-[#707070] focus:border-[#005bd3] focus:ring-1 focus:ring-[#005bd3] rounded-[6px] px-3.5 py-3 text-[14px] text-[#1a1a1a] outline-none transition-colors"
-              />
-              <button
-                type="button"
-                onClick={handleApplyDiscount}
-                disabled={!discountCode.trim()}
-                className={`px-5 rounded-[6px] text-[14px] font-medium transition-colors border ${
-                  discountCode.trim()
-                    ? "bg-[#005bd3] border-[#005bd3] text-white hover:bg-[#0051ba] cursor-pointer"
-                    : "bg-[#f5f5f5] border-[#d9d9d9] text-[#707070] cursor-not-allowed hover:bg-[#eaeaea]"
-                }`}
-              >
-                Apply
-              </button>
-            </div>
-            {discountError && (
-              <p className="text-[12px] text-red-600 mb-4">{discountError}</p>
-            )}
-            {appliedDiscount && (
-              <p className="text-[12px] text-green-700 font-medium mb-4">
-                Code &ldquo;{appliedDiscount.code}&rdquo; applied ({appliedDiscount.percent}% off)
-              </p>
-            )}
-
-            {/* Subtotal & Shipping */}
-            <div className="space-y-3 pt-4 pb-5 border-t border-[#e1e1e1]">
-              <div className="flex justify-between text-[14px]">
-                <span className="text-[#707070]">Subtotal</span>
-                <span className="font-medium text-[#1a1a1a]">
-                  {formatPricePkr(subtotal)}
-                </span>
-              </div>
-              {discountAmount > 0 && (
-                <div className="flex justify-between text-[14px] text-green-700">
-                  <span>Discount ({appliedDiscount?.code})</span>
-                  <span>-{formatPricePkr(discountAmount)}</span>
-                </div>
-              )}
-              <div className="flex justify-between text-[14px]">
-                <span className="flex items-center gap-1.5 text-[#707070]">
-                  Shipping <HelpCircle className="w-3.5 h-3.5 text-[#707070]" />
-                </span>
-                <span className="font-semibold text-[#1a1a1a] uppercase">
-                  {shippingFee === 0 ? "FREE" : formatPricePkr(shippingFee)}
-                </span>
-              </div>
-            </div>
-
-            {/* Total */}
-            <div className="border-t border-[#e1e1e1] pt-5">
-              <div className="flex items-baseline justify-between">
-                <span className="text-[16px] font-medium text-[#1a1a1a]">Total</span>
-                <div className="text-right flex items-baseline gap-1.5">
-                  <span className="text-[12px] text-[#707070] font-normal tracking-wide">
-                    PKR
-                  </span>
-                  <span className="text-[22px] font-bold text-[#1a1a1a]">
-                    {formatPricePkr(totalAmount)}
-                  </span>
                 </div>
               </div>
-              <p className="text-[12px] text-[#707070] text-right mt-1">
-                Including Rs 0.00 in taxes
-              </p>
             </div>
-          </div>
-        </aside>
+          </aside>
         </div>
       </div>
     </div>
   );
 }
 
-/* ─── Outer wrapper providing Stripe Elements & Dahlia SDK context ─── */
-export default function CheckoutPage() {
+/* ──────── Outer wrapper providing Stripe Elements context ──────── */
+function CheckoutPageInner() {
   const { settings } = useStore();
   const stripeKey =
     settings?.stripePublishableKey ||
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
     "";
-  const isReal =
-    stripeKey.length >= 40 &&
-    (stripeKey.startsWith("pk_test_") || stripeKey.startsWith("pk_live_"));
 
   const dynamicStripePromise = useMemo(() => {
-    return isReal ? loadStripe(stripeKey) : Promise.resolve(null);
-  }, [stripeKey, isReal]);
+    const trimmed = typeof stripeKey === "string" ? stripeKey.trim() : "";
+    const testModeOnly = process.env.NEXT_PUBLIC_STRIPE_TEST_MODE !== "false";
+
+    if (testModeOnly && trimmed.startsWith("pk_live_")) {
+      console.warn(
+        "[Stripe Safety Warning]: Live key (pk_live_) detected while project is configured for Stripe TEST MODE. Only pk_test_ keys are permitted."
+      );
+      return Promise.resolve(null);
+    }
+
+    const isKeyValid =
+      trimmed.length >= 20 &&
+      (trimmed.startsWith("pk_test_") || (!testModeOnly && trimmed.startsWith("pk_live_")));
+
+    if (!isKeyValid) return Promise.resolve(null);
+
+    return loadStripe(trimmed);
+  }, [stripeKey]);
 
   return (
-    <>
-      <Script
-        src="https://js.stripe.com/dahlia/stripe.js"
-        strategy="afterInteractive"
-      />
-      <Elements stripe={dynamicStripePromise}>
-        <CheckoutForm />
-      </Elements>
-    </>
+    <Elements
+      stripe={dynamicStripePromise}
+      options={{
+        // loader:"never" hides the Stripe loading animation
+        // This also prevents Stripe Link modal from auto-activating
+        loader: "never",
+      }}
+    >
+      <CheckoutForm />
+    </Elements>
   );
+}
+
+export default function CheckoutPage() {
+  return <CheckoutPageInner />;
 }

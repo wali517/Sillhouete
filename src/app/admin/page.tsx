@@ -15,6 +15,7 @@ import { getOrders, getProducts, getContactMessages, getCustomers } from "@/lib/
 import { formatPrice } from "@/lib/format";
 
 export const metadata = { title: "Admin Dashboard – Sillhouete" };
+export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
   const [orders, products, messages, customers] = await Promise.all([

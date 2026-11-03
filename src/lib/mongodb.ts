@@ -1,8 +1,6 @@
 import mongoose from "mongoose";
 
-const DEFAULT_MONGODB_URI =
-  "mongodb+srv://Sillhouete:Sillhouete123@cluster0.caugnds.mongodb.net/sillhouete?retryWrites=true&w=majority";
-const MONGODB_URI = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI;
 
 interface MongooseCache {
   conn: typeof mongoose | null;
@@ -10,17 +8,22 @@ interface MongooseCache {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
   var mongooseCache: MongooseCache | undefined;
 }
 
-let cached: MongooseCache = global.mongooseCache || { conn: null, promise: null };
+const cached: MongooseCache = global.mongooseCache || { conn: null, promise: null };
 
 if (!global.mongooseCache) {
   global.mongooseCache = cached;
 }
 
 export async function connectDB(): Promise<typeof mongoose> {
+  if (!MONGODB_URI) {
+    throw new Error(
+      "Missing MONGODB_URI environment variable. Please configure MONGODB_URI in .env.local."
+    );
+  }
+
   if (cached.conn && mongoose.connection.readyState === 1) {
     return cached.conn;
   }
@@ -34,7 +37,6 @@ export async function connectDB(): Promise<typeof mongoose> {
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((m) => {
-      console.log("MongoDB connected successfully.");
       return m;
     });
   }

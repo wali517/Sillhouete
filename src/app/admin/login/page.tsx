@@ -1,29 +1,18 @@
 "use client";
 
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Lock, ArrowRight, AlertCircle, ShieldCheck } from "lucide-react";
+import { Lock, ArrowRight, AlertCircle } from "lucide-react";
 import { SITE } from "@/data/site";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("admin@sillhouete.com");
-  const [password, setPassword] = useState("admin123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetch("/api/admin/auth")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.adminEmail) {
-          setEmail(d.adminEmail);
-        }
-      })
-      .catch(() => {});
-  }, []);
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -34,7 +23,7 @@ export default function AdminLoginPage() {
       const res = await fetch("/api/admin/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       });
 
       const data = await res.json();
@@ -74,18 +63,8 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
-        {/* Administrator Credentials Hint */}
-        <div className="rounded-lg bg-blue-50 border border-blue-200 p-3 text-xs text-blue-900 space-y-1">
-          <p className="font-bold flex items-center gap-1.5">
-            <ShieldCheck className="h-4 w-4 text-blue-700" />
-            <span>Administrator Credentials</span>
-          </p>
-          <p><strong>Email:</strong> {email || "admin@sillhouete.com"}</p>
-          <p><strong>Password:</strong> admin123</p>
-        </div>
-
         {/* Form */}
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-4" autoComplete="off">
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700">
               Admin Email
@@ -93,9 +72,10 @@ export default function AdminLoginPage() {
             <input
               type="email"
               required
+              autoComplete="off"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@sillhouete.com"
+              placeholder="Enter admin email"
               className="mt-1 w-full rounded-md border border-gray-300 p-3 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
             />
           </div>
@@ -108,6 +88,7 @@ export default function AdminLoginPage() {
               <input
                 type="password"
                 required
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
@@ -127,25 +108,11 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-md bg-black py-3 text-xs font-bold uppercase tracking-widest text-white hover:bg-gray-800 transition-colors"
+            className="flex w-full items-center justify-center gap-2 rounded-md bg-black py-3 text-xs font-bold uppercase tracking-widest text-white hover:bg-gray-800 transition-colors cursor-pointer"
           >
             <span>{loading ? "Authenticating..." : "Sign In to Admin"}</span>
             <ArrowRight className="h-4 w-4" />
           </button>
-
-          {/* Quick test convenience note */}
-          <div className="rounded-md bg-gray-50 p-3 text-center border border-gray-100">
-            <p className="text-xs text-gray-500">
-              Default password: <strong className="text-black font-mono">admin123</strong>
-            </p>
-            <button
-              type="button"
-              onClick={() => setPassword("admin123")}
-              className="mt-1 text-[11px] font-semibold text-black underline hover:text-gray-700"
-            >
-              Fill default password
-            </button>
-          </div>
         </form>
 
         <div className="text-center">
