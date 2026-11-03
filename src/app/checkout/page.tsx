@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import {
   ChevronDown,
   ChevronUp,
-  ChevronRight,
   Lock,
   ShoppingBag,
   HelpCircle,
@@ -258,7 +257,7 @@ function StripeFloatingField({
       <label className="absolute left-3.5 top-1.5 text-[10.5px] text-[#707070] pointer-events-none select-none">
         {label}
       </label>
-      <div className={`pt-5 pb-1.5 px-3.5 ${endIcon ? "pr-24" : "pr-3.5"}`}>{children}</div>
+      <div className={`pt-5 pb-1.5 px-3.5 ${endIcon ? "pr-14" : "pr-3.5"}`}>{children}</div>
       {endIcon && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
           {endIcon}
@@ -288,8 +287,8 @@ function CheckoutForm() {
     country: "Pakistan",
   });
 
-  type PayMethod = "credit_card" | "payfast" | "pay_by_card" | "bank_deposit";
-  const [paymentMethod, setPaymentMethod] = useState<PayMethod>("credit_card");
+  type PayMethod = "credit_card";
+  const [paymentMethod] = useState<PayMethod>("credit_card");
   const [emailOffers, setEmailOffers] = useState(true);
   const [saveInfo, setSaveInfo] = useState(false);
   const [useShippingAsBilling, setUseShippingAsBilling] = useState(true);
@@ -412,14 +411,7 @@ function CheckoutForm() {
             adOn: i.adOn,
           })),
           discountCode: appliedDiscount?.code || "",
-          paymentMethod:
-            paymentMethod === "credit_card"
-              ? "stripe"
-              : paymentMethod === "bank_deposit"
-              ? "bank_transfer"
-              : paymentMethod === "payfast"
-              ? "payfast"
-              : "pay_by_card",
+          paymentMethod: "stripe",
           notes: orderNote,
         }),
       });
@@ -431,14 +423,7 @@ function CheckoutForm() {
 
       const createdOrder = orderData.order;
 
-      // 2. If Bank Deposit or manual payment, finish immediately
-      if (paymentMethod !== "credit_card") {
-        clearCart();
-        router.push(`/order-confirmation/${createdOrder.id}`);
-        return;
-      }
-
-      // 3. Credit Card Payment via Stripe Elements
+      // 2. Credit Card Payment via Stripe Elements
       if (!stripe || !elements) {
         throw new Error("Stripe payment components are not ready. Please refresh the page.");
       }
@@ -576,7 +561,7 @@ function CheckoutForm() {
   };
 
   const displayItems = items.length > 0 ? items : [];
-  const showBillingSection = paymentMethod !== "credit_card" || !useShippingAsBilling;
+  const showBillingSection = !useShippingAsBilling;
 
   /* If cart is empty, show clean message */
   if (items.length === 0) {
@@ -979,299 +964,123 @@ function CheckoutForm() {
                   All transactions are secure and encrypted.
                 </p>
 
-                <div className="border border-[#d9d9d9] rounded-[8px] overflow-hidden">
-                  {/* Option 1 ── Credit card (Stripe Card Elements) */}
-                  <div
-                    className={`${
-                      paymentMethod === "credit_card"
-                        ? "border-2 border-[#005bd3] -m-[1px] rounded-[8px] relative z-10"
-                        : "border-b border-[#d9d9d9]"
-                    }`}
-                  >
-                    <div
-                      onClick={() => setPaymentMethod("credit_card")}
-                      className={`flex items-center justify-between px-4 py-3.5 cursor-pointer transition-colors ${
-                        paymentMethod === "credit_card"
-                          ? "bg-[#f4f8ff]"
-                          : "bg-white hover:bg-[#fafafa]"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center shrink-0 ${
-                            paymentMethod === "credit_card"
-                              ? "border-[#005bd3]"
-                              : "border-[#b5b5b5]"
-                          }`}
-                        >
-                          {paymentMethod === "credit_card" && (
-                            <div className="w-[8px] h-[8px] rounded-full bg-[#005bd3]" />
-                          )}
-                        </div>
-                        <span className="text-[14px] font-medium text-[#1a1a1a]">
-                          Credit card
-                        </span>
+                <div className="border border-[#005bd3] rounded-[8px] overflow-hidden bg-white">
+                  {/* Credit card header */}
+                  <div className="flex items-center justify-between px-4 py-3.5 bg-[#f4f8ff] border-b border-[#d9d9d9]">
+                    <div className="flex items-center gap-3">
+                      <div className="w-[18px] h-[18px] rounded-full border-2 border-[#005bd3] flex items-center justify-center shrink-0">
+                        <div className="w-[8px] h-[8px] rounded-full bg-[#005bd3]" />
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0 pl-2">
-                        <VisaBadge />
-                        <MastercardBadge />
-                        <AmexBadge />
-                        <PlusThreeBadge />
-                      </div>
+                      <span className="text-[14px] font-medium text-[#1a1a1a]">
+                        Credit card
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0 pl-2">
+                      <VisaBadge />
+                      <MastercardBadge />
+                      <AmexBadge />
+                      <PlusThreeBadge />
+                    </div>
+                  </div>
+
+                  {/* Card fields */}
+                  <div className="bg-[#f7f7f7] p-4 space-y-3">
+                    {/* Card number */}
+                    <div>
+                      <StripeFloatingField
+                        label="Card number"
+                        hasError={Boolean(cardFieldError)}
+                        endIcon={
+                          getCardBrandBadge(cardBrand) ? (
+                            <div className="flex items-center gap-1.5 select-none">
+                              {getCardBrandBadge(cardBrand)}
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5 select-none pointer-events-none">
+                              <Lock className="w-4 h-4 text-[#707070]" />
+                            </div>
+                          )
+                        }
+                      >
+                        <CardNumberElement
+                          options={STRIPE_CARD_NUMBER_OPTIONS}
+                          onChange={(e) => {
+                            setCardFieldError(e.error ? e.error.message : "");
+                            setCardBrand(e.brand || "");
+                          }}
+                        />
+                      </StripeFloatingField>
+                      {cardFieldError && (
+                        <p className="text-[12px] text-[#e74c3c] mt-1 pl-1 font-medium">{cardFieldError}</p>
+                      )}
                     </div>
 
-                    {paymentMethod === "credit_card" && (
-                      <div className="border-t border-[#d9d9d9] bg-[#f7f7f7] p-4 space-y-3">
-
-                        {/* Card number */}
-                        <div>
-                          <StripeFloatingField
-                            label="Card number"
-                            hasError={Boolean(cardFieldError)}
-                            endIcon={
-                              getCardBrandBadge(cardBrand) ? (
-                                <div className="flex items-center gap-1.5 select-none">
-                                  {getCardBrandBadge(cardBrand)}
-                                </div>
-                              ) : (
-                                <div className="flex items-center gap-1.5 select-none pointer-events-none">
-                                  <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#00513B] text-white text-[10.5px] font-semibold tracking-tight shadow-xs">
-                                    Autofill
-                                    <ChevronRight className="w-3 h-3 stroke-[2.5]" />
-                                  </span>
-                                  <Lock className="w-3.5 h-3.5 text-[#707070]" />
-                                </div>
-                              )
-                            }
-                          >
-                            <CardNumberElement
-                              options={STRIPE_CARD_NUMBER_OPTIONS}
-                              onChange={(e) => {
-                                setCardFieldError(e.error ? e.error.message : "");
-                                setCardBrand(e.brand || "");
-                              }}
-                            />
-                          </StripeFloatingField>
-                          {cardFieldError && (
-                            <p className="text-[12px] text-[#e74c3c] mt-1 pl-1 font-medium">{cardFieldError}</p>
-                          )}
-                        </div>
-
-                        {/* Expiration and CVC side by side */}
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <StripeFloatingField
-                              label="Expiration"
-                              hasError={Boolean(expiryFieldError)}
-                            >
-                              <CardExpiryElement
-                                options={STRIPE_CARD_EXPIRY_OPTIONS}
-                                onChange={(e) => {
-                                  setExpiryFieldError(e.error ? e.error.message : "");
-                                }}
-                              />
-                            </StripeFloatingField>
-                            {expiryFieldError && (
-                              <p className="text-[12px] text-[#e74c3c] mt-1 pl-1 font-medium">{expiryFieldError}</p>
-                            )}
-                          </div>
-                          <div>
-                            <StripeFloatingField
-                              label="CVC"
-                              hasError={Boolean(cvcFieldError)}
-                              endIcon={<HelpCircle className="w-4 h-4 text-[#707070]" />}
-                            >
-                              <CardCvcElement
-                                options={STRIPE_CARD_CVC_OPTIONS}
-                                onChange={(e) => {
-                                  setCvcFieldError(e.error ? e.error.message : "");
-                                }}
-                              />
-                            </StripeFloatingField>
-                            {cvcFieldError && (
-                              <p className="text-[12px] text-[#e74c3c] mt-1 pl-1 font-medium">{cvcFieldError}</p>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Full name (Name on card) */}
-                        <div>
-                          <FloatingInput
-                            id="cardName"
-                            label="Full name"
-                            value={cardName}
-                            onChange={(e) => setCardName(e.target.value)}
-                            autoComplete="cc-name"
+                    {/* Expiration and CVC side by side */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <StripeFloatingField
+                          label="Expiration"
+                          hasError={Boolean(expiryFieldError)}
+                        >
+                          <CardExpiryElement
+                            options={STRIPE_CARD_EXPIRY_OPTIONS}
+                            onChange={(e) => {
+                              setExpiryFieldError(e.error ? e.error.message : "");
+                            }}
                           />
-                        </div>
-
-                        {/* Use shipping address as billing address checkbox */}
-                        <label className="flex items-center gap-2.5 cursor-pointer select-none pt-1">
-                          <div
-                            onClick={() => setUseShippingAsBilling(!useShippingAsBilling)}
-                            className={`w-[18px] h-[18px] rounded-[4px] flex items-center justify-center shrink-0 transition-all ${
-                              useShippingAsBilling
-                                ? "bg-[#005bd3] text-white"
-                                : "border border-[#d9d9d9] bg-white hover:border-[#707070]"
-                            }`}
-                          >
-                            {useShippingAsBilling && (
-                              <Check className="w-3.5 h-3.5 text-white stroke-[3]" />
-                            )}
-                          </div>
-                          <span className="text-[13.5px] text-[#333333]">
-                            Use shipping address as billing address
-                          </span>
-                        </label>
+                        </StripeFloatingField>
+                        {expiryFieldError && (
+                          <p className="text-[12px] text-[#e74c3c] mt-1 pl-1 font-medium">{expiryFieldError}</p>
+                        )}
                       </div>
-                    )}
-                  </div>
-
-                  {/* Option 2 ── PAYFAST */}
-                  <div
-                    className={`${
-                      paymentMethod === "payfast"
-                        ? "border-2 border-[#005bd3] -m-[1px] rounded-[8px] relative z-10"
-                        : "border-b border-[#d9d9d9]"
-                    }`}
-                  >
-                    <div
-                      onClick={() => setPaymentMethod("payfast")}
-                      className={`flex items-center justify-between px-4 py-3.5 cursor-pointer transition-colors ${
-                        paymentMethod === "payfast"
-                          ? "bg-[#f4f8ff]"
-                          : "bg-white hover:bg-[#fafafa]"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center shrink-0 ${
-                            paymentMethod === "payfast"
-                              ? "border-[#005bd3]"
-                              : "border-[#b5b5b5]"
-                          }`}
+                      <div>
+                        <StripeFloatingField
+                          label="CVC"
+                          hasError={Boolean(cvcFieldError)}
+                          endIcon={<HelpCircle className="w-4 h-4 text-[#707070]" />}
                         >
-                          {paymentMethod === "payfast" && (
-                            <div className="w-[8px] h-[8px] rounded-full bg-[#005bd3]" />
-                          )}
-                        </div>
-                        <span className="text-[13.5px] md:text-[14px] font-medium text-[#1a1a1a]">
-                          PAYFAST (Debit/Credit/Wallet/Bank Account)
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0 pl-2">
-                        <VisaBadge />
-                        <MastercardBadge />
-                        <UnionPayBadge />
+                          <CardCvcElement
+                            options={STRIPE_CARD_CVC_OPTIONS}
+                            onChange={(e) => {
+                              setCvcFieldError(e.error ? e.error.message : "");
+                            }}
+                          />
+                        </StripeFloatingField>
+                        {cvcFieldError && (
+                          <p className="text-[12px] text-[#e74c3c] mt-1 pl-1 font-medium">{cvcFieldError}</p>
+                        )}
                       </div>
                     </div>
 
-                    {paymentMethod === "payfast" && (
-                      <div className="border-t border-[#d9d9d9] bg-[#f7f7f7] px-4 py-4 text-[13px] text-[#555555]">
-                        <p>
-                          After clicking &ldquo;Pay now&rdquo;, you will be redirected to PAYFAST to complete your purchase securely.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Option 3 ── Pay by card */}
-                  <div
-                    className={`${
-                      paymentMethod === "pay_by_card"
-                        ? "border-2 border-[#005bd3] -m-[1px] rounded-[8px] relative z-10"
-                        : "border-b border-[#d9d9d9]"
-                    }`}
-                  >
-                    <div
-                      onClick={() => setPaymentMethod("pay_by_card")}
-                      className={`flex items-center justify-between px-4 py-3.5 cursor-pointer transition-colors ${
-                        paymentMethod === "pay_by_card"
-                          ? "bg-[#f4f8ff]"
-                          : "bg-white hover:bg-[#fafafa]"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center shrink-0 ${
-                            paymentMethod === "pay_by_card"
-                              ? "border-[#005bd3]"
-                              : "border-[#b5b5b5]"
-                          }`}
-                        >
-                          {paymentMethod === "pay_by_card" && (
-                            <div className="w-[8px] h-[8px] rounded-full bg-[#005bd3]" />
-                          )}
-                        </div>
-                        <span className="text-[14px] font-medium text-[#1a1a1a]">
-                          Pay by card
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0 pl-2">
-                        <VisaBadge />
-                        <MastercardBadge />
-                        <AmexBadge />
-                        <PlusThreeBadge />
-                      </div>
+                    {/* Full name (Name on card) */}
+                    <div>
+                      <FloatingInput
+                        id="cardName"
+                        label="Full name"
+                        value={cardName}
+                        onChange={(e) => setCardName(e.target.value)}
+                        autoComplete="cc-name"
+                      />
                     </div>
 
-                    {paymentMethod === "pay_by_card" && (
-                      <div className="border-t border-[#d9d9d9] bg-[#f7f7f7] px-4 py-4 text-[13px] text-[#555555]">
-                        <p>
-                          You&apos;ll be redirected to Pay by card to complete your purchase.
-                        </p>
+                    {/* Use shipping address as billing address checkbox */}
+                    <label className="flex items-center gap-2.5 cursor-pointer select-none pt-1">
+                      <div
+                        onClick={() => setUseShippingAsBilling(!useShippingAsBilling)}
+                        className={`w-[18px] h-[18px] rounded-[4px] flex items-center justify-center shrink-0 transition-all ${
+                          useShippingAsBilling
+                            ? "bg-[#005bd3] text-white"
+                            : "border border-[#d9d9d9] bg-white hover:border-[#707070]"
+                        }`}
+                      >
+                        {useShippingAsBilling && (
+                          <Check className="w-3.5 h-3.5 text-white stroke-[3]" />
+                        )}
                       </div>
-                    )}
-                  </div>
-
-                  {/* Option 4 ── Bank Deposit */}
-                  <div
-                    className={`${
-                      paymentMethod === "bank_deposit"
-                        ? "border-2 border-[#005bd3] -m-[1px] rounded-[8px] relative z-10"
-                        : ""
-                    }`}
-                  >
-                    <div
-                      onClick={() => setPaymentMethod("bank_deposit")}
-                      className={`flex items-center justify-between px-4 py-3.5 cursor-pointer transition-colors ${
-                        paymentMethod === "bank_deposit"
-                          ? "bg-[#f4f8ff]"
-                          : "bg-white hover:bg-[#fafafa]"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center shrink-0 ${
-                            paymentMethod === "bank_deposit"
-                              ? "border-[#005bd3]"
-                              : "border-[#b5b5b5]"
-                          }`}
-                        >
-                          {paymentMethod === "bank_deposit" && (
-                            <div className="w-[8px] h-[8px] rounded-full bg-[#005bd3]" />
-                          )}
-                        </div>
-                        <span className="text-[14px] font-medium text-[#1a1a1a]">
-                          Bank Deposit
-                        </span>
-                      </div>
-                    </div>
-
-                    {paymentMethod === "bank_deposit" && (
-                      <div className="border-t border-[#d9d9d9] bg-[#f7f7f7] px-4 py-4 text-[13.5px] text-[#333333] leading-relaxed">
-                        <p>Bank: <strong>Meezan Bank</strong></p>
-                        <p>
-                          Ac title: <strong>SILLHOUETE</strong>
-                        </p>
-                        <p>
-                          IBAN: <strong>PK80MEZN0002160109517881</strong>
-                        </p>
-                        <p className="mt-2 text-[#666666]">
-                          Please share screenshot on our official WhatsApp number so that we can proceed with your order.
-                        </p>
-                      </div>
-                    )}
+                      <span className="text-[13.5px] text-[#333333]">
+                        Use shipping address as billing address
+                      </span>
+                    </label>
                   </div>
                 </div>
               </section>

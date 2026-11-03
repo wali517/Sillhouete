@@ -168,7 +168,6 @@ export default function OrderConfirmationPage() {
   }
 
   const paymentMethod = order.paymentMethod as string;
-  const isBankDeposit = paymentMethod === "bank_transfer" || paymentMethod === "bank_deposit";
   const isPaid = order.paymentStatus === "paid";
 
   return (
@@ -207,26 +206,6 @@ export default function OrderConfirmationPage() {
             Thank you, {order.shippingAddress?.firstName}!
           </h1>
 
-          {isBankDeposit && (
-            <div className="mt-4 p-4 bg-[#fff8e1] border border-[#ffe082] rounded-[8px] text-left max-w-[480px]">
-              <p className="text-[14px] font-semibold text-[#7c6000] mb-1">
-                ⚠ Bank Deposit — Action Required
-              </p>
-              <p className="text-[13px] text-[#7c6000] leading-relaxed">
-                Your order is confirmed. Please transfer{" "}
-                <strong>{formatPricePkr(order.total)}</strong> to:
-              </p>
-              <div className="mt-2 text-[13px] font-mono text-[#1a1a1a] space-y-0.5">
-                <p>Bank: <strong>Meezan Bank</strong></p>
-                <p>Account Title: <strong>SILLHOUETE</strong></p>
-                <p>IBAN: <strong>PK80MEZN0002160109517881</strong></p>
-              </div>
-              <p className="mt-2 text-[12px] text-[#7c6000]">
-                Share payment screenshot on WhatsApp to confirm your order.
-              </p>
-            </div>
-          )}
-
           {order.status === "cancelled" ? (
             <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-[8px] text-left max-w-[520px]">
               <p className="text-[14px] font-semibold text-red-800 mb-1 flex items-center gap-1.5">
@@ -259,7 +238,7 @@ export default function OrderConfirmationPage() {
                 </p>
               )}
             </div>
-          ) : isPaid && !isBankDeposit ? (
+          ) : isPaid ? (
             <div className="mt-3 flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-3.5 py-1.5 rounded-full text-[13px] font-medium border border-emerald-200">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>Stripe Payment Confirmed · Verified by Card Network</span>
@@ -275,12 +254,12 @@ export default function OrderConfirmationPage() {
                 Return to checkout & retry
               </Link>
             </div>
-          ) : !isPaid && !isBankDeposit ? (
+          ) : (
             <div className="mt-3 flex items-center gap-2 text-[13px] text-amber-800 bg-amber-50 px-3.5 py-1.5 rounded-full font-medium border border-amber-200">
               <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-700" />
               <span>Payment processing · Verifying transaction with card network...</span>
             </div>
-          ) : null}
+          )}
         </div>
 
         {/* ── Customer info card ── */}
@@ -390,11 +369,7 @@ export default function OrderConfirmationPage() {
                 <span className="text-[12px] font-semibold text-[#636363] uppercase tracking-wide">Payment</span>
               </div>
               <p className="text-[13px] text-[#1a1a1a] capitalize">
-                {isBankDeposit
-                  ? "Bank Deposit"
-                  : paymentMethod === "payfast"
-                  ? "PAYFAST"
-                  : "Stripe Card"}
+                Credit card (Stripe)
               </p>
               <span
                 className={`inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-semibold ${

@@ -136,7 +136,7 @@ export type RefundStatus =
   | "partially_refunded"
   | "refunded"
   | "refund_failed";
-export type PaymentMethod = "stripe" | "cod" | "bank_transfer" | "bank_deposit" | "credit_card" | "payfast" | "pay_by_card";
+export type PaymentMethod = "stripe" | "credit_card" | "cod" | "bank_transfer" | "bank_deposit";
 
 export interface StripePaymentDetails {
   brand?: string;
