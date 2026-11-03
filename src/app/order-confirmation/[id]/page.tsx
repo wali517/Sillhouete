@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import type { Order } from "@/types";
 import { useStore } from "@/components/providers/StoreProvider";
+import { SITE } from "@/data/site";
 
 function formatPricePkr(amt: number) {
   return `Rs. ${Math.round(amt).toLocaleString("en-US")}`;
@@ -177,17 +178,16 @@ export default function OrderConfirmationPage() {
     >
       {/* Header */}
       <header className="border-b border-[#e1e1e1]">
-        <div className="mx-auto max-w-[680px] px-4 py-5 flex items-center justify-between">
-          <Link href="/" className="flex flex-col items-center leading-none select-none">
-            <span className="text-[12px] text-black" style={{ fontFamily: "serif" }}>
-              سلوٹ
-            </span>
-            <span
-              className="text-[22px] font-semibold tracking-[0.04em] text-black"
-              style={{ fontFamily: "serif" }}
-            >
-              Sillhouete
-            </span>
+        <div className="mx-auto max-w-[680px] px-4 py-4 flex items-center justify-between">
+          <Link href="/" className="inline-block" aria-label="Sillhouete Home">
+            <Image
+              src={SITE.logo}
+              alt={SITE.name}
+              width={160}
+              height={50}
+              priority
+              className="h-9 sm:h-11 w-auto object-contain"
+            />
           </Link>
         </div>
       </header>

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
 import { Play } from "lucide-react";
+import { SITE } from "@/data/site";
 
 interface ProductVideoReelProps {
   videoId?: string;
@@ -120,10 +122,15 @@ export default function ProductVideoReel({
           {/* Top Bar: Gold Arabic Logo Avatar + "New..." + "sill..." + White Close 'X' */}
           <div className="absolute top-0 inset-x-0 z-20 flex items-start justify-between p-1.5 sm:p-2 bg-gradient-to-b from-black/85 via-black/40 to-transparent">
             <div className="flex items-center gap-1.5 overflow-hidden">
-              {/* Circular Black Avatar with Gold Arabic "سلوٹ" + "Sillhouete" */}
-              <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-black border border-[#d4af37]/70 flex flex-col items-center justify-center shrink-0 shadow-md">
-                <span className="font-serif text-[8.5px] sm:text-[9.5px] leading-tight text-[#d4af37] font-bold select-none">سلوٹ</span>
-                <span className="font-serif text-[5px] sm:text-[6px] font-bold tracking-wider text-[#d4af37] -mt-0.5 select-none">Sillhouete</span>
+              {/* Circular Avatar with official brand logo */}
+              <div className="relative h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-white border border-[#d4af37]/70 flex items-center justify-center shrink-0 shadow-md overflow-hidden p-0.5">
+                <Image
+                  src={SITE.logo}
+                  alt="Sillhouete"
+                  fill
+                  sizes="32px"
+                  className="object-contain p-0.5"
+                />
               </div>
 
               {/* Text: New... / sill... */}
@@ -217,9 +224,14 @@ export default function ProductVideoReel({
             {/* Header with Title and Close Button */}
             <div className="absolute top-0 inset-x-0 z-20 flex items-center justify-between p-3.5 bg-gradient-to-b from-black/90 to-transparent">
               <div className="flex items-center gap-2">
-                <div className="h-7 w-7 rounded-full bg-black border border-[#d4af37]/70 flex flex-col items-center justify-center shrink-0">
-                  <span className="font-serif text-[8.5px] leading-tight text-[#d4af37] font-bold">سلوٹ</span>
-                  <span className="font-serif text-[5.5px] font-bold tracking-wider text-[#d4af37] -mt-0.5">Sillhouete</span>
+                <div className="relative h-7 w-7 rounded-full bg-white border border-[#d4af37]/70 flex items-center justify-center shrink-0 overflow-hidden p-0.5">
+                  <Image
+                    src={SITE.logo}
+                    alt="Sillhouete"
+                    fill
+                    sizes="28px"
+                    className="object-contain p-0.5"
+                  />
                 </div>
                 <div className="text-white">
                   <h3 className="font-serif text-sm tracking-wide font-medium truncate max-w-[200px]">

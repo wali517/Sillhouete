@@ -10,6 +10,7 @@ import CustomerTestimonials from "@/components/products/CustomerTestimonials";
 import KeyActives from "@/components/products/KeyActives";
 import ProductVideoReel from "@/components/products/ProductVideoReel";
 import { allProducts, getProduct } from "@/data/products";
+import { SITE } from "@/data/site";
 import { getProductByHandle, getProducts } from "@/lib/db";
 import type { Product } from "@/types";
 import { SEED_BLOGS } from "@/data/seed-blogs";
@@ -349,9 +350,14 @@ export default async function ProductPage({ params }: Props) {
             {/* Official Size Chart Table matching live site */}
             {product.handle === "camilla" ? (
               <div className="pt-6 space-y-4 font-sans text-center">
-                <div className="flex flex-col items-center justify-center">
-                  <span className="font-serif text-[18px] leading-none text-black select-none">سلوٹ</span>
-                  <span className="font-serif text-[24px] font-bold tracking-wider text-black">Sillhouete</span>
+                <div className="flex items-center justify-center py-1">
+                  <Image
+                    src={SITE.logo}
+                    alt="Sillhouete"
+                    width={160}
+                    height={50}
+                    className="h-10 w-auto object-contain"
+                  />
                 </div>
 
                 <div className="bg-black text-white py-1.5 text-[14px] font-bold uppercase tracking-wider">

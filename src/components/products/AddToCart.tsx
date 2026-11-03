@@ -1,10 +1,12 @@
 "use client";
 
 import { useMemo, useState, type ReactNode } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Minus, Plus, Ruler, X } from "lucide-react";
 import type { Product } from "@/types";
 import { useStore } from "@/components/providers/StoreProvider";
+import { SITE } from "@/data/site";
 
 const SIZES = ["XS", "S", "M", "L", "XL"];
 const EXPEDITE_FEE = 8000;
@@ -317,9 +319,14 @@ export default function AddToCart({ product, children }: { product: Product; chi
 
             {/* Camilla's exact Size Chart Table matching live_top.png */}
             <div className="space-y-4 text-center font-sans">
-              <div className="flex flex-col items-center justify-center">
-                <span className="font-serif text-[18px] leading-none text-black select-none">سلوٹ</span>
-                <span className="font-serif text-[22px] font-bold tracking-wider text-black">Sillhouete</span>
+              <div className="flex items-center justify-center py-1">
+                <Image
+                  src={SITE.logo}
+                  alt="Sillhouete"
+                  width={150}
+                  height={48}
+                  className="h-9 w-auto object-contain"
+                />
               </div>
 
               <div className="bg-black text-white py-1.5 text-[14px] font-bold uppercase tracking-wider">

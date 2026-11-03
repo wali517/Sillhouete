@@ -217,6 +217,35 @@ export async function sendTrackedNotification({
   }
 }
 
+/* ──────────────── BRANDED EMAIL LOGO HEADER HELPER ──────────────── */
+
+function getEmailBrandHeader(badgeHtml = ""): string {
+  return `
+    <div style="text-align: center; margin-bottom: 24px;">
+      <a href="https://sillhouete.com" target="_blank" style="display: inline-block; text-decoration: none;">
+        <img src="${SITE.logo}" alt="${SITE.name}" style="height: 44px; width: auto; max-width: 190px; margin: 0 auto 10px; display: block; border: 0;" />
+      </a>
+      <h1 style="font-size: 24px; font-weight: normal; letter-spacing: 3px; text-transform: uppercase; margin: 0; color: #111111;">
+        ${SITE.name}
+      </h1>
+      ${badgeHtml}
+    </div>
+  `;
+}
+
+function getSimpleEmailHeader(): string {
+  return `
+    <div style="text-align: center; margin-bottom: 24px;">
+      <a href="https://sillhouete.com" target="_blank" style="display: inline-block; text-decoration: none;">
+        <img src="${SITE.logo}" alt="${SITE.name}" style="height: 40px; width: auto; max-width: 170px; margin: 0 auto 8px; display: block; border: 0;" />
+      </a>
+      <div style="font-size: 20px; font-weight: normal; letter-spacing: 2.5px; text-transform: uppercase; color: #111111;">
+        ${SITE.name}
+      </div>
+    </div>
+  `;
+}
+
 /* ──────────────── 1. ORDER CONFIRMATION EMAIL ──────────────── */
 
 export async function sendOrderConfirmationEmail(order: Order, isCod = false) {
@@ -285,14 +314,7 @@ export async function sendOrderConfirmationEmail(order: Order, isCod = false) {
   const subject = `Order Confirmation #${order.orderNumber} – ${SITE.name}`;
   const html = `
     <div style="font-family: Georgia, serif; max-width: 620px; margin: 0 auto; padding: 28px; color: #1a1a1a; border: 1px solid #e5e5e5; background: #ffffff;">
-      <div style="text-align: center; margin-bottom: 24px;">
-        <h1 style="font-size: 26px; font-weight: normal; letter-spacing: 3px; text-transform: uppercase; margin: 0;">
-          ${SITE.name}
-        </h1>
-        <p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #777; margin-top: 6px;">
-          ${paymentHeaderBadge}
-        </p>
-      </div>
+      ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #777; margin-top: 6px;">${paymentHeaderBadge}</p>`)}
 
       <p style="font-size: 15px; line-height: 1.6;">Hello ${safeCustomerName},</p>
       <p style="font-size: 15px; line-height: 1.6; color: #444;">
@@ -358,14 +380,7 @@ export async function sendPaymentFailureEmail(order: Order, failureReason?: stri
   const subject = `Payment Unsuccessful for Order #${order.orderNumber} – ${SITE.name}`;
   const html = `
     <div style="font-family: Georgia, serif; max-width: 620px; margin: 0 auto; padding: 28px; color: #1a1a1a; border: 1px solid #e5e5e5; background: #ffffff;">
-      <div style="text-align: center; margin-bottom: 24px;">
-        <h1 style="font-size: 26px; font-weight: normal; letter-spacing: 3px; text-transform: uppercase; margin: 0;">
-          ${SITE.name}
-        </h1>
-        <p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #c62828; margin-top: 6px;">
-          PAYMENT UNSUCCESSFUL
-        </p>
-      </div>
+      ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #c62828; margin-top: 6px;">PAYMENT UNSUCCESSFUL</p>`)}
 
       <p style="font-size: 15px; line-height: 1.6;">Hello ${safeCustomerName},</p>
       <p style="font-size: 15px; line-height: 1.6; color: #444;">
@@ -438,14 +453,7 @@ export async function sendOrderCancellationEmail(order: Order, reason?: string) 
   const subject = `Order Cancellation Notice: #${order.orderNumber} – ${SITE.name}`;
   const html = `
     <div style="font-family: Georgia, serif; max-width: 620px; margin: 0 auto; padding: 28px; color: #1a1a1a; border: 1px solid #e5e5e5; background: #ffffff;">
-      <div style="text-align: center; margin-bottom: 24px;">
-        <h1 style="font-size: 26px; font-weight: normal; letter-spacing: 3px; text-transform: uppercase; margin: 0;">
-          ${SITE.name}
-        </h1>
-        <p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #757575; margin-top: 6px;">
-          ORDER CANCELLED
-        </p>
-      </div>
+      ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #757575; margin-top: 6px;">ORDER CANCELLED</p>`)}
 
       <p style="font-size: 15px; line-height: 1.6;">Hello ${safeCustomerName},</p>
       <p style="font-size: 15px; line-height: 1.6; color: #444;">
@@ -492,14 +500,7 @@ export async function sendRefundInitiatedEmail(
   const subject = `Refund Initiated for Order #${order.orderNumber} – ${SITE.name}`;
   const html = `
     <div style="font-family: Georgia, serif; max-width: 620px; margin: 0 auto; padding: 28px; color: #1a1a1a; border: 1px solid #e5e5e5; background: #ffffff;">
-      <div style="text-align: center; margin-bottom: 24px;">
-        <h1 style="font-size: 26px; font-weight: normal; letter-spacing: 3px; text-transform: uppercase; margin: 0;">
-          ${SITE.name}
-        </h1>
-        <p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #6a1b9a; margin-top: 6px;">
-          REFUND INITIATED
-        </p>
-      </div>
+      ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #6a1b9a; margin-top: 6px;">REFUND INITIATED</p>`)}
 
       <p style="font-size: 15px; line-height: 1.6;">Hello ${safeCustomerName},</p>
       <p style="font-size: 15px; line-height: 1.6; color: #444;">
@@ -546,14 +547,7 @@ export async function sendRefundSuccessfulEmail(
   const subject = `Refund Confirmed for Order #${order.orderNumber} – ${SITE.name}`;
   const html = `
     <div style="font-family: Georgia, serif; max-width: 620px; margin: 0 auto; padding: 28px; color: #1a1a1a; border: 1px solid #e5e5e5; background: #ffffff;">
-      <div style="text-align: center; margin-bottom: 24px;">
-        <h1 style="font-size: 26px; font-weight: normal; letter-spacing: 3px; text-transform: uppercase; margin: 0;">
-          ${SITE.name}
-        </h1>
-        <p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #2e7d32; margin-top: 6px;">
-          REFUND CONFIRMED BY STRIPE
-        </p>
-      </div>
+      ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #2e7d32; margin-top: 6px;">REFUND CONFIRMED BY STRIPE</p>`)}
 
       <p style="font-size: 15px; line-height: 1.6;">Hello ${safeCustomerName},</p>
       <p style="font-size: 15px; line-height: 1.6; color: #444;">
@@ -595,14 +589,7 @@ export async function sendRefundFailedEmail(order: Order, failureReason?: string
   const subject = `Refund Processing Update: Order #${order.orderNumber} – ${SITE.name}`;
   const html = `
     <div style="font-family: Georgia, serif; max-width: 620px; margin: 0 auto; padding: 28px; color: #1a1a1a; border: 1px solid #e5e5e5; background: #ffffff;">
-      <div style="text-align: center; margin-bottom: 24px;">
-        <h1 style="font-size: 26px; font-weight: normal; letter-spacing: 3px; text-transform: uppercase; margin: 0;">
-          ${SITE.name}
-        </h1>
-        <p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #c62828; margin-top: 6px;">
-          REFUND NOTICE
-        </p>
-      </div>
+      ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #c62828; margin-top: 6px;">REFUND NOTICE</p>`)}
 
       <p style="font-size: 15px; line-height: 1.6;">Hello ${safeCustomerName},</p>
       <p style="font-size: 15px; line-height: 1.6; color: #444;">
@@ -661,14 +648,7 @@ export async function sendShippingUpdateEmail(order: Order) {
   const subject = `Shipping Update: Order #${order.orderNumber} is ${order.status.toUpperCase()} – ${SITE.name}`;
   const html = `
     <div style="font-family: Georgia, serif; max-width: 620px; margin: 0 auto; padding: 28px; color: #1a1a1a; border: 1px solid #e5e5e5; background: #ffffff;">
-      <div style="text-align: center; margin-bottom: 24px;">
-        <h1 style="font-size: 26px; font-weight: normal; letter-spacing: 3px; text-transform: uppercase; margin: 0;">
-          ${SITE.name}
-        </h1>
-        <p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #005bd3; margin-top: 6px;">
-          ORDER STATUS UPDATE: ${safeStatus}
-        </p>
-      </div>
+      ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #005bd3; margin-top: 6px;">ORDER STATUS UPDATE: ${safeStatus}</p>`)}
 
       <p style="font-size: 15px; line-height: 1.6;">Hello ${safeCustomerName},</p>
       <p style="font-size: 15px; line-height: 1.6; color: #444;">
@@ -738,9 +718,7 @@ export async function sendLoginAlertEmail({
   const subject = `Login Notification – ${SITE.name}`;
   const html = `
     <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1a1a1a; border: 1px solid #e5e5e5;">
-      <h2 style="font-size: 22px; font-weight: normal; letter-spacing: 2px; text-transform: uppercase; text-align: center; margin-bottom: 24px;">
-        ${SITE.name}
-      </h2>
+      ${getSimpleEmailHeader()}
       <p style="font-size: 15px; line-height: 1.6;">Hello ${safeName},</p>
       <p style="font-size: 15px; line-height: 1.6;">
         We noticed a recent sign-in to your ${SITE.name} account on <strong>${safeTime}</strong>.
@@ -777,9 +755,7 @@ export async function sendPasswordResetCodeEmail({
   const subject = `Password Reset Code – ${SITE.name}`;
   const html = `
     <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1a1a1a; border: 1px solid #e5e5e5;">
-      <h2 style="font-size: 22px; font-weight: normal; letter-spacing: 2px; text-transform: uppercase; text-align: center; margin-bottom: 24px;">
-        ${SITE.name}
-      </h2>
+      ${getSimpleEmailHeader()}
       <p style="font-size: 15px; line-height: 1.6;">Hello ${safeName},</p>
       <p style="font-size: 15px; line-height: 1.6;">
         We received a request to reset your password. Use the verification code below to set a new password:
@@ -820,9 +796,7 @@ export async function sendProfileUpdatedNotificationEmail({
   const subject = `Your ${SITE.name} Account Profile Has Been Updated`;
   const html = `
     <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1a1a1a; border: 1px solid #e5e5e5;">
-      <h2 style="font-size: 22px; font-weight: normal; letter-spacing: 2px; text-transform: uppercase; text-align: center; margin-bottom: 24px;">
-        ${SITE.name}
-      </h2>
+      ${getSimpleEmailHeader()}
       <p style="font-size: 15px; line-height: 1.6;">Hello ${safeName},</p>
       <p style="font-size: 15px; line-height: 1.6;">
         Your account profile was successfully updated. The following detail(s) were modified:
@@ -888,9 +862,7 @@ export async function sendContactFormNotification({
   const customerSubject = `We have received your message – ${SITE.name}`;
   const customerHtml = `
     <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1a1a1a; border: 1px solid #e5e5e5;">
-      <h2 style="font-size: 22px; font-weight: normal; letter-spacing: 2px; text-transform: uppercase; text-align: center; margin-bottom: 24px;">
-        ${SITE.name}
-      </h2>
+      ${getSimpleEmailHeader()}
       <p style="font-size: 15px; line-height: 1.6;">Hello ${safeName},</p>
       <p style="font-size: 15px; line-height: 1.6;">
         Thank you for contacting ${SITE.name}. We have received your inquiry regarding <strong>${safeSubject}</strong> and our atelier team will respond to you shortly.
@@ -928,12 +900,7 @@ export async function sendDiscountCodeEmail({
   const subject = `Your Exclusive ${percent}% Welcome Discount Code: ${code} – ${SITE.name}`;
   const html = `
     <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; color: #1a1a1a; border: 1px solid #e5e5e5; background: #ffffff;">
-      <div style="text-align: center; margin-bottom: 24px;">
-        <h1 style="font-size: 26px; font-weight: normal; letter-spacing: 3px; text-transform: uppercase; margin: 0;">
-          ${SITE.name}
-        </h1>
-        <p style="font-size: 13px; color: #888; margin-top: 6px; letter-spacing: 1px;">HAUTE COUTURE &amp; FESTIVE LUXURY</p>
-      </div>
+      ${getEmailBrandHeader(`<p style="font-size: 13px; color: #888; margin-top: 6px; letter-spacing: 1px;">HAUTE COUTURE &amp; FESTIVE LUXURY</p>`)}
 
       <p style="font-size: 15px; line-height: 1.6;">Hello,</p>
       <p style="font-size: 15px; line-height: 1.6;">

@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { Globe } from "lucide-react";
-import { NAV } from "@/data/site";
+import { NAV, SITE } from "@/data/site";
 import Socials from "@/components/ui/Socials";
 import { useStore, type CurrencyCode } from "@/components/providers/StoreProvider";
 
@@ -37,8 +38,17 @@ export default function MobileMenu({ open, onClose }: { open: boolean; onClose: 
             exit={{ x: "100%" }}
             transition={{ type: "tween", duration: 0.3 }}
           >
-            <div className="flex items-center justify-between border-b border-[#e8e8e1] px-5 py-4">
-              <span className="text-[13px] font-normal uppercase tracking-[0.15em] text-black/70">Navigation</span>
+            <div className="flex items-center justify-between border-b border-[#e8e8e1] px-5 py-3.5">
+              <Link href="/" onClick={onClose} className="relative block h-9 w-28" aria-label="Sillhouete Home">
+                <Image
+                  src={SITE.logo}
+                  alt="Sillhouete"
+                  fill
+                  sizes="120px"
+                  priority
+                  className="object-contain object-left"
+                />
+              </Link>
               <button
                 type="button"
                 onClick={onClose}

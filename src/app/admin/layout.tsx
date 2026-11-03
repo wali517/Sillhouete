@@ -2,7 +2,9 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { SITE } from "@/data/site";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -88,8 +90,20 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen bg-[#f8f9fa] text-gray-900 font-sans">
       {/* Mobile Header */}
       <div className="fixed top-0 left-0 right-0 z-40 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 md:hidden">
-        <Link href="/admin" className="font-bold tracking-wider text-base uppercase">
-          Sillhouete <span className="text-xs bg-black text-white px-1.5 py-0.5 rounded font-normal">Admin</span>
+        <Link href="/admin" className="flex items-center gap-2" aria-label="Sillhouete Admin">
+          <div className="relative h-8 w-24">
+            <Image
+              src={SITE.logo}
+              alt="Sillhouete"
+              fill
+              sizes="96px"
+              priority
+              className="object-contain object-left"
+            />
+          </div>
+          <span className="text-[10px] bg-black text-white px-1.5 py-0.5 rounded font-semibold tracking-normal">
+            ADMIN
+          </span>
         </Link>
         <button
           type="button"
@@ -109,8 +123,17 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       >
         {/* Brand Header */}
         <div className="flex h-16 items-center justify-between border-b border-gray-200 px-6">
-          <Link href="/admin" className="font-bold tracking-widest text-lg uppercase flex items-center gap-2">
-            <span>Sillhouete</span>
+          <Link href="/admin" className="flex items-center gap-2" aria-label="Sillhouete Admin">
+            <div className="relative h-9 w-28">
+              <Image
+                src={SITE.logo}
+                alt="Sillhouete"
+                fill
+                sizes="112px"
+                priority
+                className="object-contain object-left"
+              />
+            </div>
             <span className="text-[10px] bg-black text-white px-1.5 py-0.5 rounded font-semibold tracking-normal">
               ADMIN
             </span>
