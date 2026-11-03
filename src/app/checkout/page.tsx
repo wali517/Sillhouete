@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import {
   ChevronDown,
   ChevronUp,
+  ChevronRight,
   Lock,
   ShoppingBag,
   HelpCircle,
@@ -19,6 +20,9 @@ import {
   MastercardBadge as SharedMaster,
   AmexBadge as SharedAmex,
   UnionPayBadge as SharedUnionPay,
+  DiscoverBadge as SharedDiscover,
+  DinersBadge as SharedDiners,
+  JcbBadge as SharedJcb,
 } from "@/components/ui/CardBadges";
 import { loadStripe } from "@stripe/stripe-js";
 import {
@@ -68,6 +72,18 @@ function PlusThreeBadge() {
       +3
     </span>
   );
+}
+
+function getCardBrandBadge(brand: string) {
+  const b = (brand || "").toLowerCase().trim();
+  if (b === "visa") return <VisaBadge />;
+  if (b === "mastercard") return <MastercardBadge />;
+  if (b === "amex" || b === "american_express") return <AmexBadge />;
+  if (b === "unionpay") return <UnionPayBadge />;
+  if (b === "discover") return <SharedDiscover className={BADGE_CLASS} />;
+  if (b === "diners" || b === "diners_club") return <SharedDiners className={BADGE_CLASS} />;
+  if (b === "jcb") return <SharedJcb className={BADGE_CLASS} />;
+  return null;
 }
 
 /* ──────── Floating Label Input ──────── */
@@ -201,11 +217,10 @@ const STRIPE_ELEMENT_BASE_STYLE = {
 };
 
 // Stripe Card Element options
-// showIcon: true displays the card brand (Visa, Mastercard, etc.) directly in the field
-// Stripe Link is enabled so the popup modal ("Update card" / "Add a card") works for validation
+// showIcon: false keeps iframe clean so we display detected card brand badge on the right
 const STRIPE_CARD_NUMBER_OPTIONS = {
   style: STRIPE_ELEMENT_BASE_STYLE,
-  showIcon: true,
+  showIcon: false,
 };
 
 const STRIPE_CARD_EXPIRY_OPTIONS = {
@@ -220,16 +235,20 @@ function StripeFloatingField({
   label,
   children,
   endIcon,
+  hasError,
 }: {
   label: string;
   children: React.ReactNode;
   endIcon?: React.ReactNode;
+  hasError?: boolean;
 }) {
   const [focused, setFocused] = useState(false);
   return (
     <div
-      className={`relative w-full min-w-0 border rounded-[5px] bg-white transition-all ${
-        focused
+      className={`relative w-full min-w-0 border rounded-[6px] bg-white transition-all ${
+        hasError
+          ? "border-[#e74c3c] ring-1 ring-[#e74c3c]"
+          : focused
           ? "border-[#005bd3] ring-1 ring-[#005bd3] shadow-[0_0_0_1px_#005bd3]"
           : "border-[#d9d9d9] hover:border-[#707070]"
       }`}
@@ -239,9 +258,9 @@ function StripeFloatingField({
       <label className="absolute left-3.5 top-1.5 text-[10.5px] text-[#707070] pointer-events-none select-none">
         {label}
       </label>
-      <div className={`pt-5 pb-1.5 px-3.5 ${endIcon ? "pr-10" : "pr-3.5"}`}>{children}</div>
+      <div className={`pt-5 pb-1.5 px-3.5 ${endIcon ? "pr-24" : "pr-3.5"}`}>{children}</div>
       {endIcon && (
-        <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#707070] pointer-events-none">
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
           {endIcon}
         </div>
       )}
@@ -300,6 +319,7 @@ function CheckoutForm() {
 
   // Card details
   const [cardName, setCardName] = useState("");
+  const [cardBrand, setCardBrand] = useState("");
   const [cardFieldError, setCardFieldError] = useState("");
   const [expiryFieldError, setExpiryFieldError] = useState("");
   const [cvcFieldError, setCvcFieldError] = useState("");
@@ -1003,26 +1023,47 @@ function CheckoutForm() {
                     {paymentMethod === "credit_card" && (
                       <div className="border-t border-[#d9d9d9] bg-[#f7f7f7] p-4 space-y-3">
 
+                        {/* Card number */}
                         <div>
                           <StripeFloatingField
                             label="Card number"
-                            endIcon={<Lock className="w-4 h-4 text-[#707070]" />}
+                            hasError={Boolean(cardFieldError)}
+                            endIcon={
+                              getCardBrandBadge(cardBrand) ? (
+                                <div className="flex items-center gap-1.5 select-none">
+                                  {getCardBrandBadge(cardBrand)}
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-1.5 select-none pointer-events-none">
+                                  <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#00513B] text-white text-[10.5px] font-semibold tracking-tight shadow-xs">
+                                    Autofill
+                                    <ChevronRight className="w-3 h-3 stroke-[2.5]" />
+                                  </span>
+                                  <Lock className="w-3.5 h-3.5 text-[#707070]" />
+                                </div>
+                              )
+                            }
                           >
                             <CardNumberElement
                               options={STRIPE_CARD_NUMBER_OPTIONS}
                               onChange={(e) => {
                                 setCardFieldError(e.error ? e.error.message : "");
+                                setCardBrand(e.brand || "");
                               }}
                             />
                           </StripeFloatingField>
                           {cardFieldError && (
-                            <p className="text-[12px] text-red-600 mt-1 pl-1">{cardFieldError}</p>
+                            <p className="text-[12px] text-[#e74c3c] mt-1 pl-1 font-medium">{cardFieldError}</p>
                           )}
                         </div>
 
+                        {/* Expiration and CVC side by side */}
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <StripeFloatingField label="Expiration date (MM / YY)">
+                            <StripeFloatingField
+                              label="Expiration"
+                              hasError={Boolean(expiryFieldError)}
+                            >
                               <CardExpiryElement
                                 options={STRIPE_CARD_EXPIRY_OPTIONS}
                                 onChange={(e) => {
@@ -1031,13 +1072,14 @@ function CheckoutForm() {
                               />
                             </StripeFloatingField>
                             {expiryFieldError && (
-                              <p className="text-[12px] text-red-600 mt-1 pl-1">{expiryFieldError}</p>
+                              <p className="text-[12px] text-[#e74c3c] mt-1 pl-1 font-medium">{expiryFieldError}</p>
                             )}
                           </div>
                           <div>
                             <StripeFloatingField
-                              label="Security code"
-                              endIcon={<HelpCircle className="w-4.5 h-4.5 text-[#737373]" />}
+                              label="CVC"
+                              hasError={Boolean(cvcFieldError)}
+                              endIcon={<HelpCircle className="w-4 h-4 text-[#707070]" />}
                             >
                               <CardCvcElement
                                 options={STRIPE_CARD_CVC_OPTIONS}
@@ -1047,18 +1089,21 @@ function CheckoutForm() {
                               />
                             </StripeFloatingField>
                             {cvcFieldError && (
-                              <p className="text-[12px] text-red-600 mt-1 pl-1">{cvcFieldError}</p>
+                              <p className="text-[12px] text-[#e74c3c] mt-1 pl-1 font-medium">{cvcFieldError}</p>
                             )}
                           </div>
                         </div>
 
-                        <FloatingInput
-                          id="cardName"
-                          label="Name on card"
-                          value={cardName}
-                          onChange={(e) => setCardName(e.target.value)}
-                          autoComplete="cc-name"
-                        />
+                        {/* Full name (Name on card) */}
+                        <div>
+                          <FloatingInput
+                            id="cardName"
+                            label="Full name"
+                            value={cardName}
+                            onChange={(e) => setCardName(e.target.value)}
+                            autoComplete="cc-name"
+                          />
+                        </div>
 
                         {/* Use shipping address as billing address checkbox */}
                         <label className="flex items-center gap-2.5 cursor-pointer select-none pt-1">
@@ -1591,18 +1636,18 @@ function CheckoutPageInner() {
 
   const dynamicStripePromise = useMemo(() => {
     const trimmed = typeof stripeKey === "string" ? stripeKey.trim() : "";
-    const testModeOnly = process.env.NEXT_PUBLIC_STRIPE_TEST_MODE !== "false";
+    const forceTestMode = process.env.NEXT_PUBLIC_STRIPE_TEST_MODE === "true";
 
-    if (testModeOnly && trimmed.startsWith("pk_live_")) {
+    if (forceTestMode && trimmed.startsWith("pk_live_")) {
       console.warn(
-        "[Stripe Safety Warning]: Live key (pk_live_) detected while project is configured for Stripe TEST MODE. Only pk_test_ keys are permitted."
+        "[Stripe Safety Warning]: Live key (pk_live_) detected while NEXT_PUBLIC_STRIPE_TEST_MODE=true is enforced. Only pk_test_ keys are permitted."
       );
       return Promise.resolve(null);
     }
 
     const isKeyValid =
       trimmed.length >= 20 &&
-      (trimmed.startsWith("pk_test_") || (!testModeOnly && trimmed.startsWith("pk_live_")));
+      (trimmed.startsWith("pk_test_") || trimmed.startsWith("pk_live_"));
 
     if (!isKeyValid) return Promise.resolve(null);
 

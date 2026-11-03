@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 
+let cachedSecretKey: string | null = null;
 let stripeServerInstance: Stripe | null = null;
 
 const ZERO_DECIMAL_CURRENCIES = new Set([
@@ -8,28 +9,38 @@ const ZERO_DECIMAL_CURRENCIES = new Set([
 ]);
 
 /**
- * Checks whether Stripe Test Mode is enforced.
- * Defaults to TRUE for strict safety. Live mode must never run unless explicitly permitted.
+ * Checks whether Stripe Test Mode is active.
+ * Auto-detects based on keys (if sk_live_ or pk_live_ is provided, live mode is active).
+ * Respects STRIPE_TEST_MODE="true" or "false" if explicitly set in environment.
  */
 export function isStripeTestMode(): boolean {
-  return process.env.STRIPE_TEST_MODE !== "false";
-}
+  if (process.env.STRIPE_TEST_MODE === "true") return true;
+  if (process.env.STRIPE_TEST_MODE === "false") return false;
 
-/**
- * Validates Stripe configuration for strict Test Mode safety.
- * Rejects live keys and mismatched key types.
- */
-export function validateStripeTestConfig(): { valid: boolean; error?: string } {
-  const testMode = isStripeTestMode();
   const secretKey = process.env.STRIPE_SECRET_KEY || "";
   const pubKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "";
 
-  if (testMode) {
+  if (secretKey.startsWith("sk_live_") || pubKey.startsWith("pk_live_")) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Validates Stripe configuration.
+ * Allows test keys in test mode, and allows live keys when transitioning to live mode.
+ * Ensures secret key and publishable key modes match (both test or both live).
+ */
+export function validateStripeTestConfig(): { valid: boolean; error?: string } {
+  const secretKey = process.env.STRIPE_SECRET_KEY || "";
+  const pubKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "";
+
+  if (process.env.STRIPE_TEST_MODE === "true") {
     if (secretKey.startsWith("sk_live_") || pubKey.startsWith("pk_live_")) {
       return {
         valid: false,
         error:
-          "Stripe Live Mode is strictly disabled. Current configuration requires Stripe TEST MODE only. Replace sk_live_ / pk_live_ with test credentials (sk_test_ / pk_test_).",
+          "Stripe Live Mode is disabled because STRIPE_TEST_MODE=true is set. Please use test credentials (sk_test_ / pk_test_) or set STRIPE_TEST_MODE=false.",
       };
     }
   }
@@ -40,7 +51,7 @@ export function validateStripeTestConfig(): { valid: boolean; error?: string } {
     if (isSecretTest !== isPubTest) {
       return {
         valid: false,
-        error: `Stripe key mode mismatch: Secret Key is ${isSecretTest ? "test" : "live"} mode while Publishable Key is ${isPubTest ? "test" : "live"} mode. Both must match.`,
+        error: `Stripe key mode mismatch: Secret Key is in ${isSecretTest ? "test" : "live"} mode while Publishable Key is in ${isPubTest ? "test" : "live"} mode. Both must match.`,
       };
     }
   }
@@ -76,7 +87,6 @@ export async function resolveStripeSecretKey(): Promise<string> {
  * Throws an explicit error if STRIPE_SECRET_KEY is missing, invalid, or violates Test Mode.
  */
 export function getStripeServer(): Stripe {
-  const testMode = isStripeTestMode();
   const secretKey = process.env.STRIPE_SECRET_KEY;
 
   if (!secretKey) {
@@ -85,27 +95,32 @@ export function getStripeServer(): Stripe {
     );
   }
 
-  if (testMode && secretKey.startsWith("sk_live_")) {
+  if (process.env.STRIPE_TEST_MODE === "true" && secretKey.startsWith("sk_live_")) {
     throw new Error(
-      "Stripe Live Mode is strictly disabled. Project configuration requires Stripe TEST MODE only (STRIPE_TEST_MODE=true). Please provide a test secret key starting with 'sk_test_'."
+      "Stripe Live Mode is disabled because STRIPE_TEST_MODE=true is set. Please provide a test secret key starting with 'sk_test_'."
     );
   }
 
   if (!secretKey.startsWith("sk_test_") && !secretKey.startsWith("sk_live_")) {
     throw new Error(
-      "Invalid STRIPE_SECRET_KEY format. Key must start with 'sk_test_'."
+      "Invalid STRIPE_SECRET_KEY format. Key must start with 'sk_test_' or 'sk_live_'."
     );
   }
 
   // Validate mode matching with publishable key if present
   const pubKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-  if (pubKey && testMode && pubKey.startsWith("pk_live_")) {
-    throw new Error(
-      "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is in Live mode (pk_live_) while project is restricted to Stripe TEST MODE. Please use a test key (pk_test_)."
-    );
+  if (pubKey) {
+    const isSecretTest = secretKey.startsWith("sk_test_");
+    const isPubTest = pubKey.startsWith("pk_test_");
+    if (isSecretTest !== isPubTest) {
+      throw new Error(
+        `Stripe key mode mismatch: Secret Key is ${isSecretTest ? "test" : "live"} mode while Publishable Key is ${isPubTest ? "test" : "live"} mode.`
+      );
+    }
   }
 
-  if (!stripeServerInstance) {
+  if (!stripeServerInstance || cachedSecretKey !== secretKey) {
+    cachedSecretKey = secretKey;
     stripeServerInstance = new Stripe(secretKey, {
       apiVersion: "2026-09-30.endive" as Stripe.LatestApiVersion,
       appInfo: {
