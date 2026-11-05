@@ -110,11 +110,6 @@ export const SOCIALS = [
   { name: "TikTok", href: "https://www.tiktok.com/@sillhoueteofficial" },
 ] as const;
 
-export const PAYMENT_IMAGES = [
-  { src: "https://cdn.shopify.com/s/files/1/0709/7755/2627/files/mastercard.png?v=1742200774", alt: "master-card" },
-  { src: "https://cdn.shopify.com/s/files/1/0709/7755/2627/files/visa_484e9393-90e0-4d52-8eae-51193a00143d.png?v=1742200775", alt: "visa-card" },
-];
-
 export const ABOUT_TEXT =
   "Sillhouete is a Pakistan-based designer brand offering luxury bridal, formal, and ready-to-wear outfits to customers worldwide. Our collections are made for weddings and special occasions, with easy online shopping available globally.";
 

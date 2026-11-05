@@ -624,15 +624,15 @@ function CheckoutForm() {
 
   return (
     <div
-      className="min-h-screen bg-white w-full overflow-x-hidden"
+      className="min-h-screen bg-white w-full overflow-x-clip"
       style={{
         fontFamily:
           '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
       }}
     >
       {/* ──────── TOP HEADER: Exactly matching sillhouete.com screenshot ──────── */}
-      <header className="w-full bg-white border-b border-[#e1e1e1] py-5 md:py-6 px-4 sm:px-6">
-        <div className="max-w-[1140px] mx-auto relative flex items-center justify-center">
+      <header className="w-full bg-white border-b border-[#e1e1e1] py-5 md:py-[19px] px-4 sm:px-6">
+        <div className="max-w-[932px] mx-auto relative flex items-center justify-center">
           {/* Centered Brand Logo */}
           <Link
             href="/"
@@ -646,14 +646,14 @@ function CheckoutForm() {
               height={70}
               priority
               unoptimized
-              className="h-[46px] md:h-[54px] w-auto object-contain"
+              className="h-[46px] md:h-[66px] w-auto object-contain"
             />
           </Link>
 
           {/* Blue Shopping Bag Icon on the right */}
           <Link
             href="/cart"
-            className="absolute right-0 top-1/2 -translate-y-1/2 text-[#005bd3] hover:opacity-80 transition-opacity p-2"
+            className="absolute right-0 top-1/2 -translate-y-1/2 text-[#005bd3] hover:opacity-80 transition-opacity p-2 lg:p-0"
             aria-label="View Cart"
           >
             <ShoppingBag className="w-5 h-5 md:w-6 md:h-6 stroke-[1.8]" />
@@ -711,9 +711,7 @@ function CheckoutForm() {
                           {item.product.title}
                         </p>
                         <p className="text-[12px] text-[#707070] mt-0.5 whitespace-pre-line">
-                          {item.size}
-                          {item.dupatta ? `\nSleeves: ${item.dupatta}` : ""}
-                          {item.adOn ? `\n${item.adOn}` : ""}
+                          {`${item.size} / ${item.dupatta || "None"} / ${item.adOn || "None"}`}
                         </p>
                       </div>
                     </div>
@@ -726,22 +724,22 @@ function CheckoutForm() {
             </div>
 
             {/* Discount code in mobile accordion */}
-            <div className="flex gap-2 pt-2">
+            <div className="flex items-center bg-white border border-[#d9d9d9] focus-within:border-[#005bd3] focus-within:ring-1 focus-within:ring-[#005bd3] rounded-[8px] pr-2 mt-2">
               <input
                 type="text"
                 placeholder="Discount code"
                 value={discountCode}
                 onChange={(e) => setDiscountCode(e.target.value)}
-                className="flex-1 bg-white border border-[#d9d9d9] hover:border-[#707070] focus:border-[#005bd3] focus:ring-1 focus:ring-[#005bd3] rounded-[6px] px-3.5 py-2.5 text-[14px] text-[#1a1a1a] outline-none"
+                className="flex-1 min-w-0 bg-transparent px-3.5 py-3 text-[14px] text-[#1a1a1a] outline-none placeholder-[#707070]"
               />
               <button
                 type="button"
                 onClick={handleApplyDiscount}
                 disabled={!discountCode.trim()}
-                className={`px-4 rounded-[6px] text-[13px] font-medium transition-colors ${
+                className={`px-3.5 py-2 rounded-[6px] text-[13px] font-medium transition-colors ${
                   discountCode.trim()
                     ? "bg-[#005bd3] text-white hover:bg-[#0051ba] cursor-pointer"
-                    : "bg-[#e3e3e3] text-[#707070] cursor-not-allowed"
+                    : "bg-[#efefef] text-[#8a8a8a] cursor-not-allowed"
                 }`}
               >
                 Apply
@@ -789,21 +787,21 @@ function CheckoutForm() {
       </div>
 
       {/* ──────── MAIN SPLIT LAYOUT ──────── */}
-      <div className="relative w-full border-t border-[#e1e1e1] bg-white overflow-x-hidden">
+      <div className="relative w-full bg-white overflow-x-clip">
         {/* Continuous right-half gray background on large screens */}
         <div
-          className="hidden lg:block absolute inset-y-0 right-0 w-1/2 bg-[#f5f5f5] border-l border-[#e1e1e1] pointer-events-none"
+          className="hidden lg:block absolute inset-y-0 right-0 left-[calc(50%+48px)] bg-[#f5f5f5] border-l border-[#e1e1e1] pointer-events-none"
           aria-hidden="true"
         />
 
         {/* Centered layout container */}
-        <div className="relative w-full max-w-[1140px] mx-auto min-w-0 lg:grid lg:grid-cols-[minmax(0,1fr)_420px] xl:grid-cols-[minmax(0,1fr)_440px]">
+        <div className="relative w-full max-w-[1140px] mx-auto min-w-0 lg:max-w-[932px] lg:grid lg:grid-cols-[minmax(0,514px)_minmax(0,418px)] lg:items-stretch">
           {/* ──────── LEFT COLUMN: Checkout Form ──────── */}
-          <div className="w-full min-w-0 px-4 sm:px-6 lg:pl-0 lg:pr-12 pt-7 pb-16 bg-white flex flex-col justify-between overflow-x-clip">
+          <div className="w-full min-w-0 px-4 sm:px-6 lg:pl-0 lg:pr-[39px] pt-7 lg:pt-10 pb-16 bg-white flex flex-col justify-between overflow-x-clip">
             <form onSubmit={handleSubmit} noValidate className="w-full min-w-0">
               {/* ── Contact ── */}
-              <section className="mb-8">
-                <div className="flex items-center justify-between mb-2">
+              <section className="mb-[30px]">
+                <div className="flex items-center justify-between mb-2.5">
                   <h2 className="text-[18px] font-semibold text-[#1a1a1a]">Contact</h2>
                   <Link
                     href="/account"
@@ -842,10 +840,10 @@ function CheckoutForm() {
               </section>
 
               {/* ── Delivery ── */}
-              <section className="mb-8">
-                <h2 className="text-[18px] font-semibold text-[#1a1a1a] mb-2.5">Delivery</h2>
+              <section className="mb-5">
+                <h2 className="text-[18px] font-semibold text-[#1a1a1a] mb-3">Delivery</h2>
 
-                <div className="space-y-3">
+                <div className="space-y-[10px]">
                   <FloatingSelect
                     id="country"
                     label="Country/Region"
@@ -860,7 +858,7 @@ function CheckoutForm() {
                     ))}
                   </FloatingSelect>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-[10px]">
                     <FloatingInput
                       id="firstName"
                       label="First name"
@@ -893,7 +891,7 @@ function CheckoutForm() {
                     autoComplete="address-line2"
                   />
 
-                  <div className="grid grid-cols-[1fr_140px] gap-3">
+                  <div className="grid grid-cols-2 gap-[10px]">
                     <FloatingInput
                       id="city"
                       label="City"
@@ -940,7 +938,7 @@ function CheckoutForm() {
               </section>
 
               {/* ── Shipping method ── */}
-              <section className="mb-8">
+              <section className="mb-[30px]">
                 <h2 className="text-[18px] font-semibold text-[#1a1a1a] mb-2.5">
                   Shipping method
                 </h2>
@@ -1314,8 +1312,8 @@ function CheckoutForm() {
           </div>
 
           {/* ──────── RIGHT COLUMN: Order Summary (desktop) ──────── */}
-          <aside className="hidden lg:block px-6 lg:pl-10 lg:pr-0 pt-7 pb-16 bg-[#f5f5f5] min-h-screen">
-            <div className="sticky top-8">
+          <aside className="hidden lg:block lg:pl-[38px] lg:pr-0 lg:pt-10 pb-16 bg-[#f5f5f5] min-h-screen">
+            <div className="sticky top-10">
               {/* Items list */}
               <div className="space-y-4 mb-6">
                 {displayItems.map((item) => {
@@ -1344,9 +1342,7 @@ function CheckoutForm() {
                             {item.product.title}
                           </p>
                           <p className="text-[12px] text-[#707070] mt-0.5 whitespace-pre-line leading-relaxed">
-                            {item.size}
-                            {item.dupatta ? `\nSleeves: ${item.dupatta}` : ""}
-                            {item.adOn ? `\n${item.adOn}` : ""}
+                            {`${item.size} / ${item.dupatta || "None"} / ${item.adOn || "None"}`}
                           </p>
                         </div>
                       </div>
@@ -1358,23 +1354,23 @@ function CheckoutForm() {
                 })}
               </div>
 
-              {/* Discount Code Input + Apply Button */}
-              <div className="flex gap-2.5 mb-6">
+              {/* Discount Code Input + Apply Button (single rounded box) */}
+              <div className="flex items-center bg-white border border-[#d9d9d9] hover:border-[#707070] focus-within:border-[#005bd3] focus-within:ring-1 focus-within:ring-[#005bd3] rounded-[8px] pr-2 mb-8">
                 <input
                   type="text"
                   placeholder="Discount code"
                   value={discountCode}
                   onChange={(e) => setDiscountCode(e.target.value)}
-                  className="flex-1 bg-white border border-[#d9d9d9] hover:border-[#707070] focus:border-[#005bd3] focus:ring-1 focus:ring-[#005bd3] rounded-[5px] px-3.5 py-3 text-[14px] text-[#1a1a1a] outline-none placeholder-[#707070]"
+                  className="flex-1 min-w-0 bg-transparent px-3.5 py-3.5 text-[14px] text-[#1a1a1a] outline-none placeholder-[#707070]"
                 />
                 <button
                   type="button"
                   onClick={handleApplyDiscount}
                   disabled={!discountCode.trim()}
-                  className={`px-5 py-3 rounded-[5px] text-[14px] font-medium transition-colors ${
+                  className={`px-3.5 py-2 rounded-[6px] text-[14px] font-medium transition-colors ${
                     discountCode.trim()
                       ? "bg-[#005bd3] text-white hover:bg-[#0051ba] cursor-pointer"
-                      : "bg-[#e3e3e3] text-[#707070] cursor-not-allowed"
+                      : "bg-[#efefef] text-[#8a8a8a] cursor-not-allowed"
                   }`}
                 >
                   Apply
@@ -1391,7 +1387,7 @@ function CheckoutForm() {
               )}
 
               {/* Pricing breakdown */}
-              <div className="space-y-3 pt-6 border-t border-[#e1e1e1] text-[14px]">
+              <div className="space-y-0.5 text-[14px]">
                 <div className="flex justify-between items-center">
                   <span className="text-[#707070]">Subtotal</span>
                   <span className="font-medium text-[#1a1a1a]">
@@ -1415,7 +1411,7 @@ function CheckoutForm() {
                   </span>
                 </div>
 
-                <div className="flex justify-between items-baseline pt-4 border-t border-[#e1e1e1]">
+                <div className="flex justify-between items-baseline pt-2.5">
                   <span className="text-[16px] font-medium text-[#1a1a1a]">Total</span>
                   <div className="text-right flex items-baseline gap-1.5">
                     <span className="text-[12px] text-[#707070] font-normal tracking-wide">

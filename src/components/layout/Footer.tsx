@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { ABOUT_TEXT, FOOTER_LINKS, PAYMENT_IMAGES, SITE } from "@/data/site";
+import { ABOUT_TEXT, FOOTER_LINKS, SITE } from "@/data/site";
 import Socials from "@/components/ui/Socials";
 import {
   AmexBadge,

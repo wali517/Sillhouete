@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Tag, X } from "lucide-react";
 import { useStore, type CurrencyCode } from "@/components/providers/StoreProvider";
 import Flag, { type FlagKey } from "./CurrencyFlags";
 
@@ -34,7 +33,6 @@ function Chevron({ up }: { up: boolean }) {
 export default function FloatingWidgets() {
   const { currency, setCurrency } = useStore();
   const [currencyOpen, setCurrencyOpen] = useState(false);
-  const [showDiscountPill, setShowDiscountPill] = useState(true); // not shown on the reference storefront
   const wrapRef = useRef<HTMLDivElement>(null);
 
   const currentFlag: FlagKey = CURRENCY_LIST.find((c) => c.code === currency)?.code ?? "PKR";
@@ -54,37 +52,10 @@ export default function FloatingWidgets() {
     };
   }, [currencyOpen]);
 
-  const openDiscount = () => {
-    window.dispatchEvent(new CustomEvent("open-newsletter-popup"));
-  };
-
   return (
     <>
       {/* Bottom-Left Floating Controls */}
       <div className="fixed bottom-2 left-4 z-40 flex flex-col items-start gap-2.5 md:left-[45px]">
-        {/* Get 5% Off Box */}
-        {showDiscountPill && (
-          <div className="group relative flex items-center overflow-hidden rounded border border-white/10 bg-black text-[11px] font-semibold uppercase tracking-wider text-white shadow-2xl">
-            <button
-              type="button"
-              onClick={openDiscount}
-              className="flex items-center gap-2 px-3.5 py-2 transition-colors hover:bg-neutral-900"
-              aria-label="Get 5% discount"
-            >
-              <Tag className="h-3 w-3 text-yellow-400 transition-transform group-hover:rotate-12" />
-              <span>Get 5% Off</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowDiscountPill(false)}
-              className="border-l border-white/15 px-2 py-2 text-white/60 transition-colors hover:bg-neutral-900 hover:text-white"
-              aria-label="Close discount badge"
-            >
-              <X className="h-3 w-3" />
-            </button>
-          </div>
-        )}
-
         {/* Currency switcher */}
         <div ref={wrapRef} className="relative">
           <button

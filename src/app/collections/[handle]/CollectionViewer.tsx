@@ -14,7 +14,8 @@ type SortOption =
   | "price-desc"
   | "title-asc"
   | "title-desc"
-  | "newest";
+  | "newest"
+  | "oldest";
 
 const COLOR_OPTIONS: { name: string; hex: string; isMulti?: boolean }[] = [
   { name: "Beige", hex: "#e2d5b8" },
@@ -67,7 +68,7 @@ export default function CollectionViewer({
   const itemsPerPage = isSalePage ? 28 : 60;
 
   // Sort state
-  const [sort, setSort] = useState<SortOption>(isSalePage ? "featured" : "relevant");
+  const [sort, setSort] = useState<SortOption>("featured");
 
   // Filters state
   const [maxPrice, setMaxPrice] = useState<number>(464165);
@@ -227,6 +228,8 @@ export default function CollectionViewer({
         return list.sort((a, b) => b.title.localeCompare(a.title));
       case "newest":
         return list.filter((p) => p.isNew).concat(list.filter((p) => !p.isNew));
+      case "oldest":
+        return list.filter((p) => !p.isNew).concat(list.filter((p) => p.isNew));
       case "best-selling":
         return list.filter((p) => p.isBestSeller).concat(list.filter((p) => !p.isBestSeller));
       case "featured":
@@ -579,6 +582,7 @@ export default function CollectionViewer({
                     <option value="title-desc">Alphabetically, Z-A</option>
                     <option value="price-asc">Price, low to high</option>
                     <option value="price-desc">Price, high to low</option>
+                    <option value="oldest">Date, old to new</option>
                     <option value="newest">Date, new to old</option>
                   </select>
                   <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-black/70" />
@@ -636,13 +640,14 @@ export default function CollectionViewer({
                 onChange={(e) => setSort(e.target.value as SortOption)}
                 className="appearance-none border border-[#e8e8e1] bg-white pl-4 pr-8 py-2 text-xs font-serif tracking-wider text-[#111111] outline-none cursor-pointer focus:border-black"
               >
-                <option value="relevant">Most relevant</option>
                 <option value="featured">Featured</option>
+                <option value="relevant">Most relevant</option>
                 <option value="best-selling">Best selling</option>
                 <option value="title-asc">Alphabetically, A-Z</option>
                 <option value="title-desc">Alphabetically, Z-A</option>
                 <option value="price-asc">Price, low to high</option>
                 <option value="price-desc">Price, high to low</option>
+                <option value="oldest">Date, old to new</option>
                 <option value="newest">Date, new to old</option>
               </select>
               <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-black/70" />

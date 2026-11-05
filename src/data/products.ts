@@ -13144,7 +13144,6 @@ export const formals: Product[] = COLLECTION_PRODUCTS["formal-dresses"] || allPr
 export const maahiII: Product[] = COLLECTION_PRODUCTS["maahi-ii-luxury-eid-pret"] || allProducts.slice(0, 8);
 export const rahaPret: Product[] = COLLECTION_PRODUCTS["raha-eid-pret26"] || COLLECTION_PRODUCTS["pret"] || allProducts.slice(8, 16);
 export const silkSolids: Product[] = COLLECTION_PRODUCTS["silk-solids26"] || allProducts.slice(16, 24);
-export const lumiereFormals: Product[] = COLLECTION_PRODUCTS["lumiere-luxury-formals26"] || formals;
 
 export const getProduct = (handle: string): Product | undefined => {
   return allProducts.find((p) => p.handle === handle || p.id === handle);

@@ -92,51 +92,9 @@ button {
   cursor: not-allowed;
 }
 
-.btn-outline {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: #111111 !important;
-  color: #ffffff !important;
-  border: 1px solid #111111 !important;
-  padding: 11px 20px;
-  text-transform: uppercase;
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.3em;
-  line-height: 1.42;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
-  cursor: pointer;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-}
-
-@media (max-width: 639px) {
-  .btn-outline {
-    padding: 9px 17px;
-    font-size: 11px;
-  }
-}
-
-.btn-outline:hover {
-  background: #222222 !important;
-  color: #ffffff !important;
-  border-color: #222222 !important;
-}
-
 /* Primary CTA & form buttons: black background with white text */
 button[type="submit"]:not(.checkout-submit-btn):not(.plain-btn):not(.footer__newsletter-btn):not(.review-submit-btn),
-.btn,
-.btn-primary,
-.btn-secondary,
-.btn-outline,
-.btn-dark,
-.btn-black,
-.add_to_cart,
-.cart__checkout,
-.shopify-payment-button__button {
+.btn {
   background-color: #000000 !important;
   color: #ffffff !important;
   border-color: #000000 !important;
@@ -145,14 +103,7 @@ button[type="submit"]:not(.checkout-submit-btn):not(.plain-btn):not(.footer__new
 }
 
 button[type="submit"]:not(.checkout-submit-btn):not(.plain-btn):not(.footer__newsletter-btn):not(.review-submit-btn):hover,
-.btn:hover,
-.btn-primary:hover,
-.btn-secondary:hover,
-.btn-outline:hover,
-.btn-dark:hover,
-.btn-black:hover,
-.add_to_cart:hover,
-.cart__checkout:hover {
+.btn:hover {
   background-color: #222222 !important;
   color: #ffffff !important;
 }
@@ -172,34 +123,12 @@ a.btn.view-all-red:hover,
   background-color: #222222 !important;
 }
 
-.review-submit-btn {
-  background-color: #108474 !important;
-  color: #ffffff !important;
-  border-color: #108474 !important;
-}
-
-.review-submit-btn:hover {
-  background-color: #0c6b5e !important;
-}
-
 .footer__newsletter-btn,
 .footer__newsletter-btn:hover {
   background: transparent !important;
   color: #000000 !important;
   border: 0 !important;
   box-shadow: none !important;
-}
-
-/* Complete order Shopify Blue Button */
-.checkout-submit-btn {
-  background-color: #005bd3 !important;
-  color: #ffffff !important;
-  border-color: #005bd3 !important;
-}
-
-.checkout-submit-btn:hover {
-  background-color: #004bb0 !important;
-  color: #ffffff !important;
 }
 
 @keyframes blinks {
@@ -237,38 +166,29 @@ a.btn.view-all-red:hover,
   animation: blinks 1s linear infinite;
 }
 
-.sale-blinks,
 span.sale-menu,
-.sale-menu,
-.blink-sale,
-.site-nav__item a[href*="/collections/sale-1"],
-li.mobile-nav__item a[href*="/collections/sale-1"] {
+.sale-menu {
   color: #ff0000 !important;
   animation: blinks 1s linear infinite !important;
   font-weight: inherit;
 }
 
 .blink-meeras,
-a[href*="/collections/meeras"],
-.site-nav__dropdown-link[href*="/collections/meeras"],
-.mobile-nav__link[href*="/collections/meeras"] {
+a[href*="/collections/meeras"] {
   color: #ff0000 !important;
   animation: blinkRed 1s infinite !important;
   font-weight: inherit;
 }
 
 .highlight-red,
-a[href*="/collections/raha-eid-pret26"],
-.site-nav__dropdown-link[href*="/collections/raha-eid-pret26"] {
+a[href*="/collections/raha-eid-pret26"] {
   color: #ff0000 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .blink,
   .animate-blinks,
-  .sale-blinks,
   .sale-menu,
-  .blink-sale,
   .blink-meeras {
     animation: none !important;
   }
@@ -370,29 +290,6 @@ a[href*="/collections/raha-eid-pret26"],
   100% {
     left: -150%;
   }
-}
-
-.btn-shine {
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-shine:after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 150%;
-  width: 200%;
-  height: 100%;
-  transform: skewX(-20deg);
-  background-image: linear-gradient(to right,
-      transparent,
-      rgba(255, 255, 255, 0.25),
-      transparent);
-}
-
-.btn-shine:hover:after {
-  animation: shine 0.75s cubic-bezier(0.01, 0.56, 1, 1);
 }
 
 .product-single__sku {

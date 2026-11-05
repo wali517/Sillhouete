@@ -1,7 +1,5 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import ContactFormSection from "./ContactFormSection";
-import FaqAccordion from "./FaqAccordion";
 import livePagesData from "@/data/live-pages-content.json";
 
 const livePages = livePagesData as Record<string, { title: string; html: string }>;
@@ -114,86 +112,6 @@ export default async function InfoPage({ params }: Props) {
         normalizedSlug === "spot" ? "max-w-[1240px]" : "max-w-[1050px]"
       } px-4 py-8 md:px-8 md:py-14`}
     >
-      {/* 1. Contact Us Page */}
-      {slug === "contact-us" && (
-        <div>
-          <h1 className="heading mb-3 text-center text-[28px] md:text-[36px]">Contact Us</h1>
-          <p className="mx-auto max-w-xl text-center text-sm text-black/70 mb-10">
-            Reach out to Sillhouete for styling advice, bespoke bridal appointments, order status, or wholesale inquiries.
-          </p>
-
-          <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr]">
-            {/* Contact Information Cards */}
-            <div className="space-y-6 text-sm">
-              <div className="border border-line p-6 bg-soft space-y-3">
-                <h2 className="heading text-[16px]">Pakistan (Office &amp; Studio)</h2>
-                <div>
-                  <strong className="block text-black">Office Address:</strong>
-                  <p className="text-black/70">327-B, Street 7, Lane 15, Cavalry Ground, Lahore</p>
-                </div>
-                <div>
-                  <strong className="block text-black">Studio Address:</strong>
-                  <p className="text-black/70">Sillhouete, Almas Tower, MM Alam Rd, Block T, Gulberg 2, Lahore</p>
-                </div>
-                <div>
-                  <strong className="block text-black">WhatsApp / Bookings:</strong>
-                  <p className="text-black/70">
-                    <a href="tel:+923310397865" className="underline hover:text-black">+92 331 0397865</a> /{" "}
-                    <a href="tel:+923154204981" className="underline hover:text-black">+92 315 4204981</a>
-                  </p>
-                </div>
-                <div>
-                  <strong className="block text-black">Email:</strong>
-                  <p className="text-black/70">
-                    <a href="mailto:info@sillhouete.com" className="underline hover:text-black">info@sillhouete.com</a>
-                  </p>
-                </div>
-              </div>
-
-              <div className="border border-line p-6 bg-soft space-y-3">
-                <h2 className="heading text-[16px]">USA Office</h2>
-                <p className="text-black font-semibold">ADVENT BUSINESS CONSULTAX LLC</p>
-                <p className="text-black/70">18w100 22nd St, Ste 124, Oakbrook Terrace, IL, Zip Code 60181</p>
-                <div>
-                  <strong className="block text-black">Phone:</strong>
-                  <p className="text-black/70">
-                    <a href="tel:+12172909383" className="underline hover:text-black">+1 217 2909383</a>
-                  </p>
-                </div>
-                <div>
-                  <strong className="block text-black">Operating Hours:</strong>
-                  <p className="text-black/70">Monday – Sunday: 10:00 AM – 8:00 PM (PKT)</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Interactive Contact Form */}
-            <div className="border border-line p-6 md:p-8">
-              <h2 className="heading text-[18px] mb-2">Send Us a Message</h2>
-              <p className="text-xs text-black/60 mb-6">
-                Fill in the form below and our studio concierge will respond within 24 hours.
-              </p>
-              <ContactFormSection />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 2. FAQs Page */}
-      {slug === "faqs" && (
-        <div>
-          <header className="text-center border-b border-line pb-8 mb-8">
-            <h1 className="heading text-[30px] md:text-[38px]">Frequently Asked Questions</h1>
-            <p className="mt-2 text-xs text-black/60 uppercase tracking-widest">
-              Everything You Need to Know About Ordering, Delivery &amp; Sizing
-            </p>
-          </header>
-          <div className="mx-auto max-w-2xl">
-            <FaqAccordion />
-          </div>
-        </div>
-      )}
-
       {/* 3. Spotted Page */}
       {(normalizedSlug === "spot") && (
         <div className="spotted-section">
@@ -308,15 +226,12 @@ export default async function InfoPage({ params }: Props) {
       )}
 
       {/* 6. Comprehensive Policies and Other Information Pages */}
-      {normalizedSlug !== "contact-us" && normalizedSlug !== "faqs" && normalizedSlug !== "spot" && normalizedSlug !== "locations" && normalizedSlug !== "size-chart" && (
+      {normalizedSlug !== "spot" && normalizedSlug !== "locations" && normalizedSlug !== "size-chart" && (
         <div className="space-y-8">
           <header className="text-center border-b border-line pb-8">
-            <h1 className="heading text-[30px] md:text-[38px] capitalize">
+            <h1 className="heading text-[30px] md:text-[38px]">
               {liveData?.title || slug.replace(/-/g, " ")}
             </h1>
-            <p className="mt-2 text-xs text-black/60 uppercase tracking-widest">
-              Sillhouete Customer Information &amp; Official Policies
-            </p>
           </header>
 
           {liveData?.html ? (
