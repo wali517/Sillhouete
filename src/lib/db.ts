@@ -60,6 +60,71 @@ export async function getProducts(): Promise<Product[]> {
   return [];
 }
 
+/** Automatically derive matching collection slugs from category and attributes */
+export function deriveCollectionsFromCategory(
+  category: string = "",
+  existingCollections: string[] = []
+): string[] {
+  const set = new Set(existingCollections.map((c) => c.toLowerCase().trim()).filter(Boolean));
+  const cat = (category || "").toLowerCase().trim();
+
+  // Homepage sections & core collections
+  if (cat.includes("maahi")) {
+    set.add("maahi-ii-luxury-eid-pret");
+    set.add("luxury-pret");
+  }
+  if (cat.includes("silk") || cat.includes("solids")) {
+    set.add("silk-solids26");
+  }
+  if (cat.includes("raha")) {
+    set.add("raha-eid-pret26");
+    set.add("luxury-pret");
+  }
+  if (cat.includes("formal")) {
+    set.add("formal-dresses");
+  }
+  if (
+    cat.includes("bridal") ||
+    cat.includes("barat") ||
+    cat.includes("walima") ||
+    cat.includes("nikkah") ||
+    cat.includes("farshi") ||
+    cat.includes("lehnga")
+  ) {
+    set.add("bridal-dresses");
+  }
+  if (cat.includes("luxury pret") || cat.includes("pret")) {
+    set.add("luxury-pret");
+  }
+  if (cat.includes("best") || cat.includes("seller")) {
+    set.add("best-sellers");
+  }
+  if (cat.includes("new") || cat.includes("arrival")) {
+    set.add("new-arrivals");
+  }
+  if (cat.includes("sale")) {
+    set.add("sale-1");
+    set.add("sale");
+  }
+  if (
+    cat.includes("accessory") ||
+    cat.includes("accessories") ||
+    cat.includes("clutch") ||
+    cat.includes("pouch")
+  ) {
+    set.add("accessories");
+    set.add("pouches-clutches");
+  }
+
+  // Also include slugified category name
+  const slug = cat.replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  if (slug && slug.length > 2) {
+    set.add(slug);
+  }
+
+  return Array.from(set);
+}
+
 /** Fetch products by collection handle dynamically from MongoDB */
 export async function getProductsByCollection(collectionSlug: string): Promise<Product[]> {
   try {
@@ -67,7 +132,51 @@ export async function getProductsByCollection(collectionSlug: string): Promise<P
     if (collectionSlug === "all" || collectionSlug === "1") {
       return getProducts();
     }
-    const docs = await ProductModel.find({ collections: collectionSlug }).sort({ createdAt: -1 }).lean();
+
+    const slug = collectionSlug.toLowerCase().trim();
+    const orConditions: any[] = [{ collections: slug }];
+
+    if (slug === "formal-dresses" || slug === "formal" || slug === "formals") {
+      orConditions.push({ collections: { $in: ["formal-dresses", "formal", "formals"] } });
+      orConditions.push({ category: { $regex: /formal/i } });
+    } else if (slug === "silk-solids26" || slug === "silk-solids" || slug === "silk") {
+      orConditions.push({ collections: { $in: ["silk-solids26", "silk-solids"] } });
+      orConditions.push({ category: { $regex: /silk/i } });
+    } else if (slug === "maahi-ii-luxury-eid-pret" || slug === "maahi") {
+      orConditions.push({ collections: { $in: ["maahi-ii-luxury-eid-pret", "maahi-luxury-pret25"] } });
+      orConditions.push({ category: { $regex: /maahi/i } });
+    } else if (slug === "raha-eid-pret26" || slug === "raha") {
+      orConditions.push({ collections: { $in: ["raha-eid-pret26", "raha"] } });
+      orConditions.push({ category: { $regex: /raha/i } });
+    } else if (slug === "best-sellers") {
+      orConditions.push({ collections: "best-sellers" });
+      orConditions.push({ isBestSeller: true });
+      orConditions.push({ category: { $regex: /best seller/i } });
+    } else if (slug === "bridal-dresses" || slug === "bridal" || slug === "bridals") {
+      orConditions.push({ collections: { $in: ["bridal-dresses", "bridal", "bridals"] } });
+      orConditions.push({ category: { $regex: /bridal|barat|walima|nikkah/i } });
+    } else if (slug === "luxury-pret" || slug === "pret") {
+      orConditions.push({ collections: { $in: ["luxury-pret", "pret"] } });
+      orConditions.push({ category: { $regex: /pret/i } });
+    } else if (slug === "new-arrivals") {
+      orConditions.push({ collections: "new-arrivals" });
+      orConditions.push({ isNew: true });
+    } else if (slug === "sale-1" || slug === "sale") {
+      orConditions.push({ collections: { $in: ["sale-1", "sale"] } });
+      orConditions.push({ isSale: true });
+      orConditions.push({ originalPrice: { $gt: 0 } });
+      orConditions.push({ category: { $regex: /sale/i } });
+    } else if (slug === "accessories" || slug === "pouches-clutches") {
+      orConditions.push({ collections: { $in: ["accessories", "pouches-clutches"] } });
+      orConditions.push({ category: { $regex: /accessor|clutch|pouch/i } });
+    } else {
+      const words = slug.split(/[^a-z0-9]+/).filter(Boolean);
+      if (words.length > 0) {
+        orConditions.push({ category: { $regex: new RegExp(words.join(".*"), "i") } });
+      }
+    }
+
+    const docs = await ProductModel.find({ $or: orConditions }).sort({ createdAt: -1 }).lean();
     if (docs && docs.length > 0) {
       return toPlainArray<Product>(docs);
     }
@@ -184,6 +293,8 @@ export async function saveProduct(product: Partial<Product> & { title: string; p
       .replace(/(^-|-$)/g, "");
 
   const id = product.id || `prod-${Date.now()}`;
+  const category = product.category || "Luxury Pret";
+  const collections = deriveCollectionsFromCategory(category, product.collections || []);
 
   const fullProduct: Product = {
     id,
@@ -198,7 +309,11 @@ export async function saveProduct(product: Partial<Product> & { title: string; p
     alt: product.alt || product.title,
     ratio: product.ratio || 1.5,
     isNew: product.isNew ?? true,
-    category: product.category || "Luxury Pret",
+    isSale: product.isSale ?? (!!product.originalPrice && product.originalPrice > product.price),
+    isBestSeller: product.isBestSeller ?? false,
+    category,
+    collections,
+    color: product.color,
     description: product.description || `${product.title} luxury designer dress.`,
     inStock: product.inStock ?? true,
     sizes: product.sizes && product.sizes.length ? product.sizes : ["XS", "S", "M", "L", "XL"],

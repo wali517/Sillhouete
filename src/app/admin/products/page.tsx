@@ -19,11 +19,15 @@ import { formatPrice } from "@/lib/format";
 
 const CATEGORIES = [
   "All",
-  "Luxury Pret",
+  "Maahi II Luxury Eid Pret",
+  "Silk Solids'26",
+  "Raha Eid Pret'26",
+  "Best Sellers",
   "Formal",
   "Bridal",
+  "Luxury Pret",
   "Pret",
-  "Silk Solids",
+  "Sale",
   "Accessories",
 ];
 
@@ -469,11 +473,15 @@ export default function AdminProductsPage() {
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full rounded-md border border-gray-300 p-2.5 outline-none focus:border-black bg-white"
                   >
-                    <option value="Luxury Pret">Luxury Pret</option>
-                    <option value="Formal">Formal</option>
+                    <option value="Maahi II Luxury Eid Pret">Maahi II Luxury Eid Pret (Homepage)</option>
+                    <option value="Silk Solids'26">Silk Solids&apos;26 (Homepage)</option>
+                    <option value="Raha Eid Pret'26">Raha Eid Pret&apos;26 (Homepage)</option>
+                    <option value="Best Sellers">Best Sellers (Homepage)</option>
+                    <option value="Formal">Formal (Homepage Formals)</option>
                     <option value="Bridal">Bridal</option>
+                    <option value="Luxury Pret">Luxury Pret</option>
                     <option value="Pret">Pret</option>
-                    <option value="Silk Solids">Silk Solids</option>
+                    <option value="Sale">Sale</option>
                     <option value="Accessories">Accessories</option>
                   </select>
                 </div>
