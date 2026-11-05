@@ -22,3 +22,4 @@ const CollectionSchema = new Schema<ICollection>(
 export const CollectionModel: Model<ICollection> =
   mongoose.models.Collection ||
   mongoose.model<ICollection>("Collection", CollectionSchema);
+

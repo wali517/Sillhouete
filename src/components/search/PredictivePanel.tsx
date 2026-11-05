@@ -2,47 +2,102 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@/components/providers/StoreProvider";
+import { executePredictiveSearch, type PredictiveResult } from "@/lib/predictive-search";
 import type { Product } from "@/types";
+
+let memoryCatalog: Product[] = [];
+let pendingFetch: Promise<Product[]> | null = null;
+
+export function preloadSearchCatalog(): Promise<Product[]> {
+  if (typeof window === "undefined") return Promise.resolve([]);
+  if (memoryCatalog.length > 0) return Promise.resolve(memoryCatalog);
+  if (!pendingFetch) {
+    pendingFetch = fetch("/api/products")
+      .then((res) => (res.ok ? res.json() : { products: [] }))
+      .then((data) => {
+        if (Array.isArray(data.products) && data.products.length > 0) {
+          memoryCatalog = data.products;
+          return memoryCatalog;
+        }
+        return [];
+      })
+      .catch(() => [])
+      .finally(() => {
+        pendingFetch = null;
+      });
+  }
+  return pendingFetch;
+}
 
 const heading =
   "border-b border-black/10 pb-2 text-[11px] font-bold uppercase tracking-[0.3em] text-black";
 const linkRow = "block py-[7px] pl-2 text-[14px] text-black/90 hover:text-black hover:underline";
 
-export default function PredictivePanel({ query, onNavigate }: { query: string; onNavigate: () => void }) {
+export default function PredictivePanel({
+  query,
+  onNavigate,
+}: {
+  query: string;
+  onNavigate: () => void;
+}) {
   const { formatPrice } = useStore();
   const q = query.trim();
 
-  const [r, setR] = useState<{
-    suggestions: string[];
-    pages: { label: string; href: string }[];
-    collections: { label: string; href: string }[];
-    products: Product[];
-  }>({ suggestions: [], pages: [], collections: [], products: [] });
+  const [catalog, setCatalog] = useState<Product[]>(() => memoryCatalog);
+  const [serverFallback, setServerFallback] = useState<PredictiveResult | null>(null);
 
+  // Preload catalog on mount if not already cached
+  useEffect(() => {
+    preloadSearchCatalog().then((prods) => {
+      if (prods.length > 0) {
+        setCatalog(prods);
+      }
+    });
+  }, []);
+
+  // Synchronously compute instant results from memoryCatalog if available!
+  const localResult = useMemo(() => {
+    if (!q) return null;
+    if (catalog.length > 0) {
+      return executePredictiveSearch(q, catalog, 6);
+    }
+    return null;
+  }, [q, catalog]);
+
+  // Fallback to server API if catalog isn't loaded yet
   useEffect(() => {
     if (!q) {
-      setR({ suggestions: [], pages: [], collections: [], products: [] });
+      setServerFallback(null);
       return;
     }
 
-    const timer = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/predictive-search?q=${encodeURIComponent(q)}`);
-        if (res.ok) {
-          const data = await res.json();
-          setR(data);
-        }
-      } catch {
-        // ignore
-      }
-    }, 150);
+    if (catalog.length > 0) return;
 
-    return () => clearTimeout(timer);
-  }, [q]);
+    let active = true;
+    fetch(`/api/predictive-search?q=${encodeURIComponent(q)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data) {
+          setServerFallback(data);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      active = false;
+    };
+  }, [q, catalog.length]);
 
   if (!q) return null;
+
+  const r: PredictiveResult = localResult || serverFallback || {
+    suggestions: [],
+    pages: [],
+    collections: [],
+    products: [],
+  };
 
   const hasLeft = r.suggestions.length + r.pages.length + r.collections.length > 0;
   const empty = !hasLeft && r.products.length === 0;
@@ -71,7 +126,7 @@ export default function PredictivePanel({ query, onNavigate }: { query: string; 
                           <Link
                             href={`/search?q=${encodeURIComponent(s)}`}
                             onClick={onNavigate}
-                            className={`${linkRow} font-bold`}
+                            className={`${linkRow} font-bold capitalize`}
                           >
                             {s}
                           </Link>

@@ -6,6 +6,7 @@ import { ContactMessageModel } from "./models/ContactMessage";
 import { BlogPostModel } from "./models/BlogPost";
 import { SiteSettingsModel } from "./models/SiteSettings";
 import { CollectionModel } from "./models/Collection";
+import { executePredictiveSearch } from "./predictive-search";
 import { ANNOUNCEMENTS, SITE } from "@/data/site";
 import {
   sendOrderConfirmationEmail,
@@ -118,24 +119,17 @@ export async function searchProducts(query: string): Promise<Product[]> {
         { category: regex },
         { description: regex },
       ],
-    }).sort({ createdAt: -1 }).lean();
+    }).lean();
     if (docs && docs.length > 0) {
-      return toPlainArray<Product>(docs);
+      const prods = toPlainArray<Product>(docs);
+      return executePredictiveSearch(term, prods, 200).products;
     }
   } catch (err) {
     console.warn("MongoDB searchProducts error:", err);
   }
 
   const products = await getProducts();
-  return products.filter((product) =>
-    [
-      product.title,
-      product.handle,
-      product.alt,
-      product.category,
-      product.description,
-    ].some((value) => value?.toLowerCase().includes(term)),
-  );
+  return executePredictiveSearch(term, products, 200).products;
 }
 
 export async function getProductByHandle(handle: string): Promise<Product | undefined> {

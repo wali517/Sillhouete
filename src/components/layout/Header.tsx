@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { NAV, SITE } from "@/data/site";
 import { useStore } from "@/components/providers/StoreProvider";
 import MobileMenu from "./MobileMenu";
-import PredictivePanel from "@/components/search/PredictivePanel";
+import PredictivePanel, { preloadSearchCatalog } from "@/components/search/PredictivePanel";
 
 export default function Header() {
   const router = useRouter();
@@ -21,6 +21,7 @@ export default function Header() {
       if (e.key === "Escape") setSearchOpen(false);
     };
     if (searchOpen) {
+      preloadSearchCatalog();
       window.addEventListener("keydown", handleKeyDown);
     }
     return () => window.removeEventListener("keydown", handleKeyDown);
@@ -211,6 +212,7 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setSearchOpen((o) => !o)}
+            onMouseEnter={() => preloadSearchCatalog()}
             aria-expanded={searchOpen}
             aria-label="Search"
             className="grid h-9 w-9 place-items-center text-black hover:text-black/70 transition-colors cursor-pointer sm:h-10 sm:w-10"
