@@ -27,6 +27,7 @@ export default async function HomePage() {
         href="/collections/maahi-ii-luxury-eid-pret"
         totalCount={maahiII.length}
         showNewBadge
+        hideViewAll
       />
 
       <CollectionSection
@@ -35,6 +36,7 @@ export default async function HomePage() {
         href="/collections/silk-solids26"
         totalCount={silkSolids.length}
         showNewBadge
+        hideViewAll
       />
 
       <CollectionSection

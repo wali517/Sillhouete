@@ -10,6 +10,7 @@ interface Props {
   showViewAll?: boolean;
   showNewBadge?: boolean;
   viewAllRed?: boolean;
+  hideViewAll?: boolean;
 }
 
 export default function CollectionSection({
@@ -20,9 +21,9 @@ export default function CollectionSection({
   showViewAll = false,
   showNewBadge = false,
   viewAllRed = false,
+  hideViewAll = false,
 }: Props) {
-  const actualCount = totalCount !== undefined ? totalCount : products.length;
-  const hasMoreThanEight = actualCount > 8 || products.length > 8 || showViewAll;
+  const shouldShowViewAll = !hideViewAll && showViewAll && Boolean(href);
   const displayedProducts = products.slice(0, 8);
 
   return (
@@ -35,7 +36,7 @@ export default function CollectionSection({
 
       <ProductGrid products={displayedProducts} showNewBadge={showNewBadge} />
 
-      {hasMoreThanEight && href && (
+      {shouldShowViewAll && href && (
         <div className="mt-10 md:mt-12 mb-2 text-center">
           <Link
             href={href}
