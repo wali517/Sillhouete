@@ -5,8 +5,7 @@ import { CustomerModel } from "./models/Customer";
 import { ContactMessageModel } from "./models/ContactMessage";
 import { BlogPostModel } from "./models/BlogPost";
 import { SiteSettingsModel } from "./models/SiteSettings";
-import { allProducts as initialProducts } from "@/data/products";
-import { SEED_BLOGS } from "@/data/seed-blogs";
+import { CollectionModel } from "./models/Collection";
 import { ANNOUNCEMENTS, SITE } from "@/data/site";
 import {
   sendOrderConfirmationEmail,
@@ -47,20 +46,6 @@ function toPlainArray<T>(docs: unknown[]): T[] {
 
 /* ──────────────── PRODUCTS ──────────────── */
 
-function enrichInitialProducts(prods: typeof initialProducts): Product[] {
-  return prods.map((p) => ({
-    ...p,
-    category: p.category || (p.handle.includes("rm") || p.handle.includes("formal") ? "Formal" : "Luxury Pret"),
-    description:
-      p.description ||
-      `${p.alt}. Crafted from premium fabrics with bespoke hand embroidery, fine zardozi detailing, and artisanal tailoring. Perfect for festive ceremonies, weddings, and formal celebrations.`,
-    inStock: p.inStock ?? true,
-    sizes: p.sizes || ["XS", "S", "M", "L", "XL"],
-    images: p.images && p.images.length ? p.images : [p.image, p.hoverImage].filter(Boolean),
-    sku: p.sku || `SLH-${p.handle.toUpperCase()}`,
-  }));
-}
-
 export async function getProducts(): Promise<Product[]> {
   try {
     await connectDB();
@@ -69,15 +54,77 @@ export async function getProducts(): Promise<Product[]> {
       return toPlainArray<Product>(docs);
     }
   } catch (err) {
-    console.warn("MongoDB getProducts fallback:", err);
+    console.warn("MongoDB getProducts error:", err);
   }
-  return enrichInitialProducts(initialProducts);
+  return [];
+}
+
+/** Fetch products by collection handle dynamically from MongoDB */
+export async function getProductsByCollection(collectionSlug: string): Promise<Product[]> {
+  try {
+    await connectDB();
+    if (collectionSlug === "all" || collectionSlug === "1") {
+      return getProducts();
+    }
+    const docs = await ProductModel.find({ collections: collectionSlug }).sort({ createdAt: -1 }).lean();
+    if (docs && docs.length > 0) {
+      return toPlainArray<Product>(docs);
+    }
+  } catch (err) {
+    console.warn(`MongoDB getProductsByCollection(${collectionSlug}) error:`, err);
+  }
+  return [];
+}
+
+/** Fetch all collections from MongoDB */
+export async function getCollections(): Promise<Array<{ handle: string; title: string; description?: string; productCount?: number }>> {
+  try {
+    await connectDB();
+    const docs = await CollectionModel.find({}).sort({ productCount: -1 }).lean();
+    if (docs && docs.length > 0) {
+      return toPlainArray(docs);
+    }
+  } catch (err) {
+    console.warn("MongoDB getCollections error:", err);
+  }
+  return [];
+}
+
+/** Fetch a single collection by handle from MongoDB */
+export async function getCollectionByHandle(handle: string): Promise<{ handle: string; title: string; description?: string; productCount?: number } | undefined> {
+  try {
+    await connectDB();
+    const doc = await CollectionModel.findOne({ handle }).lean();
+    if (doc) return toPlain(doc);
+  } catch (err) {
+    console.warn(`MongoDB getCollectionByHandle(${handle}) error:`, err);
+  }
+  return undefined;
 }
 
 /** Search products by title, handle, alt text, category, or description. */
 export async function searchProducts(query: string): Promise<Product[]> {
   const term = query.trim().toLowerCase();
   if (!term) return [];
+
+  try {
+    await connectDB();
+    const regex = new RegExp(term, "i");
+    const docs = await ProductModel.find({
+      $or: [
+        { title: regex },
+        { handle: regex },
+        { alt: regex },
+        { category: regex },
+        { description: regex },
+      ],
+    }).sort({ createdAt: -1 }).lean();
+    if (docs && docs.length > 0) {
+      return toPlainArray<Product>(docs);
+    }
+  } catch (err) {
+    console.warn("MongoDB searchProducts error:", err);
+  }
 
   const products = await getProducts();
   return products.filter((product) =>
@@ -98,10 +145,9 @@ export async function getProductByHandle(handle: string): Promise<Product | unde
     const prod = toPlain<Product>(doc);
     if (prod) return prod;
   } catch (err) {
-    console.warn("MongoDB getProductByHandle fallback:", err);
+    console.warn("MongoDB getProductByHandle error:", err);
   }
-  const enriched = enrichInitialProducts(initialProducts);
-  return enriched.find((p) => p.handle === handle);
+  return undefined;
 }
 
 export async function getProductById(id: string): Promise<Product | undefined> {
@@ -111,10 +157,9 @@ export async function getProductById(id: string): Promise<Product | undefined> {
     const prod = toPlain<Product>(doc);
     if (prod) return prod;
   } catch (err) {
-    console.warn("MongoDB getProductById fallback:", err);
+    console.warn("MongoDB getProductById error:", err);
   }
-  const enriched = enrichInitialProducts(initialProducts);
-  return enriched.find((p) => p.id === id || p.handle === id);
+  return undefined;
 }
 
 export async function saveProduct(product: Partial<Product> & { title: string; price: number }): Promise<Product> {
@@ -1095,9 +1140,9 @@ export async function getBlogs(): Promise<BlogPost[]> {
       return toPlainArray<BlogPost>(docs);
     }
   } catch (err) {
-    console.warn("MongoDB getBlogs fallback:", err);
+    console.warn("MongoDB getBlogs error:", err);
   }
-  return SEED_BLOGS;
+  return [];
 }
 
 export async function getBlogBySlug(slug: string): Promise<BlogPost | undefined> {
@@ -1107,9 +1152,9 @@ export async function getBlogBySlug(slug: string): Promise<BlogPost | undefined>
     const b = toPlain<BlogPost>(doc);
     if (b) return b;
   } catch (err) {
-    console.warn("MongoDB getBlogBySlug fallback:", err);
+    console.warn("MongoDB getBlogBySlug error:", err);
   }
-  return SEED_BLOGS.find((b) => b.slug === slug || b.id === slug);
+  return undefined;
 }
 
 export async function saveBlog(blog: Partial<BlogPost> & { title: string; content: string }): Promise<BlogPost> {

@@ -5,17 +5,18 @@ import MediaGrid from "@/components/home/MediaGrid";
 import EventSection from "@/components/home/EventSection";
 import InstagramFeed from "@/components/home/InstagramFeed";
 import NewsletterSection from "@/components/home/NewsletterSection";
-
 import { HERO_SLIDES } from "@/data/campaigns";
-import {
-  bestSellers,
-  formals,
-  maahiII,
-  rahaPret,
-  silkSolids,
-} from "@/data/products";
+import { getProductsByCollection } from "@/lib/db";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [maahiII, silkSolids, rahaPret, bestSellers, formals] = await Promise.all([
+    getProductsByCollection("maahi-ii-luxury-eid-pret"),
+    getProductsByCollection("silk-solids26"),
+    getProductsByCollection("raha-eid-pret26"),
+    getProductsByCollection("best-sellers"),
+    getProductsByCollection("formal-dresses"),
+  ]);
+
   return (
     <>
       <HeroSlider slides={HERO_SLIDES} />
@@ -40,7 +41,7 @@ export default function HomePage() {
         title="Raha Eid Pret'26"
         products={rahaPret}
         href="/collections/raha-eid-pret26"
-        totalCount={8}
+        totalCount={rahaPret.length || 8}
         showViewAll
         viewAllRed
       />
@@ -49,7 +50,7 @@ export default function HomePage() {
         title="Best Sellers"
         products={bestSellers}
         href="/collections/best-sellers"
-        totalCount={17}
+        totalCount={bestSellers.length || 17}
         showViewAll
       />
 
@@ -57,7 +58,7 @@ export default function HomePage() {
         title="Formals"
         products={formals}
         href="/collections/formal-dresses"
-        totalCount={67}
+        totalCount={formals.length || 67}
         showViewAll
       />
 

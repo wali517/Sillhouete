@@ -35,6 +35,7 @@ export interface Product {
   reviewCount?: number;
   dupattaOptions?: string[];
   adOnOptions?: string[];
+  collections?: string[];
   videoId?: string;
   videoUrl?: string;
   variants?: Array<{

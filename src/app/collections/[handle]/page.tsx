@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { COLLECTION_PRODUCTS, allProducts } from "@/data/products";
+import { getProducts, getProductsByCollection, getCollectionByHandle, getCollections } from "@/lib/db";
 import { COLLECTION_DESCRIPTIONS } from "@/data/collection-descriptions";
 import { COLLECTION_TITLES } from "@/data/site";
 import CollectionViewer from "./CollectionViewer";
@@ -10,17 +10,20 @@ type Props = {
   searchParams?: Promise<{ page?: string }>;
 };
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const collections = await getCollections();
   const handles = new Set([
+    ...collections.map((c) => c.handle),
     ...Object.keys(COLLECTION_TITLES),
-    ...Object.keys(COLLECTION_PRODUCTS),
   ]);
   return Array.from(handles).map((handle) => ({ handle }));
 }
 
 export async function generateMetadata({ params }: Props) {
   const { handle } = await params;
+  const colDoc = await getCollectionByHandle(handle);
   const title =
+    colDoc?.title ||
     COLLECTION_TITLES[handle] ||
     handle.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   return { title: `${title} – Sillhouete` };
@@ -31,18 +34,23 @@ export default async function CollectionPage({ params, searchParams }: Props) {
   const sParams = await searchParams;
   const initialPage = Number(sParams?.page) || 1;
   const isSale = handle === "sale-1" || handle === "sale";
-  const rawTitle = isSale ? "SILLHOUETE SALE" : COLLECTION_TITLES[handle];
-  const base = handle === "1" || handle === "all" ? allProducts : COLLECTION_PRODUCTS[handle] ?? [];
   
-  // Only show products actually assigned to this collection. Padding sparse collections
-  // with unrelated items or synthetic sale prices made product grids inaccurate.
-  const products = base;
+  const colDoc = await getCollectionByHandle(handle);
+  const products = handle === "1" || handle === "all"
+    ? await getProducts()
+    : await getProductsByCollection(handle);
+
+  const rawTitle = isSale
+    ? "SILLHOUETE SALE"
+    : colDoc?.title || COLLECTION_TITLES[handle];
 
   const title =
     rawTitle ||
     handle.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
-  if (!rawTitle && !base.length) notFound();
+  if (!rawTitle && !products.length) notFound();
+
+  const descriptionHtml = colDoc?.description || COLLECTION_DESCRIPTIONS[handle] || "";
 
   return (
     <section className="mx-auto w-full max-w-355 px-3 py-7 sm:px-5 md:px-8 lg:px-10 md:py-9">
@@ -100,10 +108,10 @@ export default async function CollectionPage({ params, searchParams }: Props) {
         </div>
       )}
 
-      {COLLECTION_DESCRIPTIONS[handle] ? (
+      {descriptionHtml ? (
         <div
           className="mx-auto mt-14 max-w-[1100px] text-[14px] leading-[1.7] text-[#222222] collection-seo-content"
-          dangerouslySetInnerHTML={{ __html: COLLECTION_DESCRIPTIONS[handle] }}
+          dangerouslySetInnerHTML={{ __html: descriptionHtml }}
         />
       ) : null}
     </section>

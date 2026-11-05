@@ -1,6 +1,5 @@
 import ProductGrid from "@/components/products/ProductGrid";
 import { getProducts, searchProducts } from "@/lib/db";
-import { allProducts as fallbackProducts } from "@/data/products";
 import type { Product } from "@/types";
 
 type Props = { searchParams: Promise<{ q?: string }> };
@@ -20,19 +19,7 @@ export default async function SearchPage({ searchParams }: Props) {
     }
     catalog = await getProducts();
   } catch (err) {
-    console.warn("DB search failed, using fallback:", err);
-    if (term) {
-      const lower = term.toLowerCase();
-      results = fallbackProducts.filter(
-        (p) => p.title.toLowerCase().includes(lower) || p.alt.toLowerCase().includes(lower)
-      );
-    }
-    catalog = fallbackProducts;
-  }
-
-  // If no DB products yet, use fallback catalog
-  if (!catalog || catalog.length === 0) {
-    catalog = fallbackProducts;
+    console.warn("MongoDB search error:", err);
   }
 
   return (

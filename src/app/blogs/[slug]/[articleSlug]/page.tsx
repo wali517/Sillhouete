@@ -2,15 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Calendar, Clock, ArrowLeft, Share2, Tag, User } from "lucide-react";
-import { getBlogBySlug, getBlogs } from "@/lib/db";
-import { SEED_BLOGS } from "@/data/seed-blogs";
-import { allProducts } from "@/data/products";
+import { getBlogBySlug, getBlogs, getProducts } from "@/lib/db";
 import ProductCard from "@/components/products/ProductCard";
 
 type Props = { params: Promise<{ slug: string; articleSlug: string }> };
 
-export function generateStaticParams() {
-  return SEED_BLOGS.map((b) => ({
+export async function generateStaticParams() {
+  const blogs = await getBlogs();
+  return blogs.map((b) => ({
     slug: "news",
     articleSlug: b.slug,
   }));
@@ -33,11 +32,15 @@ export default async function BlogPostPage({ params }: Props) {
   const article = await getBlogBySlug(articleSlug);
   if (!article) notFound();
 
-  const allArticles = await getBlogs();
+  const [allArticles, allProds] = await Promise.all([
+    getBlogs(),
+    getProducts(),
+  ]);
+
   const related = allArticles.filter((a) => a.slug !== articleSlug).slice(0, 3);
   const featuredProducts = articleSlug.includes("wedding") || articleSlug.includes("bridal")
-    ? allProducts.filter((p) => (p.category || "").toLowerCase().includes("bridal") || (p.category || "").toLowerCase().includes("formal")).slice(0, 4)
-    : allProducts.filter((p) => (p.category || "").toLowerCase().includes("pret") || (p.category || "").toLowerCase().includes("silk")).slice(0, 4);
+    ? allProds.filter((p) => (p.category || "").toLowerCase().includes("bridal") || (p.category || "").toLowerCase().includes("formal")).slice(0, 4)
+    : allProds.filter((p) => (p.category || "").toLowerCase().includes("pret") || (p.category || "").toLowerCase().includes("silk")).slice(0, 4);
 
   return (
     <article className="mx-auto max-w-[960px] px-4 py-10 md:px-8">

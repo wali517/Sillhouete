@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo } from "react";
-import { predictiveSearch } from "@/lib/predictive-search";
+import { useState, useEffect } from "react";
 import { useStore } from "@/components/providers/StoreProvider";
+import type { Product } from "@/types";
 
 const heading =
   "border-b border-black/10 pb-2 text-[11px] font-bold uppercase tracking-[0.3em] text-black";
@@ -13,7 +13,35 @@ const linkRow = "block py-[7px] pl-2 text-[14px] text-black/90 hover:text-black 
 export default function PredictivePanel({ query, onNavigate }: { query: string; onNavigate: () => void }) {
   const { formatPrice } = useStore();
   const q = query.trim();
-  const r = useMemo(() => predictiveSearch(q), [q]);
+
+  const [r, setR] = useState<{
+    suggestions: string[];
+    pages: { label: string; href: string }[];
+    collections: { label: string; href: string }[];
+    products: Product[];
+  }>({ suggestions: [], pages: [], collections: [], products: [] });
+
+  useEffect(() => {
+    if (!q) {
+      setR({ suggestions: [], pages: [], collections: [], products: [] });
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/predictive-search?q=${encodeURIComponent(q)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setR(data);
+        }
+      } catch {
+        // ignore
+      }
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, [q]);
+
   if (!q) return null;
 
   const hasLeft = r.suggestions.length + r.pages.length + r.collections.length > 0;

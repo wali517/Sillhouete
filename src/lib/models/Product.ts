@@ -30,6 +30,7 @@ const ProductSchema = new Schema(
     reviewCount: { type: Number },
     dupattaOptions: [{ type: String }],
     adOnOptions: [{ type: String }],
+    collections: [{ type: String, index: true }],
     videoId: { type: String },
     videoUrl: { type: String },
     variants: [{ id: String, title: String, price: Number, sku: String, option1: String, option2: String, option3: String }],

@@ -9,17 +9,16 @@ import ProductGallery from "@/components/products/ProductGallery";
 import CustomerTestimonials from "@/components/products/CustomerTestimonials";
 import KeyActives from "@/components/products/KeyActives";
 import ProductVideoReel from "@/components/products/ProductVideoReel";
-import { allProducts, getProduct } from "@/data/products";
 import { SITE } from "@/data/site";
 import { getProductByHandle, getProducts } from "@/lib/db";
 import type { Product } from "@/types";
-import { SEED_BLOGS } from "@/data/seed-blogs";
 import { ChevronRight, Globe, ShieldCheck, Truck, RotateCcw, Share2 } from "lucide-react";
 
 type Props = { params: Promise<{ handle: string }> };
 
-export function generateStaticParams() {
-  return allProducts.map((p) => ({ handle: p.handle }));
+export async function generateStaticParams() {
+  const products = await getProducts();
+  return products.map((p) => ({ handle: p.handle }));
 }
 
 export async function generateMetadata({ params }: Props) {
@@ -30,7 +29,6 @@ export async function generateMetadata({ params }: Props) {
   } catch {
     // fallback
   }
-  if (!p) p = getProduct(handle);
   if (!p) return { title: "Product – Sillhouete" };
 
   const pageTitle = p.handle === "iris-rm-03"
@@ -71,88 +69,27 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function ProductPage({ params }: Props) {
   const { handle } = await params;
-  const staticProduct = getProduct(handle);
-  let product = null;
+  let product: Product | undefined = undefined;
   try {
     product = await getProductByHandle(handle);
   } catch {
-    // fallback
-  }
-
-  if (!product) {
-    product = staticProduct;
-  } else if (staticProduct) {
-    // Merge all unique images so all website photos are always present
-    const combinedImages = Array.from(
-      new Set(
-        [
-          product.image,
-          product.hoverImage,
-          ...(staticProduct.images || []),
-          ...(product.images || []),
-        ].filter(Boolean) as string[]
-      )
-    );
-    product.images = combinedImages;
-    if (!product.image) product.image = staticProduct.image;
-    if (!product.hoverImage) product.hoverImage = staticProduct.hoverImage;
-
-    // ALWAYS ensure product-related videoId is set from static product if missing
-    if (!product.videoId || product.videoId.length < 5) {
-      product.videoId = staticProduct.videoId;
-    }
-    if (!product.sku) {
-      product.sku = staticProduct.sku;
-    }
-    if (
-      !product.description ||
-      product.description.length < 100 ||
-      !product.description.includes("Price Includes")
-    ) {
-      product.description = staticProduct.description;
-    }
-    if (!product.variants || product.variants.length === 0) {
-      product.variants = staticProduct.variants;
-    }
-    if (!product.sizes || product.sizes.length === 0) {
-      product.sizes = staticProduct.sizes;
-    }
+    // ignore
   }
 
   if (!product) notFound();
 
-  // Safety fallback for product-related videoId and sku
-  if (!product.videoId && staticProduct?.videoId) {
-    product.videoId = staticProduct.videoId;
-  }
-  if (!product.sku && staticProduct?.sku) {
-    product.sku = staticProduct.sku;
-  }
   if (handle === "camilla") {
     if (!product.videoId) product.videoId = "4mWBAj2s6yU";
     if (!product.sku) product.sku = "RM-2-XS";
   }
 
-  // Related products matching real site
+  // Related products dynamically loaded from MongoDB
   let related: Product[] = [];
-  if (handle === "camilla") {
-    const matchingHandles = ["iris-rm-03", "smira", "freya", "ivy"];
-    related = matchingHandles
-      .map((h) => allProducts.find((p) => p.handle === h))
-      .filter((p): p is Product => Boolean(p));
-  }
-  if (related.length === 0) {
-    try {
-      const dbProds = await getProducts();
-      if (dbProds && dbProds.length > 0) {
-        related = dbProds.filter((p) => p.handle !== handle).slice(0, 4);
-      }
-    } catch {
-      // fallback
-    }
-  }
-  if (related.length === 0) {
-    related = allProducts.filter((p) => p.handle !== handle).slice(0, 4);
+  try {
+    const allProds = await getProducts();
+    related = allProds.filter((p) => p.handle !== handle).slice(0, 4);
+  } catch {
+    related = [];
   }
 
   // Exact JSON-LD structured data as on the real Sillhouete website
