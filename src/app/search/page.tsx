@@ -55,15 +55,17 @@ export default async function SearchPage({ searchParams }: Props) {
       {results.length > 0 ? (
         <ProductGrid products={results} />
       ) : (
-        <div className="py-6 text-center">
-          <p className="text-sm text-black/70 mb-8">
+        <div className="py-12 text-center">
+          <p className="text-sm text-black/70">
             {term
-              ? `No products found matching “${q}”. Discover our most coveted designer styles below:`
+              ? `No products found matching “${q}”.`
               : "Discover our most coveted luxury bridal, formal, and festive collections below:"}
           </p>
-          <div className="text-left">
-            <ProductGrid products={catalog.slice(0, 16)} />
-          </div>
+          {!term && (
+            <div className="mt-8 text-left">
+              <ProductGrid products={catalog.slice(0, 16)} />
+            </div>
+          )}
         </div>
       )}
     </section>

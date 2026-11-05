@@ -6,7 +6,7 @@ import { ContactMessageModel } from "./models/ContactMessage";
 import { BlogPostModel } from "./models/BlogPost";
 import { SiteSettingsModel } from "./models/SiteSettings";
 import { CollectionModel } from "./models/Collection";
-import { executePredictiveSearch } from "./predictive-search";
+import { executePredictiveSearch, tokenize } from "./predictive-search";
 import { ANNOUNCEMENTS, SITE } from "@/data/site";
 import {
   sendOrderConfirmationEmail,
@@ -103,33 +103,52 @@ export async function getCollectionByHandle(handle: string): Promise<{ handle: s
   return undefined;
 }
 
-/** Search products by title, handle, alt text, category, or description. */
+/** Exact / full match search filter for main search (when Enter is pressed). */
+export function matchExactProducts(query: string, catalog: Product[]): Product[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  const qWords = tokenize(q);
+  if (qWords.length === 0) return [];
+
+  return catalog.filter((p) => {
+    const title = (p.title || "").toLowerCase();
+    const handle = (p.handle || "").toLowerCase();
+    const sku = (p.sku || "").toLowerCase();
+    const color = (p.color || "").toLowerCase();
+    const category = (p.category || "").toLowerCase();
+    const colls = (p.collections || []).map((c) => c.toLowerCase());
+
+    // 1. Exact full field match
+    if (title === q || handle === q || sku === q || color === q || category === q) return true;
+
+    // 2. Exact word boundaries in title, category, color, sku, collections
+    const titleWords = tokenize(title);
+    if (qWords.length === 1) {
+      if (titleWords.includes(qWords[0])) return true;
+      if (color === qWords[0] || category === qWords[0] || sku === qWords[0]) return true;
+      if (colls.some((c) => tokenize(c).includes(qWords[0]))) return true;
+    } else {
+      // Multi-word: exact phrase in title or all words match exactly in title
+      if (title.includes(q)) return true;
+      if (qWords.every((w) => titleWords.includes(w))) return true;
+    }
+
+    return false;
+  });
+}
+
+/** Search products with full/exact word match for main search. */
 export async function searchProducts(query: string): Promise<Product[]> {
   const term = query.trim().toLowerCase();
   if (!term) return [];
 
   try {
-    await connectDB();
-    const regex = new RegExp(term, "i");
-    const docs = await ProductModel.find({
-      $or: [
-        { title: regex },
-        { handle: regex },
-        { alt: regex },
-        { category: regex },
-        { description: regex },
-      ],
-    }).lean();
-    if (docs && docs.length > 0) {
-      const prods = toPlainArray<Product>(docs);
-      return executePredictiveSearch(term, prods, 200).products;
-    }
+    const products = await getProducts();
+    return matchExactProducts(term, products);
   } catch (err) {
     console.warn("MongoDB searchProducts error:", err);
+    return [];
   }
-
-  const products = await getProducts();
-  return executePredictiveSearch(term, products, 200).products;
 }
 
 export async function getProductByHandle(handle: string): Promise<Product | undefined> {
