@@ -26,6 +26,7 @@ const ProductSchema = new Schema(
     fabricDetail: { shirt: String, trousers: String, dupatta: String },
     priceIncludes: [{ type: String }],
     customization: { sizeCustomization: String, colourCustomization: String },
+    customSizeImage: { type: String },
     rating: { type: Number },
     reviewCount: { type: Number },
     dupattaOptions: [{ type: String }],

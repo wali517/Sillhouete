@@ -201,7 +201,7 @@ export async function getCollections(): Promise<Array<{ handle: string; title: s
 }
 
 /** Fetch a single collection by handle from MongoDB */
-export async function getCollectionByHandle(handle: string): Promise<{ handle: string; title: string; description?: string; productCount?: number } | undefined> {
+export async function getCollectionByHandle(handle: string): Promise<{ handle: string; title: string; description?: string; image?: string; productCount?: number } | undefined> {
   try {
     await connectDB();
     const doc = await CollectionModel.findOne({ handle }).lean();
@@ -210,6 +210,51 @@ export async function getCollectionByHandle(handle: string): Promise<{ handle: s
     console.warn(`MongoDB getCollectionByHandle(${handle}) error:`, err);
   }
   return undefined;
+}
+
+/** Create or update a collection / category in MongoDB */
+export async function saveCollection(col: {
+  handle?: string;
+  title: string;
+  description?: string;
+  image?: string;
+  productCount?: number;
+}): Promise<{ handle: string; title: string; description?: string; image?: string; productCount?: number }> {
+  await connectDB();
+  const handle =
+    col.handle?.trim() ||
+    col.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+
+  const update = {
+    handle,
+    title: col.title.trim(),
+    description: col.description || "",
+    image: col.image || "",
+    productCount: col.productCount !== undefined ? col.productCount : 0,
+  };
+
+  const doc = await CollectionModel.findOneAndUpdate(
+    { handle },
+    { $set: update },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  ).lean();
+
+  return toPlain(doc) as any;
+}
+
+/** Delete a collection / category from MongoDB */
+export async function deleteCollection(handle: string): Promise<boolean> {
+  try {
+    await connectDB();
+    const res = await CollectionModel.deleteOne({ handle });
+    return res.deletedCount > 0;
+  } catch (err) {
+    console.warn(`MongoDB deleteCollection(${handle}) error:`, err);
+    return false;
+  }
 }
 
 /** Exact / full match search filter for main search (when Enter is pressed). */
@@ -319,6 +364,9 @@ export async function saveProduct(product: Partial<Product> & { title: string; p
     sizes: product.sizes && product.sizes.length ? product.sizes : ["XS", "S", "M", "L", "XL"],
     fabric: product.fabric || "Pure Silk / Chiffon",
     sku: product.sku || `SLH-${handle.toUpperCase()}`,
+    customSizeImage: product.customSizeImage,
+    videoId: product.videoId,
+    videoUrl: product.videoUrl,
     dupattaOptions: product.dupattaOptions,
     adOnOptions: product.adOnOptions,
     variants: product.variants,

@@ -31,7 +31,11 @@ export default function AddToCart({ product, children }: { product: Product; chi
   const dupattaValues = useMemo(() => optionValues(product, "option2", product.dupattaOptions), [product]);
   const adOnValues = useMemo(() => optionValues(product, "option3", product.adOnOptions), [product]);
 
-  const [size, setSize] = useState("XS");
+  const availableSizes = useMemo(() => {
+    return product.sizes?.length ? product.sizes : SIZES;
+  }, [product.sizes]);
+
+  const [size, setSize] = useState(() => (product.sizes?.length ? product.sizes[0] : "XS"));
   const [dupatta, setDupatta] = useState("None");
   const [adOn, setAdOn] = useState("None");
   const [expedite, setExpedite] = useState(false);
@@ -102,9 +106,17 @@ export default function AddToCart({ product, children }: { product: Product; chi
           <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-black font-sans">
             S I Z E
           </span>
+          <button
+            type="button"
+            onClick={() => setShowSizeChart(true)}
+            className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wider text-neutral-600 hover:text-black underline cursor-pointer"
+          >
+            <Ruler className="h-3.5 w-3.5" />
+            Size Guide
+          </button>
         </div>
         <div className="flex flex-wrap gap-2.5">
-          {SIZES.map((s) => (
+          {availableSizes.map((s) => (
             <button
               key={s}
               type="button"
@@ -116,6 +128,11 @@ export default function AddToCart({ product, children }: { product: Product; chi
             </button>
           ))}
         </div>
+        {size.toLowerCase().includes("custom") && (
+          <p className="mt-2 text-[11px] text-neutral-600 bg-neutral-50 border border-neutral-200 rounded p-2 leading-relaxed">
+            ✨ <strong>Custom Size:</strong> You can enter your custom measurements in the Order Note at checkout, or our team will contact you on WhatsApp to confirm your exact fit.
+          </p>
+        )}
       </div>
 
       {/* DUPATTA — only for products that really have the option */}
@@ -317,85 +334,100 @@ export default function AddToCart({ product, children }: { product: Product; chi
               </button>
             </div>
 
-            {/* Camilla's exact Size Chart Table matching live_top.png */}
-            <div className="space-y-4 text-center font-sans">
-              <div className="flex items-center justify-center py-1">
-                <Image
-                  src={SITE.logo}
-                  alt="Sillhouete"
-                  width={150}
-                  height={48}
-                  className="h-9 w-auto object-contain"
-                />
+            {product.customSizeImage ? (
+              <div className="py-2 space-y-3">
+                <div className="relative mx-auto max-w-full overflow-hidden rounded border border-neutral-200 bg-neutral-50 p-2">
+                  <Image
+                    src={product.customSizeImage}
+                    alt={`${product.title} Size Chart`}
+                    width={800}
+                    height={1000}
+                    className="w-full h-auto object-contain mx-auto"
+                  />
+                </div>
+                <p className="text-center text-xs text-neutral-500">
+                  Custom size chart &amp; guidelines for {product.title}.
+                </p>
               </div>
+            ) : (
+              <div className="space-y-4 text-center font-sans">
+                <div className="flex items-center justify-center py-1">
+                  <Image
+                    src={SITE.logo}
+                    alt="Sillhouete"
+                    width={150}
+                    height={48}
+                    className="h-9 w-auto object-contain"
+                  />
+                </div>
 
-              <div className="bg-black text-white py-1.5 text-[14px] font-bold uppercase tracking-wider">
-                Size Chart
-              </div>
-              <div className="text-[12px] font-bold uppercase tracking-wider text-neutral-800">
-                CAMILLA &bull; ARTICLE CODE: (RM-02)
-              </div>
+                <div className="bg-black text-white py-1.5 text-[14px] font-bold uppercase tracking-wider">
+                  Size Chart
+                </div>
+                <div className="text-[12px] font-bold uppercase tracking-wider text-neutral-800">
+                  {product.title.toUpperCase()} &bull; {product.sku || "STANDARD SIZE"}
+                </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-neutral-300 text-[12px]">
-                  <thead>
-                    <tr className="bg-neutral-100 text-black font-bold">
-                      <th className="border border-neutral-300 px-3 py-2 text-left">Details</th>
-                      <th className="border border-neutral-300 px-3 py-2">Ex Small</th>
-                      <th className="border border-neutral-300 px-3 py-2">Small</th>
-                      <th className="border border-neutral-300 px-3 py-2">Medium</th>
-                      <th className="border border-neutral-300 px-3 py-2">Large</th>
-                      <th className="border border-neutral-300 px-3 py-2">Ex Large</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Bust</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">18</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">19</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">20.5</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">22</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">23.5</td>
-                    </tr>
-                    <tr>
-                      <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Hip</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">18.5</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">19.5</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">22</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">23</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">24.5</td>
-                    </tr>
-                    <tr>
-                      <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Arm Hole</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">8</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">8.5</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">9.5</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">10.5</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">12</td>
-                    </tr>
-                    <tr>
-                      <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Shirt Length</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">56</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">56</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">56</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">56</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">56</td>
-                    </tr>
-                    <tr>
-                      <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">HEM</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">42</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">42</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">42</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">42</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">42</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border border-neutral-300 text-[12px]">
+                    <thead>
+                      <tr className="bg-neutral-100 text-black font-bold">
+                        <th className="border border-neutral-300 px-3 py-2 text-left">Details</th>
+                        <th className="border border-neutral-300 px-3 py-2">Ex Small</th>
+                        <th className="border border-neutral-300 px-3 py-2">Small</th>
+                        <th className="border border-neutral-300 px-3 py-2">Medium</th>
+                        <th className="border border-neutral-300 px-3 py-2">Large</th>
+                        <th className="border border-neutral-300 px-3 py-2">Ex Large</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Bust</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">18</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">19</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">20.5</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">22</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">23.5</td>
+                      </tr>
+                      <tr>
+                        <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Hip</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">18.5</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">19.5</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">22</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">23</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">24.5</td>
+                      </tr>
+                      <tr>
+                        <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Arm Hole</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">8</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">8.5</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">9.5</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">10.5</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">12</td>
+                      </tr>
+                      <tr>
+                        <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Shirt Length</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">56</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">56</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">56</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">56</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">56</td>
+                      </tr>
+                      <tr>
+                        <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">HEM</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">42</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">42</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">42</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">42</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">42</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
 
-              <div className="bg-black text-white py-1.5 text-[14px] font-bold uppercase tracking-wider mt-4">
-                Trouser Size
-              </div>
+                <div className="bg-black text-white py-1.5 text-[14px] font-bold uppercase tracking-wider mt-4">
+                  Trouser Size
+                </div>
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse border border-neutral-300 text-[12px]">
                   <thead>
@@ -429,6 +461,7 @@ export default function AddToCart({ product, children }: { product: Product; chi
                 </table>
               </div>
             </div>
+            )}
           </div>
         </div>
       )}

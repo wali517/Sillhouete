@@ -31,6 +31,7 @@ export interface Product {
     sizeCustomization?: string;
     colourCustomization?: string;
   };
+  customSizeImage?: string;
   rating?: number;
   reviewCount?: number;
   dupattaOptions?: string[];

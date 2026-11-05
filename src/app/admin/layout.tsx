@@ -18,11 +18,13 @@ import {
   Menu,
   X,
   CreditCard,
+  FolderTree,
 } from "lucide-react";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Products", href: "/admin/products", icon: ShoppingBag },
+  { label: "Categories", href: "/admin/categories", icon: FolderTree },
   { label: "Orders", href: "/admin/orders", icon: Package },
   { label: "Payments", href: "/admin/payments", icon: CreditCard },
   { label: "Customers", href: "/admin/customers", icon: Users },

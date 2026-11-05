@@ -284,8 +284,23 @@ export default async function ProductPage({ params }: Props) {
               dangerouslySetInnerHTML={{ __html: description.bodyHtml }}
             />
 
-            {/* Official Size Chart Table matching live site */}
-            {product.handle === "camilla" ? (
+            {/* Official or Custom Size Chart */}
+            {product.customSizeImage ? (
+              <div className="pt-6 space-y-3 font-sans text-center">
+                <div className="bg-black text-white py-1.5 text-[14px] font-bold uppercase tracking-wider">
+                  Size Chart
+                </div>
+                <div className="overflow-hidden rounded border border-neutral-200 bg-neutral-50 p-2">
+                  <Image
+                    src={product.customSizeImage}
+                    alt={`${product.title} Size Chart`}
+                    width={800}
+                    height={1000}
+                    className="w-full h-auto object-contain mx-auto"
+                  />
+                </div>
+              </div>
+            ) : product.handle === "camilla" ? (
               <div className="pt-6 space-y-4 font-sans text-center">
                 <div className="flex items-center justify-center py-1">
                   <Image
