@@ -44,6 +44,7 @@ export interface IOrder extends Document {
     image: string;
     dupatta?: string;
     adOn?: string;
+    customSizeNote?: string;
   }>;
   subtotal: number;
   shipping: number;
@@ -141,6 +142,7 @@ const OrderSchema = new Schema<IOrder>(
         image: { type: String, default: "" },
         dupatta: String,
         adOn: String,
+        customSizeNote: { type: String, default: "" },
       },
     ],
     subtotal: { type: Number, required: true },

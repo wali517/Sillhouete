@@ -314,6 +314,11 @@ export default function AdminOrderDetailPage() {
                       {item.dupatta && ` · Dupatta: ${item.dupatta}`}
                       {item.adOn && ` · Add-on: ${item.adOn}`}
                     </div>
+                    {item.customSizeNote && (
+                      <div className="text-[11px] text-purple-900 bg-purple-50 border border-purple-200 rounded px-2 py-1 mt-1 font-medium inline-block">
+                        ✂️ Custom Measurements: {item.customSizeNote}
+                      </div>
+                    )}
                   </div>
                   <div className="text-right shrink-0">
                     <div className="font-semibold text-sm">

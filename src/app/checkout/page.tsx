@@ -409,6 +409,7 @@ function CheckoutForm() {
             quantity: i.quantity,
             dupatta: i.dupatta,
             adOn: i.adOn,
+            customSizeNote: i.customSizeNote,
           })),
           discountCode: appliedDiscount?.code || "",
           paymentMethod: "stripe",
@@ -1344,6 +1345,11 @@ function CheckoutForm() {
                           <p className="text-[12px] text-[#707070] mt-0.5 whitespace-pre-line leading-relaxed">
                             {`${item.size} / ${item.dupatta || "None"} / ${item.adOn || "None"}`}
                           </p>
+                          {item.customSizeNote && (
+                            <p className="text-[11px] text-purple-900 bg-purple-50 rounded px-1.5 py-0.5 mt-1 border border-purple-200">
+                              Custom: {item.customSizeNote}
+                            </p>
+                          )}
                         </div>
                       </div>
                       <span className="text-[14px] font-medium text-[#1a1a1a] whitespace-nowrap pt-0.5">

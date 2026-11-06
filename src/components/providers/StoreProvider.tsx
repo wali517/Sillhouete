@@ -30,6 +30,7 @@ export interface AddToCartPayload {
   adOn?: string;
   expedite?: boolean;
   slip?: string;
+  customSizeNote?: string;
   unitPrice?: number;
   quantity?: number;
 }
@@ -153,6 +154,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       let adOn: string | undefined;
       let expedite = false;
       let slip: string | undefined;
+      let customSizeNote: string | undefined;
       let unitPrice = product.price;
       let quantity = qty;
 
@@ -164,6 +166,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         adOn = sizeOrOptions.adOn;
         expedite = !!sizeOrOptions.expedite;
         slip = sizeOrOptions.slip;
+        customSizeNote = sizeOrOptions.customSizeNote;
         if (sizeOrOptions.unitPrice !== undefined) {
           unitPrice = sizeOrOptions.unitPrice;
         }
@@ -172,7 +175,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      const key = `${product.id}:${size}:${dupatta || "none"}:${adOn || "none"}:${slip || "none"}:${expedite ? "exp" : "std"}`;
+      const key = `${product.id}:${size}:${dupatta || "none"}:${adOn || "none"}:${slip || "none"}:${expedite ? "exp" : "std"}${customSizeNote ? `:${customSizeNote}` : ""}`;
       setItems((prev) =>
         prev.some((i) => i.key === key)
           ? prev.map((i) => (i.key === key ? { ...i, quantity: i.quantity + quantity } : i))
@@ -186,6 +189,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 adOn,
                 expedite,
                 slip,
+                customSizeNote,
                 unitPrice,
                 quantity,
               },

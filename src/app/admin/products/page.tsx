@@ -84,6 +84,12 @@ export default function AdminProductsPage() {
   const [uploadingCustomSize, setUploadingCustomSize] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
 
+  // URL input visibility toggles (desktop upload is primary)
+  const [showMainUrl, setShowMainUrl] = useState(false);
+  const [showHoverUrl, setShowHoverUrl] = useState(false);
+  const [showSizeUrl, setShowSizeUrl] = useState(false);
+  const [showVideoUrlInput, setShowVideoUrlInput] = useState(false);
+
   const [formError, setFormError] = useState("");
   const [formSubmitting, setFormSubmitting] = useState(false);
 
@@ -138,8 +144,8 @@ export default function AdminProductsPage() {
     setPrice("");
     setOriginalPrice("");
     setCategory("Luxury Pret");
-    setImage("https://sillhouete.com/cdn/shop/files/sillhouete-formal-iris-royal-blue-intricate-embroidery.jpg?v=1776742287");
-    setHoverImage("https://sillhouete.com/cdn/shop/files/sillhouete-formal-name-color-intricate-embroidery-back.jpg?v=1776742287");
+    setImage("");
+    setHoverImage("");
     setGalleryImages([]);
     setCustomSizeImage("");
     setVideoUrl("");
@@ -149,6 +155,10 @@ export default function AdminProductsPage() {
     setSizes(["XS", "S", "M", "L", "XL"]);
     setInStock(true);
     setIsNew(true);
+    setShowMainUrl(false);
+    setShowHoverUrl(false);
+    setShowSizeUrl(false);
+    setShowVideoUrlInput(false);
     setFormError("");
     setIsModalOpen(true);
   };
@@ -171,6 +181,10 @@ export default function AdminProductsPage() {
     setSizes(p.sizes || ["XS", "S", "M", "L", "XL"]);
     setInStock(p.inStock !== false);
     setIsNew(!!p.isNew);
+    setShowMainUrl(false);
+    setShowHoverUrl(false);
+    setShowSizeUrl(false);
+    setShowVideoUrlInput(false);
     setFormError("");
     setIsModalOpen(true);
   };
@@ -667,16 +681,25 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
-              {/* ================= MAIN IMAGE (Upload from Desktop / URL) ================= */}
+              {/* ================= MAIN IMAGE (Upload from Desktop) ================= */}
               <div className="border rounded-xl p-4 bg-gray-50/50 space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="block font-bold uppercase tracking-wider text-gray-900">
-                    Main Product Image * (Front View)
-                  </label>
-                  <span className="text-[11px] text-gray-500">Upload directly from desktop</span>
+                  <div>
+                    <label className="block font-bold uppercase tracking-wider text-gray-900 text-xs">
+                      Main Product Image * (Front View)
+                    </label>
+                    <span className="text-[11px] text-gray-500">
+                      Upload directly from your computer / desktop
+                    </span>
+                  </div>
+                  {!image && (
+                    <span className="text-[10px] bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded">
+                      Required
+                    </span>
+                  )}
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <div className="rounded-xl border-2 border-dashed border-gray-300 p-3.5 text-center bg-white hover:border-black transition-colors">
                   <input
                     type="file"
                     ref={mainFileRef}
@@ -690,57 +713,89 @@ export default function AdminProductsPage() {
                   />
                   <label
                     htmlFor="main-image-file"
-                    className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-semibold text-gray-800 shadow-sm hover:bg-gray-100 cursor-pointer transition-colors"
+                    className="inline-flex flex-col items-center justify-center gap-1.5 cursor-pointer w-full py-2 select-none"
                   >
                     {uploadingMain ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin text-black" />
-                        Uploading image...
+                        <Loader2 className="h-6 w-6 animate-spin text-black" />
+                        <span className="font-semibold text-xs text-gray-800">Uploading main image from desktop...</span>
                       </>
                     ) : (
                       <>
-                        <UploadCloud className="h-4 w-4 text-black" />
-                        Choose main image from desktop
+                        <UploadCloud className="h-6 w-6 text-black" />
+                        <span className="font-bold text-xs text-gray-900">
+                          {image ? "Click to change / upload another image" : "Click to choose main image from desktop"}
+                        </span>
+                        <span className="text-[11px] text-gray-400">PNG, JPG, WEBP (Saved directly to database)</span>
                       </>
                     )}
                   </label>
-
-                  <input
-                    type="url"
-                    value={image}
-                    onChange={(e) => setImage(e.target.value)}
-                    placeholder="Or enter image URL (https://...)"
-                    className="flex-1 w-full rounded-lg border border-gray-300 p-2 text-xs outline-none focus:border-black bg-white"
-                  />
                 </div>
 
                 {image && (
-                  <div className="flex items-center gap-3 rounded-lg border border-gray-200 p-2 bg-white">
+                  <div className="flex items-center gap-3 rounded-lg border border-gray-200 p-2.5 bg-white shadow-xs">
                     <div className="relative h-16 w-14 shrink-0 overflow-hidden rounded border border-gray-200">
                       <Image src={image} alt="Main Preview" fill sizes="60px" className="object-cover" />
                     </div>
-                    <span className="flex-1 truncate font-mono text-[11px] text-gray-600">{image}</span>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs font-semibold text-emerald-700 block">✓ Main Image Uploaded</span>
+                      <span className="truncate font-mono text-[10px] text-gray-400 block">{image}</span>
+                    </div>
                     <button
                       type="button"
                       onClick={() => setImage("")}
-                      className="text-gray-400 hover:text-red-500 p-1"
+                      className="p-1 text-gray-400 hover:text-red-500 rounded hover:bg-red-50 transition-colors"
+                      title="Remove image"
                     >
-                      <X className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 )}
+
+                <div className="text-right">
+                  {!showMainUrl ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowMainUrl(true)}
+                      className="text-[11px] text-gray-400 hover:text-black underline cursor-pointer"
+                    >
+                      Or paste an external image URL
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-2 pt-1 text-left">
+                      <input
+                        type="url"
+                        value={image}
+                        onChange={(e) => setImage(e.target.value)}
+                        placeholder="https://example.com/photo.jpg"
+                        className="flex-1 rounded-md border border-gray-300 p-2 text-xs outline-none focus:border-black bg-white"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowMainUrl(false)}
+                        className="text-xs text-gray-400 hover:text-gray-600 px-1"
+                      >
+                        Hide
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* ================= HOVER IMAGE (Upload from Desktop / URL) ================= */}
+              {/* ================= HOVER IMAGE (Upload from Desktop) ================= */}
               <div className="border rounded-xl p-4 bg-gray-50/50 space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="block font-bold uppercase tracking-wider text-gray-900">
-                    Hover Product Image (Back / Detail View)
-                  </label>
-                  <span className="text-[11px] text-gray-500">Shows when visitor hovers on card</span>
+                  <div>
+                    <label className="block font-bold uppercase tracking-wider text-gray-900 text-xs">
+                      Hover Product Image (Back / Detail View)
+                    </label>
+                    <span className="text-[11px] text-gray-500">
+                      Shows when visitor hovers over product card
+                    </span>
+                  </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <div className="rounded-xl border-2 border-dashed border-gray-300 p-3.5 text-center bg-white hover:border-black transition-colors">
                   <input
                     type="file"
                     ref={hoverFileRef}
@@ -754,45 +809,73 @@ export default function AdminProductsPage() {
                   />
                   <label
                     htmlFor="hover-image-file"
-                    className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-semibold text-gray-800 shadow-sm hover:bg-gray-100 cursor-pointer transition-colors"
+                    className="inline-flex flex-col items-center justify-center gap-1.5 cursor-pointer w-full py-2 select-none"
                   >
                     {uploadingHover ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin text-black" />
-                        Uploading image...
+                        <Loader2 className="h-6 w-6 animate-spin text-black" />
+                        <span className="font-semibold text-xs text-gray-800">Uploading hover image from desktop...</span>
                       </>
                     ) : (
                       <>
-                        <UploadCloud className="h-4 w-4 text-black" />
-                        Choose hover image from desktop
+                        <UploadCloud className="h-6 w-6 text-black" />
+                        <span className="font-bold text-xs text-gray-900">
+                          {hoverImage ? "Click to change / upload another hover image" : "Click to choose hover image from desktop"}
+                        </span>
+                        <span className="text-[11px] text-gray-400">Optional back or detail view</span>
                       </>
                     )}
                   </label>
-
-                  <input
-                    type="url"
-                    value={hoverImage}
-                    onChange={(e) => setHoverImage(e.target.value)}
-                    placeholder="Or enter hover image URL (https://...)"
-                    className="flex-1 w-full rounded-lg border border-gray-300 p-2 text-xs outline-none focus:border-black bg-white"
-                  />
                 </div>
 
                 {hoverImage && (
-                  <div className="flex items-center gap-3 rounded-lg border border-gray-200 p-2 bg-white">
+                  <div className="flex items-center gap-3 rounded-lg border border-gray-200 p-2.5 bg-white shadow-xs">
                     <div className="relative h-16 w-14 shrink-0 overflow-hidden rounded border border-gray-200">
                       <Image src={hoverImage} alt="Hover Preview" fill sizes="60px" className="object-cover" />
                     </div>
-                    <span className="flex-1 truncate font-mono text-[11px] text-gray-600">{hoverImage}</span>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs font-semibold text-emerald-700 block">✓ Hover Image Uploaded</span>
+                      <span className="truncate font-mono text-[10px] text-gray-400 block">{hoverImage}</span>
+                    </div>
                     <button
                       type="button"
                       onClick={() => setHoverImage("")}
-                      className="text-gray-400 hover:text-red-500 p-1"
+                      className="p-1 text-gray-400 hover:text-red-500 rounded hover:bg-red-50 transition-colors"
+                      title="Remove hover image"
                     >
-                      <X className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 )}
+
+                <div className="text-right">
+                  {!showHoverUrl ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowHoverUrl(true)}
+                      className="text-[11px] text-gray-400 hover:text-black underline cursor-pointer"
+                    >
+                      Or paste an external hover image URL
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-2 pt-1 text-left">
+                      <input
+                        type="url"
+                        value={hoverImage}
+                        onChange={(e) => setHoverImage(e.target.value)}
+                        placeholder="https://example.com/back.jpg"
+                        className="flex-1 rounded-md border border-gray-300 p-2 text-xs outline-none focus:border-black bg-white"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowHoverUrl(false)}
+                        className="text-xs text-gray-400 hover:text-gray-600 px-1"
+                      >
+                        Hide
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* ================= IMAGE GALLERY (Multi-upload from Desktop) ================= */}
@@ -918,7 +1001,7 @@ export default function AdminProductsPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <Ruler className="h-4 w-4 text-black" />
-                        <label className="font-bold uppercase tracking-wider text-gray-900">
+                        <label className="font-bold uppercase tracking-wider text-gray-900 text-xs">
                           Custom Size Chart Image (Upload from Desktop)
                         </label>
                       </div>
@@ -927,7 +1010,7 @@ export default function AdminProductsPage() {
                       </span>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <div className="rounded-xl border-2 border-dashed border-gray-300 p-3 text-center bg-white hover:border-black transition-colors">
                       <input
                         type="file"
                         ref={customSizeFileRef}
@@ -941,62 +1024,90 @@ export default function AdminProductsPage() {
                       />
                       <label
                         htmlFor="custom-size-file"
-                        className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-semibold text-gray-800 shadow-sm hover:bg-gray-100 cursor-pointer transition-colors"
+                        className="inline-flex flex-col items-center justify-center gap-1.5 cursor-pointer w-full py-1.5 select-none"
                       >
                         {uploadingCustomSize ? (
                           <>
-                            <Loader2 className="h-4 w-4 animate-spin text-black" />
-                            Uploading chart...
+                            <Loader2 className="h-5 w-5 animate-spin text-black" />
+                            <span className="font-semibold text-xs text-gray-800">Uploading size chart...</span>
                           </>
                         ) : (
                           <>
-                            <UploadCloud className="h-4 w-4 text-black" />
-                            Upload size chart image from desktop
+                            <UploadCloud className="h-5 w-5 text-black" />
+                            <span className="font-bold text-xs text-gray-900">
+                              {customSizeImage ? "Click to change size chart image" : "Upload size chart image directly from desktop"}
+                            </span>
+                            <span className="text-[11px] text-gray-400">Attach custom measurements guidance chart</span>
                           </>
                         )}
                       </label>
-
-                      <input
-                        type="url"
-                        value={customSizeImage}
-                        onChange={(e) => setCustomSizeImage(e.target.value)}
-                        placeholder="Or enter size chart image URL (https://...)"
-                        className="flex-1 w-full rounded-lg border border-gray-300 p-2 text-xs outline-none focus:border-black bg-white"
-                      />
                     </div>
 
                     {customSizeImage && (
-                      <div className="flex items-center gap-3 rounded-lg border border-gray-200 p-2 bg-white">
+                      <div className="flex items-center gap-3 rounded-lg border border-gray-200 p-2.5 bg-white shadow-xs">
                         <div className="relative h-16 w-14 shrink-0 overflow-hidden rounded border border-gray-200">
                           <Image src={customSizeImage} alt="Size Chart Preview" fill sizes="60px" className="object-cover" />
                         </div>
-                        <span className="flex-1 truncate font-mono text-[11px] text-gray-600">{customSizeImage}</span>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-xs font-semibold text-emerald-700 block">✓ Custom Size Chart Uploaded</span>
+                          <span className="truncate font-mono text-[10px] text-gray-400 block">{customSizeImage}</span>
+                        </div>
                         <button
                           type="button"
                           onClick={() => setCustomSizeImage("")}
-                          className="text-gray-400 hover:text-red-500 p-1"
+                          className="p-1 text-gray-400 hover:text-red-500 rounded hover:bg-red-50 transition-colors"
+                          title="Remove size chart"
                         >
-                          <X className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     )}
+
+                    <div className="text-right">
+                      {!showSizeUrl ? (
+                        <button
+                          type="button"
+                          onClick={() => setShowSizeUrl(true)}
+                          className="text-[11px] text-gray-400 hover:text-black underline cursor-pointer"
+                        >
+                          Or paste size chart URL
+                        </button>
+                      ) : (
+                        <div className="flex items-center gap-2 pt-1 text-left">
+                          <input
+                            type="url"
+                            value={customSizeImage}
+                            onChange={(e) => setCustomSizeImage(e.target.value)}
+                            placeholder="https://example.com/sizechart.jpg"
+                            className="flex-1 rounded-md border border-gray-300 p-2 text-xs outline-none focus:border-black bg-white"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowSizeUrl(false)}
+                            className="text-xs text-gray-400 hover:text-gray-600 px-1"
+                          >
+                            Hide
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
 
-              {/* ================= PRODUCT VIDEO REEL (Upload from Desktop / URL) ================= */}
+              {/* ================= PRODUCT VIDEO REEL (Upload from Desktop) ================= */}
               <div className="border rounded-xl p-4 bg-gray-50/50 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <Video className="h-4 w-4 text-black" />
-                    <label className="font-bold uppercase tracking-wider text-gray-900">
-                      Product Video (Upload Video from Desktop / System)
+                    <label className="font-bold uppercase tracking-wider text-gray-900 text-xs">
+                      Product Video Reel (Upload from Computer / Desktop)
                     </label>
                   </div>
                   <span className="text-[11px] text-gray-500">Plays in bottom floating reel on product page</span>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <div className="rounded-xl border-2 border-dashed border-gray-300 p-3 text-center bg-white hover:border-black transition-colors">
                   <input
                     type="file"
                     ref={videoFileRef}
@@ -1010,54 +1121,78 @@ export default function AdminProductsPage() {
                   />
                   <label
                     htmlFor="video-file"
-                    className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-semibold text-gray-800 shadow-sm hover:bg-gray-100 cursor-pointer transition-colors"
+                    className="inline-flex flex-col items-center justify-center gap-1.5 cursor-pointer w-full py-1.5 select-none"
                   >
                     {uploadingVideo ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin text-black" />
-                        Uploading video from system...
+                        <Loader2 className="h-5 w-5 animate-spin text-black" />
+                        <span className="font-semibold text-xs text-gray-800">Uploading video from system...</span>
                       </>
                     ) : (
                       <>
-                        <UploadCloud className="h-4 w-4 text-black" />
-                        Choose video from computer (.mp4)
+                        <UploadCloud className="h-5 w-5 text-black" />
+                        <span className="font-bold text-xs text-gray-900">
+                          {videoUrl ? "Click to change / upload another video" : "Choose video from computer (.mp4, .mov)"}
+                        </span>
+                        <span className="text-[11px] text-gray-400">Desktop video upload stored directly in MongoDB GridFS</span>
                       </>
                     )}
                   </label>
-
-                  <input
-                    type="url"
-                    value={videoUrl}
-                    onChange={(e) => setVideoUrl(e.target.value)}
-                    placeholder="Or enter direct video URL (.mp4)"
-                    className="flex-1 w-full rounded-lg border border-gray-300 p-2 text-xs outline-none focus:border-black bg-white"
-                  />
-                </div>
-
-                {/* Optional YouTube ID */}
-                <div className="pt-1">
-                  <input
-                    type="text"
-                    value={videoId}
-                    onChange={(e) => setVideoId(e.target.value)}
-                    placeholder="Or YouTube Video ID (e.g. 4mWBAj2s6yU)"
-                    className="w-full rounded-lg border border-gray-300 p-2 text-xs outline-none focus:border-black bg-white"
-                  />
                 </div>
 
                 {videoUrl && (
-                  <div className="rounded-lg border border-gray-200 p-2 bg-white flex flex-col gap-2">
-                    <span className="truncate font-mono text-[11px] text-gray-600">{videoUrl}</span>
+                  <div className="rounded-lg border border-gray-200 p-2.5 bg-white flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-emerald-700">✓ Video Attached</span>
+                      <button
+                        type="button"
+                        onClick={() => setVideoUrl("")}
+                        className="text-xs text-red-600 hover:underline cursor-pointer"
+                      >
+                        Remove Video
+                      </button>
+                    </div>
                     <video src={videoUrl} controls className="max-h-48 w-full rounded bg-black" />
-                    <button
-                      type="button"
-                      onClick={() => setVideoUrl("")}
-                      className="self-end text-xs text-red-600 hover:underline"
-                    >
-                      Remove Video
-                    </button>
                   </div>
                 )}
+
+                <div className="text-right">
+                  {!showVideoUrlInput ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowVideoUrlInput(true)}
+                      className="text-[11px] text-gray-400 hover:text-black underline cursor-pointer"
+                    >
+                      Or paste video URL / YouTube ID
+                    </button>
+                  ) : (
+                    <div className="flex flex-col gap-2 pt-1 text-left">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="url"
+                          value={videoUrl}
+                          onChange={(e) => setVideoUrl(e.target.value)}
+                          placeholder="Or enter direct video URL (.mp4)"
+                          className="flex-1 rounded-md border border-gray-300 p-2 text-xs outline-none focus:border-black bg-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowVideoUrlInput(false)}
+                          className="text-xs text-gray-400 hover:text-gray-600 px-1"
+                        >
+                          Hide
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={videoId}
+                        onChange={(e) => setVideoId(e.target.value)}
+                        placeholder="Or YouTube Video ID (e.g. 4mWBAj2s6yU)"
+                        className="w-full rounded-md border border-gray-300 p-2 text-xs outline-none focus:border-black bg-white"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Description & Fabric Details */}

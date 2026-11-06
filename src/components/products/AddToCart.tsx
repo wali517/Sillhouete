@@ -43,6 +43,7 @@ export default function AddToCart({ product, children }: { product: Product; chi
   const [qty, setQty] = useState(1);
   const [addedNotice, setAddedNotice] = useState(false);
   const [showSizeChart, setShowSizeChart] = useState(false);
+  const [customSizeNote, setCustomSizeNote] = useState("");
 
   const variantPrice = (sz: string, d: string, a: string) => {
     const match = product.variants?.find(
@@ -63,6 +64,7 @@ export default function AddToCart({ product, children }: { product: Product; chi
     adOn: !isNone(adOn) ? adOn : undefined,
     expedite,
     slip: extra === WITH_SLEEVES ? WITH_SLEEVES : undefined,
+    customSizeNote: size.toLowerCase().includes("custom") && customSizeNote.trim() ? customSizeNote.trim() : undefined,
     unitPrice,
     quantity: qty,
   });
@@ -129,9 +131,24 @@ export default function AddToCart({ product, children }: { product: Product; chi
           ))}
         </div>
         {size.toLowerCase().includes("custom") && (
-          <p className="mt-2 text-[11px] text-neutral-600 bg-neutral-50 border border-neutral-200 rounded p-2 leading-relaxed">
-            ✨ <strong>Custom Size:</strong> You can enter your custom measurements in the Order Note at checkout, or our team will contact you on WhatsApp to confirm your exact fit.
-          </p>
+          <div className="mt-3 p-3 bg-neutral-50 border border-neutral-200 rounded-lg space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-black">
+                Custom Measurements / Sizing Note
+              </label>
+              <span className="text-[10px] text-neutral-500">Optional or provide your fit</span>
+            </div>
+            <textarea
+              rows={2}
+              value={customSizeNote}
+              onChange={(e) => setCustomSizeNote(e.target.value)}
+              placeholder="e.g. Chest: 36, Waist: 30, Hips: 40, Shirt Length: 42, Shoulder: 15..."
+              className="w-full text-xs p-2.5 border border-neutral-300 rounded outline-none focus:border-black bg-white resize-none"
+            />
+            <p className="text-[11px] text-neutral-500">
+              Your custom measurements will be attached directly to your order and tailored by our atelier.
+            </p>
+          </div>
         )}
       </div>
 

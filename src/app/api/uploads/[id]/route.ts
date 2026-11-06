@@ -20,31 +20,19 @@ export async function GET(req: Request, { params }: Props) {
     const { doc, stream } = file;
     const metadata = doc.metadata as { contentType?: string } | undefined;
     const contentType = metadata?.contentType || "application/octet-stream";
-    const fileSize = doc.length || 0;
 
-    // Convert Node Readable stream to Web ReadableStream
-    const webStream = new ReadableStream({
-      start(controller) {
-        stream.on("data", (chunk) => {
-          controller.enqueue(chunk);
-        });
-        stream.on("end", () => {
-          controller.close();
-        });
-        stream.on("error", (err) => {
-          controller.error(err);
-        });
-      },
-      cancel() {
-        stream.destroy();
-      },
-    });
+    // Read full stream into buffer - completely reliable on Vercel serverless
+    const chunks: Buffer[] = [];
+    for await (const chunk of stream) {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    }
+    const buffer = Buffer.concat(chunks);
 
-    return new NextResponse(webStream, {
+    return new NextResponse(buffer, {
       status: 200,
       headers: {
         "Content-Type": contentType,
-        "Content-Length": String(fileSize),
+        "Content-Length": String(buffer.length),
         "Cache-Control": "public, max-age=31536000, immutable",
         "Accept-Ranges": "bytes",
       },

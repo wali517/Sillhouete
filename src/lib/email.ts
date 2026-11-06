@@ -328,6 +328,7 @@ export async function sendOrderConfirmationEmail(order: Order, isCod = false) {
           <div style="font-weight: bold; font-size: 14px; color: #1a1a1a;">${escapeHtml(item.title)}</div>
           <div style="font-size: 12px; color: #666; margin-top: 3px;">
             Size: ${escapeHtml(item.size)}
+            ${item.customSizeNote ? `<br/><span style="color: #7b1fa2; font-size: 11.5px; font-weight: 500;">Custom Measurements: ${escapeHtml(item.customSizeNote)}</span>` : ""}
             ${item.dupatta ? ` | Sleeves: ${escapeHtml(item.dupatta)}` : ""}
             ${item.adOn ? ` | ${escapeHtml(item.adOn)}` : ""}
           </div>

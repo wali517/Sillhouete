@@ -6,63 +6,83 @@ import EventSection from "@/components/home/EventSection";
 import InstagramFeed from "@/components/home/InstagramFeed";
 import NewsletterSection from "@/components/home/NewsletterSection";
 import { HERO_SLIDES } from "@/data/campaigns";
-import { getProductsByCollection } from "@/lib/db";
+import { getProductsByCollection, getMainCategories } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function HomePage() {
-  const [maahiII, silkSolids, rahaPret, bestSellers, formals] = await Promise.all([
-    getProductsByCollection("maahi-ii-luxury-eid-pret"),
-    getProductsByCollection("silk-solids26"),
-    getProductsByCollection("raha-eid-pret26"),
-    getProductsByCollection("best-sellers"),
-    getProductsByCollection("formal-dresses"),
-  ]);
+  // 1. Fetch main categories from MongoDB
+  let mainCats = await getMainCategories();
+
+  const defaultHandles = [
+    { handle: "maahi-ii-luxury-eid-pret", title: "MAAHI II LUXURY EID PRET" },
+    { handle: "silk-solids26", title: "Silk Solids'26" },
+    { handle: "raha-eid-pret26", title: "Raha Eid Pret'26" },
+    { handle: "best-sellers", title: "Best Sellers" },
+    { handle: "formal-dresses", title: "Formals" },
+  ];
+
+  if (!mainCats || mainCats.length === 0) {
+    mainCats = defaultHandles.map((d) => ({
+      handle: d.handle,
+      title: d.title,
+      isMainCategory: true,
+      showOnHomepage: true,
+    }));
+  } else {
+    const existingHandles = new Set(mainCats.map((c) => c.handle));
+    for (const def of defaultHandles) {
+      if (!existingHandles.has(def.handle)) {
+        mainCats.push({
+          handle: def.handle,
+          title: def.title,
+          isMainCategory: true,
+          showOnHomepage: true,
+        });
+      }
+    }
+  }
+
+  // 2. Fetch products for each main category concurrently
+  const sections = await Promise.all(
+    mainCats.map(async (cat) => {
+      const products = await getProductsByCollection(cat.handle);
+      return {
+        cat,
+        products,
+      };
+    })
+  );
+
+  // Render categories that have products
+  const activeSections = sections.filter((s) => s.products && s.products.length > 0);
 
   return (
     <>
       <HeroSlider slides={HERO_SLIDES} />
 
-      <CollectionSection
-        title="MAAHI II LUXURY EID PRET"
-        products={maahiII}
-        href="/collections/maahi-ii-luxury-eid-pret"
-        totalCount={maahiII.length}
-        showNewBadge
-        hideViewAll
-      />
+      {activeSections.map(({ cat, products }) => {
+        const isHideViewAll =
+          cat.handle === "maahi-ii-luxury-eid-pret" || cat.handle === "silk-solids26";
+        const isRedViewAll = cat.handle === "raha-eid-pret26";
+        const isNewBadge =
+          cat.handle === "maahi-ii-luxury-eid-pret" || cat.handle === "silk-solids26";
 
-      <CollectionSection
-        title="Silk Solids'26"
-        products={silkSolids}
-        href="/collections/silk-solids26"
-        totalCount={silkSolids.length}
-        showNewBadge
-        hideViewAll
-      />
-
-      <CollectionSection
-        title="Raha Eid Pret'26"
-        products={rahaPret}
-        href="/collections/raha-eid-pret26"
-        totalCount={rahaPret.length || 8}
-        showViewAll
-        viewAllRed
-      />
-
-      <CollectionSection
-        title="Best Sellers"
-        products={bestSellers}
-        href="/collections/best-sellers"
-        totalCount={bestSellers.length || 17}
-        showViewAll
-      />
-
-      <CollectionSection
-        title="Formals"
-        products={formals}
-        href="/collections/formal-dresses"
-        totalCount={formals.length || 67}
-        showViewAll
-      />
+        return (
+          <CollectionSection
+            key={cat.handle}
+            title={cat.title}
+            products={products}
+            href={`/collections/${cat.handle}`}
+            totalCount={products.length}
+            showNewBadge={isNewBadge}
+            hideViewAll={isHideViewAll}
+            showViewAll={!isHideViewAll}
+            viewAllRed={isRedViewAll}
+          />
+        );
+      })}
 
       <MediaGrid />
       <EventSection />

@@ -187,10 +187,20 @@ export async function getProductsByCollection(collectionSlug: string): Promise<P
 }
 
 /** Fetch all collections from MongoDB */
-export async function getCollections(): Promise<Array<{ handle: string; title: string; description?: string; productCount?: number }>> {
+export async function getCollections(): Promise<Array<{
+  handle: string;
+  title: string;
+  description?: string;
+  image?: string;
+  productCount?: number;
+  isMainCategory?: boolean;
+  parentHandle?: string;
+  showOnHomepage?: boolean;
+  order?: number;
+}>> {
   try {
     await connectDB();
-    const docs = await CollectionModel.find({}).sort({ productCount: -1 }).lean();
+    const docs = await CollectionModel.find({}).sort({ order: 1, productCount: -1 }).lean();
     if (docs && docs.length > 0) {
       return toPlainArray(docs);
     }
@@ -219,7 +229,21 @@ export async function saveCollection(col: {
   description?: string;
   image?: string;
   productCount?: number;
-}): Promise<{ handle: string; title: string; description?: string; image?: string; productCount?: number }> {
+  isMainCategory?: boolean;
+  parentHandle?: string;
+  showOnHomepage?: boolean;
+  order?: number;
+}): Promise<{
+  handle: string;
+  title: string;
+  description?: string;
+  image?: string;
+  productCount?: number;
+  isMainCategory?: boolean;
+  parentHandle?: string;
+  showOnHomepage?: boolean;
+  order?: number;
+}> {
   await connectDB();
   const handle =
     col.handle?.trim() ||
@@ -228,13 +252,32 @@ export async function saveCollection(col: {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
 
-  const update = {
+  const isMain =
+    col.isMainCategory !== undefined
+      ? Boolean(col.isMainCategory)
+      : !col.parentHandle || col.parentHandle.trim() === "";
+
+  const showHome =
+    col.showOnHomepage !== undefined
+      ? Boolean(col.showOnHomepage)
+      : isMain;
+
+  const update: Record<string, unknown> = {
     handle,
     title: col.title.trim(),
     description: col.description || "",
     image: col.image || "",
-    productCount: col.productCount !== undefined ? col.productCount : 0,
+    isMainCategory: isMain,
+    parentHandle: col.parentHandle?.trim() || "",
+    showOnHomepage: showHome,
   };
+
+  if (col.productCount !== undefined) {
+    update.productCount = col.productCount;
+  }
+  if (col.order !== undefined) {
+    update.order = col.order;
+  }
 
   const doc = await CollectionModel.findOneAndUpdate(
     { handle },
@@ -243,6 +286,35 @@ export async function saveCollection(col: {
   ).lean();
 
   return toPlain(doc) as any;
+}
+
+/** Get all main categories to show on homepage or in main navigation */
+export async function getMainCategories(): Promise<Array<{
+  handle: string;
+  title: string;
+  description?: string;
+  image?: string;
+  productCount?: number;
+  isMainCategory?: boolean;
+  parentHandle?: string;
+  showOnHomepage?: boolean;
+}>> {
+  try {
+    await connectDB();
+    const docs = await CollectionModel.find({
+      $or: [
+        { showOnHomepage: true },
+        { isMainCategory: true },
+      ],
+    }).sort({ order: 1, productCount: -1 }).lean();
+
+    if (docs && docs.length > 0) {
+      return toPlainArray(docs);
+    }
+  } catch (err) {
+    console.warn("MongoDB getMainCategories error:", err);
+  }
+  return [];
 }
 
 /** Delete a collection / category from MongoDB */
@@ -406,6 +478,7 @@ export interface CartInputItem {
   quantity?: number;
   dupatta?: string;
   adOn?: string;
+  customSizeNote?: string;
 }
 
 export interface ValidatedCartCalculation {
@@ -419,6 +492,7 @@ export interface ValidatedCartCalculation {
     image: string;
     dupatta?: string;
     adOn?: string;
+    customSizeNote?: string;
   }>;
   subtotal: number;
   shipping: number;
@@ -464,8 +538,9 @@ export async function validateAndCalculateOrder(
 
     // Check size validity if defined on product
     if (product.sizes && product.sizes.length > 0 && !product.sizes.includes(size)) {
-      // Allow custom size only if size customization is allowed
-      const isCustomAllowed = product.customization?.sizeCustomization?.toLowerCase().includes("yes");
+      // Allow custom size
+      const isCustom = size.toLowerCase().includes("custom");
+      const isCustomAllowed = isCustom || product.customization?.sizeCustomization?.toLowerCase().includes("yes");
       if (!isCustomAllowed && !product.sizes.includes(size)) {
         throw new Error(`Selected size "${size}" is not available for "${product.title}".`);
       }
@@ -489,6 +564,7 @@ export async function validateAndCalculateOrder(
       image: product.image || product.images?.[0] || "",
       dupatta: item.dupatta,
       adOn: item.adOn,
+      customSizeNote: item.customSizeNote,
     });
   }
 

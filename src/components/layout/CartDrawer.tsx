@@ -122,6 +122,11 @@ export default function CartDrawer() {
 
                         <div className="mt-1 space-y-0.5 text-xs text-neutral-600">
                           <p>Size: <span className="text-black font-medium">{i.size}</span></p>
+                          {i.customSizeNote && (
+                            <p className="text-[11px] text-purple-900 bg-purple-50 rounded px-2 py-1 border border-purple-200 mt-1 leading-snug">
+                              <strong>Custom Fit:</strong> {i.customSizeNote}
+                            </p>
+                          )}
                           {i.dupatta && <p>Dupatta: <span className="text-black font-medium">{i.dupatta}</span></p>}
                           {i.adOn && <p>Ad Ons: <span className="text-black font-medium">{i.adOn}</span></p>}
                           {i.expedite && <p className="text-amber-700 font-semibold">Express Shipping (5-6 Days)</p>}

@@ -58,6 +58,7 @@ export interface CartItem {
   adOn?: string;
   expedite?: boolean;
   slip?: string;
+  customSizeNote?: string;
   unitPrice?: number;
   quantity: number;
 }
@@ -106,6 +107,20 @@ export interface OrderItem {
   /** Optional product customization selections saved with the order. */
   dupatta?: string;
   adOn?: string;
+  customSizeNote?: string;
+}
+
+export interface CategoryItem {
+  id?: string;
+  handle: string;
+  title: string;
+  description?: string;
+  image?: string;
+  productCount?: number;
+  isMainCategory?: boolean;
+  parentHandle?: string;
+  showOnHomepage?: boolean;
+  order?: number;
 }
 
 export interface OrderShippingAddress {

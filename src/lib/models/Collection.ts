@@ -6,6 +6,10 @@ export interface ICollection extends Document {
   description?: string;
   image?: string;
   productCount?: number;
+  isMainCategory?: boolean;
+  parentHandle?: string;
+  showOnHomepage?: boolean;
+  order?: number;
 }
 
 const CollectionSchema = new Schema<ICollection>(
@@ -15,6 +19,10 @@ const CollectionSchema = new Schema<ICollection>(
     description: { type: String, default: "" },
     image: { type: String, default: "" },
     productCount: { type: Number, default: 0 },
+    isMainCategory: { type: Boolean, default: true },
+    parentHandle: { type: String, default: "" },
+    showOnHomepage: { type: Boolean, default: true },
+    order: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

@@ -5,19 +5,13 @@ import { COLLECTION_DESCRIPTIONS } from "@/data/collection-descriptions";
 import { COLLECTION_TITLES } from "@/data/site";
 import CollectionViewer from "./CollectionViewer";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type Props = {
   params: Promise<{ handle: string }>;
   searchParams?: Promise<{ page?: string }>;
 };
-
-export async function generateStaticParams() {
-  const collections = await getCollections();
-  const handles = new Set([
-    ...collections.map((c) => c.handle),
-    ...Object.keys(COLLECTION_TITLES),
-  ]);
-  return Array.from(handles).map((handle) => ({ handle }));
-}
 
 export async function generateMetadata({ params }: Props) {
   const { handle } = await params;

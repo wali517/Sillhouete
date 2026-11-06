@@ -14,12 +14,10 @@ import { getProductByHandle, getProducts } from "@/lib/db";
 import type { Product } from "@/types";
 import { ChevronRight, Globe, ShieldCheck, Truck, RotateCcw, Share2 } from "lucide-react";
 
-type Props = { params: Promise<{ handle: string }> };
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-export async function generateStaticParams() {
-  const products = await getProducts();
-  return products.map((p) => ({ handle: p.handle }));
-}
+type Props = { params: Promise<{ handle: string }> };
 
 export async function generateMetadata({ params }: Props) {
   const { handle } = await params;
