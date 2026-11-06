@@ -15,6 +15,12 @@ export interface Product {
   isSale?: boolean;
   isBestSeller?: boolean;
   category?: string;
+  mainCategoryId?: string;
+  mainCategorySlug?: string;
+  mainCategoryName?: string;
+  subcategoryId?: string;
+  subcategorySlug?: string;
+  subcategoryName?: string;
   description?: string;
   inStock?: boolean;
   sizes?: string[];
@@ -111,14 +117,18 @@ export interface OrderItem {
 }
 
 export interface CategoryItem {
+  _id?: string;
   id?: string;
   handle: string;
   title: string;
   description?: string;
   image?: string;
   productCount?: number;
+  subcategoriesCount?: number;
   isMainCategory?: boolean;
   parentHandle?: string;
+  mainCategoryId?: string;
+  isActive?: boolean;
   showOnHomepage?: boolean;
   order?: number;
 }

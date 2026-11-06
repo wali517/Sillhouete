@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCollectionByHandle, saveCollection, deleteCollection } from "@/lib/db";
+import { getCollectionByHandle, saveCollection, deleteCategorySafely } from "@/lib/db";
 
 type Props = { params: Promise<{ handle: string }> };
 
@@ -23,7 +23,24 @@ export async function PUT(req: Request, { params }: Props) {
   try {
     const { handle } = await params;
     const body = await req.json();
-    const updated = await saveCollection({ ...body, handle });
+
+    const isMain =
+      body.isMainCategory !== undefined
+        ? Boolean(body.isMainCategory)
+        : !body.parentHandle;
+
+    if (!isMain && !body.parentHandle && !body.mainCategoryId) {
+      return NextResponse.json(
+        { error: "Subcategory must have a parent Main Category." },
+        { status: 400 }
+      );
+    }
+
+    const updated = await saveCollection({
+      ...body,
+      handle,
+      isMainCategory: isMain,
+    });
     return NextResponse.json({ success: true, category: updated });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to update category";
@@ -34,14 +51,10 @@ export async function PUT(req: Request, { params }: Props) {
 export async function DELETE(req: Request, { params }: Props) {
   try {
     const { handle } = await params;
-    const deleted = await deleteCollection(handle);
-    if (!deleted) {
-      return NextResponse.json({ error: "Category not found" }, { status: 404 });
-    }
+    await deleteCategorySafely(handle);
     return NextResponse.json({ success: true });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to delete category";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }
-

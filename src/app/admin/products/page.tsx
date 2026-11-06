@@ -19,7 +19,7 @@ import {
   Ruler,
   FolderTree,
 } from "lucide-react";
-import type { Product } from "@/types";
+import type { Product, CategoryItem } from "@/types";
 import { formatPrice } from "@/lib/format";
 
 const DEFAULT_CATEGORIES = [
@@ -56,6 +56,17 @@ export default function AdminProductsPage() {
   const [price, setPrice] = useState("");
   const [originalPrice, setOriginalPrice] = useState("");
   const [category, setCategory] = useState("Luxury Pret");
+
+  // Category Hierarchy State
+  const [mainCategoriesList, setMainCategoriesList] = useState<CategoryItem[]>([]);
+  const [subcategoriesList, setSubcategoriesList] = useState<CategoryItem[]>([]);
+  const [selectedMainCategoryId, setSelectedMainCategoryId] = useState("");
+  const [selectedMainCategorySlug, setSelectedMainCategorySlug] = useState("");
+  const [selectedMainCategoryName, setSelectedMainCategoryName] = useState("");
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState("");
+  const [selectedSubcategorySlug, setSelectedSubcategorySlug] = useState("");
+  const [selectedSubcategoryName, setSelectedSubcategoryName] = useState("");
+  const [loadingSubcategories, setLoadingSubcategories] = useState(false);
 
   // Images & Media State
   const [image, setImage] = useState("");
@@ -114,21 +125,85 @@ export default function AdminProductsPage() {
     }
   };
 
+  const loadSubcategoriesForMain = async (
+    mainSlug: string,
+    currentSubSlugOrName?: string
+  ) => {
+    if (!mainSlug) {
+      setSubcategoriesList([]);
+      return;
+    }
+    try {
+      setLoadingSubcategories(true);
+      const res = await fetch(`/api/categories?parent=${encodeURIComponent(mainSlug)}&active=true`);
+      const data = await res.json();
+      if (Array.isArray(data.categories)) {
+        setSubcategoriesList(data.categories);
+        if (currentSubSlugOrName) {
+          const match = data.categories.find(
+            (s: CategoryItem) =>
+              s.handle === currentSubSlugOrName ||
+              String(s._id) === currentSubSlugOrName ||
+              s.title.toLowerCase() === currentSubSlugOrName.toLowerCase()
+          );
+          if (match) {
+            setSelectedSubcategoryId(String(match._id || match.id || ""));
+            setSelectedSubcategorySlug(match.handle);
+            setSelectedSubcategoryName(match.title);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch subcategories:", err);
+    } finally {
+      setLoadingSubcategories(false);
+    }
+  };
+
   const fetchCategories = async () => {
     try {
-      const res = await fetch("/api/categories");
+      const res = await fetch("/api/categories?type=main&active=true");
       const data = await res.json();
-      if (Array.isArray(data.categories) && data.categories.length > 0) {
-        const titles = Array.from(
-          new Set([
-            ...DEFAULT_CATEGORIES,
-            ...data.categories.map((c: { title: string }) => c.title).filter(Boolean),
-          ])
-        );
-        setCategoryOptions(titles);
+      if (Array.isArray(data.categories)) {
+        setMainCategoriesList(data.categories);
       }
     } catch {
       // ignore
+    }
+  };
+
+  const handleMainCategoryChange = (slug: string) => {
+    const found = mainCategoriesList.find((m) => m.handle === slug);
+    if (found) {
+      setSelectedMainCategoryId(String(found._id || found.id || ""));
+      setSelectedMainCategorySlug(found.handle);
+      setSelectedMainCategoryName(found.title);
+      // Reset subcategory
+      setSelectedSubcategoryId("");
+      setSelectedSubcategorySlug("");
+      setSelectedSubcategoryName("");
+      loadSubcategoriesForMain(found.handle);
+    } else {
+      setSelectedMainCategoryId("");
+      setSelectedMainCategorySlug("");
+      setSelectedMainCategoryName("");
+      setSelectedSubcategoryId("");
+      setSelectedSubcategorySlug("");
+      setSelectedSubcategoryName("");
+      setSubcategoriesList([]);
+    }
+  };
+
+  const handleSubcategoryChange = (slug: string) => {
+    const found = subcategoriesList.find((s) => s.handle === slug);
+    if (found) {
+      setSelectedSubcategoryId(String(found._id || found.id || ""));
+      setSelectedSubcategorySlug(found.handle);
+      setSelectedSubcategoryName(found.title);
+    } else {
+      setSelectedSubcategoryId("");
+      setSelectedSubcategorySlug("");
+      setSelectedSubcategoryName("");
     }
   };
 
@@ -144,6 +219,13 @@ export default function AdminProductsPage() {
     setPrice("");
     setOriginalPrice("");
     setCategory("Luxury Pret");
+    setSelectedMainCategoryId("");
+    setSelectedMainCategorySlug("");
+    setSelectedMainCategoryName("");
+    setSelectedSubcategoryId("");
+    setSelectedSubcategorySlug("");
+    setSelectedSubcategoryName("");
+    setSubcategoriesList([]);
     setImage("");
     setHoverImage("");
     setGalleryImages([]);
@@ -170,6 +252,40 @@ export default function AdminProductsPage() {
     setPrice(p.price.toString());
     setOriginalPrice(p.originalPrice ? p.originalPrice.toString() : "");
     setCategory(p.category || "Luxury Pret");
+
+    // Match main category
+    let mainSlug = p.mainCategorySlug || "";
+    let mainId = p.mainCategoryId || "";
+    let mainName = p.mainCategoryName || "";
+
+    if (!mainSlug && mainCategoriesList.length > 0) {
+      const match = mainCategoriesList.find(
+        (m) =>
+          m.handle === p.category?.toLowerCase() ||
+          m.title.toLowerCase() === p.category?.toLowerCase() ||
+          (p.collections || []).includes(m.handle)
+      );
+      if (match) {
+        mainSlug = match.handle;
+        mainId = String(match._id || match.id || "");
+        mainName = match.title;
+      }
+    }
+
+    setSelectedMainCategoryId(mainId);
+    setSelectedMainCategorySlug(mainSlug);
+    setSelectedMainCategoryName(mainName);
+
+    if (mainSlug) {
+      const subTarget = p.subcategorySlug || p.subcategoryId || p.category || "";
+      loadSubcategoriesForMain(mainSlug, subTarget);
+    } else {
+      setSubcategoriesList([]);
+      setSelectedSubcategoryId("");
+      setSelectedSubcategorySlug("");
+      setSelectedSubcategoryName("");
+    }
+
     setImage(p.image || "");
     setHoverImage(p.hoverImage || "");
     setGalleryImages(Array.isArray(p.images) ? p.images : []);
@@ -314,17 +430,31 @@ export default function AdminProductsPage() {
       return;
     }
 
+    if (!selectedMainCategorySlug) {
+      setFormError("Please select a Main Category for this product.");
+      return;
+    }
+
     setFormSubmitting(true);
 
     // Filter and combine gallery images
     const cleanGallery = Array.from(new Set(galleryImages.map((u) => u.trim()).filter(Boolean)));
+
+    const finalCategory =
+      selectedSubcategoryName || selectedMainCategoryName || category || "Luxury Pret";
 
     const payload = {
       title: title.trim(),
       handle: handle.trim() || title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       price: Number(price),
       originalPrice: originalPrice ? Number(originalPrice) : undefined,
-      category,
+      category: finalCategory,
+      mainCategoryId: selectedMainCategoryId,
+      mainCategorySlug: selectedMainCategorySlug,
+      mainCategoryName: selectedMainCategoryName,
+      subcategoryId: selectedSubcategoryId,
+      subcategorySlug: selectedSubcategorySlug,
+      subcategoryName: selectedSubcategoryName,
       image: image.trim(),
       hoverImage: hoverImage.trim() || image.trim(),
       images: cleanGallery,
@@ -654,30 +784,85 @@ export default function AdminProductsPage() {
                   />
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block font-semibold uppercase tracking-wider text-gray-700">
-                      Category *
-                    </label>
-                    <Link
-                      href="/admin/categories"
-                      target="_blank"
-                      className="text-[10px] text-blue-600 hover:underline flex items-center gap-0.5"
+                <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4 rounded-xl border border-gray-200 bg-gray-50/80 p-4">
+                  {/* Main Category Dropdown */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-gray-900">
+                        Main Category *
+                      </label>
+                      <Link
+                        href="/admin/categories"
+                        target="_blank"
+                        className="text-[11px] text-blue-600 hover:underline flex items-center gap-0.5"
+                      >
+                        <FolderTree className="h-3 w-3" />
+                        Manage
+                      </Link>
+                    </div>
+                    <select
+                      required
+                      value={selectedMainCategorySlug}
+                      onChange={(e) => handleMainCategoryChange(e.target.value)}
+                      className="w-full rounded-md border border-gray-300 p-2.5 text-sm outline-none focus:border-black bg-white"
                     >
-                      + New
-                    </Link>
+                      <option value="">-- Select Main Category --</option>
+                      {mainCategoriesList.map((m) => (
+                        <option key={m.handle} value={m.handle}>
+                          {m.title}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-[11px] text-gray-500 mt-1">
+                      Choose primary category (e.g. Women, Men, Kids, Formals)
+                    </p>
                   </div>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 p-2.5 outline-none focus:border-black bg-white"
-                  >
-                    {categoryOptions.map((opt) => (
-                      <option key={opt} value={opt}>
-                        {opt}
-                      </option>
-                    ))}
-                  </select>
+
+                  {/* Subcategory Dropdown */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-gray-900">
+                        Subcategory
+                      </label>
+                      {selectedMainCategorySlug && (
+                        <span className="text-[11px] text-gray-500">
+                          in {selectedMainCategoryName}
+                        </span>
+                      )}
+                    </div>
+                    <select
+                      disabled={!selectedMainCategorySlug || loadingSubcategories}
+                      value={selectedSubcategorySlug}
+                      onChange={(e) => handleSubcategoryChange(e.target.value)}
+                      className="w-full rounded-md border border-gray-300 p-2.5 text-sm outline-none focus:border-black bg-white disabled:bg-gray-100 disabled:text-gray-400"
+                    >
+                      {!selectedMainCategorySlug ? (
+                        <option value="">-- Select Main Category first --</option>
+                      ) : loadingSubcategories ? (
+                        <option value="">Loading subcategories...</option>
+                      ) : subcategoriesList.length === 0 ? (
+                        <option value="">(No subcategories exist for this Main Category)</option>
+                      ) : (
+                        <>
+                          <option value="">-- Select Subcategory (Optional) --</option>
+                          {subcategoriesList.map((s) => (
+                            <option key={s.handle} value={s.handle}>
+                              {s.title}
+                            </option>
+                          ))}
+                        </>
+                      )}
+                    </select>
+                    <p className="text-[11px] text-gray-500 mt-1">
+                      {selectedMainCategorySlug && subcategoriesList.length === 0 ? (
+                        <span className="text-amber-600">
+                          No subcategories found. You can add one in Category Management.
+                        </span>
+                      ) : (
+                        "Specific department (e.g. Clothing, Bridal, Dupatta)"
+                      )}
+                    </p>
+                  </div>
                 </div>
               </div>
 

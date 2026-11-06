@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import connectDB from "./mongodb";
 import { ProductModel } from "./models/Product";
 import { OrderModel } from "./models/Order";
@@ -21,6 +22,7 @@ import {
 import { getStripeServer, toStripeAmount, fromStripeAmount } from "./stripe";
 import type {
   Product,
+  CategoryItem,
   Order,
   Customer,
   ContactMessage,
@@ -35,8 +37,10 @@ import type {
 function toPlain<T>(doc: unknown): T | undefined {
   if (!doc) return undefined;
   const obj = JSON.parse(JSON.stringify(doc));
-  if (!obj.id && obj._id) obj.id = String(obj._id);
-  delete obj._id;
+  if (obj._id) {
+    obj._id = String(obj._id);
+    if (!obj.id) obj.id = obj._id;
+  }
   delete obj.__v;
   return obj as T;
 }
@@ -134,7 +138,36 @@ export async function getProductsByCollection(collectionSlug: string): Promise<P
     }
 
     const slug = collectionSlug.toLowerCase().trim();
-    const orConditions: any[] = [{ collections: slug }];
+    const orConditions: any[] = [
+      { collections: slug },
+      { mainCategorySlug: slug },
+      { subcategorySlug: slug },
+      { mainCategoryId: slug },
+      { subcategoryId: slug },
+    ];
+
+    // If this slug is a main category, also include products from any of its subcategories
+    try {
+      const subcats = await CollectionModel.find({
+        $or: [{ parentHandle: slug }, { mainCategoryId: slug }],
+      })
+        .select("handle _id")
+        .lean();
+
+      if (subcats && subcats.length > 0) {
+        const subSlugs = subcats.map((s) => s.handle).filter(Boolean);
+        const subIds = subcats.map((s) => String(s._id)).filter(Boolean);
+        if (subSlugs.length > 0) {
+          orConditions.push({ collections: { $in: subSlugs } });
+          orConditions.push({ subcategorySlug: { $in: subSlugs } });
+        }
+        if (subIds.length > 0) {
+          orConditions.push({ subcategoryId: { $in: subIds } });
+        }
+      }
+    } catch {
+      // ignore
+    }
 
     if (slug === "formal-dresses" || slug === "formal" || slug === "formals") {
       orConditions.push({ collections: { $in: ["formal-dresses", "formal", "formals"] } });
@@ -187,17 +220,7 @@ export async function getProductsByCollection(collectionSlug: string): Promise<P
 }
 
 /** Fetch all collections from MongoDB */
-export async function getCollections(): Promise<Array<{
-  handle: string;
-  title: string;
-  description?: string;
-  image?: string;
-  productCount?: number;
-  isMainCategory?: boolean;
-  parentHandle?: string;
-  showOnHomepage?: boolean;
-  order?: number;
-}>> {
+export async function getCollections(): Promise<CategoryItem[]> {
   try {
     await connectDB();
     const docs = await CollectionModel.find({}).sort({ order: 1, productCount: -1 }).lean();
@@ -210,20 +233,126 @@ export async function getCollections(): Promise<Array<{
   return [];
 }
 
-/** Fetch a single collection by handle from MongoDB */
-export async function getCollectionByHandle(handle: string): Promise<{ handle: string; title: string; description?: string; image?: string; productCount?: number } | undefined> {
+/** Fetch a single collection by handle or ID from MongoDB */
+export async function getCollectionByHandle(handleOrId: string): Promise<CategoryItem | undefined> {
   try {
     await connectDB();
-    const doc = await CollectionModel.findOne({ handle }).lean();
+    const isObjectId = mongoose.isValidObjectId(handleOrId);
+    const query = isObjectId
+      ? { $or: [{ _id: handleOrId }, { handle: handleOrId }] }
+      : { handle: handleOrId };
+    const doc = await CollectionModel.findOne(query).lean();
     if (doc) return toPlain(doc);
   } catch (err) {
-    console.warn(`MongoDB getCollectionByHandle(${handle}) error:`, err);
+    console.warn(`MongoDB getCollectionByHandle(${handleOrId}) error:`, err);
   }
   return undefined;
 }
 
+/**
+ * Get all Main Categories
+ * @param onlyActive if true, filters only active main categories (isActive !== false)
+ */
+export async function getMainCategories(onlyActive = false): Promise<CategoryItem[]> {
+  try {
+    await connectDB();
+    const filter: Record<string, unknown> = {
+      $or: [
+        { isMainCategory: true },
+        { parentHandle: "" },
+        { parentHandle: null },
+        { parentHandle: { $exists: false } },
+      ],
+    };
+    if (onlyActive) {
+      filter.isActive = { $ne: false };
+    }
+
+    const docs = await CollectionModel.find(filter).sort({ order: 1, title: 1 }).lean();
+    if (!docs || docs.length === 0) return [];
+
+    const plainDocs = toPlainArray<CategoryItem>(docs);
+
+    // Compute live subcategory and product counts for each main category
+    for (const cat of plainDocs) {
+      try {
+        const idStr = String(cat._id || cat.id || "");
+        const subCount = await CollectionModel.countDocuments({
+          $or: [
+            { parentHandle: cat.handle },
+            ...(idStr ? [{ mainCategoryId: idStr }] : []),
+          ],
+        });
+        const prodCount = await ProductModel.countDocuments({
+          $or: [
+            { mainCategorySlug: cat.handle },
+            ...(idStr ? [{ mainCategoryId: idStr }] : []),
+            { collections: cat.handle },
+          ],
+        });
+        cat.subcategoriesCount = subCount;
+        cat.productCount = prodCount;
+      } catch {
+        // fallback
+      }
+    }
+
+    return plainDocs;
+  } catch (err) {
+    console.warn("MongoDB getMainCategories error:", err);
+  }
+  return [];
+}
+
+/**
+ * Get all Subcategories for a given Main Category
+ * @param mainHandleOrId Handle or ID of the parent Main Category
+ * @param onlyActive if true, filters only active subcategories
+ */
+export async function getSubcategories(
+  mainHandleOrId: string,
+  onlyActive = false
+): Promise<CategoryItem[]> {
+  try {
+    await connectDB();
+    const filter: Record<string, unknown> = {
+      $or: [{ parentHandle: mainHandleOrId }, { mainCategoryId: mainHandleOrId }],
+    };
+    if (onlyActive) {
+      filter.isActive = { $ne: false };
+    }
+
+    const docs = await CollectionModel.find(filter).sort({ order: 1, title: 1 }).lean();
+    if (!docs || docs.length === 0) return [];
+
+    const plainDocs = toPlainArray<CategoryItem>(docs);
+
+    for (const sub of plainDocs) {
+      try {
+        const idStr = String(sub._id || sub.id || "");
+        const prodCount = await ProductModel.countDocuments({
+          $or: [
+            { subcategorySlug: sub.handle },
+            ...(idStr ? [{ subcategoryId: idStr }] : []),
+            { collections: sub.handle },
+          ],
+        });
+        sub.productCount = prodCount;
+      } catch {
+        // fallback
+      }
+    }
+
+    return plainDocs;
+  } catch (err) {
+    console.warn(`MongoDB getSubcategories(${mainHandleOrId}) error:`, err);
+  }
+  return [];
+}
+
 /** Create or update a collection / category in MongoDB */
 export async function saveCollection(col: {
+  _id?: string;
   handle?: string;
   title: string;
   description?: string;
@@ -231,20 +360,13 @@ export async function saveCollection(col: {
   productCount?: number;
   isMainCategory?: boolean;
   parentHandle?: string;
+  mainCategoryId?: string;
+  isActive?: boolean;
   showOnHomepage?: boolean;
   order?: number;
-}): Promise<{
-  handle: string;
-  title: string;
-  description?: string;
-  image?: string;
-  productCount?: number;
-  isMainCategory?: boolean;
-  parentHandle?: string;
-  showOnHomepage?: boolean;
-  order?: number;
-}> {
+}): Promise<CategoryItem> {
   await connectDB();
+
   const handle =
     col.handle?.trim() ||
     col.title
@@ -257,10 +379,16 @@ export async function saveCollection(col: {
       ? Boolean(col.isMainCategory)
       : !col.parentHandle || col.parentHandle.trim() === "";
 
-  const showHome =
-    col.showOnHomepage !== undefined
-      ? Boolean(col.showOnHomepage)
-      : isMain;
+  let parentHandle = isMain ? "" : col.parentHandle?.trim() || "";
+  let mainCategoryId = isMain ? "" : col.mainCategoryId?.trim() || "";
+
+  // If subcategory has parentHandle but no mainCategoryId, look up parent
+  if (!isMain && parentHandle && !mainCategoryId) {
+    const parentDoc = await CollectionModel.findOne({ handle: parentHandle }).lean();
+    if (parentDoc) {
+      mainCategoryId = String(parentDoc._id);
+    }
+  }
 
   const update: Record<string, unknown> = {
     handle,
@@ -268,64 +396,103 @@ export async function saveCollection(col: {
     description: col.description || "",
     image: col.image || "",
     isMainCategory: isMain,
-    parentHandle: col.parentHandle?.trim() || "",
-    showOnHomepage: showHome,
+    parentHandle,
+    mainCategoryId,
+    isActive: col.isActive !== undefined ? Boolean(col.isActive) : true,
+    showOnHomepage: isMain ? (col.showOnHomepage !== undefined ? Boolean(col.showOnHomepage) : true) : false,
+    order: col.order !== undefined ? Number(col.order) : 0,
   };
 
   if (col.productCount !== undefined) {
     update.productCount = col.productCount;
   }
-  if (col.order !== undefined) {
-    update.order = col.order;
+
+  let doc;
+  if (col._id && mongoose.isValidObjectId(col._id)) {
+    doc = await CollectionModel.findByIdAndUpdate(
+      col._id,
+      { $set: update },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    ).lean();
+  } else {
+    doc = await CollectionModel.findOneAndUpdate(
+      { handle },
+      { $set: update },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    ).lean();
   }
 
-  const doc = await CollectionModel.findOneAndUpdate(
-    { handle },
-    { $set: update },
-    { upsert: true, new: true, setDefaultsOnInsert: true }
-  ).lean();
-
-  return toPlain(doc) as any;
+  return toPlain(doc) as CategoryItem;
 }
 
-/** Get all main categories to show on homepage or in main navigation */
-export async function getMainCategories(): Promise<Array<{
-  handle: string;
-  title: string;
-  description?: string;
-  image?: string;
-  productCount?: number;
-  isMainCategory?: boolean;
-  parentHandle?: string;
-  showOnHomepage?: boolean;
-}>> {
-  try {
-    await connectDB();
-    const docs = await CollectionModel.find({
-      $or: [
-        { showOnHomepage: true },
-        { isMainCategory: true },
-      ],
-    }).sort({ order: 1, productCount: -1 }).lean();
+/** Safe deletion of category/subcategory with relationship integrity checks */
+export async function deleteCategorySafely(handleOrId: string): Promise<{ success: boolean; message?: string }> {
+  await connectDB();
+  const isObjectId = mongoose.isValidObjectId(handleOrId);
+  const query = isObjectId
+    ? { $or: [{ _id: handleOrId }, { handle: handleOrId }] }
+    : { handle: handleOrId };
 
-    if (docs && docs.length > 0) {
-      return toPlainArray(docs);
+  const cat = await CollectionModel.findOne(query).lean();
+  if (!cat) {
+    throw new Error("Category not found.");
+  }
+
+  const catIdStr = String(cat._id);
+  const isMain = cat.isMainCategory || !cat.parentHandle;
+
+  if (isMain) {
+    // 1. Check for child subcategories
+    const subCount = await CollectionModel.countDocuments({
+      $or: [{ parentHandle: cat.handle }, { mainCategoryId: catIdStr }],
+    });
+    if (subCount > 0) {
+      throw new Error(
+        `Cannot delete Main Category "${cat.title}": It contains ${subCount} subcategory(s). Please delete or reassign them first.`
+      );
     }
-  } catch (err) {
-    console.warn("MongoDB getMainCategories error:", err);
+
+    // 2. Check for assigned products
+    const prodCount = await ProductModel.countDocuments({
+      $or: [
+        { mainCategorySlug: cat.handle },
+        { mainCategoryId: catIdStr },
+        { collections: cat.handle },
+      ],
+    });
+    if (prodCount > 0) {
+      throw new Error(
+        `Cannot delete Main Category "${cat.title}": It has ${prodCount} product(s) assigned. Please reassign the products first.`
+      );
+    }
+  } else {
+    // Subcategory check: check for assigned products
+    const prodCount = await ProductModel.countDocuments({
+      $or: [
+        { subcategorySlug: cat.handle },
+        { subcategoryId: catIdStr },
+        { collections: cat.handle },
+      ],
+    });
+    if (prodCount > 0) {
+      throw new Error(
+        `Cannot delete Subcategory "${cat.title}": It has ${prodCount} product(s) assigned. Please reassign the products first.`
+      );
+    }
   }
-  return [];
+
+  await CollectionModel.deleteOne({ _id: cat._id });
+  return { success: true };
 }
 
-/** Delete a collection / category from MongoDB */
+/** Delete a collection / category from MongoDB (backward compatibility) */
 export async function deleteCollection(handle: string): Promise<boolean> {
   try {
-    await connectDB();
-    const res = await CollectionModel.deleteOne({ handle });
-    return res.deletedCount > 0;
+    const res = await deleteCategorySafely(handle);
+    return res.success;
   } catch (err) {
     console.warn(`MongoDB deleteCollection(${handle}) error:`, err);
-    return false;
+    throw err;
   }
 }
 
@@ -410,8 +577,19 @@ export async function saveProduct(product: Partial<Product> & { title: string; p
       .replace(/(^-|-$)/g, "");
 
   const id = product.id || `prod-${Date.now()}`;
-  const category = product.category || "Luxury Pret";
-  const collections = deriveCollectionsFromCategory(category, product.collections || []);
+  
+  // Category determination
+  const category =
+    product.subcategoryName ||
+    product.category ||
+    product.mainCategoryName ||
+    "Luxury Pret";
+
+  const derivedCollections = deriveCollectionsFromCategory(category, product.collections || []);
+  const collSet = new Set(derivedCollections);
+  if (product.mainCategorySlug) collSet.add(product.mainCategorySlug);
+  if (product.subcategorySlug) collSet.add(product.subcategorySlug);
+  const collections = Array.from(collSet);
 
   const fullProduct: Product = {
     id,
@@ -429,6 +607,12 @@ export async function saveProduct(product: Partial<Product> & { title: string; p
     isSale: product.isSale ?? (!!product.originalPrice && product.originalPrice > product.price),
     isBestSeller: product.isBestSeller ?? false,
     category,
+    mainCategoryId: product.mainCategoryId || "",
+    mainCategorySlug: product.mainCategorySlug || "",
+    mainCategoryName: product.mainCategoryName || "",
+    subcategoryId: product.subcategoryId || "",
+    subcategorySlug: product.subcategorySlug || "",
+    subcategoryName: product.subcategoryName || "",
     collections,
     color: product.color,
     description: product.description || `${product.title} luxury designer dress.`,

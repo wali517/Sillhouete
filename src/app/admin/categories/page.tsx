@@ -15,19 +15,33 @@ import {
   Check,
   X,
   AlertCircle,
-  Home,
+  ArrowLeft,
+  ChevronRight,
   Layers,
+  Eye,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import type { CategoryItem } from "@/types";
 
 export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState<CategoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Navigation State: null = Level 1 (Main Categories list), CategoryItem = Level 2 (Subcategories of that Main Category)
+  const [selectedMainCategory, setSelectedMainCategory] = useState<CategoryItem | null>(null);
+
+  // Main Categories state
+  const [mainCategories, setMainCategories] = useState<CategoryItem[]>([]);
+  const [loadingMains, setLoadingMains] = useState(true);
+
+  // Subcategories state (for selected main category)
+  const [subcategories, setSubcategories] = useState<CategoryItem[]>([]);
+  const [loadingSubs, setLoadingSubs] = useState(false);
+
+  // Search filter
   const [search, setSearch] = useState("");
-  const [filterTab, setFilterTab] = useState<"all" | "main" | "sub">("all");
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<"main" | "sub">("main");
   const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(null);
 
   // Form Fields
@@ -35,61 +49,102 @@ export default function AdminCategoriesPage() {
   const [handle, setHandle] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
-  const [isMainCategory, setIsMainCategory] = useState(true);
-  const [parentHandle, setParentHandle] = useState("");
-  const [showOnHomepage, setShowOnHomepage] = useState(true);
+  const [order, setOrder] = useState<number>(0);
+  const [isActive, setIsActive] = useState<boolean>(true);
   const [showUrlInput, setShowUrlInput] = useState(false);
 
   const [uploadingImage, setUploadingImage] = useState(false);
   const [formError, setFormError] = useState("");
   const [formSubmitting, setFormSubmitting] = useState(false);
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load categories
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
+  // 1. Fetch Main Categories
+  const fetchMainCategories = async () => {
     try {
-      setLoading(true);
-      const res = await fetch("/api/categories");
+      setLoadingMains(true);
+      const res = await fetch("/api/categories?type=main");
       const data = await res.json();
       if (data.categories) {
-        setCategories(data.categories);
+        setMainCategories(data.categories);
       }
     } catch (err) {
-      console.error("Failed to load categories:", err);
+      console.error("Failed to load main categories:", err);
     } finally {
-      setLoading(false);
+      setLoadingMains(false);
     }
   };
 
-  const openAddModal = () => {
+  // 2. Fetch Subcategories for selected main category
+  const fetchSubcategories = async (mainCat: CategoryItem) => {
+    try {
+      setLoadingSubs(true);
+      const parentParam = mainCat.handle;
+      const res = await fetch(`/api/categories?parent=${encodeURIComponent(parentParam)}`);
+      const data = await res.json();
+      if (data.categories) {
+        setSubcategories(data.categories);
+      }
+    } catch (err) {
+      console.error("Failed to load subcategories:", err);
+    } finally {
+      setLoadingSubs(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMainCategories();
+  }, []);
+
+  // When selectedMainCategory changes, fetch its subcategories
+  useEffect(() => {
+    if (selectedMainCategory) {
+      fetchSubcategories(selectedMainCategory);
+      setSearch("");
+    }
+  }, [selectedMainCategory]);
+
+  // Open modal for Main Category
+  const openAddMainModal = () => {
+    setModalMode("main");
     setEditingCategory(null);
     setTitle("");
     setHandle("");
     setDescription("");
     setImage("");
-    setIsMainCategory(true);
-    setParentHandle("");
-    setShowOnHomepage(true);
+    setOrder(mainCategories.length);
+    setIsActive(true);
     setShowUrlInput(false);
     setFormError("");
     setIsModalOpen(true);
   };
 
-  const openEditModal = (cat: CategoryItem) => {
+  // Open modal for Subcategory inside selected Main Category
+  const openAddSubModal = () => {
+    if (!selectedMainCategory) return;
+    setModalMode("sub");
+    setEditingCategory(null);
+    setTitle("");
+    setHandle("");
+    setDescription("");
+    setImage("");
+    setOrder(subcategories.length);
+    setIsActive(true);
+    setShowUrlInput(false);
+    setFormError("");
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (cat: CategoryItem, mode: "main" | "sub") => {
+    setModalMode(mode);
     setEditingCategory(cat);
     setTitle(cat.title);
     setHandle(cat.handle);
     setDescription(cat.description || "");
     setImage(cat.image || "");
-    const isMain = cat.isMainCategory !== undefined ? cat.isMainCategory : !cat.parentHandle;
-    setIsMainCategory(isMain);
-    setParentHandle(cat.parentHandle || "");
-    setShowOnHomepage(cat.showOnHomepage !== undefined ? cat.showOnHomepage : isMain);
+    setOrder(cat.order !== undefined ? cat.order : 0);
+    setIsActive(cat.isActive !== undefined ? cat.isActive : true);
     setShowUrlInput(false);
     setFormError("");
     setIsModalOpen(true);
@@ -107,7 +162,7 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  // Direct desktop image upload for category
+  // Direct desktop image upload
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -137,27 +192,72 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  const handleDelete = async (catHandle: string, catTitle: string) => {
-    if (!confirm(`Are you sure you want to delete category "${catTitle}"?`)) return;
+  // Safe delete
+  const handleDelete = async (cat: CategoryItem, mode: "main" | "sub") => {
+    const typeLabel = mode === "main" ? "Main Category" : "Subcategory";
+    if (!confirm(`Are you sure you want to delete ${typeLabel} "${cat.title}"?`)) return;
 
+    setDeleteErrorMessage("");
     try {
-      const res = await fetch(`/api/categories/${catHandle}`, { method: "DELETE" });
-      if (res.ok) {
-        setCategories((prev) => prev.filter((c) => c.handle !== catHandle));
+      const res = await fetch(`/api/categories/${encodeURIComponent(cat.handle)}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setDeleteErrorMessage(data.error || `Failed to delete ${typeLabel}`);
+        return;
+      }
+
+      if (mode === "main") {
+        setMainCategories((prev) => prev.filter((c) => c.handle !== cat.handle));
       } else {
-        alert("Failed to delete category");
+        setSubcategories((prev) => prev.filter((c) => c.handle !== cat.handle));
+        // Refresh main category counts
+        fetchMainCategories();
       }
     } catch {
-      alert("Error deleting category");
+      setDeleteErrorMessage(`Error connecting to server to delete ${typeLabel}`);
     }
   };
 
+  // Toggle active status directly
+  const handleToggleActive = async (cat: CategoryItem, mode: "main" | "sub") => {
+    const newActive = !(cat.isActive !== false);
+    try {
+      const res = await fetch(`/api/categories/${encodeURIComponent(cat.handle)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          isActive: newActive,
+          isMainCategory: mode === "main",
+          parentHandle: mode === "sub" ? (cat.parentHandle || selectedMainCategory?.handle) : "",
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.category) {
+        if (mode === "main") {
+          setMainCategories((prev) =>
+            prev.map((c) => (c.handle === cat.handle ? { ...c, isActive: newActive } : c))
+          );
+        } else {
+          setSubcategories((prev) =>
+            prev.map((c) => (c.handle === cat.handle ? { ...c, isActive: newActive } : c))
+          );
+        }
+      }
+    } catch {
+      alert("Failed to update status");
+    }
+  };
+
+  // Submit modal form
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setFormError("");
 
     if (!title.trim()) {
-      setFormError("Category title is required.");
+      setFormError("Category name is required.");
       return;
     }
 
@@ -170,19 +270,26 @@ export default function AdminCategoriesPage() {
 
     setFormSubmitting(true);
 
+    const isMain = modalMode === "main";
+    const parentH = isMain ? "" : selectedMainCategory?.handle || "";
+    const parentId = isMain ? "" : String(selectedMainCategory?._id || selectedMainCategory?.id || "");
+
     const payload = {
       title: title.trim(),
       handle: finalHandle,
       description: description.trim(),
       image: image.trim(),
-      isMainCategory,
-      parentHandle: isMainCategory ? "" : parentHandle.trim(),
-      showOnHomepage: isMainCategory ? showOnHomepage : false,
+      order: Number(order) || 0,
+      isActive,
+      isMainCategory: isMain,
+      parentHandle: parentH,
+      mainCategoryId: parentId,
+      showOnHomepage: isMain ? true : false,
     };
 
     try {
       if (editingCategory) {
-        const res = await fetch(`/api/categories/${editingCategory.handle}`, {
+        const res = await fetch(`/api/categories/${encodeURIComponent(editingCategory.handle)}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -190,9 +297,19 @@ export default function AdminCategoriesPage() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Update failed");
 
-        setCategories((prev) =>
-          prev.map((c) => (c.handle === editingCategory.handle ? data.category : c))
-        );
+        if (isMain) {
+          setMainCategories((prev) =>
+            prev.map((c) => (c.handle === editingCategory.handle ? data.category : c))
+          );
+          if (selectedMainCategory?.handle === editingCategory.handle) {
+            setSelectedMainCategory(data.category);
+          }
+        } else {
+          setSubcategories((prev) =>
+            prev.map((c) => (c.handle === editingCategory.handle ? data.category : c))
+          );
+          fetchMainCategories();
+        }
       } else {
         const res = await fetch("/api/categories", {
           method: "POST",
@@ -202,7 +319,12 @@ export default function AdminCategoriesPage() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Create failed");
 
-        setCategories((prev) => [data.category, ...prev]);
+        if (isMain) {
+          setMainCategories((prev) => [data.category, ...prev]);
+        } else {
+          setSubcategories((prev) => [data.category, ...prev]);
+          fetchMainCategories();
+        }
       }
 
       setIsModalOpen(false);
@@ -214,547 +336,660 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  const handleToggleHomepage = async (cat: CategoryItem) => {
-    const newIsMain = !cat.isMainCategory;
-    const newShowOnHome = newIsMain;
-    const newParent = newIsMain ? "" : (cat.parentHandle || "formal-dresses");
-
-    try {
-      const res = await fetch(`/api/categories/${cat.handle}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          isMainCategory: newIsMain,
-          showOnHomepage: newShowOnHome,
-          parentHandle: newParent,
-        }),
-      });
-      const data = await res.json();
-      if (res.ok && data.category) {
-        setCategories((prev) =>
-          prev.map((c) => (c.handle === cat.handle ? data.category : c))
-        );
-      }
-    } catch {
-      alert("Failed to update category status");
-    }
-  };
-
-  const mainCategoriesCount = categories.filter((c) => c.isMainCategory || c.showOnHomepage).length;
-  const subCategoriesCount = categories.filter((c) => !c.isMainCategory && !c.showOnHomepage).length;
-
-  const filteredCategories = categories.filter((c) => {
-    const isMain = c.isMainCategory || c.showOnHomepage;
-    if (filterTab === "main" && !isMain) return false;
-    if (filterTab === "sub" && isMain) return false;
-
-    const q = search.toLowerCase().trim();
-    if (!q) return true;
-    return (
-      c.title.toLowerCase().includes(q) ||
-      c.handle.toLowerCase().includes(q) ||
-      (c.description && c.description.toLowerCase().includes(q)) ||
-      (c.parentHandle && c.parentHandle.toLowerCase().includes(q))
-    );
+  // Filter lists based on search
+  const filteredMainCategories = mainCategories.filter((c) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return c.title.toLowerCase().includes(q) || c.handle.toLowerCase().includes(q);
   });
 
-  // Potential parent categories (categories that are main or have no parent)
-  const potentialParents = categories.filter(
-    (c) => c.handle !== editingCategory?.handle && (c.isMainCategory || !c.parentHandle)
-  );
+  const filteredSubcategories = subcategories.filter((s) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return s.title.toLowerCase().includes(q) || s.handle.toLowerCase().includes(q);
+  });
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Global Error Banner */}
+      {deleteErrorMessage && (
+        <div className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-5 w-5 shrink-0 text-red-500" />
+            <span className="font-medium">{deleteErrorMessage}</span>
+          </div>
+          <button
+            onClick={() => setDeleteErrorMessage("")}
+            className="rounded p-1 text-red-500 hover:bg-red-100"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Top Header & Breadcrumb */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="flex items-center gap-2">
-            <FolderTree className="h-6 w-6 text-black" />
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-              Category &amp; Sub-Category Management
-            </h1>
-          </div>
-          <p className="text-sm text-gray-500 mt-1">
-            Organize main categories and subcategories. Main categories automatically show directly on the homepage.
-          </p>
+          {selectedMainCategory ? (
+            <div>
+              <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                <button
+                  onClick={() => setSelectedMainCategory(null)}
+                  className="hover:text-black flex items-center gap-1 font-medium text-gray-600 transition-colors"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Main Categories
+                </button>
+                <ChevronRight className="h-4 w-4 text-gray-400" />
+                <span className="text-black font-semibold">{selectedMainCategory.title}</span>
+                <ChevronRight className="h-4 w-4 text-gray-400" />
+                <span className="text-gray-500">Subcategories</span>
+              </div>
+              <h1 className="text-2xl font-serif font-bold text-gray-900 tracking-tight">
+                {selectedMainCategory.title} — Subcategories
+              </h1>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Manage subcategories nested strictly inside &quot;{selectedMainCategory.title}&quot;.
+              </p>
+            </div>
+          ) : (
+            <div>
+              <h1 className="text-2xl font-serif font-bold text-gray-900 tracking-tight">
+                Main Categories
+              </h1>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Top-level storefront main categories. Click &quot;Manage Subcategories&quot; to view or add subcategories.
+              </p>
+            </div>
+          )}
         </div>
 
-        <button
-          type="button"
-          onClick={openAddModal}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-black px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-white shadow-sm hover:bg-neutral-800 transition-colors cursor-pointer"
-        >
-          <Plus className="h-4 w-4" />
-          Add Category
-        </button>
+        <div className="flex items-center gap-3">
+          {selectedMainCategory ? (
+            <>
+              <button
+                onClick={() => setSelectedMainCategory(null)}
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Main Categories
+              </button>
+              <button
+                onClick={openAddSubModal}
+                className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-800 transition-colors"
+              >
+                <Plus className="h-4 w-4" />
+                Add Subcategory
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={openAddMainModal}
+              className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-800 transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              Add Main Category
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Search Bar */}
-      <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+      <div className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-3 shadow-xs">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
-            type="search"
-            placeholder="Search categories by name, slug, or parent..."
+            type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs border border-gray-200 rounded-lg outline-none focus:border-black"
+            placeholder={
+              selectedMainCategory
+                ? `Search subcategories in ${selectedMainCategory.title}...`
+                : "Search main categories by name or slug..."
+            }
+            className="w-full rounded-lg border-0 bg-transparent pl-10 pr-4 text-sm text-gray-900 focus:outline-none focus:ring-0 placeholder:text-gray-400"
           />
         </div>
-        <div className="text-xs text-gray-500 font-medium whitespace-nowrap pr-2">
-          {filteredCategories.length} Categories
-        </div>
+        <span className="text-xs text-gray-400 pr-2">
+          {selectedMainCategory
+            ? `${filteredSubcategories.length} subcategories`
+            : `${filteredMainCategories.length} main categories`}
+        </span>
       </div>
 
-      {/* Category Tabs: All / Main (Homepage) / Sub-Categories */}
-      <div className="flex gap-2 border-b border-gray-200 pb-1 flex-wrap">
-        <button
-          type="button"
-          onClick={() => setFilterTab("all")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-            filterTab === "all"
-              ? "bg-black text-white shadow-xs"
-              : "text-gray-600 hover:text-black hover:bg-gray-100"
-          }`}
-        >
-          All Categories ({categories.length})
-        </button>
-        <button
-          type="button"
-          onClick={() => setFilterTab("main")}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-            filterTab === "main"
-              ? "bg-black text-white shadow-xs"
-              : "text-gray-600 hover:text-black hover:bg-gray-100"
-          }`}
-        >
-          <Home className="h-3.5 w-3.5" />
-          Main Categories (Homepage) ({mainCategoriesCount})
-        </button>
-        <button
-          type="button"
-          onClick={() => setFilterTab("sub")}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-            filterTab === "sub"
-              ? "bg-black text-white shadow-xs"
-              : "text-gray-600 hover:text-black hover:bg-gray-100"
-          }`}
-        >
-          <Layers className="h-3.5 w-3.5" />
-          Sub-Categories ({subCategoriesCount})
-        </button>
-      </div>
+      {/* ──────────────── LEVEL 1: MAIN CATEGORIES TABLE ──────────────── */}
+      {!selectedMainCategory && (
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
+          {loadingMains ? (
+            <div className="flex h-64 items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+            </div>
+          ) : filteredMainCategories.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-12 text-center">
+              <FolderTree className="h-12 w-12 text-gray-300 mb-3" />
+              <h3 className="text-base font-medium text-gray-900">No Main Categories found</h3>
+              <p className="mt-1 text-sm text-gray-500 max-w-sm">
+                Get started by creating your first Main Category (e.g. Women, Men, Kids, Accessories).
+              </p>
+              <button
+                onClick={openAddMainModal}
+                className="mt-4 inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+              >
+                <Plus className="h-4 w-4" />
+                Add Main Category
+              </button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-gray-600">
+                <thead className="border-b border-gray-200 bg-gray-50 text-[11px] uppercase tracking-wider font-semibold text-gray-500">
+                  <tr>
+                    <th className="px-5 py-3.5">Category</th>
+                    <th className="px-4 py-3.5">Slug</th>
+                    <th className="px-4 py-3.5 text-center">Subcategories</th>
+                    <th className="px-4 py-3.5 text-center">Products</th>
+                    <th className="px-4 py-3.5 text-center">Order</th>
+                    <th className="px-4 py-3.5 text-center">Status</th>
+                    <th className="px-5 py-3.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {filteredMainCategories.map((cat) => {
+                    const isAct = cat.isActive !== false;
+                    const subCount = cat.subcategoriesCount ?? 0;
+                    const prodCount = cat.productCount ?? 0;
 
-      {/* Categories Table */}
-      <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-        {loading ? (
-          <div className="p-12 text-center text-sm text-gray-500 flex items-center justify-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin text-black" />
-            Loading categories from MongoDB...
-          </div>
-        ) : filteredCategories.length === 0 ? (
-          <div className="p-12 text-center text-sm text-gray-500">
-            No categories found matching &ldquo;{search}&rdquo;.
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="border-b border-gray-200 bg-gray-50 uppercase tracking-wider text-gray-500 font-semibold">
-                <tr>
-                  <th className="py-3 px-4">Category</th>
-                  <th className="py-3 px-4">Type / Hierarchy</th>
-                  <th className="py-3 px-4 text-center">Homepage</th>
-                  <th className="py-3 px-4">URL Handle</th>
-                  <th className="py-3 px-4 text-center">Products</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredCategories.map((cat) => {
-                  const isMain = cat.isMainCategory !== undefined ? cat.isMainCategory : !cat.parentHandle;
-                  const parentCat = cat.parentHandle ? categories.find((c) => c.handle === cat.parentHandle) : null;
+                    return (
+                      <tr key={cat.handle} className="hover:bg-gray-50/80 transition-colors">
+                        {/* Image + Title */}
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-3">
+                            <div className="relative h-12 w-10 shrink-0 overflow-hidden rounded border border-gray-200 bg-gray-100">
+                              {cat.image ? (
+                                <Image
+                                  src={cat.image}
+                                  alt={cat.title}
+                                  fill
+                                  sizes="48px"
+                                  className="object-cover"
+                                />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center text-gray-300">
+                                  <Layers className="h-5 w-5" />
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <div className="font-medium text-gray-900">{cat.title}</div>
+                              {cat.description && (
+                                <p className="text-xs text-gray-400 line-clamp-1 max-w-xs">
+                                  {cat.description}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </td>
 
-                  return (
-                    <tr key={cat.handle} className="hover:bg-gray-50/75 transition-colors">
-                      {/* Item Image & Title */}
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-3">
-                          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md bg-gray-100 border border-gray-200">
-                            {cat.image ? (
-                              <Image
-                                src={cat.image}
-                                alt={cat.title}
-                                fill
-                                sizes="48px"
-                                className="object-cover"
-                              />
+                        {/* Slug */}
+                        <td className="px-4 py-3.5">
+                          <span className="font-mono text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
+                            /{cat.handle}
+                          </span>
+                        </td>
+
+                        {/* Subcategories count pill */}
+                        <td className="px-4 py-3.5 text-center">
+                          <button
+                            onClick={() => setSelectedMainCategory(cat)}
+                            className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-colors"
+                            title="Click to view & manage subcategories"
+                          >
+                            <FolderTree className="h-3.5 w-3.5" />
+                            {subCount} {subCount === 1 ? "subcategory" : "subcategories"}
+                          </button>
+                        </td>
+
+                        {/* Product count */}
+                        <td className="px-4 py-3.5 text-center">
+                          <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
+                            {prodCount}
+                          </span>
+                        </td>
+
+                        {/* Display Order */}
+                        <td className="px-4 py-3.5 text-center">
+                          <span className="text-xs text-gray-500 font-mono">{cat.order ?? 0}</span>
+                        </td>
+
+                        {/* Status Toggle */}
+                        <td className="px-4 py-3.5 text-center">
+                          <button
+                            onClick={() => handleToggleActive(cat, "main")}
+                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
+                              isAct
+                                ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                                : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                            }`}
+                          >
+                            {isAct ? (
+                              <>
+                                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Active
+                              </>
                             ) : (
-                              <div className="h-full w-full flex items-center justify-center text-gray-400">
-                                <FolderTree className="h-5 w-5" />
-                              </div>
+                              <>
+                                <XCircle className="h-3.5 w-3.5 text-gray-400" /> Inactive
+                              </>
                             )}
-                          </div>
-                          <div>
-                            <span className="font-semibold text-gray-900 text-sm block">
-                              {cat.title}
-                            </span>
-                            {cat.description && (
-                              <span className="text-[11px] text-gray-400 max-w-xs truncate block">
-                                {cat.description}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Hierarchy Badge */}
-                      <td className="py-3 px-4">
-                        {isMain ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-black text-white px-2.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase">
-                            <Layers className="h-3 w-3" />
-                            Main Category
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 text-[10px] font-medium">
-                            Sub-Category of{" "}
-                            <strong>{parentCat ? parentCat.title : cat.parentHandle}</strong>
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Homepage Status */}
-                      <td className="py-3 px-4 text-center">
-                        <button
-                          type="button"
-                          onClick={() => handleToggleHomepage(cat)}
-                          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold cursor-pointer transition-all ${
-                            cat.showOnHomepage
-                              ? "bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 shadow-xs"
-                              : "bg-gray-100 text-gray-500 hover:bg-gray-200 border border-gray-200"
-                          }`}
-                          title="Click to toggle Homepage display"
-                        >
-                          <Home className="h-3 w-3" />
-                          <span>{cat.showOnHomepage ? "Shows on Homepage" : "Hidden from Homepage"}</span>
-                        </button>
-                      </td>
-
-                      {/* Handle / Storefront link */}
-                      <td className="py-3 px-4">
-                        <Link
-                          href={`/collections/${cat.handle}`}
-                          target="_blank"
-                          className="inline-flex items-center gap-1 font-mono text-[11px] text-blue-600 hover:underline"
-                          title="View collection page"
-                        >
-                          /collections/{cat.handle}
-                          <ExternalLink className="h-3 w-3" />
-                        </Link>
-                      </td>
-
-                      {/* Products count */}
-                      <td className="py-3 px-4 text-center">
-                        <span className="inline-block rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-700">
-                          {cat.productCount ?? 0}
-                        </span>
-                      </td>
-
-                      {/* Actions */}
-                      <td className="py-3 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            type="button"
-                            onClick={() => openEditModal(cat)}
-                            className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-black transition-colors"
-                            title="Edit Category"
-                          >
-                            <Edit className="h-4 w-4" />
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDelete(cat.handle, cat.title)}
-                            className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors"
-                            title="Delete Category"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
+                        </td>
+
+                        {/* Actions */}
+                        <td className="px-5 py-3.5 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            {/* Manage Subcategories Button */}
+                            <button
+                              onClick={() => setSelectedMainCategory(cat)}
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-800 shadow-xs hover:bg-gray-50 hover:border-black transition-colors"
+                              title="Manage Subcategories inside this category"
+                            >
+                              <FolderTree className="h-3.5 w-3.5 text-blue-600" />
+                              Manage Subcategories
+                            </button>
+
+                            {/* View Live */}
+                            <Link
+                              href={`/collections/${cat.handle}`}
+                              target="_blank"
+                              className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-black transition-colors"
+                              title="View storefront collection"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Link>
+
+                            {/* Edit */}
+                            <button
+                              onClick={() => openEditModal(cat, "main")}
+                              className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-black transition-colors"
+                              title="Edit Main Category"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+
+                            {/* Delete */}
+                            <button
+                              onClick={() => handleDelete(cat, "main")}
+                              className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                              title="Delete Main Category"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ──────────────── LEVEL 2: SUBCATEGORIES TABLE (INSIDE MAIN CATEGORY) ──────────────── */}
+      {selectedMainCategory && (
+        <div className="space-y-4">
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
+            {loadingSubs ? (
+              <div className="flex h-64 items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+              </div>
+            ) : filteredSubcategories.length === 0 ? (
+              <div className="flex flex-col items-center justify-center p-12 text-center">
+                <Layers className="h-12 w-12 text-gray-300 mb-3" />
+                <h3 className="text-base font-medium text-gray-900">
+                  No Subcategories inside &quot;{selectedMainCategory.title}&quot;
+                </h3>
+                <p className="mt-1 text-sm text-gray-500 max-w-sm">
+                  Add subcategories to organize products under {selectedMainCategory.title} (e.g. Clothing, Bridal, Accessories).
+                </p>
+                <button
+                  onClick={openAddSubModal}
+                  className="mt-4 inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add First Subcategory
+                </button>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm text-gray-600">
+                  <thead className="border-b border-gray-200 bg-gray-50 text-[11px] uppercase tracking-wider font-semibold text-gray-500">
+                    <tr>
+                      <th className="px-5 py-3.5">Subcategory</th>
+                      <th className="px-4 py-3.5">Slug</th>
+                      <th className="px-4 py-3.5 text-center">Products</th>
+                      <th className="px-4 py-3.5 text-center">Order</th>
+                      <th className="px-4 py-3.5 text-center">Status</th>
+                      <th className="px-5 py-3.5 text-right">Actions</th>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {filteredSubcategories.map((sub) => {
+                      const isAct = sub.isActive !== false;
+                      const prodCount = sub.productCount ?? 0;
+
+                      return (
+                        <tr key={sub.handle} className="hover:bg-gray-50/80 transition-colors">
+                          {/* Image + Title */}
+                          <td className="px-5 py-3.5">
+                            <div className="flex items-center gap-3">
+                              <div className="relative h-12 w-10 shrink-0 overflow-hidden rounded border border-gray-200 bg-gray-100">
+                                {sub.image ? (
+                                  <Image
+                                    src={sub.image}
+                                    alt={sub.title}
+                                    fill
+                                    sizes="48px"
+                                    className="object-cover"
+                                  />
+                                ) : (
+                                  <div className="flex h-full w-full items-center justify-center text-gray-300">
+                                    <Layers className="h-5 w-5" />
+                                  </div>
+                                )}
+                              </div>
+                              <div>
+                                <div className="font-medium text-gray-900">{sub.title}</div>
+                                {sub.description && (
+                                  <p className="text-xs text-gray-400 line-clamp-1 max-w-xs">
+                                    {sub.description}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Slug */}
+                          <td className="px-4 py-3.5">
+                            <span className="font-mono text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
+                              /{sub.handle}
+                            </span>
+                          </td>
+
+                          {/* Products count */}
+                          <td className="px-4 py-3.5 text-center">
+                            <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
+                              {prodCount}
+                            </span>
+                          </td>
+
+                          {/* Order */}
+                          <td className="px-4 py-3.5 text-center">
+                            <span className="text-xs text-gray-500 font-mono">{sub.order ?? 0}</span>
+                          </td>
+
+                          {/* Status */}
+                          <td className="px-4 py-3.5 text-center">
+                            <button
+                              onClick={() => handleToggleActive(sub, "sub")}
+                              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
+                                isAct
+                                  ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                              }`}
+                            >
+                              {isAct ? (
+                                <>
+                                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Active
+                                </>
+                              ) : (
+                                <>
+                                  <XCircle className="h-3.5 w-3.5 text-gray-400" /> Inactive
+                                </>
+                              )}
+                            </button>
+                          </td>
+
+                          {/* Actions */}
+                          <td className="px-5 py-3.5 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              {/* View live */}
+                              <Link
+                                href={`/collections/${sub.handle}`}
+                                target="_blank"
+                                className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-black transition-colors"
+                                title="View storefront collection"
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </Link>
+
+                              {/* Edit */}
+                              <button
+                                onClick={() => openEditModal(sub, "sub")}
+                                className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-black transition-colors"
+                                title="Edit Subcategory"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </button>
+
+                              {/* Delete */}
+                              <button
+                                onClick={() => handleDelete(sub, "sub")}
+                                className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                                title="Delete Subcategory"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* Add / Edit Category Modal */}
+      {/* ──────────────── MODAL: ADD / EDIT CATEGORY ──────────────── */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
-          <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl my-8">
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(false)}
-              className="absolute right-4 top-4 rounded-full p-1.5 text-gray-400 hover:bg-gray-100 hover:text-black cursor-pointer"
-            >
-              <X className="h-5 w-5" />
-            </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+          <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+              <div>
+                <h2 className="text-lg font-serif font-bold text-gray-900">
+                  {editingCategory
+                    ? `Edit ${modalMode === "main" ? "Main Category" : "Subcategory"}`
+                    : `Add ${modalMode === "main" ? "Main Category" : "Subcategory"}`}
+                </h2>
+                {modalMode === "sub" && selectedMainCategory && (
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Parent: <strong className="text-gray-800">{selectedMainCategory.title}</strong>
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
-            <h2 className="text-lg font-bold text-gray-900 mb-1">
-              {editingCategory ? `Edit Category: ${editingCategory.title}` : "Add New Category"}
-            </h2>
-            <p className="text-xs text-gray-500 mb-4">
-              Categories without a parent automatically display directly on the homepage as their own collection section.
-            </p>
-
+            {/* Error Message */}
             {formError && (
-              <div className="mb-4 flex items-center gap-2 rounded-lg bg-red-50 p-3 text-xs text-red-600">
+              <div className="mt-4 flex items-center gap-2 rounded-lg bg-red-50 p-3 text-xs text-red-600">
                 <AlertCircle className="h-4 w-4 shrink-0" />
-                {formError}
+                <span>{formError}</span>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+            {/* Modal Form */}
+            <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+              {/* Category Name */}
               <div>
-                <label className="block font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                  Category Title *
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
+                  {modalMode === "main" ? "Main Category Name" : "Subcategory Name"} *
                 </label>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder="e.g. Luxury Velvet Formals"
-                  className="w-full rounded-md border border-gray-300 p-2.5 outline-none focus:border-black text-xs"
+                  placeholder={
+                    modalMode === "main"
+                      ? "e.g. Women, Men, Kids, Accessories"
+                      : "e.g. Clothing, Bridal, Footwear, Kurtis"
+                  }
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                 />
               </div>
 
+              {/* Slug */}
               <div>
-                <label className="block font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                  URL Handle (Slug) *
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
+                  URL Slug
                 </label>
-                <input
-                  type="text"
-                  required
-                  value={handle}
-                  onChange={(e) => setHandle(e.target.value)}
-                  placeholder="luxury-velvet-formals"
-                  className="w-full rounded-md border border-gray-300 p-2.5 outline-none focus:border-black font-mono text-xs"
-                />
-              </div>
-
-              {/* Hierarchy Selection */}
-              <div className="rounded-xl border border-gray-200 bg-gray-50 p-3.5 space-y-3">
-                <label className="block font-semibold uppercase tracking-wider text-gray-800 text-[11px]">
-                  Category Type &amp; Hierarchy
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <label
-                    className={`flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all ${
-                      isMainCategory
-                        ? "bg-white border-black shadow-xs text-black"
-                        : "bg-transparent border-gray-200 text-gray-600 hover:bg-white"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="catType"
-                      checked={isMainCategory}
-                      onChange={() => {
-                        setIsMainCategory(true);
-                        setParentHandle("");
-                        setShowOnHomepage(true);
-                      }}
-                      className="mt-0.5 accent-black"
-                    />
-                    <div>
-                      <span className="font-bold text-xs block">Main Category</span>
-                      <span className="text-[10px] text-gray-500 block leading-tight">
-                        Displays directly on homepage
-                      </span>
-                    </div>
-                  </label>
-
-                  <label
-                    className={`flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all ${
-                      !isMainCategory
-                        ? "bg-white border-black shadow-xs text-black"
-                        : "bg-transparent border-gray-200 text-gray-600 hover:bg-white"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="catType"
-                      checked={!isMainCategory}
-                      onChange={() => {
-                        setIsMainCategory(false);
-                        setShowOnHomepage(false);
-                      }}
-                      className="mt-0.5 accent-black"
-                    />
-                    <div>
-                      <span className="font-bold text-xs block">Sub-Category</span>
-                      <span className="text-[10px] text-gray-500 block leading-tight">
-                        Belongs to a main category
-                      </span>
-                    </div>
-                  </label>
+                <div className="flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-500 focus-within:border-black focus-within:ring-1 focus-within:ring-black">
+                  <span>/collections/</span>
+                  <input
+                    type="text"
+                    value={handle}
+                    onChange={(e) => setHandle(e.target.value)}
+                    placeholder="slug"
+                    className="flex-1 border-0 bg-transparent p-0 pl-1 text-sm text-gray-900 focus:outline-none focus:ring-0"
+                  />
                 </div>
-
-                {!isMainCategory && (
-                  <div className="pt-2">
-                    <label className="block font-semibold text-gray-700 text-[11px] mb-1">
-                      Choose Parent Category *
-                    </label>
-                    <select
-                      value={parentHandle}
-                      onChange={(e) => setParentHandle(e.target.value)}
-                      required={!isMainCategory}
-                      className="w-full rounded-md border border-gray-300 p-2 text-xs outline-none focus:border-black bg-white"
-                    >
-                      <option value="">-- Select Parent Category --</option>
-                      {potentialParents.map((p) => (
-                        <option key={p.handle} value={p.handle}>
-                          {p.title} (/collections/{p.handle})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                {isMainCategory && (
-                  <label className="flex items-center gap-2 pt-1 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={showOnHomepage}
-                      onChange={(e) => setShowOnHomepage(e.target.checked)}
-                      className="h-4 w-4 accent-black rounded"
-                    />
-                    <span className="text-xs font-medium text-gray-700">
-                      Show this main category section on the Homepage
-                    </span>
-                  </label>
-                )}
               </div>
 
+              {/* Description */}
               <div>
-                <label className="block font-semibold uppercase tracking-wider text-gray-700 mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
                   Description
                 </label>
                 <textarea
                   rows={2}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Brief description of this collection..."
-                  className="w-full rounded-md border border-gray-300 p-2.5 outline-none focus:border-black text-xs resize-none"
+                  placeholder="Optional SEO and category description..."
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                 />
               </div>
 
-              {/* Direct Desktop Image Upload (No URL required!) */}
+              {/* Image Upload: Desktop First */}
               <div>
-                <label className="block font-semibold uppercase tracking-wider text-gray-700 mb-1.5">
-                  Category Banner / Image
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
+                  Category Image
                 </label>
-
-                <div className="rounded-xl border-2 border-dashed border-gray-200 p-4 text-center hover:border-gray-400 transition-colors bg-gray-50/50">
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    id="cat-image-file"
-                  />
-                  <label
-                    htmlFor="cat-image-file"
-                    className="inline-flex flex-col items-center justify-center gap-2 cursor-pointer w-full py-2"
-                  >
-                    {uploadingImage ? (
-                      <>
-                        <Loader2 className="h-7 w-7 animate-spin text-black" />
-                        <span className="font-semibold text-xs text-gray-700">Uploading from desktop...</span>
-                      </>
-                    ) : (
-                      <>
-                        <UploadCloud className="h-7 w-7 text-gray-600" />
-                        <span className="font-bold text-xs text-gray-900">
-                          Click to upload image directly from computer
-                        </span>
-                        <span className="text-[11px] text-gray-500">
-                          PNG, JPG, WEBP up to 25MB (Saved to database)
-                        </span>
-                      </>
-                    )}
-                  </label>
-                </div>
-
-                {image && (
-                  <div className="mt-2.5 flex items-center gap-3 rounded-lg border border-gray-200 p-2.5 bg-white shadow-xs">
-                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md border border-gray-300 bg-gray-100">
-                      <Image src={image} alt="Preview" fill sizes="56px" className="object-cover" />
+                <div className="flex items-center gap-4">
+                  {image ? (
+                    <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg border border-gray-200">
+                      <Image src={image} alt="Preview" fill className="object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setImage("")}
+                        className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white hover:bg-black"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <span className="text-xs font-semibold text-gray-800 block">Uploaded Image Preview</span>
-                      <span className="truncate font-mono text-[10px] text-gray-400 block">{image}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setImage("")}
-                      className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
-                      title="Remove image"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                )}
+                  ) : null}
 
-                {/* Optional URL Toggle */}
-                <div className="mt-2 text-right">
-                  {!showUrlInput ? (
-                    <button
-                      type="button"
-                      onClick={() => setShowUrlInput(true)}
-                      className="text-[11px] text-gray-500 hover:text-black underline cursor-pointer"
+                  <div className="flex-1 space-y-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      id="cat-image-file"
+                    />
+                    <label
+                      htmlFor="cat-image-file"
+                      className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 px-4 py-2.5 text-xs font-medium text-gray-700 hover:border-black hover:bg-gray-50 transition-colors"
                     >
-                      Or paste an external image URL
-                    </button>
-                  ) : (
-                    <div className="mt-1 flex items-center gap-2 text-left">
+                      {uploadingImage ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+                      ) : (
+                        <UploadCloud className="h-4 w-4 text-gray-500" />
+                      )}
+                      <span>{uploadingImage ? "Uploading from Desktop..." : "Upload from Desktop"}</span>
+                    </label>
+
+                    {/* Or URL input toggle */}
+                    <div className="flex items-center justify-between text-[11px] text-gray-400">
+                      <span>or enter an image URL</span>
+                      <button
+                        type="button"
+                        onClick={() => setShowUrlInput(!showUrlInput)}
+                        className="text-blue-600 hover:underline"
+                      >
+                        {showUrlInput ? "Hide URL input" : "Paste URL"}
+                      </button>
+                    </div>
+
+                    {showUrlInput && (
                       <input
                         type="url"
                         value={image}
                         onChange={(e) => setImage(e.target.value)}
                         placeholder="https://example.com/image.jpg"
-                        className="flex-1 rounded-md border border-gray-300 p-2 text-xs outline-none focus:border-black"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-900 focus:border-black focus:outline-none"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowUrlInput(false)}
-                        className="text-xs text-gray-400 hover:text-gray-600 px-1"
-                      >
-                        Hide
-                      </button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-6 flex justify-end gap-3 pt-3 border-t border-gray-100">
+              {/* Display Order & Status */}
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
+                    Display Order
+                  </label>
+                  <input
+                    type="number"
+                    value={order}
+                    onChange={(e) => setOrder(Number(e.target.value))}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-black focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
+                    Status
+                  </label>
+                  <label className="flex items-center gap-2 mt-2.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={isActive}
+                      onChange={(e) => setIsActive(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
+                    />
+                    <span className="text-sm text-gray-700">Active</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex items-center justify-end gap-3 border-t border-gray-100 pt-4 mt-6">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="rounded-md border border-gray-300 px-4 py-2 font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
+                  className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={formSubmitting || uploadingImage}
-                  className="inline-flex items-center gap-2 rounded-md bg-black px-5 py-2 font-semibold text-white hover:bg-neutral-800 disabled:opacity-50 cursor-pointer"
+                  className="inline-flex items-center gap-2 rounded-lg bg-black px-5 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
                 >
-                  {formSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                  {editingCategory ? "Update Category" : "Save Category"}
+                  {formSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {editingCategory ? "Save Changes" : "Create Category"}
                 </button>
               </div>
             </form>

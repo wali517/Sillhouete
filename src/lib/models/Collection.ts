@@ -8,8 +8,12 @@ export interface ICollection extends Document {
   productCount?: number;
   isMainCategory?: boolean;
   parentHandle?: string;
+  mainCategoryId?: string;
+  isActive?: boolean;
   showOnHomepage?: boolean;
   order?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 const CollectionSchema = new Schema<ICollection>(
@@ -19,8 +23,10 @@ const CollectionSchema = new Schema<ICollection>(
     description: { type: String, default: "" },
     image: { type: String, default: "" },
     productCount: { type: Number, default: 0 },
-    isMainCategory: { type: Boolean, default: false },
-    parentHandle: { type: String, default: "" },
+    isMainCategory: { type: Boolean, default: false, index: true },
+    parentHandle: { type: String, default: "", index: true },
+    mainCategoryId: { type: String, default: "", index: true },
+    isActive: { type: Boolean, default: true, index: true },
     showOnHomepage: { type: Boolean, default: false },
     order: { type: Number, default: 0 },
   },
@@ -30,4 +36,3 @@ const CollectionSchema = new Schema<ICollection>(
 export const CollectionModel: Model<ICollection> =
   mongoose.models.Collection ||
   mongoose.model<ICollection>("Collection", CollectionSchema);
-

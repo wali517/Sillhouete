@@ -144,17 +144,22 @@ export default async function ProductPage({ params }: Props) {
 
   // Derive collection breadcrumb
   const description = parseDescription(product.description);
+  const mainCatSlug = product.mainCategorySlug;
+  const mainCatName = product.mainCategoryName;
+  const subCatSlug = product.subcategorySlug;
+  const subCatName = product.subcategoryName;
+
   const rawCategory = product.category || "Best Sellers";
   const isLuxuryPret = rawCategory.toLowerCase().includes("luxury pret");
-  const collectionName = isLuxuryPret
+  const fallbackCollectionName = isLuxuryPret
     ? "Luxury Pret Dresses for Women – Shop Pakistani Ready-to-Wear Online"
     : rawCategory;
-  const collectionSlug =
+  const fallbackCollectionSlug =
     isLuxuryPret ? "luxury-pret" :
-    collectionName.toLowerCase().includes("formal") ? "formal-dresses" :
-    collectionName.toLowerCase().includes("maahi") ? "maahi-ii-luxury-eid-pret" :
-    collectionName.toLowerCase().includes("silk") ? "silk-solids26" :
-    collectionName.toLowerCase().includes("raha") ? "raha-eid-pret26" :
+    fallbackCollectionName.toLowerCase().includes("formal") ? "formal-dresses" :
+    fallbackCollectionName.toLowerCase().includes("maahi") ? "maahi-ii-luxury-eid-pret" :
+    fallbackCollectionName.toLowerCase().includes("silk") ? "silk-solids26" :
+    fallbackCollectionName.toLowerCase().includes("raha") ? "raha-eid-pret26" :
     "best-sellers";
 
   return (
@@ -165,7 +170,7 @@ export default async function ProductPage({ params }: Props) {
       />
 
       <div className="mx-auto w-full max-w-[1440px] px-3.5 py-3 sm:px-6 md:px-10 md:py-8">
-        {/* Breadcrumb Navigation: responsive horizontal scroll on mobile */}
+        {/* Breadcrumb Navigation: Home > Main Category > Subcategory > Product */}
         <nav
           aria-label="Breadcrumb"
           className="mb-3.5 md:mb-6 flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[12px] text-neutral-600 font-serif overflow-x-auto whitespace-nowrap scrollbar-none pb-0.5"
@@ -173,10 +178,32 @@ export default async function ProductPage({ params }: Props) {
           <Link href="/" className="hover:text-black">
             Home
           </Link>
-          <span className="text-neutral-400">&gt;</span>
-          <Link href={`/collections/${collectionSlug}`} className="hover:text-black truncate max-w-[200px] sm:max-w-none">
-            {collectionName}
-          </Link>
+          
+          {mainCatSlug && mainCatName ? (
+            <>
+              <span className="text-neutral-400">&gt;</span>
+              <Link href={`/collections/${mainCatSlug}`} className="hover:text-black">
+                {mainCatName}
+              </Link>
+            </>
+          ) : !subCatSlug ? (
+            <>
+              <span className="text-neutral-400">&gt;</span>
+              <Link href={`/collections/${fallbackCollectionSlug}`} className="hover:text-black truncate max-w-[200px] sm:max-w-none">
+                {fallbackCollectionName}
+              </Link>
+            </>
+          ) : null}
+
+          {subCatSlug && subCatName && (
+            <>
+              <span className="text-neutral-400">&gt;</span>
+              <Link href={`/collections/${subCatSlug}`} className="hover:text-black">
+                {subCatName}
+              </Link>
+            </>
+          )}
+
           <span className="text-neutral-400">&gt;</span>
           <span className="text-black font-medium">
             {product.title}
