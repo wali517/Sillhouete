@@ -1,8 +1,9 @@
-import nodemailer from "nodemailer";
+import nodemailer, { type Transporter } from "nodemailer";
 import type { Order } from "@/types";
 import { formatPrice } from "@/lib/format";
 import { SITE } from "@/data/site";
 import { NotificationModel, type NotificationType, type NotificationDeliveryStatus } from "./models/Notification";
+import { SiteSettingsModel } from "./models/SiteSettings";
 import connectDB from "./mongodb";
 
 /* ──────────────── HTML & HEADER SANITIZATION ──────────────── */
@@ -26,38 +27,78 @@ export function isValidEmail(email: string = ""): boolean {
 
 /* ──────────────── NODEMAILER TRANSPORTER ──────────────── */
 
-async function getTransporter() {
+interface TransporterContext {
+  transporter: Transporter;
+  user: string;
+  from: string;
+}
+
+export async function getTransporter(): Promise<TransporterContext | null> {
   let host = process.env.SMTP_HOST || "smtp.gmail.com";
   let port = Number(process.env.SMTP_PORT) || 465;
   let user = process.env.SMTP_USER;
   let pass = process.env.SMTP_PASS;
+  let customFrom = process.env.SMTP_FROM;
 
+  // If environment variables are not set (e.g. on Vercel deployment), read directly from MongoDB SiteSettings
   if (!user || !pass) {
     try {
-      const { getSettings } = await import("./db");
-      const settings = await getSettings();
+      await connectDB();
+      const settings = await SiteSettingsModel.findOne({}).lean();
       if (settings?.smtpUser && settings?.smtpPass) {
         user = settings.smtpUser;
         pass = settings.smtpPass;
         host = settings.smtpHost || host;
         port = Number(settings.smtpPort) || port;
+        if (settings.smtpFrom) {
+          customFrom = settings.smtpFrom;
+        }
       }
-    } catch {
-      // fallback
+    } catch (err) {
+      console.error("📧 [EMAIL ERROR] Failed to load SMTP settings from MongoDB:", err);
     }
   }
 
   if (host && user && pass) {
     const cleanPass = pass.replace(/\s+/g, "");
-    return nodemailer.createTransport({
+    const cleanUser = user.trim();
+    const isPort465 = Number(port) === 465;
+
+    const transporter = nodemailer.createTransport({
       host,
-      port,
-      secure: port === 465,
-      auth: { user: user.trim(), pass: cleanPass },
+      port: Number(port),
+      secure: isPort465,
+      auth: { user: cleanUser, pass: cleanPass },
+      connectionTimeout: 12000,
+      greetingTimeout: 10000,
+      socketTimeout: 20000,
     });
+
+    const from =
+      customFrom ||
+      (cleanUser ? `"SILLHOUETE" <${cleanUser}>` : `"SILLHOUETE" <saleemalbala18@gmail.com>`);
+
+    return { transporter, user: cleanUser, from };
   }
 
   return null;
+}
+
+export async function verifySmtpConnection(): Promise<{ success: boolean; error?: string; user?: string }> {
+  const context = await getTransporter();
+  if (!context) {
+    return {
+      success: false,
+      error: "SMTP credentials (user or password) are not configured. Please enter them in Admin Settings.",
+    };
+  }
+  try {
+    await context.transporter.verify();
+    return { success: true, user: context.user };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "SMTP verification failed";
+    return { success: false, error: msg, user: context.user };
+  }
 }
 
 export interface SendEmailResult {
@@ -68,12 +109,7 @@ export interface SendEmailResult {
 }
 
 /**
- * Truthful sendEmail implementation supporting strict EMAIL TEST MODE:
- * - If EMAIL_MODE === "preview" (default safe setting):
- *   - NEVER sends emails to real customer addresses!
- *   - If EMAIL_TEST_RECIPIENT is explicitly set and SMTP is configured, sends ONLY to the test recipient.
- *   - Otherwise, logs email preview to console and records status: "simulated".
- * - Never claims simulated console logs were "successfully delivered"!
+ * Dispatch real customer email via configured SMTP (Gmail / Custom SMTP)
  */
 export async function sendEmail({
   to,
@@ -97,23 +133,19 @@ export async function sendEmail({
     };
   }
 
-  const transporter = await getTransporter();
+  const context = await getTransporter();
 
-  if (!transporter) {
-    console.warn(`📧 [EMAIL SIMULATED - NO SMTP CONFIGURED] Intended Recipient: ${cleanTo}`);
+  if (!context) {
+    console.warn(`📧 [EMAIL NOT CONFIGURED] Intended Recipient: ${cleanTo}`);
     return {
       success: false,
-      status: "simulated",
-      messageId: `simulated-${Date.now()}`,
-      error: "SMTP not configured. Please configure SMTP credentials.",
+      status: "failed",
+      messageId: `not-configured-${Date.now()}`,
+      error: "SMTP not configured. Please configure your Gmail/SMTP settings in Admin Settings.",
     };
   }
 
-  const from =
-    process.env.SMTP_FROM ||
-    (process.env.SMTP_USER
-      ? `"SILLHOUETE" <${process.env.SMTP_USER}>`
-      : `"SILLHOUETE" <saleemalbala18@gmail.com>`);
+  const { transporter, from } = context;
 
   try {
     const info = await transporter.sendMail({
@@ -169,13 +201,13 @@ export async function sendTrackedNotification({
   try {
     await connectDB();
 
-    // 1. Check idempotency: if already successfully sent or simulated, skip duplicate send
+    // 1. Check idempotency: only skip if already successfully delivered
     const existing = await NotificationModel.findOne({ idempotencyKey });
-    if (existing && (existing.status === "sent" || existing.status === "simulated")) {
-      console.log(`[Notification] Already processed notification (${existing.type}) for key: ${idempotencyKey}. Skipping duplicate.`);
+    if (existing && existing.status === "sent") {
+      console.log(`[Notification] Already sent notification (${existing.type}) for key: ${idempotencyKey}. Skipping duplicate.`);
       return {
-        success: existing.status === "sent",
-        status: existing.status,
+        success: true,
+        status: "sent",
         messageId: existing.messageId,
       };
     }
@@ -201,7 +233,7 @@ export async function sendTrackedNotification({
           status: result.status,
           messageId: result.messageId,
           lastError: result.error,
-          sentAt: result.status === "sent" || result.status === "simulated" ? new Date() : undefined,
+          sentAt: result.status === "sent" ? new Date() : undefined,
         },
         $inc: { attempts: 1 },
       },

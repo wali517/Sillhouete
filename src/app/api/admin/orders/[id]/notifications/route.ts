@@ -4,6 +4,8 @@ import { NotificationModel } from "@/lib/models/Notification";
 import { sendEmail } from "@/lib/email";
 import connectDB from "@/lib/mongodb";
 
+export const dynamic = "force-dynamic";
+
 const AUTH_COOKIE = "slh_admin_token";
 
 export async function GET(
@@ -96,7 +98,7 @@ export async function POST(
     notif.status = result.status;
     notif.messageId = result.messageId;
     notif.lastError = result.error;
-    if (result.status === "sent" || result.status === "simulated") {
+    if (result.status === "sent") {
       notif.sentAt = new Date();
     }
 
@@ -108,9 +110,7 @@ export async function POST(
       message:
         result.status === "sent"
           ? "Notification sent successfully."
-          : result.status === "simulated"
-          ? "Notification simulated in console (No SMTP configured)."
-          : `Delivery failed: ${result.error}`,
+          : `Delivery failed: ${result.error || "Could not dispatch email."}`,
       notification: {
         id: notif.id,
         status: notif.status,

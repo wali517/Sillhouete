@@ -27,6 +27,7 @@ export interface ISiteSettings extends Document {
   smtpPort?: number;
   smtpUser?: string;
   smtpPass?: string;
+  smtpFrom?: string;
 }
 
 const SiteSettingsSchema = new Schema<ISiteSettings>(
@@ -56,6 +57,7 @@ const SiteSettingsSchema = new Schema<ISiteSettings>(
     smtpPort: { type: Number, default: 465 },
     smtpUser: { type: String, default: "" },
     smtpPass: { type: String, default: "" },
+    smtpFrom: { type: String, default: "" },
     discountCodes: [
       {
         code: { type: String },

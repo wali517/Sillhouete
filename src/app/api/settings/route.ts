@@ -2,10 +2,16 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getSettings, updateSettings } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 const AUTH_COOKIE = "slh_admin_token";
 
 export async function GET() {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(AUTH_COOKIE)?.value;
+    const isAdmin = token === "authenticated_admin_session";
+
     const settings = await getSettings();
 
     // Securely sanitize public settings response - never expose secret keys or admin password hash
@@ -14,9 +20,15 @@ export async function GET() {
       adminPasswordHash: undefined,
       stripeSecretKey: undefined,
       stripeSecretKeyConfigured: !!(process.env.STRIPE_SECRET_KEY || settings.stripeSecretKey),
+      smtpConfigured: !!(process.env.SMTP_PASS || settings.smtpPass),
+      // Only include smtpPass if authenticated as admin
+      smtpPass: isAdmin ? settings.smtpPass || "" : undefined,
     };
     delete (sanitized as Record<string, unknown>).stripeSecretKey;
     delete (sanitized as Record<string, unknown>).adminPasswordHash;
+    if (!isAdmin) {
+      delete (sanitized as Record<string, unknown>).smtpPass;
+    }
 
     return NextResponse.json({
       settings: sanitized,
@@ -46,6 +58,11 @@ export async function PUT(req: Request) {
       delete body.stripeSecretKey;
     }
 
+    // Don't overwrite existing smtpPass with blank unless explicitly clearing
+    if (body.smtpPass === "" && !body.clearSmtpPass) {
+      delete body.smtpPass;
+    }
+
     const updated = await updateSettings(body);
 
     const sanitized = {
@@ -53,6 +70,8 @@ export async function PUT(req: Request) {
       adminPasswordHash: undefined,
       stripeSecretKey: undefined,
       stripeSecretKeyConfigured: !!(process.env.STRIPE_SECRET_KEY || updated.stripeSecretKey),
+      smtpConfigured: !!(process.env.SMTP_PASS || updated.smtpPass),
+      smtpPass: updated.smtpPass || "",
     };
     delete (sanitized as Record<string, unknown>).stripeSecretKey;
     delete (sanitized as Record<string, unknown>).adminPasswordHash;

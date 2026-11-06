@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Save, Plus, Trash2, Settings, CreditCard, Truck, Bell, Store, Lock, ShieldCheck } from "lucide-react";
+import { Save, Plus, Trash2, Settings, CreditCard, Truck, Bell, Store, Lock, ShieldCheck, Mail, CheckCircle2, AlertCircle, Eye, EyeOff, Send, RefreshCw } from "lucide-react";
 import type { SiteSettings } from "@/types";
 
-type Tab = "store" | "shipping" | "announcements" | "payment" | "discounts" | "security";
+type Tab = "store" | "shipping" | "announcements" | "payment" | "discounts" | "security" | "email";
 
 export default function AdminSettingsPage() {
-  const [settings, setSettings] = useState<Partial<SiteSettings & { discountCodes?: Array<{ code: string; percent: number; active: boolean }> }>>({});
+  const [settings, setSettings] = useState<Partial<SiteSettings & { discountCodes?: Array<{ code: string; percent: number; active: boolean }>; smtpConfigured?: boolean }>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<Tab | null>(null);
   const [toast, setToast] = useState("");
@@ -20,6 +20,13 @@ export default function AdminSettingsPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [credentialUpdating, setCredentialUpdating] = useState(false);
+
+  // Email / SMTP states
+  const [testEmailRecipient, setTestEmailRecipient] = useState("");
+  const [sendingTestEmail, setSendingTestEmail] = useState(false);
+  const [verifyingSmtp, setVerifyingSmtp] = useState(false);
+  const [smtpStatusMessage, setSmtpStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [showSmtpPassword, setShowSmtpPassword] = useState(false);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -109,12 +116,70 @@ export default function AdminSettingsPage() {
     }
   };
 
+  const handleVerifySmtp = async () => {
+    setVerifyingSmtp(true);
+    setSmtpStatusMessage(null);
+    try {
+      const res = await fetch("/api/admin/email/test");
+      const d = await res.json();
+      if (d.success) {
+        setSmtpStatusMessage({
+          type: "success",
+          text: `SMTP connection established successfully (${d.user || "Verified"}). Real customer emails will dispatch properly!`,
+        });
+      } else {
+        setSmtpStatusMessage({
+          type: "error",
+          text: d.error || "SMTP connection failed. Please check host, port, email, and password.",
+        });
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to verify connection";
+      setSmtpStatusMessage({ type: "error", text: msg });
+    } finally {
+      setVerifyingSmtp(false);
+    }
+  };
+
+  const handleSendTestEmail = async () => {
+    const target = testEmailRecipient.trim() || settings.email || settings.adminEmail || "saleemalbala18@gmail.com";
+    if (!target) {
+      showToast("Please enter a recipient email for the test.");
+      return;
+    }
+    setSendingTestEmail(true);
+    setSmtpStatusMessage(null);
+    try {
+      const res = await fetch("/api/admin/email/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipient: target }),
+      });
+      const d = await res.json();
+      if (!res.ok || !d.success) {
+        throw new Error(d.error || "Failed to send test email");
+      }
+      setSmtpStatusMessage({
+        type: "success",
+        text: `Test email successfully dispatched to ${target}! Check the inbox.`,
+      });
+      showToast(`Test email sent to ${target}!`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to send test email";
+      setSmtpStatusMessage({ type: "error", text: msg });
+      showToast(msg);
+    } finally {
+      setSendingTestEmail(false);
+    }
+  };
+
   const tabs: Array<{ key: Tab; label: string; icon: typeof Store }> = [
     { key: "store", label: "Store Info", icon: Store },
     { key: "shipping", label: "Shipping", icon: Truck },
     { key: "announcements", label: "Announcements", icon: Bell },
     { key: "payment", label: "Payment", icon: CreditCard },
     { key: "discounts", label: "Discounts", icon: Settings },
+    { key: "email", label: "Email & SMTP", icon: Mail },
     { key: "security", label: "Admin Account & Security", icon: ShieldCheck },
   ];
 
@@ -341,6 +406,178 @@ export default function AdminSettingsPage() {
             className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50">
             <Save className="h-4 w-4" /> {saving === "discounts" ? "Saving..." : "Save Discount Codes"}
           </button>
+        </div>
+      )}
+
+      {/* Email & SMTP Notifications */}
+      {activeTab === "email" && (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
+            <div>
+              <h2 className="font-semibold text-gray-900 text-lg flex items-center gap-2">
+                <Mail className="h-5 w-5 text-gray-700" />
+                <span>Customer Email Notification Settings (SMTP)</span>
+              </h2>
+              <p className="text-xs text-gray-500 mt-1">
+                Configure live order confirmation, dispatch, and bank transfer emails sent directly to customers.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleVerifySmtp}
+                disabled={verifyingSmtp}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${verifyingSmtp ? "animate-spin" : ""}`} />
+                <span>{verifyingSmtp ? "Testing..." : "Verify Connection"}</span>
+              </button>
+            </div>
+          </div>
+
+          {smtpStatusMessage && (
+            <div
+              className={`p-3.5 rounded-lg text-xs flex items-start gap-2 ${
+                smtpStatusMessage.type === "success"
+                  ? "bg-emerald-50 border border-emerald-200 text-emerald-800"
+                  : "bg-red-50 border border-red-200 text-red-800"
+              }`}
+            >
+              {smtpStatusMessage.type === "success" ? (
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+              ) : (
+                <AlertCircle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+              )}
+              <span className="leading-relaxed">{smtpStatusMessage.text}</span>
+            </div>
+          )}
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wider text-gray-700 block mb-1">
+                SMTP Host
+              </label>
+              <input
+                type="text"
+                value={settings.smtpHost || ""}
+                onChange={(e) => setSettings({ ...settings, smtpHost: e.target.value })}
+                placeholder="smtp.gmail.com"
+                className="w-full border border-gray-200 rounded-lg px-3.5 py-2 text-sm outline-none focus:border-black font-mono"
+              />
+              <p className="text-[11px] text-gray-400 mt-1">Default: smtp.gmail.com</p>
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wider text-gray-700 block mb-1">
+                SMTP Port
+              </label>
+              <input
+                type="number"
+                value={settings.smtpPort || 465}
+                onChange={(e) => setSettings({ ...settings, smtpPort: Number(e.target.value) })}
+                placeholder="465"
+                className="w-full border border-gray-200 rounded-lg px-3.5 py-2 text-sm outline-none focus:border-black font-mono"
+              />
+              <p className="text-[11px] text-gray-400 mt-1">465 (SSL/TLS) or 587 (STARTTLS)</p>
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wider text-gray-700 block mb-1">
+                SMTP User / Gmail Address *
+              </label>
+              <input
+                type="email"
+                value={settings.smtpUser || ""}
+                onChange={(e) => setSettings({ ...settings, smtpUser: e.target.value })}
+                placeholder="saleemalbala18@gmail.com"
+                className="w-full border border-gray-200 rounded-lg px-3.5 py-2 text-sm outline-none focus:border-black"
+              />
+              <p className="text-[11px] text-gray-400 mt-1">The email account used to authenticate and send.</p>
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wider text-gray-700 block mb-1">
+                SMTP Password / Google App Password *
+              </label>
+              <div className="relative">
+                <input
+                  type={showSmtpPassword ? "text" : "password"}
+                  value={settings.smtpPass || ""}
+                  onChange={(e) => setSettings({ ...settings, smtpPass: e.target.value })}
+                  placeholder="Enter 16-character App Password"
+                  className="w-full border border-gray-200 rounded-lg px-3.5 py-2 text-sm outline-none focus:border-black font-mono pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowSmtpPassword(!showSmtpPassword)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
+                >
+                  {showSmtpPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              <p className="text-[11px] text-gray-400 mt-1">
+                For Gmail: Use an App Password from Google Account &gt; Security &gt; 2-Step Verification &gt; App Passwords.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wider text-gray-700 block mb-1">
+              Custom Sender Header (Optional)
+            </label>
+            <input
+              type="text"
+              value={settings.smtpFrom || ""}
+              onChange={(e) => setSettings({ ...settings, smtpFrom: e.target.value })}
+              placeholder={`"SILLHOUETE" <${settings.smtpUser || "saleemalbala18@gmail.com"}>`}
+              className="w-full border border-gray-200 rounded-lg px-3.5 py-2 text-sm outline-none focus:border-black font-mono"
+            />
+            <p className="text-[11px] text-gray-400 mt-1">Leave empty to use the default branded header.</p>
+          </div>
+
+          <div className="pt-2">
+            <button
+              onClick={() =>
+                saveSection("email", {
+                  smtpHost: settings.smtpHost || "smtp.gmail.com",
+                  smtpPort: Number(settings.smtpPort) || 465,
+                  smtpUser: settings.smtpUser || "",
+                  smtpPass: settings.smtpPass || "",
+                  smtpFrom: settings.smtpFrom || "",
+                })
+              }
+              disabled={saving === "email"}
+              className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50"
+            >
+              <Save className="h-4 w-4" /> {saving === "email" ? "Saving..." : "Save Email Settings"}
+            </button>
+          </div>
+
+          {/* Test Email Section */}
+          <div className="border-t border-gray-100 pt-5 space-y-3">
+            <h3 className="font-semibold text-gray-900 text-sm">Send a Live Test Email</h3>
+            <p className="text-xs text-gray-500">
+              Send an instant test email to verify that your inbox receives customer notifications properly.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2 max-w-md">
+              <input
+                type="email"
+                placeholder="Enter recipient email (e.g. waleedjutt3312@gmail.com)"
+                value={testEmailRecipient}
+                onChange={(e) => setTestEmailRecipient(e.target.value)}
+                className="flex-1 border border-gray-200 rounded-lg px-3.5 py-2 text-sm outline-none focus:border-black"
+              />
+              <button
+                type="button"
+                onClick={handleSendTestEmail}
+                disabled={sendingTestEmail}
+                className="flex items-center justify-center gap-1.5 bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50"
+              >
+                <Send className="h-3.5 w-3.5" />
+                <span>{sendingTestEmail ? "Sending..." : "Send Test"}</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

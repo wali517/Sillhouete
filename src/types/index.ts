@@ -287,4 +287,5 @@ export interface SiteSettings {
   smtpPort?: number;
   smtpUser?: string;
   smtpPass?: string;
+  smtpFrom?: string;
 }
