@@ -19,9 +19,9 @@ const CollectionSchema = new Schema<ICollection>(
     description: { type: String, default: "" },
     image: { type: String, default: "" },
     productCount: { type: Number, default: 0 },
-    isMainCategory: { type: Boolean, default: true },
+    isMainCategory: { type: Boolean, default: false },
     parentHandle: { type: String, default: "" },
-    showOnHomepage: { type: Boolean, default: true },
+    showOnHomepage: { type: Boolean, default: false },
     order: { type: Number, default: 0 },
   },
   { timestamps: true }

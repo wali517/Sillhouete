@@ -24,6 +24,7 @@ export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [filterTab, setFilterTab] = useState<"all" | "main" | "sub">("all");
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -213,13 +214,47 @@ export default function AdminCategoriesPage() {
     }
   };
 
+  const handleToggleHomepage = async (cat: CategoryItem) => {
+    const newIsMain = !cat.isMainCategory;
+    const newShowOnHome = newIsMain;
+    const newParent = newIsMain ? "" : (cat.parentHandle || "formal-dresses");
+
+    try {
+      const res = await fetch(`/api/categories/${cat.handle}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          isMainCategory: newIsMain,
+          showOnHomepage: newShowOnHome,
+          parentHandle: newParent,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.category) {
+        setCategories((prev) =>
+          prev.map((c) => (c.handle === cat.handle ? data.category : c))
+        );
+      }
+    } catch {
+      alert("Failed to update category status");
+    }
+  };
+
+  const mainCategoriesCount = categories.filter((c) => c.isMainCategory || c.showOnHomepage).length;
+  const subCategoriesCount = categories.filter((c) => !c.isMainCategory && !c.showOnHomepage).length;
+
   const filteredCategories = categories.filter((c) => {
+    const isMain = c.isMainCategory || c.showOnHomepage;
+    if (filterTab === "main" && !isMain) return false;
+    if (filterTab === "sub" && isMain) return false;
+
     const q = search.toLowerCase().trim();
     if (!q) return true;
     return (
       c.title.toLowerCase().includes(q) ||
       c.handle.toLowerCase().includes(q) ||
-      (c.description && c.description.toLowerCase().includes(q))
+      (c.description && c.description.toLowerCase().includes(q)) ||
+      (c.parentHandle && c.parentHandle.toLowerCase().includes(q))
     );
   });
 
@@ -269,6 +304,45 @@ export default function AdminCategoriesPage() {
         <div className="text-xs text-gray-500 font-medium whitespace-nowrap pr-2">
           {filteredCategories.length} Categories
         </div>
+      </div>
+
+      {/* Category Tabs: All / Main (Homepage) / Sub-Categories */}
+      <div className="flex gap-2 border-b border-gray-200 pb-1 flex-wrap">
+        <button
+          type="button"
+          onClick={() => setFilterTab("all")}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+            filterTab === "all"
+              ? "bg-black text-white shadow-xs"
+              : "text-gray-600 hover:text-black hover:bg-gray-100"
+          }`}
+        >
+          All Categories ({categories.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setFilterTab("main")}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+            filterTab === "main"
+              ? "bg-black text-white shadow-xs"
+              : "text-gray-600 hover:text-black hover:bg-gray-100"
+          }`}
+        >
+          <Home className="h-3.5 w-3.5" />
+          Main Categories (Homepage) ({mainCategoriesCount})
+        </button>
+        <button
+          type="button"
+          onClick={() => setFilterTab("sub")}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+            filterTab === "sub"
+              ? "bg-black text-white shadow-xs"
+              : "text-gray-600 hover:text-black hover:bg-gray-100"
+          }`}
+        >
+          <Layers className="h-3.5 w-3.5" />
+          Sub-Categories ({subCategoriesCount})
+        </button>
       </div>
 
       {/* Categories Table */}
@@ -350,13 +424,19 @@ export default function AdminCategoriesPage() {
 
                       {/* Homepage Status */}
                       <td className="py-3 px-4 text-center">
-                        {cat.showOnHomepage || (isMain && cat.showOnHomepage !== false) ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold">
-                            <Home className="h-3 w-3" /> Shows on Homepage
-                          </span>
-                        ) : (
-                          <span className="text-gray-400 text-[11px]">—</span>
-                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleToggleHomepage(cat)}
+                          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold cursor-pointer transition-all ${
+                            cat.showOnHomepage
+                              ? "bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 shadow-xs"
+                              : "bg-gray-100 text-gray-500 hover:bg-gray-200 border border-gray-200"
+                          }`}
+                          title="Click to toggle Homepage display"
+                        >
+                          <Home className="h-3 w-3" />
+                          <span>{cat.showOnHomepage ? "Shows on Homepage" : "Hidden from Homepage"}</span>
+                        </button>
                       </td>
 
                       {/* Handle / Storefront link */}
