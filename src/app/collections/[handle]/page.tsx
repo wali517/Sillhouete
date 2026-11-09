@@ -70,7 +70,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
   const descriptionHtml = colDoc?.description || COLLECTION_DESCRIPTIONS[handle] || "";
 
   return (
-    <section className="mx-auto w-full max-w-355 px-3 py-7 sm:px-5 md:px-8 lg:px-10 md:py-9">
+    <section className="mx-auto w-full max-w-[1520px] px-3.5 py-6 sm:px-6 md:px-8 lg:px-10 md:py-8">
       {/* Header section matching Sillhouete aesthetic */}
       {isSale ? (
         <header className="mb-8 text-center">
@@ -82,85 +82,46 @@ export default async function CollectionPage({ params, searchParams }: Props) {
           </p>
         </header>
       ) : (
-        <header className="mb-6 text-center">
-          <h1 className="font-serif text-[22px] sm:text-[25px] md:text-[28px] font-medium uppercase tracking-[0.08em] text-[#111111]">
+        <header className="mb-6">
+          <h1 className="font-serif text-[26px] sm:text-[30px] md:text-[34px] font-normal uppercase tracking-[0.08em] text-[#111111] text-center mb-6 md:mb-8">
             {title.toUpperCase()}
           </h1>
 
-          {/* Breadcrumbs: Home > (Main Category) > Subcategory */}
+          {/* Breadcrumbs: Left-aligned matching Image 1 */}
           <nav
             aria-label="Breadcrumb"
-            className="mt-3 flex items-center justify-center gap-1.5 text-[12px] text-black/70 font-serif flex-wrap"
+            className="mb-2 flex items-center gap-2 text-[12px] sm:text-[13px] text-[#666666] font-serif"
           >
-            <Link href="/" aria-label="Home" className="hover:text-black">
-              <svg
-                className="w-3.5 h-3.5 inline-block -mt-0.5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-              >
-                <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1V9.5z" />
+            <Link href="/" aria-label="Home" className="text-[#666666] hover:text-black transition-colors flex items-center">
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path
+                  d="M2 6L8 1L14 6V13C14 13.5304 13.7893 14.0391 13.4142 14.4142C13.0391 14.7893 12.5304 15 12 15H4C3.46957 15 2.96086 14.7893 2.58579 14.4142C2.21071 14.0391 2 13.5304 2 13V6Z"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path d="M6 15V8H10V15" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </Link>
 
             {parentDoc && (
               <>
-                <span aria-hidden="true" className="text-black/40">
+                <span aria-hidden="true" className="text-[#999999]">
                   /
                 </span>
                 <Link
                   href={`/collections/${parentDoc.handle}`}
-                  className="hover:text-black capitalize text-black/60 hover:underline"
+                  className="hover:text-black capitalize text-[#666666] hover:underline"
                 >
                   {parentDoc.title}
                 </Link>
               </>
             )}
 
-            <span aria-hidden="true" className="text-black/40">
+            <span aria-hidden="true" className="text-[#999999]">
               /
             </span>
-            <span className="capitalize font-medium text-black">{title}</span>
+            <span className="capitalize font-normal text-black">{title}</span>
           </nav>
-
-          {/* Subcategory Filter Navigation Pills */}
-          {subcategoriesNav.length > 0 && (
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-              {parentDoc ? (
-                <Link
-                  href={`/collections/${parentDoc.handle}`}
-                  className="rounded-full border border-gray-300 px-3.5 py-1 text-xs font-serif uppercase tracking-wider text-gray-600 hover:border-black hover:text-black transition-colors"
-                >
-                  All {parentDoc.title}
-                </Link>
-              ) : (
-                <span className="rounded-full bg-black px-3.5 py-1 text-xs font-serif uppercase tracking-wider text-white shadow-xs">
-                  All
-                </span>
-              )}
-
-              {subcategoriesNav.map((sub) => {
-                const isCurrent = sub.handle === handle;
-                return isCurrent ? (
-                  <span
-                    key={sub.handle}
-                    className="rounded-full bg-black px-3.5 py-1 text-xs font-serif uppercase tracking-wider text-white shadow-xs"
-                  >
-                    {sub.title}
-                  </span>
-                ) : (
-                  <Link
-                    key={sub.handle}
-                    href={`/collections/${sub.handle}`}
-                    className="rounded-full border border-gray-300 px-3.5 py-1 text-xs font-serif uppercase tracking-wider text-gray-600 hover:border-black hover:text-black transition-colors"
-                  >
-                    {sub.title}
-                  </Link>
-                );
-              })}
-            </div>
-          )}
         </header>
       )}
 

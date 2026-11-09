@@ -67,8 +67,8 @@ export default function CollectionViewer({
   const [currentPage, setCurrentPage] = useState<number>(initialPage || 1);
   const itemsPerPage = isSalePage ? 28 : 60;
 
-  // Sort state
-  const [sort, setSort] = useState<SortOption>("featured");
+  // Sort state (default to "relevant" matching live site and screenshot)
+  const [sort, setSort] = useState<SortOption>("relevant");
 
   // Filters state
   const [maxPrice, setMaxPrice] = useState<number>(464165);
@@ -654,11 +654,11 @@ export default function CollectionViewer({
             </div>
           </div>
 
-          {/* Product Grid (Full Width 4 columns, Image 4) */}
+          {/* Product Grid: Exactly 3 Columns on Desktop (matching live site & screenshot) */}
           {paginatedProducts.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-x-5 md:gap-y-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10 lg:gap-x-7 lg:gap-y-12">
               {paginatedProducts.map((p, i) => (
-                <ProductCard key={p.id} product={p} index={i} />
+                <ProductCard key={p.id} product={p} index={i} isThreeColumn={true} />
               ))}
             </div>
           ) : (

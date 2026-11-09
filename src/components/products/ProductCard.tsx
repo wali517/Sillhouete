@@ -12,6 +12,7 @@ export default function ProductCard({
   isSale = false,
   isNew = false,
   showFrom = false,
+  isThreeColumn = false,
   index = 0,
   className = "",
 }: {
@@ -20,14 +21,16 @@ export default function ProductCard({
   isSale?: boolean;
   isNew?: boolean;
   showFrom?: boolean;
+  isThreeColumn?: boolean;
   index?: number;
   className?: string;
 }) {
   const [inView, setInView] = useState(false);
   const cardRef = useRef<HTMLElement>(null);
 
-  // Stagger reveal delay across columns (left to right: col 0 = 0ms, col 1 = 120ms, col 2 = 240ms, col 3 = 360ms)
-  const colIndex = index % 4;
+  // Stagger reveal delay across columns
+  const colModulo = isThreeColumn ? 3 : 4;
+  const colIndex = index % colModulo;
   const delayMs = colIndex * 120;
 
   useEffect(() => {
@@ -54,35 +57,50 @@ export default function ProductCard({
   }, []);
 
   const showSaleBadge = isSale || product.isSale || !!product.originalPrice;
-  const showNewBadge = !showSaleBadge && (isNew || product.isNew);
+  // In collection pages matching reference storefront, products display NEW badge unless on sale
+  const showNewBadge = !showSaleBadge && (isNew || product.isNew !== false);
+
+  // Aspect ratio: exactly 2/3 (150% height matching Shopify collection grid)
+  const imageAspect = isThreeColumn ? "aspect-[2/3]" : "aspect-[2/3]";
 
   return (
-    <article ref={cardRef} data-aos="row-of-4" className={`group relative ${className}`}>
+    <article
+      ref={cardRef}
+      data-aos={isThreeColumn ? "row-of-3" : "row-of-4"}
+      className={`group relative ${className}`}
+    >
       <div className="relative">
         <Link href={`/products/${product.handle}`} className="block" aria-label={product.title}>
           <div
-            className={`relative w-full overflow-hidden bg-[#f7f6f3] image-reveal-mask ${
+            className={`relative w-full overflow-hidden bg-[#f7f6f3] ${imageAspect} image-reveal-mask ${
               inView ? "is-revealed" : ""
             }`}
-            style={{ aspectRatio: `1 / ${product.ratio || 1.35}` }}
           >
             <Image
               src={product.image}
               alt={product.alt || product.title}
               fill
-              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-              priority={true}
-              loading="eager"
-              className="object-cover"
+              sizes={
+                isThreeColumn
+                  ? "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 50vw"
+                  : "(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+              }
+              priority={priority && index < 6}
+              loading={priority && index < 6 ? "eager" : "lazy"}
+              className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
             />
             {product.hoverImage && (
               <Image
                 src={product.hoverImage}
                 alt=""
                 fill
-                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-                loading="eager"
-                className="hidden object-cover opacity-0 transition-opacity duration-500 motion-reduce:transition-none md:block md:group-hover:opacity-100"
+                sizes={
+                  isThreeColumn
+                    ? "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 50vw"
+                    : "(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+                }
+                loading="lazy"
+                className="hidden object-cover object-center opacity-0 transition-opacity duration-500 motion-reduce:transition-none md:block md:group-hover:opacity-100"
               />
             )}
           </div>
@@ -95,9 +113,9 @@ export default function ProductCard({
           </span>
         )}
 
-        {/* Keep collection labels visible, as on the reference storefront */}
+        {/* NEW Badge matching live site and reference images */}
         {showNewBadge && (
-          <span className="pointer-events-none absolute right-2 top-2 z-10 bg-white px-[7px] py-[5px] font-[Arial,Helvetica,sans-serif] text-[9px] font-bold uppercase leading-none tracking-[0.02em] text-black md:right-3 md:top-3 md:text-[10px]">
+          <span className="pointer-events-none absolute right-2 top-2 z-10 bg-white border border-black/80 px-2 py-0.5 text-[9px] md:text-[10px] font-bold uppercase leading-none tracking-wider text-black md:right-3 md:top-3">
             NEW
           </span>
         )}
@@ -105,21 +123,21 @@ export default function ProductCard({
 
       <Link
         href={`/products/${product.handle}`}
-        className="mt-2.5 block text-center md:mt-3"
+        className="mt-3 block text-center md:mt-3.5"
       >
-        <h3 className="line-clamp-2 text-center text-[11px] font-semibold uppercase leading-relaxed tracking-[0.1em] text-[#111111] md:text-[14px]">
+        <h3 className="line-clamp-2 text-center text-[12px] sm:text-[13px] md:text-[14px] font-medium uppercase leading-relaxed tracking-[0.12em] text-[#111111] hover:text-black">
           {product.title}
         </h3>
 
-        <p className="mt-2 flex flex-wrap items-baseline justify-center gap-x-1.5 gap-y-0.5 text-center text-[11px] font-normal text-black md:text-[13px]">
-          {showFrom && product.priceFrom && (
-            <span className="text-black/65">from</span>
+        <p className="mt-1.5 flex flex-wrap items-baseline justify-center gap-x-1.5 gap-y-0.5 text-center text-[12px] sm:text-[13px] md:text-[13.5px] font-normal text-[#111111]">
+          {(showFrom || product.priceFrom || product.handle === "bella") && (
+            <span className="text-black/65 font-serif mr-0.5">from</span>
           )}
 
-          <span>{formatPrice(product.price)}</span>
+          <span className="font-serif">{formatPrice(product.price)}</span>
 
           {product.originalPrice && product.originalPrice > product.price && (
-            <span className="text-[11px] text-black/45 line-through md:text-[13px]">
+            <span className="text-[11px] text-black/45 line-through md:text-[12.5px] ml-1">
               {formatPrice(product.originalPrice)}
             </span>
           )}
