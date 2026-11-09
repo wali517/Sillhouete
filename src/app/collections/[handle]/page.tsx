@@ -74,7 +74,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
       {/* Header section matching Sillhouete aesthetic */}
       {isSale ? (
         <header className="mb-8 text-center">
-          <h1 className="font-serif text-[26px] md:text-[24px] font-bold uppercase tracking-[0.08em] text-[#111111]">
+          <h1 className="font-serif text-[26px] md:text-[24px] font-bold uppercase tracking-[0.02em] text-[#111111]">
             SILLHOUETE SALE
           </h1>
           <p className="mt-2 text-[14px] md:text-[15px] font-serif text-[#111111]">
@@ -83,7 +83,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
         </header>
       ) : (
         <header className="mb-6">
-          <h1 className="font-serif text-[26px] sm:text-[30px] md:text-[26px] font-normal uppercase tracking-[0.08em] text-[#111111] text-center mb-16 md:mb-24 mt-10 md:mt-12">
+          <h1 className="font-serif text-[22px] sm:text-[24px] md:text-[26px] font-normal uppercase tracking-[0.02em] text-[#111111] text-center mb-16 md:mb-24 mt-2 md:mt-6">
             {title.toUpperCase()}
           </h1>
 
