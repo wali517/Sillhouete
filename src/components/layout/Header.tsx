@@ -112,7 +112,7 @@ export default function Header() {
                 <li key={item.label} className="relative group">
                   <Link
                     href={item.href}
-                    className={`relative flex items-center gap-0.5 px-1 py-1 text-[13px] xl:text-[14px] uppercase tracking-[0.06em] font-normal transition-colors hover:text-black after:content-[''] after:absolute after:bottom-0 after:left-1 after:right-1 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:ease-out after:origin-left ${
+                    className={`relative flex items-center py-1 text-[14px] xl:text-[15px] uppercase tracking-[0.01em] font-normal transition-colors hover:text-black after:content-[''] after:absolute after:bottom-0 after:left-1 after:right-1 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:ease-out after:origin-left ${
                       item.sale ? "!text-[#ff0000] font-normal animate-blinks sale-menu" : "text-black"
                     }`}
                   >
@@ -177,7 +177,7 @@ export default function Header() {
                 <li key={item.label} className="relative group">
                   <Link
                     href={item.href}
-                    className="relative flex items-center gap-0.5 px-1.5 py-0.5 text-[13px] xl:text-[14px] uppercase tracking-[0.06em] font-normal text-black hover:text-black transition-colors after:content-[''] after:absolute after:bottom-0 after:left-1 after:right-1 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:ease-out after:origin-left"
+                    className="relative flex items-center py-0.5 text-[13px] xl:text-[15px] uppercase tracking-[0.06em] font-normal text-black hover:text-black transition-colors after:content-[''] after:absolute after:bottom-0 after:left-1 after:right-1 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:ease-out after:origin-left"
                   >
                     <span>{item.label}</span>
                     {hasDropdown && (
