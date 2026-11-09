@@ -74,7 +74,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
       {/* Header section matching Sillhouete aesthetic */}
       {isSale ? (
         <header className="mb-8 text-center">
-          <h1 className="font-serif text-[26px] md:text-[32px] font-bold uppercase tracking-[0.08em] text-[#111111]">
+          <h1 className="font-serif text-[26px] md:text-[24px] font-bold uppercase tracking-[0.08em] text-[#111111]">
             SILLHOUETE SALE
           </h1>
           <p className="mt-2 text-[14px] md:text-[15px] font-serif text-[#111111]">
@@ -83,14 +83,14 @@ export default async function CollectionPage({ params, searchParams }: Props) {
         </header>
       ) : (
         <header className="mb-6">
-          <h1 className="font-serif text-[26px] sm:text-[30px] md:text-[34px] font-normal uppercase tracking-[0.08em] text-[#111111] text-center mb-6 md:mb-8">
+          <h1 className="font-serif text-[26px] sm:text-[30px] md:text-[26px] font-normal uppercase tracking-[0.08em] text-[#111111] text-center mb-16 md:mb-24 mt-10 md:mt-12">
             {title.toUpperCase()}
           </h1>
 
           {/* Breadcrumbs: Left-aligned matching Image 1 */}
           <nav
             aria-label="Breadcrumb"
-            className="mb-2 flex items-center gap-2 text-[12px] sm:text-[13px] text-[#666666] font-serif"
+            className="mb-2 flex items-center gap-2 text-[12px] sm:text-[16px] text-[#666666] font-serif"
           >
             <Link href="/" aria-label="Home" className="text-[#666666] hover:text-black transition-colors flex items-center">
               <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">

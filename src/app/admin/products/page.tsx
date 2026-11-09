@@ -547,6 +547,23 @@ export default function AdminProductsPage() {
     const cf = categoryFilter.toLowerCase();
     const matchCategory =
       categoryFilter === "All" ||
+      (categoryFilter === "Bridals" && (
+        (p.category && p.category.toLowerCase().includes("bridal")) ||
+        (p.mainCategorySlug && p.mainCategorySlug.includes("bridal")) ||
+        (p.subcategorySlug && p.subcategorySlug.includes("bridal")) ||
+        (p.collections && p.collections.some((c) => c.toLowerCase().includes("bridal")))
+      )) ||
+      (categoryFilter === "Formal" && (
+        (p.category && p.category.toLowerCase().includes("formal")) ||
+        (p.mainCategorySlug && p.mainCategorySlug.includes("formal")) ||
+        (p.subcategorySlug && p.subcategorySlug.includes("formal")) ||
+        (p.collections && p.collections.some((c) => c.toLowerCase().includes("formal")))
+      )) ||
+      (categoryFilter === "Sale" && (
+        p.isSale ||
+        (p.originalPrice && p.originalPrice > p.price) ||
+        (p.collections && p.collections.some((c) => c.toLowerCase().includes("sale")))
+      )) ||
       (p.category && p.category.toLowerCase().includes(cf)) ||
       (p.mainCategoryName && p.mainCategoryName.toLowerCase().includes(cf)) ||
       (p.subcategoryName && p.subcategoryName.toLowerCase().includes(cf)) ||
@@ -561,6 +578,9 @@ export default function AdminProductsPage() {
 
     return matchCategory && matchSearch;
   });
+
+  const QUICK_CATS = ["All", "Sale", "Formal", "Bridals"];
+  const isCustomSelected = !QUICK_CATS.includes(categoryFilter);
 
   return (
     <div className="space-y-6">
@@ -592,34 +612,61 @@ export default function AdminProductsPage() {
         </div>
       </div>
 
-      {/* Filters & Search */}
-      <div className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-sm md:flex-row md:items-center md:justify-between">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+      {/* Filters & Search Header */}
+      <div className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-3.5 shadow-xs sm:flex-row sm:items-center sm:justify-between">
+        {/* Spacious Search Bar */}
+        <div className="relative flex-1 min-w-[240px] sm:max-w-md lg:max-w-lg">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by title, SKU, or slug..."
-            className="w-full pl-9 pr-4 py-2 text-xs border border-gray-200 rounded-lg outline-none focus:border-black"
+            className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm border border-gray-200 rounded-lg outline-none focus:border-black transition-colors bg-white"
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto py-1">
-          {["All", ...categoryOptions.slice(0, 7)].map((cat) => (
+        {/* Clean 2-3 Category Pills + All & More dropdown */}
+        <div className="flex items-center gap-1.5 shrink-0 flex-wrap sm:flex-nowrap">
+          {QUICK_CATS.map((cat) => (
             <button
               key={cat}
               type="button"
               onClick={() => setCategoryFilter(cat)}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap ${
+              className={`rounded-lg px-3.5 py-2 text-xs font-semibold uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer ${
                 categoryFilter === cat
-                  ? "bg-black text-white"
+                  ? "bg-black text-white shadow-xs"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
               {cat}
             </button>
           ))}
+
+          {/* Compact dropdown for remaining categories */}
+          <div className="relative">
+            <select
+              value={isCustomSelected ? categoryFilter : ""}
+              onChange={(e) => setCategoryFilter(e.target.value || "All")}
+              className={`rounded-lg border px-3 py-2 text-xs font-semibold uppercase tracking-wider outline-none cursor-pointer transition-colors ${
+                isCustomSelected
+                  ? "bg-black text-white border-black"
+                  : "bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200"
+              }`}
+            >
+              <option value="" disabled={isCustomSelected}>
+                {isCustomSelected ? categoryFilter : "More..."}
+              </option>
+              <option value="All">All Categories</option>
+              {categoryOptions
+                .filter((cat) => !QUICK_CATS.includes(cat))
+                .map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+            </select>
+          </div>
         </div>
       </div>
 
