@@ -58,15 +58,29 @@ export default function Header() {
     "shop by events",
   ];
 
-  const NAV_ROW1 = navItems.filter((item) => {
-    const l = item.label.toLowerCase();
-    return ROW1_KEYS.includes(l);
-  });
+  // Canonical Row 1 strictly ordered as in the official storefront
+  const NAV_ROW1: NavLink[] = ROW1_KEYS.map((key) =>
+    navItems.find((item) => item.label.toLowerCase().trim() === key)
+  ).filter(Boolean) as NavLink[];
 
-  const NAV_ROW2 = navItems.filter((item) => {
-    const l = item.label.toLowerCase();
+  // Row 2: Best Sellers, Spotted, Accessories, then any custom main categories from admin
+  const ROW2_CANONICAL = ["best sellers", "spotted", "accessories"];
+  const remaining = navItems.filter((item) => {
+    const l = item.label.toLowerCase().trim();
     return !ROW1_KEYS.includes(l);
   });
+
+  const NAV_ROW2: NavLink[] = [];
+  for (const key of ROW2_CANONICAL) {
+    const found = remaining.find((item) => item.label.toLowerCase().trim() === key);
+    if (found) NAV_ROW2.push(found);
+  }
+  for (const item of remaining) {
+    const l = item.label.toLowerCase().trim();
+    if (!ROW2_CANONICAL.includes(l) && !NAV_ROW2.some((x) => x.label === item.label)) {
+      NAV_ROW2.push(item);
+    }
+  }
 
   return (
     <header className="relative z-40 border-b border-[#e8e8e1] bg-white font-serif">
@@ -125,7 +139,7 @@ export default function Header() {
                   {hasDropdown && (
                     <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full pt-1.5 z-50 pointer-events-none group-hover:pointer-events-auto">
                       <ul className="min-w-[220px] bg-white border border-black/[0.08] shadow-[0_10px_24px_rgba(0,0,0,0.08)] py-2.5 text-left font-serif">
-                        {item.children!.map((child) => {
+                        {item.children!.filter((child) => child.label.toLowerCase().trim() !== "view all").map((child) => {
                           const isMeeras = child.blink || child.label.toLowerCase() === "meeras";
                           const isHighlight = child.highlight || child.label.includes("Raha Eid Pret");
 
@@ -188,7 +202,7 @@ export default function Header() {
                   {hasDropdown && (
                     <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full pt-1.5 z-50 pointer-events-none group-hover:pointer-events-auto">
                       <ul className="min-w-[220px] bg-white border border-black/[0.08] shadow-[0_10px_24px_rgba(0,0,0,0.08)] py-2.5 text-left font-serif">
-                        {item.children!.map((child) => {
+                        {item.children!.filter((child) => child.label.toLowerCase().trim() !== "view all").map((child) => {
                           const isMeeras = child.blink || child.label.toLowerCase() === "meeras";
                           const isHighlight = child.highlight || child.label.includes("Raha Eid Pret");
 

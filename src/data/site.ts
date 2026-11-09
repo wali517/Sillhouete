@@ -50,7 +50,6 @@ export const NAV: NavLink[] = [
       { label: "Rang e Bahar", href: "/collections/rang-e-bahar" },
       { label: "Tosha Kinari", href: "/collections/tosha-kinari" },
       { label: "Shawl Collection", href: "/collections/luxury-shawl" },
-      { label: "View All", href: "/collections/formal-dresses" },
     ],
   },
   {

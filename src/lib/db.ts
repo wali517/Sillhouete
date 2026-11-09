@@ -571,30 +571,24 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
 
     const navItems: NavLink[] = [];
 
-    // Helper to get active children of a main category
+    // Helper to get active children of a main category (strictly no "View All", exclude main categories)
     const getChildrenFor = async (handle: string, id: string): Promise<NavLink[]> => {
       const subDocs = await CollectionModel.find({
         $or: [{ parentHandle: handle }, { mainCategoryId: id }],
+        isMainCategory: { $ne: true },
         isActive: { $ne: false },
       })
         .sort({ order: 1, createdAt: 1 })
         .lean();
 
-      const children: NavLink[] = subDocs.map((sub) => ({
-        label: sub.title,
-        href: `/collections/${sub.handle}`,
-        blink: sub.handle.includes("meeras") || sub.title.toLowerCase().includes("meeras"),
-        highlight: sub.handle.includes("raha") || sub.title.toLowerCase().includes("raha"),
-      }));
-
-      if (children.length > 0) {
-        children.push({
-          label: "View All",
-          href: `/collections/${handle}`,
-        });
-      }
-
-      return children;
+      return subDocs
+        .filter((sub) => sub.title.toLowerCase().trim() !== "view all" && sub.handle !== "view-all")
+        .map((sub) => ({
+          label: sub.title,
+          href: `/collections/${sub.handle}`,
+          blink: sub.handle.includes("meeras") || sub.title.toLowerCase().includes("meeras"),
+          highlight: sub.handle.includes("raha") || sub.title.toLowerCase().includes("raha"),
+        }));
     };
 
     // 1. Sale
@@ -631,14 +625,13 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       children: newArrivalsChildren,
     });
 
-    // 4. Bridals
+    // 4. Bridals (strictly 4 children: Husan ara, Anarkali, Noor Jahn, Roshanara)
     const bridalDoc = mainMap.get("bridal-dresses");
     let bridalChildren: NavLink[] = [
       { label: "Husan ara - Birdal '25", href: "/collections/husan-ara-birdal-25" },
       { label: "Anarkali - Birdal '24", href: "/collections/anarkali-birdal-24" },
       { label: "Noor Jahn Bridal '23", href: "/collections/noor-jahn-bridal-23" },
       { label: "Roshanara Bridal '22", href: "/collections/roshanara-bridal-22" },
-      { label: "View All", href: "/collections/bridal-dresses" },
     ];
     if (bridalDoc) {
       const dynamicChildren = await getChildrenFor("bridal-dresses", String(bridalDoc._id));
@@ -652,7 +645,7 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       children: bridalChildren,
     });
 
-    // 5. Formal
+    // 5. Formal (strictly 7 children: Lumiere, Meeras, Zarqaa, Riwaj Formals, Rang e Bahar, Tosha Kinari, Shawl Collection - no View All)
     const formalDoc = mainMap.get("formal-dresses");
     let formalChildren: NavLink[] = [
       { label: "Lumiere Luxury Formals'26", href: "/collections/lumiere-luxury-formals26" },
@@ -662,7 +655,6 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       { label: "Rang e Bahar", href: "/collections/rang-e-bahar" },
       { label: "Tosha Kinari", href: "/collections/tosha-kinari" },
       { label: "Shawl Collection", href: "/collections/luxury-shawl" },
-      { label: "View All", href: "/collections/formal-dresses" },
     ];
     if (formalDoc) {
       const dynamicChildren = await getChildrenFor("formal-dresses", String(formalDoc._id));
@@ -676,7 +668,7 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       children: formalChildren,
     });
 
-    // 6. Luxury Pret
+    // 6. Luxury Pret (strictly 6 children: Maahi II, Silk Solids'26, Maahi Luxury Pret'25, Luxe, Opal, Riwaj Luxury Pret - no View All)
     const luxPretDoc = mainMap.get("luxury-pret");
     let luxPretChildren: NavLink[] = [
       { label: "Maahi II Luxury Eid Pret", href: "/collections/maahi-ii-luxury-eid-pret" },
@@ -685,12 +677,18 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       { label: "Luxe", href: "/collections/luxe" },
       { label: "Opal", href: "/collections/opal" },
       { label: "Riwaj Luxury Pret", href: "/collections/riwaj-luxury-pret" },
-      { label: "View All", href: "/collections/luxury-pret" },
     ];
     if (luxPretDoc) {
       const dynamicChildren = await getChildrenFor("luxury-pret", String(luxPretDoc._id));
       if (dynamicChildren.length > 0) {
-        luxPretChildren = dynamicChildren;
+        // Prepend Maahi II Luxury Eid Pret if not already included
+        const hasMaahi = dynamicChildren.some((c) => c.href.includes("maahi-ii"));
+        luxPretChildren = hasMaahi
+          ? dynamicChildren
+          : [
+              { label: "Maahi II Luxury Eid Pret", href: "/collections/maahi-ii-luxury-eid-pret" },
+              ...dynamicChildren,
+            ];
       }
     }
     navItems.push({
@@ -699,11 +697,10 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       children: luxPretChildren,
     });
 
-    // 7. Pret
+    // 7. Pret (strictly 1 child: Raha Eid Pret'26 - no View All)
     const pretDoc = mainMap.get("pret");
     let pretChildren: NavLink[] = [
       { label: "Raha Eid Pret'26", href: "/collections/raha-eid-pret26", highlight: true },
-      { label: "View All", href: "/collections/pret" },
     ];
     if (pretDoc) {
       const dynamicChildren = await getChildrenFor("pret", String(pretDoc._id));
@@ -717,17 +714,25 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       children: pretChildren,
     });
 
-    // 8. Shop By Events
+    // 8. Shop By Events (strictly 5 children: Engagement, Mehndi, Nikkah, Barat, Walima - no View All)
+    const sbeDoc = mainMap.get("shop-by-events");
+    let sbeChildren: NavLink[] = [
+      { label: "Engagement", href: "/collections/engagement-dresses" },
+      { label: "Mehndi", href: "/collections/mehndi-dresses" },
+      { label: "Nikkah", href: "/collections/nikkah-dresses" },
+      { label: "Barat", href: "/collections/barat-dresses" },
+      { label: "Walima", href: "/collections/walima-dresses" },
+    ];
+    if (sbeDoc) {
+      const dynamicChildren = await getChildrenFor("shop-by-events", String(sbeDoc._id));
+      if (dynamicChildren.length > 0) {
+        sbeChildren = dynamicChildren;
+      }
+    }
     navItems.push({
       label: "Shop By Events",
       href: "#",
-      children: [
-        { label: "Engagement", href: "/collections/engagement-dresses" },
-        { label: "Mehndi", href: "/collections/mehndi-dresses" },
-        { label: "Nikkah", href: "/collections/nikkah-dresses" },
-        { label: "Barat", href: "/collections/barat-dresses" },
-        { label: "Walima", href: "/collections/walima-dresses" },
-      ],
+      children: sbeChildren,
     });
 
     // 9. Best Sellers
@@ -742,11 +747,10 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       href: "/pages/spot",
     });
 
-    // 11. Accessories
+    // 11. Accessories (strictly 1 child: Pouches & Clutches - no View All)
     const accDoc = mainMap.get("accessories");
     let accChildren: NavLink[] = [
       { label: "Pouches & Clutches", href: "/collections/pouches-clutches" },
-      { label: "View All", href: "/collections/accessories" },
     ];
     if (accDoc) {
       const dynamicChildren = await getChildrenFor("accessories", String(accDoc._id));

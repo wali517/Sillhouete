@@ -120,7 +120,7 @@ export default function MobileMenu({
                   </div>
                   {item.children && expanded === item.label && (
                     <ul className="pb-3 pl-4 space-y-1 bg-soft/50 rounded p-2 mb-2">
-                      {item.children.map((c) => {
+                      {item.children.filter((c) => c.label.toLowerCase().trim() !== "view all").map((c) => {
                         const isMeeras = c.blink || c.label.toLowerCase() === "meeras";
                         const isHighlight = c.highlight || c.label.includes("Raha Eid Pret");
 
