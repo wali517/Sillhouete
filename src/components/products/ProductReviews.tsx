@@ -223,7 +223,7 @@ export default function ProductReviews({ productTitle }: { productTitle: string 
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Give your review a title"
-                className="w-full h-[44px] px-3.5 border border-[#108474] bg-white text-[13px] text-black placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#108474]"
+                className="w-full h-11 px-3.5 border border-[#108474] bg-white text-[13px] text-black placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#108474]"
               />
             </div>
 
@@ -311,7 +311,7 @@ export default function ProductReviews({ productTitle }: { productTitle: string 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Display name"
-                className="w-full h-[44px] px-3.5 border border-[#d1d5db] focus:border-[#108474] bg-white text-[13px] text-black placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#108474]"
+                className="w-full h-11 px-3.5 border border-[#d1d5db] focus:border-[#108474] bg-white text-[13px] text-black placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#108474]"
               />
             </div>
 
@@ -326,7 +326,7 @@ export default function ProductReviews({ productTitle }: { productTitle: string 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email address"
-                className="w-full h-[44px] px-3.5 border border-[#d1d5db] focus:border-[#108474] bg-white text-[13px] text-black placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#108474]"
+                className="w-full h-11 px-3.5 border border-[#d1d5db] focus:border-[#108474] bg-white text-[13px] text-black placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#108474]"
               />
             </div>
 

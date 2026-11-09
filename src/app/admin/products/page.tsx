@@ -227,8 +227,12 @@ export default function AdminProductsPage() {
   };
 
   useEffect(() => {
-    fetchProducts();
-    fetchCategories();
+    const timeoutId = window.setTimeout(() => {
+      void fetchProducts();
+      void fetchCategories();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   const openAddModal = () => {
@@ -1182,7 +1186,7 @@ export default function AdminProductsPage() {
                     {galleryImages.map((imgUrl, idx) => (
                       <div
                         key={idx}
-                        className="group relative rounded-lg border border-gray-200 overflow-hidden bg-white shadow-xs aspect-[3/4]"
+                        className="group relative rounded-lg border border-gray-200 overflow-hidden bg-white shadow-xs aspect-3/4"
                       >
                         <Image src={imgUrl} alt={`Gallery ${idx + 1}`} fill sizes="120px" className="object-cover" />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-1.5">

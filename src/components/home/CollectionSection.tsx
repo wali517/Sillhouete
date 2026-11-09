@@ -41,7 +41,7 @@ export default function CollectionSection({
           <Link
             href={href}
             className={`btn inline-flex items-center justify-center bg-[#111111] px-6 py-[11px] text-[11px] font-bold uppercase tracking-[0.25em] rounded-none border border-[#111111] hover:bg-[#222222] transition-colors shadow-none ${
-              viewAllRed ? "view-all-red !text-[#ff0000]" : "!text-white"
+              viewAllRed ? "view-all-red text-[#ff0000]!" : "!text-white"
             }`}
           >
             View all

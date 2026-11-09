@@ -88,7 +88,7 @@ export default function Header() {
         {/* Left Logo */}
         <Link
           href="/"
-          className="relative block h-[44px] w-[112px] shrink-0 sm:h-[48px] sm:w-[126px] lg:h-[48px] lg:w-[130px]"
+          className="relative block h-11 w-28 shrink-0 sm:h-12 sm:w-31.5 lg:h-12 lg:w-32.5"
           aria-label="Sillhouete home"
         >
           <Image
@@ -113,7 +113,7 @@ export default function Header() {
                   <Link
                     href={item.href}
                     className={`relative flex items-center py-1 text-[14px] xl:text-[15px] uppercase tracking-[0.01em] font-normal transition-colors hover:text-black after:content-[''] after:absolute after:bottom-0 after:left-1 after:right-1 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:ease-out after:origin-left ${
-                      item.sale ? "!text-[#ff0000] font-normal animate-blinks sale-menu" : "text-black"
+                      item.sale ? "text-[#ff0000]! font-normal animate-blinks sale-menu" : "text-black"
                     }`}
                   >
                     <span>{item.label}</span>
@@ -122,7 +122,7 @@ export default function Header() {
                         aria-hidden="true"
                         focusable="false"
                         role="presentation"
-                        className="w-[8px] h-[5px] opacity-70 transition-transform duration-200 group-hover:rotate-180 ml-1"
+                        className="w-2 h-1.25 opacity-70 transition-transform duration-200 group-hover:rotate-180 ml-1"
                         viewBox="0 0 28 16"
                       >
                         <path
@@ -138,7 +138,7 @@ export default function Header() {
                   {/* Vertical Dropdown on Hover */}
                   {hasDropdown && (
                     <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full pt-1.5 z-50 pointer-events-none group-hover:pointer-events-auto">
-                      <ul className="min-w-[220px] bg-white border border-black/[0.08] shadow-[0_10px_24px_rgba(0,0,0,0.08)] py-2.5 text-left font-serif">
+                      <ul className="min-w-55 bg-white border border-black/8 shadow-[0_10px_24px_rgba(0,0,0,0.08)] py-2.5 text-left font-serif">
                         {item.children!.filter((child) => child.label.toLowerCase().trim() !== "view all").map((child) => {
                           const isMeeras = child.blink || child.label.toLowerCase() === "meeras";
                           const isHighlight = child.highlight || child.label.includes("Raha Eid Pret");
@@ -147,7 +147,7 @@ export default function Header() {
                             <li key={child.label}>
                               <Link
                                 href={child.href}
-                                className={`block px-5 py-2 text-[14px] transition-colors whitespace-nowrap hover:bg-neutral-50 ${
+                                className={`block px-5 py-2 text-[15px] transition-colors whitespace-nowrap hover:bg-neutral-50 ${
                                   isMeeras
                                     ? "text-[#ff0000] font-normal blink-meeras"
                                     : isHighlight
@@ -185,7 +185,7 @@ export default function Header() {
                         aria-hidden="true"
                         focusable="false"
                         role="presentation"
-                        className="w-[8px] h-[5px] opacity-70 transition-transform duration-200 group-hover:rotate-180 ml-1"
+                        className="w-2 h-1.25 opacity-70 transition-transform duration-200 group-hover:rotate-180 ml-1"
                         viewBox="0 0 28 16"
                       >
                         <path
@@ -201,7 +201,7 @@ export default function Header() {
                   {/* Vertical Dropdown on Hover */}
                   {hasDropdown && (
                     <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full pt-1.5 z-50 pointer-events-none group-hover:pointer-events-auto">
-                      <ul className="min-w-[220px] bg-white border border-black/[0.08] shadow-[0_10px_24px_rgba(0,0,0,0.08)] py-2.5 text-left font-serif">
+                      <ul className="min-w-55 bg-white border border-black/8 shadow-[0_10px_24px_rgba(0,0,0,0.08)] py-2.5 text-left font-serif">
                         {item.children!.filter((child) => child.label.toLowerCase().trim() !== "view all").map((child) => {
                           const isMeeras = child.blink || child.label.toLowerCase() === "meeras";
                           const isHighlight = child.highlight || child.label.includes("Raha Eid Pret");

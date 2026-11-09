@@ -946,7 +946,7 @@ function CheckoutForm() {
                 <div className="border border-[#005bd3] bg-[#f4f8ff] rounded-[6px] px-4 py-3.5 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-[18px] h-[18px] rounded-full border-2 border-[#005bd3] flex items-center justify-center shrink-0">
-                      <div className="w-[8px] h-[8px] rounded-full bg-[#005bd3]" />
+                      <div className="w-2 h-[8px] rounded-full bg-[#005bd3]" />
                     </div>
                     <span className="text-[14px] text-[#1a1a1a]">Standard</span>
                   </div>
@@ -968,7 +968,7 @@ function CheckoutForm() {
                   <div className="flex items-center justify-between px-4 py-3.5 bg-[#f4f8ff] border-b border-[#d9d9d9]">
                     <div className="flex items-center gap-3">
                       <div className="w-[18px] h-[18px] rounded-full border-2 border-[#005bd3] flex items-center justify-center shrink-0">
-                        <div className="w-[8px] h-[8px] rounded-full bg-[#005bd3]" />
+                        <div className="w-2 h-[8px] rounded-full bg-[#005bd3]" />
                       </div>
                       <span className="text-[14px] font-medium text-[#1a1a1a]">
                         Credit card
@@ -1111,7 +1111,7 @@ function CheckoutForm() {
                           }`}
                         >
                           {billingSame && (
-                            <div className="w-[8px] h-[8px] rounded-full bg-[#005bd3]" />
+                            <div className="w-2 h-[8px] rounded-full bg-[#005bd3]" />
                           )}
                         </div>
                         <span className="text-[14px] font-medium text-[#1a1a1a]">
@@ -1140,7 +1140,7 @@ function CheckoutForm() {
                           }`}
                         >
                           {!billingSame && (
-                            <div className="w-[8px] h-[8px] rounded-full bg-[#005bd3]" />
+                            <div className="w-2 h-[8px] rounded-full bg-[#005bd3]" />
                           )}
                         </div>
                         <span className="text-[14px] font-medium text-[#1a1a1a]">

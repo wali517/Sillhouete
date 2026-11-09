@@ -88,7 +88,7 @@ export default function MobileMenu({
                       href={item.href}
                       onClick={onClose}
                       className={`flex-1 py-3 text-[15px] uppercase tracking-wide font-normal ${
-                        item.sale ? "!text-[#ff0000] animate-blinks sale-menu font-normal" : "text-black"
+                        item.sale ? "text-[#ff0000]! animate-blinks sale-menu font-normal" : "text-black"
                       }`}
                     >
                       {item.label}
@@ -105,7 +105,7 @@ export default function MobileMenu({
                           aria-hidden="true"
                           focusable="false"
                           role="presentation"
-                          className={`w-[9px] h-[5px] opacity-70 transition-transform duration-200 ${
+                          className={`w-[9px] h-1.25 opacity-70 transition-transform duration-200 ${
                             expanded === item.label ? "rotate-180" : ""
                           }`}
                           viewBox="0 0 28 16"
@@ -131,9 +131,9 @@ export default function MobileMenu({
                               onClick={onClose}
                               className={`block py-1.5 text-[14px] font-normal hover:underline ${
                                 isMeeras
-                                  ? "!text-[#ff0000] font-normal blink-meeras"
+                                  ? "text-[#ff0000]! font-normal blink-meeras"
                                   : isHighlight
-                                  ? "!text-[#ff0000] font-normal highlight-red"
+                                  ? "text-[#ff0000]! font-normal highlight-red"
                                   : "text-black/80 hover:text-black"
                               }`}
                             >

@@ -87,7 +87,7 @@ export default function CartPage() {
                     {/* Product Thumbnail (vertical dress framing) */}
                     <Link
                       href={`/products/${item.product.handle}`}
-                      className="relative w-[78px] sm:w-[92px] aspect-[3/4] shrink-0 overflow-hidden bg-[#f4f4f4]"
+                      className="relative w-[78px] sm:w-[92px] aspect-3/4 shrink-0 overflow-hidden bg-[#f4f4f4]"
                     >
                       <Image
                         src={item.product.image}
