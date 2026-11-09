@@ -538,7 +538,22 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
   try {
     await connectDB();
 
-    // 1. Fetch all active main categories
+    // Defined canonical order for Sillhouete's official top-level navigation
+    const OFFICIAL_ORDER = [
+      "sale-1",
+      "maahi-ii-luxury-eid-pret",
+      "new-arrivals",
+      "bridal-dresses",
+      "formal-dresses",
+      "luxury-pret",
+      "pret",
+      "shop-by-events",
+      "best-sellers",
+      "spotted",
+      "accessories",
+    ];
+
+    // 1. Fetch all active main categories from MongoDB
     const mainDocs = await CollectionModel.find({
       $or: [
         { isMainCategory: true },
@@ -547,35 +562,19 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
         { parentHandle: { $exists: false } },
       ],
       isActive: { $ne: false },
-    })
-      .sort({ order: 1, createdAt: 1 })
-      .lean();
+    }).lean();
+
+    const mainMap = new Map<string, any>();
+    for (const d of mainDocs) {
+      mainMap.set(d.handle, d);
+    }
 
     const navItems: NavLink[] = [];
-    const addedHandles = new Set<string>();
 
-    // 2. Format Sale item at start
-    const saleItem: NavLink = {
-      label: "Sale",
-      href: "/collections/sale-1",
-      sale: true,
-      blink: true,
-    };
-    navItems.push(saleItem);
-    addedHandles.add("sale");
-    addedHandles.add("sale-1");
-
-    // 3. Loop through active main categories from MongoDB
-    for (const main of mainDocs) {
-      if (addedHandles.has(main.handle)) continue;
-      addedHandles.add(main.handle);
-
-      // Fetch active subcategories for this main category
+    // Helper to get active children of a main category
+    const getChildrenFor = async (handle: string, id: string): Promise<NavLink[]> => {
       const subDocs = await CollectionModel.find({
-        $or: [
-          { parentHandle: main.handle },
-          { mainCategoryId: String(main._id) },
-        ],
+        $or: [{ parentHandle: handle }, { mainCategoryId: id }],
         isActive: { $ne: false },
       })
         .sort({ order: 1, createdAt: 1 })
@@ -588,14 +587,183 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
         highlight: sub.handle.includes("raha") || sub.title.toLowerCase().includes("raha"),
       }));
 
-      // If it has children, add "View All" link at the end
       if (children.length > 0) {
         children.push({
-          label: `View All`,
-          href: `/collections/${main.handle}`,
+          label: "View All",
+          href: `/collections/${handle}`,
         });
       }
 
+      return children;
+    };
+
+    // 1. Sale
+    navItems.push({
+      label: "Sale",
+      href: "/collections/sale-1",
+      sale: true,
+      blink: true,
+    });
+
+    // 2. Maahi II Luxury Eid Pret
+    navItems.push({
+      label: "Maahi II Luxury Eid Pret",
+      href: "/collections/maahi-ii-luxury-eid-pret",
+    });
+
+    // 3. New Arrivals (dropdown: Maahi II, Silk Solids'26, Raha Eid Pret'26, Lumiere)
+    const newArrivalsDoc = mainMap.get("new-arrivals");
+    let newArrivalsChildren: NavLink[] = [
+      { label: "Maahi II Luxury Eid Pret", href: "/collections/maahi-ii-luxury-eid-pret" },
+      { label: "Silk Solids'26", href: "/collections/silk-solids26" },
+      { label: "Raha Eid Pret'26", href: "/collections/raha-eid-pret26", highlight: true },
+      { label: "Lumiere Luxury Formals'26", href: "/collections/lumiere-luxury-formals26" },
+    ];
+    if (newArrivalsDoc) {
+      const dynamicChildren = await getChildrenFor("new-arrivals", String(newArrivalsDoc._id));
+      if (dynamicChildren.length > 0) {
+        newArrivalsChildren = dynamicChildren;
+      }
+    }
+    navItems.push({
+      label: "New Arrivals",
+      href: "/collections/new-arrivals",
+      children: newArrivalsChildren,
+    });
+
+    // 4. Bridals
+    const bridalDoc = mainMap.get("bridal-dresses");
+    let bridalChildren: NavLink[] = [
+      { label: "Husan ara - Birdal '25", href: "/collections/husan-ara-birdal-25" },
+      { label: "Anarkali - Birdal '24", href: "/collections/anarkali-birdal-24" },
+      { label: "Noor Jahn Bridal '23", href: "/collections/noor-jahn-bridal-23" },
+      { label: "Roshanara Bridal '22", href: "/collections/roshanara-bridal-22" },
+      { label: "View All", href: "/collections/bridal-dresses" },
+    ];
+    if (bridalDoc) {
+      const dynamicChildren = await getChildrenFor("bridal-dresses", String(bridalDoc._id));
+      if (dynamicChildren.length > 0) {
+        bridalChildren = dynamicChildren;
+      }
+    }
+    navItems.push({
+      label: "Bridals",
+      href: "/collections/bridal-dresses",
+      children: bridalChildren,
+    });
+
+    // 5. Formal
+    const formalDoc = mainMap.get("formal-dresses");
+    let formalChildren: NavLink[] = [
+      { label: "Lumiere Luxury Formals'26", href: "/collections/lumiere-luxury-formals26" },
+      { label: "Meeras", href: "/collections/meeras", blink: true },
+      { label: "Zarqaa", href: "/collections/zarqaa" },
+      { label: "Riwaj Formals", href: "/collections/riwaj-formals" },
+      { label: "Rang e Bahar", href: "/collections/rang-e-bahar" },
+      { label: "Tosha Kinari", href: "/collections/tosha-kinari" },
+      { label: "Shawl Collection", href: "/collections/luxury-shawl" },
+      { label: "View All", href: "/collections/formal-dresses" },
+    ];
+    if (formalDoc) {
+      const dynamicChildren = await getChildrenFor("formal-dresses", String(formalDoc._id));
+      if (dynamicChildren.length > 0) {
+        formalChildren = dynamicChildren;
+      }
+    }
+    navItems.push({
+      label: "Formal",
+      href: "/collections/formal-dresses",
+      children: formalChildren,
+    });
+
+    // 6. Luxury Pret
+    const luxPretDoc = mainMap.get("luxury-pret");
+    let luxPretChildren: NavLink[] = [
+      { label: "Maahi II Luxury Eid Pret", href: "/collections/maahi-ii-luxury-eid-pret" },
+      { label: "Silk Solids'26", href: "/collections/silk-solids26" },
+      { label: "Maahi Luxury Pret'25", href: "/collections/maahi-luxury-pret25" },
+      { label: "Luxe", href: "/collections/luxe" },
+      { label: "Opal", href: "/collections/opal" },
+      { label: "Riwaj Luxury Pret", href: "/collections/riwaj-luxury-pret" },
+      { label: "View All", href: "/collections/luxury-pret" },
+    ];
+    if (luxPretDoc) {
+      const dynamicChildren = await getChildrenFor("luxury-pret", String(luxPretDoc._id));
+      if (dynamicChildren.length > 0) {
+        luxPretChildren = dynamicChildren;
+      }
+    }
+    navItems.push({
+      label: "Luxury Pret",
+      href: "/collections/luxury-pret",
+      children: luxPretChildren,
+    });
+
+    // 7. Pret
+    const pretDoc = mainMap.get("pret");
+    let pretChildren: NavLink[] = [
+      { label: "Raha Eid Pret'26", href: "/collections/raha-eid-pret26", highlight: true },
+      { label: "View All", href: "/collections/pret" },
+    ];
+    if (pretDoc) {
+      const dynamicChildren = await getChildrenFor("pret", String(pretDoc._id));
+      if (dynamicChildren.length > 0) {
+        pretChildren = dynamicChildren;
+      }
+    }
+    navItems.push({
+      label: "Pret",
+      href: "/collections/pret",
+      children: pretChildren,
+    });
+
+    // 8. Shop By Events
+    navItems.push({
+      label: "Shop By Events",
+      href: "#",
+      children: [
+        { label: "Engagement", href: "/collections/engagement-dresses" },
+        { label: "Mehndi", href: "/collections/mehndi-dresses" },
+        { label: "Nikkah", href: "/collections/nikkah-dresses" },
+        { label: "Barat", href: "/collections/barat-dresses" },
+        { label: "Walima", href: "/collections/walima-dresses" },
+      ],
+    });
+
+    // 9. Best Sellers
+    navItems.push({
+      label: "Best Sellers",
+      href: "/collections/best-sellers",
+    });
+
+    // 10. Spotted
+    navItems.push({
+      label: "Spotted",
+      href: "/pages/spot",
+    });
+
+    // 11. Accessories
+    const accDoc = mainMap.get("accessories");
+    let accChildren: NavLink[] = [
+      { label: "Pouches & Clutches", href: "/collections/pouches-clutches" },
+      { label: "View All", href: "/collections/accessories" },
+    ];
+    if (accDoc) {
+      const dynamicChildren = await getChildrenFor("accessories", String(accDoc._id));
+      if (dynamicChildren.length > 0) {
+        accChildren = dynamicChildren;
+      }
+    }
+    navItems.push({
+      label: "Accessories",
+      href: "/collections/accessories",
+      children: accChildren,
+    });
+
+    // 12. Add any additional custom Main Categories created in Admin Panel
+    for (const main of mainDocs) {
+      if (OFFICIAL_ORDER.includes(main.handle)) continue;
+      const children = await getChildrenFor(main.handle, String(main._id));
       navItems.push({
         label: main.title,
         href: `/collections/${main.handle}`,
@@ -603,35 +771,11 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       });
     }
 
-    // 4. Ensure "Shop By Events" is present
-    if (!navItems.some((n) => n.label.toLowerCase().includes("event"))) {
-      navItems.push({
-        label: "Shop By Events",
-        href: "#",
-        children: [
-          { label: "Engagement", href: "/collections/engagement-dresses" },
-          { label: "Mehndi", href: "/collections/mehndi-dresses" },
-          { label: "Nikkah", href: "/collections/nikkah-dresses" },
-          { label: "Barat", href: "/collections/barat-dresses" },
-          { label: "Walima", href: "/collections/walima-dresses" },
-        ],
-      });
-    }
-
-    // 5. Ensure "Spotted" is present
-    if (!navItems.some((n) => n.label.toLowerCase() === "spotted")) {
-      navItems.push({ label: "Spotted", href: "/pages/spot" });
-    }
-
-    if (navItems.length > 1) {
-      return navItems;
-    }
+    return navItems;
   } catch (err) {
     console.warn("getNavigationMenu error:", err);
+    return NAV;
   }
-
-  // Fallback to static NAV
-  return NAV;
 }
 
 /** Exact / full match search filter for main search (when Enter is pressed). */

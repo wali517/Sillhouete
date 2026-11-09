@@ -47,9 +47,26 @@ export default function Header() {
     router.push(`/search?q=${encodeURIComponent(query.trim())}`);
   };
 
-  const splitIndex = Math.min(8, Math.ceil(navItems.length / 2));
-  const NAV_ROW1 = navItems.slice(0, splitIndex);
-  const NAV_ROW2 = navItems.slice(splitIndex);
+  const ROW1_KEYS = [
+    "sale",
+    "maahi ii luxury eid pret",
+    "new arrivals",
+    "bridals",
+    "formal",
+    "luxury pret",
+    "pret",
+    "shop by events",
+  ];
+
+  const NAV_ROW1 = navItems.filter((item) => {
+    const l = item.label.toLowerCase();
+    return ROW1_KEYS.includes(l);
+  });
+
+  const NAV_ROW2 = navItems.filter((item) => {
+    const l = item.label.toLowerCase();
+    return !ROW1_KEYS.includes(l);
+  });
 
   return (
     <header className="relative z-40 border-b border-[#e8e8e1] bg-white font-serif">
@@ -73,7 +90,7 @@ export default function Header() {
         {/* Primary Desktop Navigation: 2 Rows Centered */}
         <nav aria-label="Primary" className="hidden flex-1 flex-col items-center justify-center lg:flex">
           {/* Row 1 */}
-          <ul className="flex flex-wrap items-center justify-center gap-0.5">
+          <ul className="flex flex-wrap items-center justify-center gap-x-4 lg:gap-x-5 xl:gap-x-6">
             {NAV_ROW1.map((item) => {
               const hasDropdown = Boolean(item.children && item.children.length > 0);
 
@@ -81,7 +98,7 @@ export default function Header() {
                 <li key={item.label} className="relative group">
                   <Link
                     href={item.href}
-                    className={`relative flex items-center gap-1 px-1.5 py-1 text-[15px] uppercase tracking-wide font-normal transition-colors hover:text-black after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out after:origin-left ${
+                    className={`relative flex items-center gap-0.5 px-1 py-1 text-[13px] xl:text-[14px] uppercase tracking-[0.06em] font-normal transition-colors hover:text-black after:content-[''] after:absolute after:bottom-0 after:left-1 after:right-1 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:ease-out after:origin-left ${
                       item.sale ? "!text-[#ff0000] font-normal animate-blinks sale-menu" : "text-black"
                     }`}
                   >
@@ -91,12 +108,12 @@ export default function Header() {
                         aria-hidden="true"
                         focusable="false"
                         role="presentation"
-                        className="w-[9px] h-[5px] opacity-70 transition-transform duration-200 group-hover:rotate-180 ml-0.5"
+                        className="w-[8px] h-[5px] opacity-70 transition-transform duration-200 group-hover:rotate-180 ml-1"
                         viewBox="0 0 28 16"
                       >
                         <path
                           d="m1.57 1.59 12.76 12.77L27.1 1.59"
-                          strokeWidth="2"
+                          strokeWidth="2.5"
                           stroke="currentColor"
                           fill="none"
                         />
@@ -116,7 +133,7 @@ export default function Header() {
                             <li key={child.label}>
                               <Link
                                 href={child.href}
-                                className={`block px-5 py-2 text-[15px] transition-colors whitespace-nowrap hover:bg-neutral-50 ${
+                                className={`block px-5 py-2 text-[14px] transition-colors whitespace-nowrap hover:bg-neutral-50 ${
                                   isMeeras
                                     ? "text-[#ff0000] font-normal blink-meeras"
                                     : isHighlight
@@ -138,7 +155,7 @@ export default function Header() {
           </ul>
 
           {/* Row 2 */}
-          <ul className="flex flex-wrap items-center justify-center gap-1.5 mt-1">
+          <ul className="flex flex-wrap items-center justify-center gap-x-5 lg:gap-x-7 mt-1.5">
             {NAV_ROW2.map((item) => {
               const hasDropdown = Boolean(item.children && item.children.length > 0);
 
@@ -146,7 +163,7 @@ export default function Header() {
                 <li key={item.label} className="relative group">
                   <Link
                     href={item.href}
-                    className="relative flex items-center gap-1 px-2.5 py-0.5 text-[15px] uppercase tracking-wide font-normal text-black hover:text-black transition-colors after:content-[''] after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out after:origin-left"
+                    className="relative flex items-center gap-0.5 px-1.5 py-0.5 text-[13px] xl:text-[14px] uppercase tracking-[0.06em] font-normal text-black hover:text-black transition-colors after:content-[''] after:absolute after:bottom-0 after:left-1 after:right-1 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:ease-out after:origin-left"
                   >
                     <span>{item.label}</span>
                     {hasDropdown && (
@@ -154,12 +171,12 @@ export default function Header() {
                         aria-hidden="true"
                         focusable="false"
                         role="presentation"
-                        className="w-[9px] h-[5px] opacity-70 transition-transform duration-200 group-hover:rotate-180 ml-0.5"
+                        className="w-[8px] h-[5px] opacity-70 transition-transform duration-200 group-hover:rotate-180 ml-1"
                         viewBox="0 0 28 16"
                       >
                         <path
                           d="m1.57 1.59 12.76 12.77L27.1 1.59"
-                          strokeWidth="2"
+                          strokeWidth="2.5"
                           stroke="currentColor"
                           fill="none"
                         />
@@ -179,7 +196,7 @@ export default function Header() {
                             <li key={child.label}>
                               <Link
                                 href={child.href}
-                                className={`block px-5 py-2 text-[15px] transition-colors whitespace-nowrap hover:bg-neutral-50 ${
+                                className={`block px-5 py-2 text-[14px] transition-colors whitespace-nowrap hover:bg-neutral-50 ${
                                   isMeeras
                                     ? "text-[#ff0000] font-normal blink-meeras"
                                     : isHighlight
