@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { NAV, SITE } from "@/data/site";
+import type { NavLink } from "@/types";
 import { useStore } from "@/components/providers/StoreProvider";
 import MobileMenu from "./MobileMenu";
 import PredictivePanel, { preloadSearchCatalog } from "@/components/search/PredictivePanel";
@@ -15,6 +16,18 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [navItems, setNavItems] = useState<NavLink[]>(NAV);
+
+  useEffect(() => {
+    fetch("/api/categories/nav")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data.nav) && data.nav.length > 0) {
+          setNavItems(data.nav);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -34,8 +47,9 @@ export default function Header() {
     router.push(`/search?q=${encodeURIComponent(query.trim())}`);
   };
 
-  const NAV_ROW1 = NAV.slice(0, 8);
-  const NAV_ROW2 = NAV.slice(8);
+  const splitIndex = Math.min(8, Math.ceil(navItems.length / 2));
+  const NAV_ROW1 = navItems.slice(0, splitIndex);
+  const NAV_ROW2 = navItems.slice(splitIndex);
 
   return (
     <header className="relative z-40 border-b border-[#e8e8e1] bg-white font-serif">
@@ -361,7 +375,7 @@ export default function Header() {
         </>
       )}
 
-      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} navItems={navItems} />
     </header>
   );
 }

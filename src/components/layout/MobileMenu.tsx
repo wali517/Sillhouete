@@ -6,14 +6,24 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { Globe } from "lucide-react";
 import { NAV, SITE } from "@/data/site";
+import type { NavLink } from "@/types";
 import Socials from "@/components/ui/Socials";
 import { useStore, type CurrencyCode } from "@/components/providers/StoreProvider";
 
 const CURRENCIES: CurrencyCode[] = ["PKR", "USD", "GBP", "EUR", "CAD", "AED"];
 
-export default function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
+export default function MobileMenu({
+  open,
+  onClose,
+  navItems = NAV,
+}: {
+  open: boolean;
+  onClose: () => void;
+  navItems?: NavLink[];
+}) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const { currency, setCurrency } = useStore();
+  const items = navItems && navItems.length > 0 ? navItems : NAV;
 
   return (
     <AnimatePresence>
@@ -71,7 +81,7 @@ export default function MobileMenu({ open, onClose }: { open: boolean; onClose: 
             </div>
 
             <ul className="flex-1 px-5 divide-y divide-line">
-              {NAV.map((item) => (
+              {items.map((item) => (
                 <li key={item.label}>
                   <div className="flex items-center justify-between">
                     <Link

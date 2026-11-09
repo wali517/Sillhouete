@@ -59,6 +59,7 @@ export default function AdminProductsPage() {
 
   // Category Hierarchy State
   const [mainCategoriesList, setMainCategoriesList] = useState<CategoryItem[]>([]);
+  const [allCategoriesList, setAllCategoriesList] = useState<CategoryItem[]>([]);
   const [subcategoriesList, setSubcategoriesList] = useState<CategoryItem[]>([]);
   const [selectedMainCategoryId, setSelectedMainCategoryId] = useState("");
   const [selectedMainCategorySlug, setSelectedMainCategorySlug] = useState("");
@@ -162,10 +163,28 @@ export default function AdminProductsPage() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch("/api/categories?type=main&active=true");
-      const data = await res.json();
-      if (Array.isArray(data.categories)) {
-        setMainCategoriesList(data.categories);
+      const [mainsRes, allRes] = await Promise.all([
+        fetch("/api/categories?type=main&active=true"),
+        fetch("/api/categories?all=true"),
+      ]);
+      const mainsData = await mainsRes.json();
+      const allData = await allRes.json();
+
+      if (Array.isArray(mainsData.categories)) {
+        setMainCategoriesList(mainsData.categories);
+      }
+      if (Array.isArray(allData.categories)) {
+        setAllCategoriesList(allData.categories);
+        const titles: string[] = Array.from(
+          new Set(
+            allData.categories
+              .map((c: CategoryItem) => c.title)
+              .filter(Boolean) as string[]
+          )
+        );
+        if (titles.length > 0) {
+          setCategoryOptions(titles);
+        }
       }
     } catch {
       // ignore
@@ -253,22 +272,42 @@ export default function AdminProductsPage() {
     setOriginalPrice(p.originalPrice ? p.originalPrice.toString() : "");
     setCategory(p.category || "Luxury Pret");
 
-    // Match main category
+    // Match main category and subcategory
     let mainSlug = p.mainCategorySlug || "";
     let mainId = p.mainCategoryId || "";
     let mainName = p.mainCategoryName || "";
+    let subSlug = p.subcategorySlug || "";
 
-    if (!mainSlug && mainCategoriesList.length > 0) {
-      const match = mainCategoriesList.find(
-        (m) =>
-          m.handle === p.category?.toLowerCase() ||
-          m.title.toLowerCase() === p.category?.toLowerCase() ||
-          (p.collections || []).includes(m.handle)
+    if (!mainSlug && allCategoriesList.length > 0) {
+      // Check if p.category matches a subcategory directly
+      const subMatch = allCategoriesList.find(
+        (c) =>
+          !c.isMainCategory &&
+          c.parentHandle &&
+          (c.handle === p.category?.toLowerCase() ||
+            c.title.toLowerCase() === p.category?.toLowerCase() ||
+            (p.collections || []).includes(c.handle))
       );
-      if (match) {
-        mainSlug = match.handle;
-        mainId = String(match._id || match.id || "");
-        mainName = match.title;
+      if (subMatch) {
+        subSlug = subMatch.handle;
+        mainSlug = subMatch.parentHandle || "";
+        const parentMatch = allCategoriesList.find((c) => c.handle === mainSlug);
+        if (parentMatch) {
+          mainId = String(parentMatch._id || parentMatch.id || "");
+          mainName = parentMatch.title;
+        }
+      } else {
+        const match = mainCategoriesList.find(
+          (m) =>
+            m.handle === p.category?.toLowerCase() ||
+            m.title.toLowerCase() === p.category?.toLowerCase() ||
+            (p.collections || []).includes(m.handle)
+        );
+        if (match) {
+          mainSlug = match.handle;
+          mainId = String(match._id || match.id || "");
+          mainName = match.title;
+        }
       }
     }
 
@@ -277,7 +316,7 @@ export default function AdminProductsPage() {
     setSelectedMainCategoryName(mainName);
 
     if (mainSlug) {
-      const subTarget = p.subcategorySlug || p.subcategoryId || p.category || "";
+      const subTarget = subSlug || p.subcategoryId || p.category || "";
       loadSubcategoriesForMain(mainSlug, subTarget);
     } else {
       setSubcategoriesList([]);
@@ -501,9 +540,13 @@ export default function AdminProductsPage() {
 
   // Filtered products list
   const filteredProducts = products.filter((p) => {
+    const cf = categoryFilter.toLowerCase();
     const matchCategory =
       categoryFilter === "All" ||
-      (p.category && p.category.toLowerCase().includes(categoryFilter.toLowerCase()));
+      (p.category && p.category.toLowerCase().includes(cf)) ||
+      (p.mainCategoryName && p.mainCategoryName.toLowerCase().includes(cf)) ||
+      (p.subcategoryName && p.subcategoryName.toLowerCase().includes(cf)) ||
+      (p.collections && p.collections.some((c) => c.toLowerCase() === cf || c.toLowerCase().includes(cf)));
 
     const q = search.toLowerCase();
     const matchSearch =
@@ -630,8 +673,17 @@ export default function AdminProductsPage() {
                     </td>
 
                     {/* Category */}
-                    <td className="py-3 px-4 text-gray-600 font-medium">
-                      {p.category || "Luxury Pret"}
+                    <td className="py-3 px-4">
+                      <div className="flex flex-col">
+                        <span className="font-medium text-gray-900 text-xs">
+                          {p.mainCategoryName || p.category || "Luxury Pret"}
+                        </span>
+                        {p.subcategoryName && p.subcategoryName !== p.mainCategoryName ? (
+                          <span className="text-[11px] text-gray-500 font-normal">
+                            › {p.subcategoryName}
+                          </span>
+                        ) : null}
+                      </div>
                     </td>
 
                     {/* Price */}
@@ -785,11 +837,11 @@ export default function AdminProductsPage() {
                 </div>
 
                 <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4 rounded-xl border border-gray-200 bg-gray-50/80 p-4">
-                  {/* Main Category Dropdown */}
+                  {/* Parent Category Dropdown */}
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <label className="block text-xs font-bold uppercase tracking-wider text-gray-900">
-                        Main Category *
+                        1. Parent Category (Main Category) *
                       </label>
                       <Link
                         href="/admin/categories"
@@ -806,7 +858,7 @@ export default function AdminProductsPage() {
                       onChange={(e) => handleMainCategoryChange(e.target.value)}
                       className="w-full rounded-md border border-gray-300 p-2.5 text-sm outline-none focus:border-black bg-white"
                     >
-                      <option value="">-- Select Main Category --</option>
+                      <option value="">-- Select Parent Category --</option>
                       {mainCategoriesList.map((m) => (
                         <option key={m.handle} value={m.handle}>
                           {m.title}
@@ -818,11 +870,11 @@ export default function AdminProductsPage() {
                     </p>
                   </div>
 
-                  {/* Subcategory Dropdown */}
+                  {/* Child Category Dropdown */}
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <label className="block text-xs font-bold uppercase tracking-wider text-gray-900">
-                        Subcategory
+                        2. Child Category (Subcategory)
                       </label>
                       {selectedMainCategorySlug && (
                         <span className="text-[11px] text-gray-500">
@@ -837,14 +889,14 @@ export default function AdminProductsPage() {
                       className="w-full rounded-md border border-gray-300 p-2.5 text-sm outline-none focus:border-black bg-white disabled:bg-gray-100 disabled:text-gray-400"
                     >
                       {!selectedMainCategorySlug ? (
-                        <option value="">-- Select Main Category first --</option>
+                        <option value="">-- Select Parent Category first --</option>
                       ) : loadingSubcategories ? (
-                        <option value="">Loading subcategories...</option>
+                        <option value="">Loading child categories...</option>
                       ) : subcategoriesList.length === 0 ? (
-                        <option value="">(No subcategories exist for this Main Category)</option>
+                        <option value="">(No child categories exist for this parent category)</option>
                       ) : (
                         <>
-                          <option value="">-- Select Subcategory (Optional) --</option>
+                          <option value="">-- Select Child Category (Optional) --</option>
                           {subcategoriesList.map((s) => (
                             <option key={s.handle} value={s.handle}>
                               {s.title}
@@ -856,7 +908,7 @@ export default function AdminProductsPage() {
                     <p className="text-[11px] text-gray-500 mt-1">
                       {selectedMainCategorySlug && subcategoriesList.length === 0 ? (
                         <span className="text-amber-600">
-                          No subcategories found. You can add one in Category Management.
+                          No child categories found. You can add one in Category Management.
                         </span>
                       ) : (
                         "Specific department (e.g. Clothing, Bridal, Dupatta)"

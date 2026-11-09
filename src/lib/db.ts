@@ -8,7 +8,7 @@ import { BlogPostModel } from "./models/BlogPost";
 import { SiteSettingsModel } from "./models/SiteSettings";
 import { CollectionModel } from "./models/Collection";
 import { executePredictiveSearch, tokenize } from "./predictive-search";
-import { ANNOUNCEMENTS, SITE } from "@/data/site";
+import { ANNOUNCEMENTS, SITE, NAV } from "@/data/site";
 import {
   sendOrderConfirmationEmail,
   sendPaymentFailureEmail,
@@ -23,6 +23,7 @@ import { getStripeServer, toStripeAmount, fromStripeAmount } from "./stripe";
 import type {
   Product,
   CategoryItem,
+  NavLink,
   Order,
   Customer,
   ContactMessage,
@@ -129,6 +130,10 @@ export function deriveCollectionsFromCategory(
   return Array.from(set);
 }
 
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 /** Fetch products by collection handle dynamically from MongoDB */
 export async function getProductsByCollection(collectionSlug: string): Promise<Product[]> {
   try {
@@ -146,27 +151,59 @@ export async function getProductsByCollection(collectionSlug: string): Promise<P
       { subcategoryId: slug },
     ];
 
-    // If this slug is a main category, also include products from any of its subcategories
+    // Look up the collection document to get title, handle, _id, and any children/parent
     try {
-      const subcats = await CollectionModel.find({
-        $or: [{ parentHandle: slug }, { mainCategoryId: slug }],
-      })
-        .select("handle _id")
-        .lean();
+      const colDoc = await CollectionModel.findOne({
+        $or: [
+          { handle: slug },
+          { handle: { $regex: new RegExp(`^${escapeRegex(slug)}$`, "i") } },
+        ],
+      }).lean();
 
-      if (subcats && subcats.length > 0) {
-        const subSlugs = subcats.map((s) => s.handle).filter(Boolean);
-        const subIds = subcats.map((s) => String(s._id)).filter(Boolean);
-        if (subSlugs.length > 0) {
-          orConditions.push({ collections: { $in: subSlugs } });
-          orConditions.push({ subcategorySlug: { $in: subSlugs } });
+      if (colDoc) {
+        const colIdStr = String(colDoc._id);
+        orConditions.push({ collections: colDoc.handle });
+        orConditions.push({ mainCategorySlug: colDoc.handle });
+        orConditions.push({ subcategorySlug: colDoc.handle });
+        orConditions.push({ mainCategoryId: colIdStr });
+        orConditions.push({ subcategoryId: colIdStr });
+
+        if (colDoc.title) {
+          const escTitle = escapeRegex(colDoc.title.trim());
+          orConditions.push({ category: { $regex: new RegExp(`^${escTitle}$`, "i") } });
+          orConditions.push({ mainCategoryName: { $regex: new RegExp(`^${escTitle}$`, "i") } });
+          orConditions.push({ subcategoryName: { $regex: new RegExp(`^${escTitle}$`, "i") } });
         }
-        if (subIds.length > 0) {
-          orConditions.push({ subcategoryId: { $in: subIds } });
+
+        // If this is a main category, also include products from any of its subcategories
+        const isMain = colDoc.isMainCategory || !colDoc.parentHandle;
+        if (isMain) {
+          const subcats = await CollectionModel.find({
+            $or: [{ parentHandle: colDoc.handle }, { mainCategoryId: colIdStr }],
+          })
+            .select("handle title _id")
+            .lean();
+
+          if (subcats && subcats.length > 0) {
+            for (const sub of subcats) {
+              if (sub.handle) {
+                orConditions.push({ collections: sub.handle });
+                orConditions.push({ subcategorySlug: sub.handle });
+              }
+              if (sub._id) {
+                orConditions.push({ subcategoryId: String(sub._id) });
+              }
+              if (sub.title) {
+                const escSubTitle = escapeRegex(sub.title.trim());
+                orConditions.push({ category: { $regex: new RegExp(`^${escSubTitle}$`, "i") } });
+                orConditions.push({ subcategoryName: { $regex: new RegExp(`^${escSubTitle}$`, "i") } });
+              }
+            }
+          }
         }
       }
     } catch {
-      // ignore
+      // non-blocking
     }
 
     if (slug === "formal-dresses" || slug === "formal" || slug === "formals") {
@@ -494,6 +531,107 @@ export async function deleteCollection(handle: string): Promise<boolean> {
     console.warn(`MongoDB deleteCollection(${handle}) error:`, err);
     throw err;
   }
+}
+
+/** Build dynamic Header navigation tree with Parent Categories and Child Category dropdowns */
+export async function getNavigationMenu(): Promise<NavLink[]> {
+  try {
+    await connectDB();
+
+    // 1. Fetch all active main categories
+    const mainDocs = await CollectionModel.find({
+      $or: [
+        { isMainCategory: true },
+        { parentHandle: "" },
+        { parentHandle: null },
+        { parentHandle: { $exists: false } },
+      ],
+      isActive: { $ne: false },
+    })
+      .sort({ order: 1, createdAt: 1 })
+      .lean();
+
+    const navItems: NavLink[] = [];
+    const addedHandles = new Set<string>();
+
+    // 2. Format Sale item at start
+    const saleItem: NavLink = {
+      label: "Sale",
+      href: "/collections/sale-1",
+      sale: true,
+      blink: true,
+    };
+    navItems.push(saleItem);
+    addedHandles.add("sale");
+    addedHandles.add("sale-1");
+
+    // 3. Loop through active main categories from MongoDB
+    for (const main of mainDocs) {
+      if (addedHandles.has(main.handle)) continue;
+      addedHandles.add(main.handle);
+
+      // Fetch active subcategories for this main category
+      const subDocs = await CollectionModel.find({
+        $or: [
+          { parentHandle: main.handle },
+          { mainCategoryId: String(main._id) },
+        ],
+        isActive: { $ne: false },
+      })
+        .sort({ order: 1, createdAt: 1 })
+        .lean();
+
+      const children: NavLink[] = subDocs.map((sub) => ({
+        label: sub.title,
+        href: `/collections/${sub.handle}`,
+        blink: sub.handle.includes("meeras") || sub.title.toLowerCase().includes("meeras"),
+        highlight: sub.handle.includes("raha") || sub.title.toLowerCase().includes("raha"),
+      }));
+
+      // If it has children, add "View All" link at the end
+      if (children.length > 0) {
+        children.push({
+          label: `View All`,
+          href: `/collections/${main.handle}`,
+        });
+      }
+
+      navItems.push({
+        label: main.title,
+        href: `/collections/${main.handle}`,
+        children: children.length > 0 ? children : undefined,
+      });
+    }
+
+    // 4. Ensure "Shop By Events" is present
+    if (!navItems.some((n) => n.label.toLowerCase().includes("event"))) {
+      navItems.push({
+        label: "Shop By Events",
+        href: "#",
+        children: [
+          { label: "Engagement", href: "/collections/engagement-dresses" },
+          { label: "Mehndi", href: "/collections/mehndi-dresses" },
+          { label: "Nikkah", href: "/collections/nikkah-dresses" },
+          { label: "Barat", href: "/collections/barat-dresses" },
+          { label: "Walima", href: "/collections/walima-dresses" },
+        ],
+      });
+    }
+
+    // 5. Ensure "Spotted" is present
+    if (!navItems.some((n) => n.label.toLowerCase() === "spotted")) {
+      navItems.push({ label: "Spotted", href: "/pages/spot" });
+    }
+
+    if (navItems.length > 1) {
+      return navItems;
+    }
+  } catch (err) {
+    console.warn("getNavigationMenu error:", err);
+  }
+
+  // Fallback to static NAV
+  return NAV;
 }
 
 /** Exact / full match search filter for main search (when Enter is pressed). */
