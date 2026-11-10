@@ -167,7 +167,7 @@ export default function Header() {
           </ul>
 
           {/* Row 2 */}
-          <ul className="flex flex-wrap items-center justify-center gap-x-5 lg:gap-x-5 mt-1.5">
+          <ul className="flex flex-wrap items-center justify-center gap-x-5 lg:gap-x-5 mt-2">
             {NAV_ROW2.map((item) => {
               const hasDropdown = Boolean(item.children && item.children.length > 0);
 
