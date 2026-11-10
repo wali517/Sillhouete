@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import { getBlogs, saveBlog } from "@/lib/db";
-import { runSeedIfEmpty } from "@/lib/seed";
 
 export async function GET() {
   try {
-    await runSeedIfEmpty();
     const blogs = await getBlogs();
     return NextResponse.json({ blogs });
   } catch (err: unknown) {

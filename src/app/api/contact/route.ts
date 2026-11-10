@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 import { getContactMessages, saveContactMessage, getSettings } from "@/lib/db";
-import { runSeedIfEmpty } from "@/lib/seed";
 import { sendDiscountCodeEmail } from "@/lib/email";
 
 export async function GET() {
   try {
-    await runSeedIfEmpty();
     const messages = await getContactMessages();
     return NextResponse.json({ messages });
   } catch (err: unknown) {

@@ -143,11 +143,13 @@ async function seedBlogs() {
   const count = await BlogPostModel.countDocuments();
   if (count > 0) return;
 
-  console.log("🌱 Seeding blogs from seed data...");
   try {
     const { SEED_BLOGS } = await import("@/data/seed-blogs");
-    await BlogPostModel.insertMany(SEED_BLOGS, { ordered: false }).catch(() => {});
-    console.log(`✅ Seeded ${SEED_BLOGS.length} blog posts`);
+    if (SEED_BLOGS && SEED_BLOGS.length > 0) {
+      console.log("🌱 Seeding blogs from seed data...");
+      await BlogPostModel.insertMany(SEED_BLOGS, { ordered: false }).catch(() => {});
+      console.log(`✅ Seeded ${SEED_BLOGS.length} blog posts`);
+    }
   } catch (err) {
     console.error("⚠️ Blog seed error:", err);
   }

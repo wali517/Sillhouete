@@ -4,30 +4,30 @@ import {
   Package,
   ShoppingBag,
   MessageSquare,
-  Users,
   ArrowUpRight,
   TrendingUp,
-  Clock,
-  CheckCircle,
   Plus,
 } from "lucide-react";
-import { getOrders, getProducts, getContactMessages, getCustomers } from "@/lib/db";
+import { getDashboardSummary } from "@/lib/db";
 import { formatPrice } from "@/lib/format";
 
 export const metadata = { title: "Admin Dashboard – Sillhouete" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-  const [orders, products, messages, customers] = await Promise.all([
-    getOrders(),
-    getProducts(),
-    getContactMessages(),
-    getCustomers(),
-  ]);
+  const summary = await getDashboardSummary();
 
-  const totalRevenue = orders.reduce((sum, o) => (o.paymentStatus === "paid" ? sum + o.total : sum), 0);
-  const unreadMessages = messages.filter((m) => m.status === "unread").length;
-  const pendingOrders = orders.filter((o) => o.status === "pending").length;
+  const {
+    totalRevenue,
+    totalOrdersCount,
+    pendingOrdersCount,
+    totalProductsCount,
+    inStockProductsCount,
+    totalMessagesCount,
+    unreadMessagesCount,
+    recentOrders,
+    recentMessages,
+  } = summary;
 
   return (
     <div className="space-y-8">
@@ -61,7 +61,10 @@ export default async function AdminDashboardPage() {
       {/* Metrics Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Total Sales */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm space-y-3">
+        <Link
+          href="/admin/payments"
+          className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm space-y-3 hover:shadow-md hover:border-gray-300 transition-all block cursor-pointer"
+        >
           <div className="flex items-center justify-between text-gray-500">
             <span className="text-xs font-semibold uppercase tracking-wider">Total Revenue</span>
             <div className="rounded-full bg-emerald-50 p-2 text-emerald-600">
@@ -75,10 +78,13 @@ export default async function AdminDashboardPage() {
               <span>Verified paid orders</span>
             </p>
           </div>
-        </div>
+        </Link>
 
         {/* Total Orders */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm space-y-3">
+        <Link
+          href="/admin/orders"
+          className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm space-y-3 hover:shadow-md hover:border-gray-300 transition-all block cursor-pointer"
+        >
           <div className="flex items-center justify-between text-gray-500">
             <span className="text-xs font-semibold uppercase tracking-wider">Orders</span>
             <div className="rounded-full bg-blue-50 p-2 text-blue-600">
@@ -86,15 +92,18 @@ export default async function AdminDashboardPage() {
             </div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-gray-900">{orders.length}</div>
+            <div className="text-2xl font-bold text-gray-900">{totalOrdersCount}</div>
             <p className="mt-1 text-xs text-gray-500">
-              <strong className="text-amber-600 font-semibold">{pendingOrders} pending</strong> fulfillment
+              <strong className="text-amber-600 font-semibold">{pendingOrdersCount} pending</strong> fulfillment
             </p>
           </div>
-        </div>
+        </Link>
 
         {/* Products in Catalog */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm space-y-3">
+        <Link
+          href="/admin/products"
+          className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm space-y-3 hover:shadow-md hover:border-gray-300 transition-all block cursor-pointer"
+        >
           <div className="flex items-center justify-between text-gray-500">
             <span className="text-xs font-semibold uppercase tracking-wider">Catalog Products</span>
             <div className="rounded-full bg-purple-50 p-2 text-purple-600">
@@ -102,15 +111,18 @@ export default async function AdminDashboardPage() {
             </div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-gray-900">{products.length}</div>
+            <div className="text-2xl font-bold text-gray-900">{totalProductsCount}</div>
             <p className="mt-1 text-xs text-gray-500">
-              {products.filter((p) => p.inStock).length} in stock, ready to ship
+              {inStockProductsCount} in stock, ready to ship
             </p>
           </div>
-        </div>
+        </Link>
 
         {/* Inquiries */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm space-y-3">
+        <Link
+          href="/admin/messages"
+          className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm space-y-3 hover:shadow-md hover:border-gray-300 transition-all block cursor-pointer"
+        >
           <div className="flex items-center justify-between text-gray-500">
             <span className="text-xs font-semibold uppercase tracking-wider">Customer Inquiries</span>
             <div className="rounded-full bg-amber-50 p-2 text-amber-600">
@@ -118,12 +130,12 @@ export default async function AdminDashboardPage() {
             </div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-gray-900">{messages.length}</div>
+            <div className="text-2xl font-bold text-gray-900">{totalMessagesCount}</div>
             <p className="mt-1 text-xs text-gray-500">
-              <strong className="text-red-600 font-semibold">{unreadMessages} unread</strong> messages
+              <strong className="text-red-600 font-semibold">{unreadMessagesCount} unread</strong> messages
             </p>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Recent Orders & Messages Grid */}
@@ -136,45 +148,53 @@ export default async function AdminDashboardPage() {
               href="/admin/orders"
               className="text-xs font-semibold text-black hover:underline flex items-center gap-1"
             >
-              <span>View all ({orders.length})</span>
+              <span>View all ({totalOrdersCount})</span>
               <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
           <div className="divide-y divide-gray-100 overflow-x-auto">
-            {orders.slice(0, 5).map((order) => (
-              <div key={order.id} className="flex items-center justify-between p-4 hover:bg-gray-50 text-xs">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-sm text-gray-900">
-                      #{order.orderNumber}
-                    </span>
-                    <span
-                      className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${
-                        order.paymentStatus === "paid"
-                          ? "bg-emerald-100 text-emerald-800"
-                          : "bg-amber-100 text-amber-800"
-                      }`}
-                    >
-                      {order.paymentStatus}
+            {recentOrders.length === 0 ? (
+              <div className="p-8 text-center text-xs text-gray-400">No recent orders yet</div>
+            ) : (
+              recentOrders.map((order) => (
+                <Link
+                  key={order.id}
+                  href={`/admin/orders/${order.id}`}
+                  className="flex items-center justify-between p-4 hover:bg-neutral-50 text-xs transition-colors cursor-pointer group block"
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-bold text-sm text-gray-900 group-hover:text-black group-hover:underline">
+                        #{order.orderNumber}
+                      </span>
+                      <span
+                        className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${
+                          order.paymentStatus === "paid"
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-amber-100 text-amber-800"
+                        }`}
+                      >
+                        {order.paymentStatus}
+                      </span>
+                    </div>
+                    <p className="text-gray-600 mt-0.5">
+                      {order.customer.name} ({order.shippingAddress.city}, {order.shippingAddress.country})
+                    </p>
+                    <p className="text-[11px] text-gray-400">
+                      {new Date(order.createdAt).toLocaleDateString()} • {order.itemsCount} items
+                    </p>
+                  </div>
+
+                  <div className="text-right space-y-1">
+                    <div className="font-bold text-sm text-gray-900">{formatPrice(order.total)}</div>
+                    <span className="inline-block rounded bg-gray-100 px-2 py-0.5 text-[10px] font-medium uppercase text-gray-700">
+                      {order.status}
                     </span>
                   </div>
-                  <p className="text-gray-600 mt-0.5">
-                    {order.customer.name} ({order.shippingAddress.city}, {order.shippingAddress.country})
-                  </p>
-                  <p className="text-[11px] text-gray-400">
-                    {new Date(order.createdAt).toLocaleDateString()} • {order.items.length} items
-                  </p>
-                </div>
-
-                <div className="text-right space-y-1">
-                  <div className="font-bold text-sm text-gray-900">{formatPrice(order.total)}</div>
-                  <span className="inline-block rounded bg-gray-100 px-2 py-0.5 text-[10px] font-medium uppercase text-gray-700">
-                    {order.status}
-                  </span>
-                </div>
-              </div>
-            ))}
+                </Link>
+              ))
+            )}
           </div>
         </div>
 
@@ -186,35 +206,43 @@ export default async function AdminDashboardPage() {
               href="/admin/messages"
               className="text-xs font-semibold text-black hover:underline flex items-center gap-1"
             >
-              <span>View all ({messages.length})</span>
+              <span>View all ({totalMessagesCount})</span>
               <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
           <div className="divide-y divide-gray-100">
-            {messages.slice(0, 4).map((msg) => (
-              <div key={msg.id} className="p-4 hover:bg-gray-50 space-y-1 text-xs">
-                <div className="flex items-center justify-between">
-                  <strong className="text-gray-900 text-sm">{msg.name}</strong>
-                  <span
-                    className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${
-                      msg.status === "unread"
-                        ? "bg-red-100 text-red-800"
-                        : msg.status === "replied"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {msg.status}
-                  </span>
-                </div>
-                <p className="text-gray-500 text-[11px] font-medium">{msg.subject}</p>
-                <p className="text-gray-700 line-clamp-2">{msg.message}</p>
-                <p className="text-[10px] text-gray-400 pt-1">
-                  {new Date(msg.createdAt).toLocaleDateString()} • {msg.email} {msg.phone ? `• ${msg.phone}` : ""}
-                </p>
-              </div>
-            ))}
+            {recentMessages.length === 0 ? (
+              <div className="p-8 text-center text-xs text-gray-400">No customer messages yet</div>
+            ) : (
+              recentMessages.map((msg) => (
+                <Link
+                  key={msg.id}
+                  href="/admin/messages"
+                  className="block p-4 hover:bg-neutral-50 space-y-1 text-xs transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center justify-between">
+                    <strong className="text-gray-900 text-sm">{msg.name}</strong>
+                    <span
+                      className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${
+                        msg.status === "unread"
+                          ? "bg-red-100 text-red-800"
+                          : msg.status === "replied"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {msg.status}
+                    </span>
+                  </div>
+                  <p className="text-gray-500 text-[11px] font-medium">{msg.subject}</p>
+                  <p className="text-gray-700 line-clamp-2">{msg.message}</p>
+                  <p className="text-[10px] text-gray-400 pt-1">
+                    {new Date(msg.createdAt).toLocaleDateString()} • {msg.email} {msg.phone ? `• ${msg.phone}` : ""}
+                  </p>
+                </Link>
+              ))
+            )}
           </div>
         </div>
       </div>

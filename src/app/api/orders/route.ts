@@ -1,23 +1,22 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createOrder, getOrders, validateAndCalculateOrder } from "@/lib/db";
-import { runSeedIfEmpty } from "@/lib/seed";
 import type { PaymentMethod } from "@/types";
 
 const AUTH_COOKIE = "slh_admin_token";
 
 export async function GET(req: Request) {
   try {
-    await runSeedIfEmpty();
     const { searchParams } = new URL(req.url);
     const email = searchParams.get("email");
+    const limit = parseInt(searchParams.get("limit") ?? "0", 10);
 
     // Check if requester is an authenticated administrator
     const cookieStore = await cookies();
     const token = cookieStore.get(AUTH_COOKIE)?.value;
     const isAdmin = token === "authenticated_admin_session";
 
-    const orders = await getOrders();
+    const orders = await getOrders(limit > 0 ? limit : undefined);
 
     if (email) {
       const normalized = email.toLowerCase().trim();

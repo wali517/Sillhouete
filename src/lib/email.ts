@@ -31,6 +31,9 @@ interface TransporterContext {
   transporter: Transporter;
   user: string;
   from: string;
+  host: string;
+  port: number;
+  pass: string;
 }
 
 export async function getTransporter(): Promise<TransporterContext | null> {
@@ -69,16 +72,16 @@ export async function getTransporter(): Promise<TransporterContext | null> {
       port: Number(port),
       secure: isPort465,
       auth: { user: cleanUser, pass: cleanPass },
-      connectionTimeout: 12000,
-      greetingTimeout: 10000,
-      socketTimeout: 20000,
+      connectionTimeout: 8000,
+      greetingTimeout: 6000,
+      socketTimeout: 12000,
     });
 
     const from =
       customFrom ||
       (cleanUser ? `"SILLHOUETE" <${cleanUser}>` : `"SILLHOUETE" <saleemalbala18@gmail.com>`);
 
-    return { transporter, user: cleanUser, from };
+    return { transporter, user: cleanUser, from, host, port: Number(port), pass: cleanPass };
   }
 
   return null;
@@ -162,14 +165,45 @@ export async function sendEmail({
       status: "sent",
       messageId: info.messageId,
     };
-  } catch (error: unknown) {
-    const errMsg = error instanceof Error ? error.message : "SMTP transport failure";
-    console.error("📧 [EMAIL SEND ERROR]:", errMsg);
-    return {
-      success: false,
-      status: "failed",
-      error: errMsg,
-    };
+  } catch (primaryError: unknown) {
+    console.warn("📧 [EMAIL RETRY] Primary attempt failed or timed out. Switching transport port...", primaryError);
+
+    // Automatic fallback: if port 465 timed out, switch to port 587 (or vice versa)
+    try {
+      const altPort = context.port === 465 ? 587 : 465;
+      const altTransporter = nodemailer.createTransport({
+        host: context.host,
+        port: altPort,
+        secure: altPort === 465,
+        auth: { user: context.user, pass: context.pass },
+        connectionTimeout: 8000,
+        greetingTimeout: 6000,
+        socketTimeout: 12000,
+      });
+
+      const altInfo = await altTransporter.sendMail({
+        from: context.from,
+        to: cleanTo,
+        subject: cleanSubject,
+        text: text || html.replace(/<[^>]*>?/gm, " ").trim(),
+        html,
+      });
+
+      console.log(`📧 [EMAIL DELIVERED ON RETRY] To: ${cleanTo} via port ${altPort} | ID: ${altInfo.messageId}`);
+      return {
+        success: true,
+        status: "sent",
+        messageId: altInfo.messageId,
+      };
+    } catch (retryError: unknown) {
+      const errMsg = retryError instanceof Error ? retryError.message : "SMTP transport failure";
+      console.error("📧 [EMAIL SEND ERROR - ALL ATTEMPTS FAILED]:", errMsg);
+      return {
+        success: false,
+        status: "failed",
+        error: errMsg,
+      };
+    }
   }
 }
 
@@ -971,5 +1005,69 @@ export async function sendDiscountCodeEmail({
     subject,
     html,
     idempotencyKey: `notif_discount_${email}_${code}`,
+  });
+}
+
+/* ──────────────── 9. SUPPORT REPLY EMAIL ──────────────── */
+
+export async function sendCustomerReplyEmail({
+  to,
+  customerName = "Valued Customer",
+  subject,
+  replyText,
+  originalMessage,
+}: {
+  to: string;
+  customerName?: string;
+  subject: string;
+  replyText: string;
+  originalMessage?: string;
+}) {
+  const safeName = escapeHtml(customerName);
+  const safeReply = escapeHtml(replyText).replace(/\n/g, "<br />");
+  const cleanSubject = sanitizeHeader(subject || `Response from ${SITE.name} Support`);
+
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; color: #1a1a1a; border: 1px solid #e5e5e5; background: #ffffff;">
+      ${getEmailBrandHeader(`<p style="font-size: 13px; color: #888; margin-top: 6px; letter-spacing: 1px;">CUSTOMER CONCIERGE &amp; CLIENT SUPPORT</p>`)}
+
+      <p style="font-size: 15px; line-height: 1.6;">Dear ${safeName},</p>
+      
+      <div style="margin: 20px 0; padding: 18px 20px; background: #fdfdfd; border-left: 4px solid #111111; font-size: 15px; line-height: 1.7; color: #222222;">
+        ${safeReply}
+      </div>
+
+      ${originalMessage ? `
+        <div style="margin: 24px 0; padding: 14px 16px; background: #f9f9f9; border-radius: 4px; border: 1px solid #eeeeee;">
+          <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #777; margin: 0 0 6px 0; font-weight: 600;">In reference to your message:</p>
+          <p style="font-size: 13px; color: #555; line-height: 1.5; margin: 0; font-style: italic;">"${escapeHtml(originalMessage)}"</p>
+        </div>
+      ` : ""}
+
+      <p style="font-size: 14px; line-height: 1.6; color: #555; margin-top: 24px;">
+        If you have any further questions or require additional assistance, feel free to reply directly to this email or visit our store.
+      </p>
+
+      <div style="text-align: center; margin: 28px 0 16px;">
+        <a href="https://sillhouete.com" style="background: #111111; color: #ffffff; text-decoration: none; padding: 12px 26px; font-size: 11px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; display: inline-block;">
+          Visit Sillhouete Online
+        </a>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0 16px;" />
+      <p style="font-size: 12px; color: #888; text-align: center; line-height: 1.6;">
+        ${SITE.name} Boutique · Almas Tower, MM Alam Road, Gulberg 2, Lahore<br />
+        Direct Support: ${SITE.email}
+      </p>
+    </div>
+  `;
+
+  return sendTrackedNotification({
+    type: "support_reply",
+    recipient: to,
+    subject: cleanSubject,
+    html,
+    text: replyText,
+    idempotencyKey: `notif_reply_${to}_${Date.now()}`,
   });
 }

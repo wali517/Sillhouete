@@ -12,7 +12,8 @@ export type NotificationType =
   | "password_reset"
   | "profile_updated"
   | "contact_form"
-  | "discount_code";
+  | "discount_code"
+  | "support_reply";
 
 export type NotificationDeliveryStatus = "sent" | "failed" | "simulated" | "queued";
 
@@ -56,6 +57,7 @@ const NotificationSchema = new Schema<INotification>(
         "profile_updated",
         "contact_form",
         "discount_code",
+        "support_reply",
       ],
       index: true,
     },

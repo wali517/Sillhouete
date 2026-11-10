@@ -1101,11 +1101,126 @@ export async function validateAndCalculateOrder(
   };
 }
 
-/* ──────────────── ORDERS ──────────────── */
+/* ──────────────── ORDERS & DASHBOARD ──────────────── */
 
-export async function getOrders(): Promise<Order[]> {
+export interface DashboardSummary {
+  totalRevenue: number;
+  totalOrdersCount: number;
+  pendingOrdersCount: number;
+  totalProductsCount: number;
+  inStockProductsCount: number;
+  totalMessagesCount: number;
+  unreadMessagesCount: number;
+  recentOrders: Array<{
+    id: string;
+    orderNumber: string;
+    createdAt: string;
+    customer: { name: string; email: string };
+    shippingAddress: { city: string; country: string };
+    itemsCount: number;
+    total: number;
+    status: string;
+    paymentStatus: string;
+  }>;
+  recentMessages: Array<{
+    id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    subject?: string;
+    message: string;
+    status: string;
+    createdAt: string;
+  }>;
+}
+
+export async function getDashboardSummary(): Promise<DashboardSummary> {
   await connectDB();
-  const docs = await OrderModel.find({}).sort({ createdAt: -1 }).lean();
+
+  const [
+    productsCount,
+    inStockCount,
+    ordersCount,
+    pendingOrdersCount,
+    revenueAgg,
+    recentOrderDocs,
+    messagesCount,
+    unreadMessagesCount,
+    recentMessageDocs,
+  ] = await Promise.all([
+    ProductModel.countDocuments({}),
+    ProductModel.countDocuments({ inStock: { $ne: false } }),
+    OrderModel.countDocuments({}),
+    OrderModel.countDocuments({ status: "pending" }),
+    OrderModel.aggregate([
+      { $match: { paymentStatus: { $in: ["paid", "succeeded"] } } },
+      { $group: { _id: null, total: { $sum: "$total" } } },
+    ]),
+    OrderModel.find({})
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select("id orderNumber createdAt customer shippingAddress items total status paymentStatus")
+      .lean(),
+    ContactMessageModel.countDocuments({}),
+    ContactMessageModel.countDocuments({ status: "unread" }),
+    ContactMessageModel.find({})
+      .sort({ createdAt: -1 })
+      .limit(4)
+      .select("id name email phone subject message status createdAt")
+      .lean(),
+  ]);
+
+  const totalRevenue = revenueAgg?.[0]?.total || 0;
+
+  const recentOrders = (recentOrderDocs || []).map((o: any) => ({
+    id: o.id || String(o._id),
+    orderNumber: o.orderNumber || "0000",
+    createdAt: o.createdAt ? new Date(o.createdAt).toISOString() : new Date().toISOString(),
+    customer: {
+      name: o.customer?.name || "Customer",
+      email: o.customer?.email || "",
+    },
+    shippingAddress: {
+      city: o.shippingAddress?.city || "Lahore",
+      country: o.shippingAddress?.country || "Pakistan",
+    },
+    itemsCount: Array.isArray(o.items) ? o.items.length : 1,
+    total: Number(o.total || 0),
+    status: o.status || "pending",
+    paymentStatus: o.paymentStatus || "pending",
+  }));
+
+  const recentMessages = (recentMessageDocs || []).map((m: any) => ({
+    id: m.id || String(m._id),
+    name: m.name || "Anonymous",
+    email: m.email || "",
+    phone: m.phone || "",
+    subject: m.subject || "General Inquiry",
+    message: m.message || "",
+    status: m.status || "unread",
+    createdAt: m.createdAt ? new Date(m.createdAt).toISOString() : new Date().toISOString(),
+  }));
+
+  return {
+    totalRevenue,
+    totalOrdersCount: ordersCount || 0,
+    pendingOrdersCount: pendingOrdersCount || 0,
+    totalProductsCount: productsCount || 0,
+    inStockProductsCount: inStockCount || 0,
+    totalMessagesCount: messagesCount || 0,
+    unreadMessagesCount: unreadMessagesCount || 0,
+    recentOrders,
+    recentMessages,
+  };
+}
+
+export async function getOrders(limit?: number): Promise<Order[]> {
+  await connectDB();
+  const query = OrderModel.find({}).sort({ createdAt: -1 });
+  if (limit && limit > 0) {
+    query.limit(limit);
+  }
+  const docs = await query.lean();
   return toPlainArray<Order>(docs);
 }
 

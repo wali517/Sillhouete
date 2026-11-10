@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import type { Order } from "@/types";
+import AdminPagination from "@/components/admin/AdminPagination";
 
 const STATUS_OPTIONS = ["pending", "processing", "shipped", "delivered", "cancelled"];
 const PAYMENT_OPTIONS = ["pending", "processing", "paid", "failed", "partially_refunded", "refunded"];
@@ -38,6 +39,10 @@ export default function AdminOrdersPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [updates, setUpdates] = useState<Record<string, { status?: string; paymentStatus?: string; trackingNumber?: string; courier?: string }>>({});
   const [toast, setToast] = useState("");
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   const fetchOrders = async () => {
     try {
@@ -92,18 +97,14 @@ export default function AdminOrdersPage() {
     return matchesSearch && matchesStatus;
   });
 
+  const paginatedOrders = filtered.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   const totalRevenue = orders
     .filter((o) => o.paymentStatus === "paid")
     .reduce((sum, o) => sum + o.total, 0);
-
-  const tabs = [
-    { key: "all", label: "All", count: orders.length },
-    { key: "pending", label: "Pending", count: orders.filter((o) => o.status === "pending").length },
-    { key: "processing", label: "Processing", count: orders.filter((o) => o.status === "processing").length },
-    { key: "shipped", label: "Shipped", count: orders.filter((o) => o.status === "shipped").length },
-    { key: "delivered", label: "Delivered", count: orders.filter((o) => o.status === "delivered").length },
-    { key: "cancelled", label: "Cancelled", count: orders.filter((o) => o.status === "cancelled").length },
-  ];
 
   return (
     <div className="space-y-6">
@@ -127,12 +128,20 @@ export default function AdminOrdersPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "Total Orders", value: orders.length, icon: Package, color: "blue" },
-          { label: "Pending", value: orders.filter((o) => o.status === "pending").length, icon: Clock, color: "amber" },
-          { label: "Shipped", value: orders.filter((o) => o.status === "shipped").length, icon: Truck, color: "purple" },
-          { label: "Delivered", value: orders.filter((o) => o.status === "delivered").length, icon: CheckCircle, color: "emerald" },
-        ].map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+          { label: "Total Orders", value: orders.length, icon: Package, color: "blue", key: "all" },
+          { label: "Pending", value: orders.filter((o) => o.status === "pending").length, icon: Clock, color: "amber", key: "pending" },
+          { label: "Shipped", value: orders.filter((o) => o.status === "shipped").length, icon: Truck, color: "purple", key: "shipped" },
+          { label: "Delivered", value: orders.filter((o) => o.status === "delivered").length, icon: CheckCircle, color: "emerald", key: "delivered" },
+        ].map(({ label, value, icon: Icon, color, key }) => (
+          <button
+            key={label}
+            type="button"
+            onClick={() => {
+              setStatusFilter((prev) => (prev === key ? "all" : key));
+              setCurrentPage(1);
+            }}
+            className="text-left bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:border-gray-300 hover:shadow-md transition-all cursor-pointer"
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">{label}</span>
               <div className={`rounded-full p-1.5 bg-${color}-50 text-${color}-600`}>
@@ -140,38 +149,38 @@ export default function AdminOrdersPage() {
               </div>
             </div>
             <div className="text-2xl font-bold text-gray-900">{value}</div>
-          </div>
+          </button>
         ))}
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+      {/* Filters & Orders Table */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         {/* Search */}
-        <div className="p-4 border-b border-gray-100">
-          <div className="relative max-w-md">
+        <div className="p-4 border-b border-gray-100 flex items-center justify-between gap-4">
+          <div className="relative max-w-md w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text" placeholder="Search by order#, customer name or email..."
-              value={search} onChange={(e) => setSearch(e.target.value)}
+              value={search} onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
               className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-gray-400 bg-gray-50"
             />
           </div>
-        </div>
-
-        {/* Status Tabs */}
-        <div className="flex gap-1 px-4 pt-3 overflow-x-auto">
-          {tabs.map((t) => (
-            <button key={t.key} onClick={() => setStatusFilter(t.key)}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-colors ${
-                statusFilter === t.key ? "bg-black text-white" : "text-gray-600 hover:bg-gray-100"
-              }`}>
-              {t.label} {t.count > 0 && <span className="ml-1 opacity-70">({t.count})</span>}
-            </button>
-          ))}
+          {statusFilter !== "all" && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">Filtered by: <strong className="capitalize text-black">{statusFilter}</strong></span>
+              <button
+                type="button"
+                onClick={() => { setStatusFilter("all"); setCurrentPage(1); }}
+                className="text-xs text-blue-600 hover:underline font-medium"
+              >
+                Clear
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto mt-3">
+        <div className="overflow-x-auto">
           {loading ? (
             <div className="p-8 text-center text-gray-400 text-sm">Loading orders...</div>
           ) : filtered.length === 0 ? (
@@ -191,7 +200,7 @@ export default function AdminOrdersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {filtered.map((order) => (
+                {paginatedOrders.map((order) => (
   <Fragment key={order.id}>
     <tr className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3">
@@ -297,6 +306,14 @@ export default function AdminOrdersPage() {
             </table>
           )}
         </div>
+
+        <AdminPagination
+          currentPage={currentPage}
+          totalItems={filtered.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
       </div>
     </div>
   );

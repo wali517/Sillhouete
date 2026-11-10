@@ -2,10 +2,21 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Plus, Edit, Trash2, FileText, Search } from "lucide-react";
+import { Plus, Edit, Trash2, FileText, Search, ExternalLink } from "lucide-react";
 import type { BlogPost } from "@/types";
+import AdminPagination from "@/components/admin/AdminPagination";
 
-const CATEGORIES = ["Fashion & Style", "Bridal", "Events", "Lifestyle", "Behind the Brand", "Styling Tips"];
+const CATEGORIES = [
+  "Fashion & Style",
+  "Bridal Guide",
+  "Traditions & Weddings",
+  "Style Guide",
+  "Heritage & Trends",
+  "Trends",
+  "Events",
+  "Lifestyle",
+  "Behind the Brand"
+];
 
 function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -20,6 +31,8 @@ export default function AdminBlogsPage() {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -99,6 +112,11 @@ export default function AdminBlogsPage() {
     !search || b.title.toLowerCase().includes(search.toLowerCase()) || b.category.toLowerCase().includes(search.toLowerCase())
   );
 
+  const paginatedBlogs = filtered.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className="space-y-6">
       {toast && (
@@ -122,7 +140,7 @@ export default function AdminBlogsPage() {
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input type="text" placeholder="Search blogs..." value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
               className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-gray-400 bg-gray-50" />
           </div>
         </div>
@@ -132,8 +150,9 @@ export default function AdminBlogsPage() {
         ) : filtered.length === 0 ? (
           <div className="p-8 text-center text-gray-400 text-sm">No blog posts yet. Create your first one!</div>
         ) : (
-          <div className="divide-y divide-gray-50">
-            {filtered.map((blog) => (
+          <>
+            <div className="divide-y divide-gray-50">
+              {paginatedBlogs.map((blog) => (
               <div key={blog.id} className="px-5 py-4 flex items-center gap-4 hover:bg-gray-50 transition-colors">
                 {blog.coverImage ? (
                   <div className="relative h-16 w-24 rounded-lg overflow-hidden border border-gray-100 shrink-0">
@@ -145,17 +164,31 @@ export default function AdminBlogsPage() {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 text-sm truncate">{blog.title}</h3>
-                  <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">{blog.category}</span>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-gray-900 text-sm truncate">{blog.title}</h3>
+                    <a
+                      href={`/blogs/news/${blog.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-400 hover:text-black transition-colors"
+                      title="View Article"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  </div>
+                  <p className="text-xs text-gray-500 line-clamp-2 mt-0.5 leading-relaxed">
+                    {blog.excerpt}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                    <span className="text-xs bg-gray-100 text-gray-700 font-medium px-2 py-0.5 rounded">{blog.category}</span>
                     <span className="text-xs text-gray-400">{blog.author}</span>
                     <span className="text-xs text-gray-400">{blog.publishedAt}</span>
                     <span className="text-xs text-gray-400">{blog.readTime}</span>
                   </div>
                   {blog.tags.length > 0 && (
-                    <div className="flex gap-1 mt-1 flex-wrap">
-                      {blog.tags.slice(0, 3).map((t) => (
-                        <span key={t} className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">{t}</span>
+                    <div className="flex gap-1 mt-1.5 flex-wrap">
+                      {blog.tags.slice(0, 4).map((t) => (
+                        <span key={t} className="text-[10px] bg-neutral-100 text-neutral-600 px-1.5 py-0.5 rounded">{t}</span>
                       ))}
                     </div>
                   )}
@@ -173,8 +206,17 @@ export default function AdminBlogsPage() {
               </div>
             ))}
           </div>
-        )}
-      </div>
+
+          <AdminPagination
+            currentPage={currentPage}
+            totalItems={filtered.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={setItemsPerPage}
+          />
+        </>
+      )}
+    </div>
 
       {/* Modal */}
       {isOpen && (

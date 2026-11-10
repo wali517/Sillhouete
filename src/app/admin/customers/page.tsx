@@ -5,13 +5,14 @@ import Link from "next/link";
 import { Search, Users, TrendingUp, ShoppingBag } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import type { Customer } from "@/types";
+import AdminPagination from "@/components/admin/AdminPagination";
 
 export default function AdminCustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const PER_PAGE = 20;
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   useEffect(() => {
     fetch("/api/customers")
@@ -31,8 +32,7 @@ export default function AdminCustomersPage() {
     );
   });
 
-  const totalPages = Math.ceil(filtered.length / PER_PAGE);
-  const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const paginated = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
   const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0);
 
   return (
@@ -47,21 +47,49 @@ export default function AdminCustomersPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {[
-          { label: "Total Customers", value: customers.length, icon: Users },
-          { label: "Total Revenue", value: formatPrice(totalRevenue), icon: TrendingUp, isText: true },
-          { label: "Avg Order Value", value: customers.length > 0 ? formatPrice(Math.round(totalRevenue / customers.reduce((s, c) => s + c.ordersCount, 0) || 0)) : "—", icon: ShoppingBag, isText: true },
-        ].map(({ label, value, icon: Icon, isText }) => (
-          <div key={label} className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">{label}</span>
-              <div className="rounded-full p-1.5 bg-gray-50 text-gray-600">
-                <Icon className="h-4 w-4" />
-              </div>
+        <button
+          type="button"
+          onClick={() => { setSearch(""); setPage(1); }}
+          className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:border-gray-300 hover:shadow-md transition-all text-left cursor-pointer"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">Total Customers</span>
+            <div className="rounded-full p-1.5 bg-gray-50 text-gray-600">
+              <Users className="h-4 w-4" />
             </div>
-            <div className={`font-bold text-gray-900 ${isText ? "text-lg" : "text-2xl"}`}>{value}</div>
           </div>
-        ))}
+          <div className="font-bold text-gray-900 text-2xl">{customers.length}</div>
+        </button>
+
+        <Link
+          href="/admin/payments"
+          className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:border-gray-300 hover:shadow-md transition-all text-left cursor-pointer block"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">Total Revenue</span>
+            <div className="rounded-full p-1.5 bg-gray-50 text-gray-600">
+              <TrendingUp className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="font-bold text-gray-900 text-lg">{formatPrice(totalRevenue)}</div>
+        </Link>
+
+        <Link
+          href="/admin/orders"
+          className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:border-gray-300 hover:shadow-md transition-all text-left cursor-pointer block"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">Avg Order Value</span>
+            <div className="rounded-full p-1.5 bg-gray-50 text-gray-600">
+              <ShoppingBag className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="font-bold text-gray-900 text-lg">
+            {customers.length > 0
+              ? formatPrice(Math.round(totalRevenue / customers.reduce((s, c) => s + c.ordersCount, 0) || 0))
+              : "—"}
+          </div>
+        </Link>
       </div>
 
       {/* Table */}
@@ -125,23 +153,13 @@ export default function AdminCustomersPage() {
         </div>
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
-            <p className="text-xs text-gray-500">
-              Showing {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length}
-            </p>
-            <div className="flex gap-2">
-              <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
-                className="text-xs px-3 py-1.5 border border-gray-200 rounded-md disabled:opacity-40 hover:bg-gray-50">
-                ← Prev
-              </button>
-              <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                className="text-xs px-3 py-1.5 border border-gray-200 rounded-md disabled:opacity-40 hover:bg-gray-50">
-                Next →
-              </button>
-            </div>
-          </div>
-        )}
+        <AdminPagination
+          currentPage={page}
+          totalItems={filtered.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
       </div>
     </div>
   );

@@ -22,19 +22,7 @@ import {
 import type { Product, CategoryItem } from "@/types";
 import { formatPrice } from "@/lib/format";
 import { uploadFileWithChunks } from "@/lib/upload-client";
-
-const DEFAULT_CATEGORIES = [
-  "Maahi II Luxury Eid Pret",
-  "Silk Solids'26",
-  "Raha Eid Pret'26",
-  "Best Sellers",
-  "Formal",
-  "Bridal",
-  "Luxury Pret",
-  "Pret",
-  "Sale",
-  "Accessories",
-];
+import AdminPagination from "@/components/admin/AdminPagination";
 
 const ALL_SIZES = ["XS", "S", "M", "L", "XL", "Custom Size"];
 
@@ -44,8 +32,12 @@ export default function AdminProductsPage() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+
   // Dynamic Categories from MongoDB
-  const [categoryOptions, setCategoryOptions] = useState<string[]>(DEFAULT_CATEGORIES);
+  const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -570,6 +562,11 @@ export default function AdminProductsPage() {
     return matchCategory && matchSearch;
   });
 
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   const QUICK_CATS = ["All", "Sale", "Formal", "Bridals"];
   const isCustomSelected = !QUICK_CATS.includes(categoryFilter);
 
@@ -611,7 +608,10 @@ export default function AdminProductsPage() {
           <input
             type="search"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
             placeholder="Search by title, SKU, or slug..."
             className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm border border-gray-200 rounded-lg outline-none focus:border-black transition-colors bg-white"
           />
@@ -623,7 +623,10 @@ export default function AdminProductsPage() {
             <button
               key={cat}
               type="button"
-              onClick={() => setCategoryFilter(cat)}
+              onClick={() => {
+                setCategoryFilter(cat);
+                setCurrentPage(1);
+              }}
               className={`rounded-lg px-3.5 py-2 text-xs font-semibold uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer ${
                 categoryFilter === cat
                   ? "bg-black text-white shadow-xs"
@@ -638,7 +641,10 @@ export default function AdminProductsPage() {
           <div className="relative">
             <select
               value={isCustomSelected ? categoryFilter : ""}
-              onChange={(e) => setCategoryFilter(e.target.value || "All")}
+              onChange={(e) => {
+                setCategoryFilter(e.target.value || "All");
+                setCurrentPage(1);
+              }}
               className={`rounded-lg border px-3 py-2 text-xs font-semibold uppercase tracking-wider outline-none cursor-pointer transition-colors ${
                 isCustomSelected
                   ? "bg-black text-white border-black"
@@ -683,7 +689,7 @@ export default function AdminProductsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredProducts.map((p) => (
+                {paginatedProducts.map((p) => (
                   <tr key={p.id} className="hover:bg-gray-50/75 transition-colors">
                     {/* Item Image & Title */}
                     <td className="py-3 px-4">
@@ -792,6 +798,14 @@ export default function AdminProductsPage() {
             </table>
           </div>
         )}
+
+        <AdminPagination
+          currentPage={currentPage}
+          totalItems={filteredProducts.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
       </div>
 
       {/* ===================== ADD / EDIT PRODUCT MODAL ===================== */}

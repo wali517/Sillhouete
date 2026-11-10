@@ -24,10 +24,17 @@ import {
 } from "lucide-react";
 import type { CategoryItem } from "@/types";
 import { uploadFileWithChunks } from "@/lib/upload-client";
+import AdminPagination from "@/components/admin/AdminPagination";
 
 export default function AdminCategoriesPage() {
   // Navigation State: null = Level 1 (Main Categories list), CategoryItem = Level 2 (Subcategories of that Main Category)
   const [selectedMainCategory, setSelectedMainCategory] = useState<CategoryItem | null>(null);
+
+  const selectCategoryView = (cat: CategoryItem | null) => {
+    setSelectedMainCategory(cat);
+    setCurrentPage(1);
+    setSearch("");
+  };
 
   // Main Categories state
   const [mainCategories, setMainCategories] = useState<CategoryItem[]>([]);
@@ -39,6 +46,10 @@ export default function AdminCategoriesPage() {
 
   // Search filter
   const [search, setSearch] = useState("");
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -340,6 +351,16 @@ export default function AdminCategoriesPage() {
     return s.title.toLowerCase().includes(q) || s.handle.toLowerCase().includes(q);
   });
 
+  const paginatedMainCategories = filteredMainCategories.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const paginatedSubcategories = filteredSubcategories.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className="space-y-6">
       {/* Global Error Banner */}
@@ -365,7 +386,7 @@ export default function AdminCategoriesPage() {
             <div>
               <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
                 <button
-                  onClick={() => setSelectedMainCategory(null)}
+                  onClick={() => selectCategoryView(null)}
                   className="hover:text-black flex items-center gap-1 font-medium text-gray-600 transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
@@ -399,7 +420,7 @@ export default function AdminCategoriesPage() {
           {selectedMainCategory ? (
             <>
               <button
-                onClick={() => setSelectedMainCategory(null)}
+                onClick={() => selectCategoryView(null)}
                 className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -432,7 +453,10 @@ export default function AdminCategoriesPage() {
           <input
             type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
             placeholder={
               selectedMainCategory
                 ? `Search subcategories in ${selectedMainCategory.title}...`
@@ -485,7 +509,7 @@ export default function AdminCategoriesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filteredMainCategories.map((cat) => {
+                  {paginatedMainCategories.map((cat) => {
                     const isAct = cat.isActive !== false;
                     const subCount = cat.subcategoriesCount ?? 0;
                     const prodCount = cat.productCount ?? 0;
@@ -531,7 +555,7 @@ export default function AdminCategoriesPage() {
                         {/* Subcategories count pill */}
                         <td className="px-4 py-3.5 text-center">
                           <button
-                            onClick={() => setSelectedMainCategory(cat)}
+                            onClick={() => selectCategoryView(cat)}
                             className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-colors"
                             title="Click to view & manage subcategories"
                           >
@@ -579,7 +603,7 @@ export default function AdminCategoriesPage() {
                           <div className="flex items-center justify-end gap-1.5">
                             {/* Manage Subcategories Button */}
                             <button
-                              onClick={() => setSelectedMainCategory(cat)}
+                              onClick={() => selectCategoryView(cat)}
                               className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-800 shadow-xs hover:bg-gray-50 hover:border-black transition-colors"
                               title="Manage Subcategories inside this category"
                             >
@@ -623,6 +647,14 @@ export default function AdminCategoriesPage() {
               </table>
             </div>
           )}
+
+          <AdminPagination
+            currentPage={currentPage}
+            totalItems={filteredMainCategories.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={setItemsPerPage}
+          />
         </div>
       )}
 
@@ -665,7 +697,7 @@ export default function AdminCategoriesPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {filteredSubcategories.map((sub) => {
+                    {paginatedSubcategories.map((sub) => {
                       const isAct = sub.isActive !== false;
                       const prodCount = sub.productCount ?? 0;
 
@@ -780,6 +812,14 @@ export default function AdminCategoriesPage() {
                 </table>
               </div>
             )}
+
+            <AdminPagination
+              currentPage={currentPage}
+              totalItems={filteredSubcategories.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
           </div>
         </div>
       )}
