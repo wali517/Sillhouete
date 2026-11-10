@@ -541,6 +541,7 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
     // Defined canonical order for Sillhouete's official top-level navigation
     const OFFICIAL_ORDER = [
       "sale-1",
+      "sale",
       "maahi-ii-luxury-eid-pret",
       "new-arrivals",
       "bridal-dresses",
@@ -553,14 +554,9 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       "accessories",
     ];
 
-    // 1. Fetch all active main categories from MongoDB
+    // 1. Fetch only verified active main categories from MongoDB
     const mainDocs = await CollectionModel.find({
-      $or: [
-        { isMainCategory: true },
-        { parentHandle: "" },
-        { parentHandle: null },
-        { parentHandle: { $exists: false } },
-      ],
+      isMainCategory: true,
       isActive: { $ne: false },
     }).lean();
 

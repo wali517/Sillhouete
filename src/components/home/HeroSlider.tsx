@@ -49,8 +49,9 @@ export default function HeroSlider({ slides }: { slides: HeroSlide[] }) {
                 alt={s.mobileAlt}
                 fill
                 sizes="100vw"
-                priority={true}
-                loading="eager"
+                priority={i === 0}
+                loading={i === 0 ? "eager" : "lazy"}
+                decoding="async"
                 className="object-cover md:hidden"
               />
               <Image
@@ -58,8 +59,9 @@ export default function HeroSlider({ slides }: { slides: HeroSlide[] }) {
                 alt={s.alt}
                 fill
                 sizes="100vw"
-                priority={true}
-                loading="eager"
+                priority={i === 0}
+                loading={i === 0 ? "eager" : "lazy"}
+                decoding="async"
                 className="hidden object-cover md:block"
               />
             </div>

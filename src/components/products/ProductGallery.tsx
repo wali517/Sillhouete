@@ -128,6 +128,8 @@ export default function ProductGallery({ product }: { product: Product }) {
                 alt={`${product.title} angle ${idx + 1}`}
                 fill
                 sizes="64px"
+                loading="lazy"
+                decoding="async"
                 className="object-cover"
               />
             </button>
@@ -179,6 +181,8 @@ export default function ProductGallery({ product }: { product: Product }) {
                   alt={`${product.title} view ${idx + 1}`}
                   fill
                   priority={idx === 0}
+                  loading={idx === 0 ? "eager" : "lazy"}
+                  decoding="async"
                   sizes="(min-width: 1024px) 60vw, 100vw"
                   className="object-cover pointer-events-none select-none"
                 />

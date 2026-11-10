@@ -61,11 +61,10 @@ export default function CollectionViewer({
   isSalePage?: boolean;
   initialPage?: number;
 }) {
-  const [productsList, setProductsList] = useState<Product[]>(initialProducts);
   const gridTopRef = useRef<HTMLDivElement>(null);
-  // Pagination state (28 products per page on Sale page, 60 per page on other collections matching live)
+  // Pagination state: exactly 12 products per page across all collection routes for fast lazy loading
   const [currentPage, setCurrentPage] = useState<number>(initialPage || 1);
-  const itemsPerPage = isSalePage ? 28 : 60;
+  const itemsPerPage = 12;
 
   // Sort state (default to "relevant" matching live site and screenshot)
   const [sort, setSort] = useState<SortOption>("relevant");
@@ -180,7 +179,7 @@ export default function CollectionViewer({
 
   // Filter products
   const filteredProducts = useMemo(() => {
-    return productsList.filter((p) => {
+    return initialProducts.filter((p) => {
       if (p.price > maxPrice) return false;
 
       if (selectedColors.length > 0) {
@@ -212,7 +211,7 @@ export default function CollectionViewer({
 
       return true;
     });
-  }, [productsList, maxPrice, selectedColors, selectedSizes, selectedStyles]);
+  }, [initialProducts, maxPrice, selectedColors, selectedSizes, selectedStyles]);
 
   // Sort products
   const sortedProducts = useMemo(() => {
@@ -261,6 +260,8 @@ export default function CollectionViewer({
     }
     if (gridTopRef.current) {
       gridTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -593,7 +594,13 @@ export default function CollectionViewer({
               {paginatedProducts.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 md:gap-x-4 md:gap-y-8">
                   {paginatedProducts.map((p, i) => (
-                    <ProductCard key={p.id} product={p} isSale={true} index={i} />
+                    <ProductCard
+                      key={p.id}
+                      product={p}
+                      isSale={true}
+                      index={i}
+                      priority={activePage === 1 && i < 4}
+                    />
                   ))}
                 </div>
               ) : (
@@ -658,7 +665,13 @@ export default function CollectionViewer({
           {paginatedProducts.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10 lg:gap-x-7 lg:gap-y-12">
               {paginatedProducts.map((p, i) => (
-                <ProductCard key={p.id} product={p} index={i} isThreeColumn={true} />
+                <ProductCard
+                  key={p.id}
+                  product={p}
+                  index={i}
+                  isThreeColumn={true}
+                  priority={activePage === 1 && i < 3}
+                />
               ))}
             </div>
           ) : (

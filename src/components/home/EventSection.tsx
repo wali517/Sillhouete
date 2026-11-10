@@ -49,8 +49,8 @@ export default function EventSection() {
                   alt={e.alt}
                   fill
                   sizes="(min-width: 768px) 20vw, 50vw"
-                  priority={true}
-                  loading="eager"
+                  loading="lazy"
+                  decoding="async"
                   className="object-cover"
                 />
               </div>

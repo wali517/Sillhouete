@@ -8,7 +8,7 @@ import { formatPrice } from "@/lib/format";
 
 export default function ProductCard({
   product,
-  priority = true,
+  priority = false,
   isSale = false,
   isNew = false,
   showFrom = false,
@@ -85,8 +85,9 @@ export default function ProductCard({
                   ? "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 50vw"
                   : "(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
               }
-              priority={priority && index < 6}
-              loading={priority && index < 6 ? "eager" : "lazy"}
+              priority={priority && index < 3}
+              loading={priority && index < 3 ? "eager" : "lazy"}
+              decoding="async"
               className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
             />
             {product.hoverImage && (
@@ -100,6 +101,7 @@ export default function ProductCard({
                     : "(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
                 }
                 loading="lazy"
+                decoding="async"
                 className="hidden object-cover object-center opacity-0 transition-opacity duration-500 motion-reduce:transition-none md:block md:group-hover:opacity-100"
               />
             )}

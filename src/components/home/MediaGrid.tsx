@@ -66,7 +66,7 @@ export default function MediaGrid() {
       autoPlay
       muted
       loop
-      preload="auto"
+      preload="metadata"
       aria-label="Sillhouete campaign film"
     >
       <source src={VIDEO_URL} type="video/mp4" />
@@ -94,7 +94,8 @@ export default function MediaGrid() {
               alt="Blush pink bridal lehenga with heavy silver embroidery"
               fill
               sizes="(max-width: 1023px) 100vw, 33vw"
-              priority
+              loading="lazy"
+              decoding="async"
               className="object-cover"
             />
           </div>

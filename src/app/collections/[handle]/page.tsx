@@ -4,10 +4,7 @@ import {
   getProducts,
   getProductsByCollection,
   getCollectionByHandle,
-  getSubcategories,
 } from "@/lib/db";
-import { COLLECTION_DESCRIPTIONS } from "@/data/collection-descriptions";
-import { COLLECTION_TITLES } from "@/data/site";
 import CollectionViewer from "./CollectionViewer";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +20,6 @@ export async function generateMetadata({ params }: Props) {
   const colDoc = await getCollectionByHandle(handle);
   const title =
     colDoc?.title ||
-    COLLECTION_TITLES[handle] ||
     handle.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   return { title: `${title} – Sillhouete` };
 }
@@ -34,40 +30,28 @@ export default async function CollectionPage({ params, searchParams }: Props) {
   const initialPage = Number(sParams?.page) || 1;
   const isSale = handle === "sale-1" || handle === "sale";
 
-  const colDoc = await getCollectionByHandle(handle);
-  const products =
+  // Fetch collection document and products concurrently for optimal speed
+  const [colDoc, products] = await Promise.all([
+    getCollectionByHandle(handle),
     handle === "1" || handle === "all"
-      ? await getProducts()
-      : await getProductsByCollection(handle);
-
-  const rawTitle = isSale
-    ? "SILLHOUETE SALE"
-    : colDoc?.title || COLLECTION_TITLES[handle];
+      ? getProducts()
+      : getProductsByCollection(handle),
+  ]);
 
   const title =
-    rawTitle ||
-    handle.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    colDoc?.title ||
+    (isSale
+      ? "SILLHOUETE SALE"
+      : handle.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()));
 
-  if (!rawTitle && !products.length) notFound();
+  if (!colDoc && !products.length) notFound();
 
-  // Determine hierarchy: is this a Subcategory or a Main Category?
+  // If subcategory, fetch parent collection for breadcrumbs
   const parentHandle = colDoc?.parentHandle?.trim() || "";
-  let parentDoc = null;
-  let subcategoriesNav: Array<{ handle: string; title: string }> = [];
+  const parentDoc = parentHandle ? await getCollectionByHandle(parentHandle) : null;
 
-  if (parentHandle) {
-    // 1. Current page is a SUBCATEGORY
-    parentDoc = await getCollectionByHandle(parentHandle);
-    // Fetch sibling subcategories under the same parent
-    const siblings = await getSubcategories(parentHandle, true);
-    subcategoriesNav = siblings.map((s) => ({ handle: s.handle, title: s.title }));
-  } else {
-    // 2. Current page is a MAIN CATEGORY
-    const childSubs = await getSubcategories(handle, true);
-    subcategoriesNav = childSubs.map((s) => ({ handle: s.handle, title: s.title }));
-  }
-
-  const descriptionHtml = colDoc?.description || COLLECTION_DESCRIPTIONS[handle] || "";
+  // SEO Description directly from MongoDB
+  const descriptionHtml = colDoc?.description || "";
 
   return (
     <section className="mx-auto w-full max-w-[1520px] px-3.5 py-6 sm:px-6 md:px-8 lg:px-10 md:py-8">

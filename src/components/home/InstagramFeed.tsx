@@ -192,6 +192,8 @@ export default function InstagramFeed() {
               alt={item.alt}
               fill
               unoptimized
+              loading="lazy"
+              decoding="async"
               sizes="(min-width: 1200px) 16vw, (min-width: 640px) 33vw, 50vw"
             />
             <span className="igf-tile__veil">
