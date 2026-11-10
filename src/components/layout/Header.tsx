@@ -26,7 +26,7 @@ export default function Header() {
           setNavItems(data.nav);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -104,7 +104,7 @@ export default function Header() {
         {/* Primary Desktop Navigation: 2 Rows Centered */}
         <nav aria-label="Primary" className="hidden flex-1 flex-col items-center justify-center lg:flex">
           {/* Row 1 */}
-          <ul className="flex flex-wrap items-center justify-center gap-x-4 lg:gap-x-5 xl:gap-x-6">
+          <ul className="flex flex-wrap items-center justify-center gap-x-4 lg:gap-x-3 xl:gap-x-4">
             {NAV_ROW1.map((item) => {
               const hasDropdown = Boolean(item.children && item.children.length > 0);
 
@@ -112,9 +112,8 @@ export default function Header() {
                 <li key={item.label} className="relative group">
                   <Link
                     href={item.href}
-                    className={`relative flex items-center py-1 text-[14px] xl:text-[15px] uppercase tracking-[0.01em] font-normal transition-colors hover:text-black after:content-[''] after:absolute after:bottom-0 after:left-1 after:right-1 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:ease-out after:origin-left ${
-                      item.sale ? "text-[#ff0000]! font-normal animate-blinks sale-menu" : "text-black"
-                    }`}
+                    className={`relative flex items-center py-1 text-[14px] xl:text-[15px] uppercase tracking-[0.01em] font-normal transition-colors hover:text-black after:content-[''] after:absolute after:bottom-0 after:left-1 after:right-1 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:ease-out after:origin-left ${item.sale ? "text-[#ff0000]! font-normal animate-blinks sale-menu" : "text-black"
+                      }`}
                   >
                     <span>{item.label}</span>
                     {hasDropdown && (
@@ -147,13 +146,12 @@ export default function Header() {
                             <li key={child.label}>
                               <Link
                                 href={child.href}
-                                className={`block px-5 py-2 text-[15px] transition-colors whitespace-nowrap hover:bg-neutral-50 ${
-                                  isMeeras
-                                    ? "text-[#ff0000] font-normal blink-meeras"
-                                    : isHighlight
+                                className={`block px-5 py-2 text-[15px] transition-colors whitespace-nowrap hover:bg-neutral-50 ${isMeeras
+                                  ? "text-[#ff0000] font-normal blink-meeras"
+                                  : isHighlight
                                     ? "text-[#ff0000] font-normal highlight-red hover:text-[#ff0000]"
                                     : "text-black/85 hover:text-black font-normal"
-                                }`}
+                                  }`}
                               >
                                 {child.label}
                               </Link>
@@ -169,7 +167,7 @@ export default function Header() {
           </ul>
 
           {/* Row 2 */}
-          <ul className="flex flex-wrap items-center justify-center gap-x-5 lg:gap-x-7 mt-1.5">
+          <ul className="flex flex-wrap items-center justify-center gap-x-5 lg:gap-x-5 mt-1.5">
             {NAV_ROW2.map((item) => {
               const hasDropdown = Boolean(item.children && item.children.length > 0);
 
@@ -210,13 +208,12 @@ export default function Header() {
                             <li key={child.label}>
                               <Link
                                 href={child.href}
-                                className={`block px-5 py-2 text-[14px] transition-colors whitespace-nowrap hover:bg-neutral-50 ${
-                                  isMeeras
-                                    ? "text-[#ff0000] font-normal blink-meeras"
-                                    : isHighlight
+                                className={`block px-5 py-2 text-[14px] transition-colors whitespace-nowrap hover:bg-neutral-50 ${isMeeras
+                                  ? "text-[#ff0000] font-normal blink-meeras"
+                                  : isHighlight
                                     ? "text-[#ff0000] font-normal highlight-red hover:text-[#ff0000]"
                                     : "text-black/85 hover:text-black font-normal"
-                                }`}
+                                  }`}
                               >
                                 {child.label}
                               </Link>
