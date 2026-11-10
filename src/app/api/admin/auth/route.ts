@@ -28,25 +28,16 @@ export async function POST(req: Request) {
 
     const enteredEmail = typeof email === "string" ? email.toLowerCase().trim() : "";
 
-    // Check if the email matches admin (or standard shortcuts "admin", "admin@sillhouete.com")
-    const isEmailAdmin =
-      !enteredEmail ||
-      enteredEmail === currentAdminEmail ||
-      enteredEmail === "admin" ||
-      enteredEmail === "admin@sillhouete.com";
-
-    if (!isEmailAdmin) {
+    // Strictly authenticate against the admin email stored in MongoDB
+    if (!enteredEmail || enteredEmail !== currentAdminEmail) {
       return NextResponse.json(
-        { error: "This email does not belong to an administrator account", notAdmin: true },
+        { error: "Invalid administrator email address", notAdmin: true },
         { status: 401 }
       );
     }
 
-    const isValidPassword =
-      password === currentPass ||
-      password === "SillhoueteAdmin2026!" ||
-      password === "admin123";
-    if (!isValidPassword) {
+    // Strictly authenticate against the admin password stored in MongoDB
+    if (!password || password !== currentPass) {
       return NextResponse.json({ error: "Invalid administrator password" }, { status: 401 });
     }
 
@@ -78,11 +69,8 @@ export async function PATCH(req: Request) {
     const storedPass = settings.adminPasswordHash || "admin123";
     const currentAdminEmail = settings.adminEmail || "admin@sillhouete.com";
 
-    const isPassValid =
-      currentPassword === storedPass ||
-      currentPassword === "SillhoueteAdmin2026!" ||
-      currentPassword === "admin123";
-    if (!isPassValid) {
+    // Strictly verify current password matches MongoDB
+    if (!currentPassword || currentPassword !== storedPass) {
       return NextResponse.json({ error: "Current administrator password is incorrect" }, { status: 401 });
     }
 

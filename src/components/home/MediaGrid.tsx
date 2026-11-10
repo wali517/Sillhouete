@@ -3,10 +3,11 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { MEDIA_IMAGE, VIDEO_URL } from "@/data/campaigns";
 
-export default function MediaGrid() {
+export default function MediaGrid({ videoSrc }: { videoSrc?: string } = {}) {
   const [inView, setInView] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const effectiveVideoUrl = videoSrc || VIDEO_URL;
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
@@ -69,7 +70,7 @@ export default function MediaGrid() {
       preload="metadata"
       aria-label="Sillhouete campaign film"
     >
-      <source src={VIDEO_URL} type="video/mp4" />
+      <source src={effectiveVideoUrl} type="video/mp4" />
     </video>
   );
   return (

@@ -70,11 +70,9 @@ export default function NewsletterPopup() {
           message: `Subscribed on ${new Date().toLocaleDateString()}`,
         }),
       });
-      const data = await res.json();
-      const code = data.discountCode || "WELCOME5";
-      const percent = data.percent || 5;
+      await res.json();
       setStatus("done");
-      setMessage(`Thank you! Your ${percent}% discount code (${code}) has been emailed to you.`);
+      setMessage("Thank you for subscribing! Your exclusive discount code has been sent to your email. Please check your inbox.");
       setEmail("");
       setTimeout(() => close(), 4000);
     } catch {

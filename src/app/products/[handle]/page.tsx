@@ -10,7 +10,7 @@ import CustomerTestimonials from "@/components/products/CustomerTestimonials";
 import KeyActives from "@/components/products/KeyActives";
 import ProductVideoReel from "@/components/products/ProductVideoReel";
 import { SITE } from "@/data/site";
-import { getProductByHandle, getProducts } from "@/lib/db";
+import { getProductByHandle, getProducts, getSettings } from "@/lib/db";
 import type { Product } from "@/types";
 import { ChevronRight, Globe, ShieldCheck, Truck, RotateCcw, Share2 } from "lucide-react";
 
@@ -68,8 +68,11 @@ export async function generateMetadata({ params }: Props) {
 export default async function ProductPage({ params }: Props) {
   const { handle } = await params;
   let product: Product | undefined = undefined;
+  let settings = null;
   try {
-    product = await getProductByHandle(handle);
+    const [p, s] = await Promise.all([getProductByHandle(handle), getSettings()]);
+    product = p;
+    settings = s;
   } catch {
     // ignore
   }
@@ -532,6 +535,7 @@ export default async function ProductPage({ params }: Props) {
         <ProductVideoReel
           videoId={product.videoId}
           videoUrl={product.videoUrl}
+          defaultVideoUrl={settings?.defaultProductVideoUrl}
           productTitle={product.title}
         />
       </div>

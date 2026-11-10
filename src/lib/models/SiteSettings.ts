@@ -28,6 +28,8 @@ export interface ISiteSettings extends Document {
   smtpUser?: string;
   smtpPass?: string;
   smtpFrom?: string;
+  campaignVideoUrl?: string;
+  defaultProductVideoUrl?: string;
 }
 
 const SiteSettingsSchema = new Schema<ISiteSettings>(
@@ -58,6 +60,8 @@ const SiteSettingsSchema = new Schema<ISiteSettings>(
     smtpUser: { type: String, default: "" },
     smtpPass: { type: String, default: "" },
     smtpFrom: { type: String, default: "" },
+    campaignVideoUrl: { type: String, default: "https://cdn.shopify.com/videos/c/o/v/061ca40eef70464293b2a672d62f7b0a.mp4" },
+    defaultProductVideoUrl: { type: String, default: "https://cdn.shopify.com/videos/c/o/v/061ca40eef70464293b2a672d62f7b0a.mp4" },
     discountCodes: [
       {
         code: { type: String },

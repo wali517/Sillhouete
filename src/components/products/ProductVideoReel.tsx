@@ -8,6 +8,7 @@ import { SITE } from "@/data/site";
 interface ProductVideoReelProps {
   videoId?: string;
   videoUrl?: string;
+  defaultVideoUrl?: string;
   productTitle: string;
 }
 
@@ -16,6 +17,7 @@ const DEFAULT_VIDEO_URL = "https://cdn.shopify.com/videos/c/o/v/061ca40eef704642
 export default function ProductVideoReel({
   videoId,
   videoUrl,
+  defaultVideoUrl,
   productTitle,
 }: ProductVideoReelProps) {
   const [isOpen, setIsOpen] = useState(true);
@@ -35,7 +37,7 @@ export default function ProductVideoReel({
     !videoUrl
   );
 
-  const effectiveVideoSrc = videoUrl || DEFAULT_VIDEO_URL;
+  const effectiveVideoSrc = videoUrl || defaultVideoUrl || DEFAULT_VIDEO_URL;
 
   // Close modal on Escape key
   const handleKeyDown = useCallback(

@@ -113,25 +113,27 @@ export default function AccountView({ initialTab = "login" }: { initialTab?: "lo
 
     setAuthLoading(true);
 
-    // 1. Check if this is an administrator login attempt (works with any custom admin email set in settings)
-    try {
-      const adminRes = await fetch("/api/admin/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: trimmedEmail, password: password || "admin123" }),
-      });
-      const adminData = await adminRes.json();
-      if (adminRes.ok && adminData.isAdmin) {
-        router.push("/admin");
-        return;
-      } else if (!adminData.notAdmin && adminRes.status === 401) {
-        // Specifically matched the admin account email but the password was wrong
-        setAuthError(adminData.error || "Invalid administrator password");
-        setAuthLoading(false);
-        return;
+    // 1. Check if this is an administrator login attempt (works strictly with custom admin email set in settings)
+    if (trimmedEmail && password) {
+      try {
+        const adminRes = await fetch("/api/admin/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: trimmedEmail, password }),
+        });
+        const adminData = await adminRes.json();
+        if (adminRes.ok && adminData.isAdmin) {
+          router.push("/admin");
+          return;
+        } else if (!adminData.notAdmin && adminRes.status === 401) {
+          // Specifically matched the admin account email but the password was wrong
+          setAuthError(adminData.error || "Invalid administrator password");
+          setAuthLoading(false);
+          return;
+        }
+      } catch {
+        // Not admin or network issue, proceed to customer authentication
       }
-    } catch {
-      // Not admin or network issue, proceed to customer authentication
     }
 
     // 2. Customer login

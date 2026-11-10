@@ -357,13 +357,9 @@ function CheckoutForm() {
   const handleApplyDiscount = () => {
     const code = discountCode.trim().toUpperCase();
     setDiscountError("");
-    const found = availableCodes.find((c) => c.code === code);
+    const found = availableCodes.find((c) => c.code.toUpperCase() === code);
     if (found) {
       setAppliedDiscount({ code: found.code, percent: found.percent });
-    } else if (code === "WELCOME5") {
-      setAppliedDiscount({ code: "WELCOME5", percent: 5 });
-    } else if (code === "EID2026") {
-      setAppliedDiscount({ code: "EID2026", percent: 10 });
     } else if (code.length > 0) {
       setDiscountError("Enter a valid discount code");
     }

@@ -23,6 +23,7 @@ import {
   XCircle,
 } from "lucide-react";
 import type { CategoryItem } from "@/types";
+import { uploadFileWithChunks } from "@/lib/upload-client";
 
 export default function AdminCategoriesPage() {
   // Navigation State: null = Level 1 (Main Categories list), CategoryItem = Level 2 (Subcategories of that Main Category)
@@ -162,26 +163,16 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  // Direct desktop image upload
+  // Direct desktop image upload (safe chunked & Vercel friendly)
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
       setUploadingImage(true);
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
-
-      if (data.url) {
-        setImage(data.url);
+      const res = await uploadFileWithChunks(file);
+      if (res.url) {
+        setImage(res.url);
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to upload image from desktop";

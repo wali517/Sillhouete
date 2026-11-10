@@ -115,9 +115,9 @@ export default function ProductCard({
           </span>
         )}
 
-        {/* NEW Badge matching live site and reference images */}
+        {/* NEW Badge matching live site and screenshot */}
         {showNewBadge && (
-          <span className="pointer-events-none absolute right-2 top-2 z-10 bg-white border border-black/80 px-2 py-0.5 text-[9px] md:text-[10px] font-bold uppercase leading-none tracking-wider text-black md:right-3 md:top-3">
+          <span className="pointer-events-none absolute right-2.5 top-2.5 z-10 bg-white text-black px-2.5 py-1 text-[10px] md:text-[11px] font-semibold tracking-[0.06em] uppercase leading-none shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
             NEW
           </span>
         )}

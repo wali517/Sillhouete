@@ -41,31 +41,33 @@ export async function POST(req: Request) {
           body.subject.toLowerCase().includes("5% off") ||
           body.subject.toLowerCase().includes("10% off")));
 
-    let activeDiscount = { code: "WELCOME5", percent: 5 };
+    let hasActiveDiscount = false;
 
     if (isDiscountRequest) {
       try {
         const settings = await getSettings();
-        const found = (settings.discountCodes || []).find((d) => d.active);
-        if (found) {
-          activeDiscount = { code: found.code, percent: found.percent };
+        const activeCodes = (settings.discountCodes || []).filter((d) => d.active);
+        const activeDiscount = activeCodes.length > 0 ? activeCodes[0] : null;
+
+        if (activeDiscount) {
+          hasActiveDiscount = true;
+          // Send the discount code email via nodemailer directly to user's inbox
+          await sendDiscountCodeEmail({
+            email: body.email.toLowerCase().trim(),
+            code: activeDiscount.code,
+            percent: activeDiscount.percent,
+          });
         }
-        // Send the discount code email via nodemailer
-        await sendDiscountCodeEmail({
-          email: body.email.toLowerCase().trim(),
-          code: activeDiscount.code,
-          percent: activeDiscount.percent,
-        });
       } catch (emailErr) {
         console.warn("Discount email dispatch error:", emailErr);
       }
     }
 
+    // Do NOT expose the discount code on the screen or in response JSON; delivered strictly to user's email
     return NextResponse.json({
       success: true,
       message,
-      discountCode: isDiscountRequest ? activeDiscount.code : undefined,
-      percent: isDiscountRequest ? activeDiscount.percent : undefined,
+      emailSent: hasActiveDiscount,
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Failed to save message";

@@ -221,6 +221,8 @@ export default function AdminSettingsPage() {
             { label: "Studio Address", key: "studioAddress" },
             { label: "Office Address", key: "officeAddress" },
             { label: "USA Office Address", key: "usaOfficeAddress" },
+            { label: "Campaign Film Video URL (.mp4)", key: "campaignVideoUrl" },
+            { label: "Default Product Video Reel URL (.mp4)", key: "defaultProductVideoUrl" },
           ].map(({ label, key }) => (
             <div key={key}>
               <label className="text-xs font-semibold text-gray-600 block mb-1">{label}</label>
@@ -244,6 +246,8 @@ export default function AdminSettingsPage() {
             studioAddress: settings.studioAddress,
             officeAddress: settings.officeAddress,
             usaOfficeAddress: settings.usaOfficeAddress,
+            campaignVideoUrl: settings.campaignVideoUrl,
+            defaultProductVideoUrl: settings.defaultProductVideoUrl,
             description: settings.description,
           })} disabled={saving === "store"}
             className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50">

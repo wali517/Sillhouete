@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import type { Product, CategoryItem } from "@/types";
 import { formatPrice } from "@/lib/format";
+import { uploadFileWithChunks } from "@/lib/upload-client";
 
 const DEFAULT_CATEGORIES = [
   "Maahi II Luxury Eid Pret",
@@ -95,6 +96,7 @@ export default function AdminProductsPage() {
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const [uploadingCustomSize, setUploadingCustomSize] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [videoUploadProgress, setVideoUploadProgress] = useState("");
 
   // URL input visibility toggles (desktop upload is primary)
   const [showMainUrl, setShowMainUrl] = useState(false);
@@ -379,57 +381,46 @@ export default function AdminProductsPage() {
     setSizes((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
   };
 
-  // Generic desktop single file uploader
+  // Generic desktop single file uploader (supports chunking for large files/videos)
   const uploadSingleFile = async (
     file: File,
     setLoader: (val: boolean) => void,
-    onSuccess: (url: string) => void
+    onSuccess: (url: string) => void,
+    onProgressMsg?: (msg: string) => void
   ) => {
     try {
       setLoader(true);
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
+      const res = await uploadFileWithChunks(file, {
+        onProgress: (_pct, msg) => {
+          if (onProgressMsg && msg) onProgressMsg(msg);
+        },
       });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
-      if (data.url) {
-        onSuccess(data.url);
+      if (res.url) {
+        onSuccess(res.url);
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "File upload failed";
       alert(msg);
     } finally {
       setLoader(false);
+      if (onProgressMsg) onProgressMsg("");
     }
   };
 
-  // Gallery multi-file upload from desktop
+  // Gallery multi-file upload from desktop (handles large/multiple files safely)
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     try {
       setUploadingGallery(true);
-      const formData = new FormData();
+      const newUrls: string[] = [];
       for (let i = 0; i < files.length; i++) {
-        formData.append("files", files[i]);
+        const res = await uploadFileWithChunks(files[i]);
+        if (res.url) newUrls.push(res.url);
       }
-
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Gallery upload failed");
-
-      if (Array.isArray(data.urls) && data.urls.length > 0) {
-        setGalleryImages((prev) => [...prev, ...data.urls]);
+      if (newUrls.length > 0) {
+        setGalleryImages((prev) => [...prev, ...newUrls]);
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to upload gallery images";
@@ -1402,7 +1393,9 @@ export default function AdminProductsPage() {
                     accept="video/mp4,video/webm,video/quicktime"
                     onChange={(e) => {
                       const f = e.target.files?.[0];
-                      if (f) uploadSingleFile(f, setUploadingVideo, setVideoUrl);
+                      if (f) {
+                        uploadSingleFile(f, setUploadingVideo, setVideoUrl, setVideoUploadProgress);
+                      }
                     }}
                     className="hidden"
                     id="video-file"
@@ -1414,7 +1407,9 @@ export default function AdminProductsPage() {
                     {uploadingVideo ? (
                       <>
                         <Loader2 className="h-5 w-5 animate-spin text-black" />
-                        <span className="font-semibold text-xs text-gray-800">Uploading video from system...</span>
+                        <span className="font-semibold text-xs text-gray-800">
+                          {videoUploadProgress || "Uploading video to MongoDB GridFS..."}
+                        </span>
                       </>
                     ) : (
                       <>

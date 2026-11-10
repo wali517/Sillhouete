@@ -76,9 +76,9 @@ export async function uploadBufferToGridFS(
 }
 
 /**
- * Retrieve file stream and metadata from GridFS by ID
+ * Retrieve file stream and metadata from GridFS by ID, with optional byte range support for video streaming
  */
-export async function getGridFSFile(id: string) {
+export async function getGridFSFile(id: string, range?: { start?: number; end?: number }) {
   await connectDB();
 
   if (!mongoose.connection.db) {
@@ -102,7 +102,12 @@ export async function getGridFSFile(id: string) {
   }
 
   const fileDoc = files[0];
-  const downloadStream = bucket.openDownloadStream(objectId);
+  const downloadStream = bucket.openDownloadStream(
+    objectId,
+    range && (range.start !== undefined || range.end !== undefined)
+      ? { start: range.start || 0, end: range.end !== undefined ? range.end + 1 : undefined }
+      : undefined
+  );
 
   return {
     doc: fileDoc,

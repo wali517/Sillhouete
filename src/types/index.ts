@@ -313,4 +313,6 @@ export interface SiteSettings {
   smtpUser?: string;
   smtpPass?: string;
   smtpFrom?: string;
+  campaignVideoUrl?: string;
+  defaultProductVideoUrl?: string;
 }

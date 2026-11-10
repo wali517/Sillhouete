@@ -5,7 +5,7 @@ import EventSection from "@/components/home/EventSection";
 import InstagramFeed from "@/components/home/InstagramFeed";
 import NewsletterSection from "@/components/home/NewsletterSection";
 import { HERO_SLIDES } from "@/data/campaigns";
-import { getProductsByCollection } from "@/lib/db";
+import { getProductsByCollection, getSettings } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -50,16 +50,19 @@ const HOMEPAGE_SECTIONS = [
 ];
 
 export default async function HomePage() {
-  // Fetch products for each original homepage category dynamically from MongoDB
-  const sections = await Promise.all(
-    HOMEPAGE_SECTIONS.map(async (sec) => {
-      const products = await getProductsByCollection(sec.handle);
-      return {
-        ...sec,
-        products,
-      };
-    })
-  );
+  // Fetch site settings (for dynamic campaign video) and products concurrently from MongoDB
+  const [settings, sections] = await Promise.all([
+    getSettings(),
+    Promise.all(
+      HOMEPAGE_SECTIONS.map(async (sec) => {
+        const products = await getProductsByCollection(sec.handle);
+        return {
+          ...sec,
+          products,
+        };
+      })
+    ),
+  ]);
 
   return (
     <>
@@ -80,7 +83,7 @@ export default async function HomePage() {
         />
       ))}
 
-      <MediaGrid />
+      <MediaGrid videoSrc={settings.campaignVideoUrl} />
       <EventSection />
       <InstagramFeed />
       <NewsletterSection />

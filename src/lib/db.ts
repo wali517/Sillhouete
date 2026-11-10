@@ -588,17 +588,31 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
     };
 
     // 1. Sale
+    const saleDoc = mainMap.get("sale-1") || mainMap.get("sale");
+    let saleChildren: NavLink[] | undefined = undefined;
+    if (saleDoc) {
+      const dynamicChildren = await getChildrenFor(saleDoc.handle, String(saleDoc._id));
+      if (dynamicChildren.length > 0) saleChildren = dynamicChildren;
+    }
     navItems.push({
       label: "Sale",
       href: "/collections/sale-1",
       sale: true,
       blink: true,
+      children: saleChildren,
     });
 
     // 2. Maahi II Luxury Eid Pret
+    const maahiDoc = mainMap.get("maahi-ii-luxury-eid-pret");
+    let maahiChildren: NavLink[] | undefined = undefined;
+    if (maahiDoc) {
+      const dynamicChildren = await getChildrenFor("maahi-ii-luxury-eid-pret", String(maahiDoc._id));
+      if (dynamicChildren.length > 0) maahiChildren = dynamicChildren;
+    }
     navItems.push({
       label: "Maahi II Luxury Eid Pret",
       href: "/collections/maahi-ii-luxury-eid-pret",
+      children: maahiChildren,
     });
 
     // 3. New Arrivals (dropdown: Maahi II, Silk Solids'26, Raha Eid Pret'26, Lumiere)
@@ -732,15 +746,29 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
     });
 
     // 9. Best Sellers
+    const bsDoc = mainMap.get("best-sellers");
+    let bsChildren: NavLink[] | undefined = undefined;
+    if (bsDoc) {
+      const dynamicChildren = await getChildrenFor("best-sellers", String(bsDoc._id));
+      if (dynamicChildren.length > 0) bsChildren = dynamicChildren;
+    }
     navItems.push({
       label: "Best Sellers",
       href: "/collections/best-sellers",
+      children: bsChildren,
     });
 
     // 10. Spotted
+    const spottedDoc = mainMap.get("spotted");
+    let spottedChildren: NavLink[] | undefined = undefined;
+    if (spottedDoc) {
+      const dynamicChildren = await getChildrenFor("spotted", String(spottedDoc._id));
+      if (dynamicChildren.length > 0) spottedChildren = dynamicChildren;
+    }
     navItems.push({
       label: "Spotted",
       href: "/pages/spot",
+      children: spottedChildren,
     });
 
     // 11. Accessories (strictly 1 child: Pouches & Clutches - no View All)
@@ -1042,21 +1070,12 @@ export async function validateAndCalculateOrder(
     const code = discountCodeInput.trim().toUpperCase();
     let discountPercent = 0;
 
-    const availableCodes = settings.discountCodes || [
-      { code: "WELCOME5", percent: 5, active: true },
-      { code: "EID2026", percent: 10, active: true },
-    ];
+    const availableCodes = (settings.discountCodes || []).filter((c) => c.active === true);
 
-    const match = availableCodes.find((c) => c.code.toUpperCase() === code && c.active);
+    const match = availableCodes.find((c) => c.code.toUpperCase() === code);
     if (match) {
       discountPercent = match.percent;
       validCode = match.code;
-    } else if (code === "WELCOME5") {
-      discountPercent = 5;
-      validCode = "WELCOME5";
-    } else if (code === "EID2026") {
-      discountPercent = 10;
-      validCode = "EID2026";
     }
 
     if (discountPercent > 0) {
@@ -1952,6 +1971,8 @@ const INITIAL_SETTINGS: SiteSettings = {
     { code: "WELCOME5", percent: 5, active: true },
     { code: "EID2026", percent: 10, active: true },
   ],
+  campaignVideoUrl: "https://cdn.shopify.com/videos/c/o/v/061ca40eef70464293b2a672d62f7b0a.mp4",
+  defaultProductVideoUrl: "https://cdn.shopify.com/videos/c/o/v/061ca40eef70464293b2a672d62f7b0a.mp4",
 };
 
 export async function getSettings(): Promise<SiteSettings> {

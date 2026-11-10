@@ -33,12 +33,9 @@ export default function NewsletterForm({ id, className = "" }: { id: string; cla
           message: `Subscribed to newsletter on ${new Date().toLocaleDateString()}`,
         }),
       });
-      const data = await res.json();
-      const code = data.discountCode || "WELCOME5";
-      const percent = data.percent || 5;
-
+      await res.json();
       setStatus("done");
-      setMessage(`Thank you for subscribing! Your ${percent}% discount code (${code}) has been sent to your email.`);
+      setMessage("Thank you for subscribing! Your exclusive discount code has been sent to your email. Please check your inbox.");
       setEmail("");
     } catch {
       setStatus("done");
