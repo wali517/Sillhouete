@@ -2131,23 +2131,17 @@ export async function updateSettings(updates: Partial<SiteSettings>): Promise<Si
     delete (cleanUpdates as Record<string, unknown>).__v;
     delete (cleanUpdates as Record<string, unknown>).stripeSecretKeyConfigured;
 
-    let doc = await SiteSettingsModel.findOne({});
-    if (!doc) {
-      doc = await SiteSettingsModel.create({ ...INITIAL_SETTINGS, ...cleanUpdates });
-    } else {
-      for (const [key, val] of Object.entries(cleanUpdates)) {
-        if (val !== undefined) {
-          (doc as unknown as Record<string, unknown>)[key] = val;
-          doc.markModified(key);
-        }
-      }
-      await doc.save();
-    }
+    const doc = await SiteSettingsModel.findOneAndUpdate(
+      {},
+      { $set: cleanUpdates },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    ).lean();
 
-    const plain = toPlain<SiteSettings>(doc.toObject());
+    const plain = toPlain<SiteSettings>(doc);
     if (plain) return plain;
   } catch (err) {
     console.error("MongoDB updateSettings error:", err);
+    throw err;
   }
 
   return { ...INITIAL_SETTINGS, ...updates };

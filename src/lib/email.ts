@@ -43,23 +43,21 @@ export async function getTransporter(): Promise<TransporterContext | null> {
   let pass = process.env.SMTP_PASS;
   let customFrom = process.env.SMTP_FROM;
 
-  // If environment variables are not set (e.g. on Vercel deployment), read directly from MongoDB SiteSettings
-  if (!user || !pass) {
-    try {
-      await connectDB();
-      const settings = await SiteSettingsModel.findOne({}).lean();
-      if (settings?.smtpUser && settings?.smtpPass) {
-        user = settings.smtpUser;
-        pass = settings.smtpPass;
-        host = settings.smtpHost || host;
-        port = Number(settings.smtpPort) || port;
-        if (settings.smtpFrom) {
-          customFrom = settings.smtpFrom;
-        }
+  // Always check MongoDB SiteSettings so any updates in Admin Settings take effect immediately!
+  try {
+    await connectDB();
+    const settings = await SiteSettingsModel.findOne({}).lean();
+    if (settings?.smtpUser && settings?.smtpPass) {
+      user = settings.smtpUser;
+      pass = settings.smtpPass;
+      host = settings.smtpHost || host;
+      port = Number(settings.smtpPort) || port;
+      if (settings.smtpFrom) {
+        customFrom = settings.smtpFrom;
       }
-    } catch (err) {
-      console.error("📧 [EMAIL ERROR] Failed to load SMTP settings from MongoDB:", err);
     }
+  } catch (err) {
+    console.error("📧 [EMAIL ERROR] Failed to load SMTP settings from MongoDB:", err);
   }
 
   if (host && user && pass) {
@@ -72,14 +70,21 @@ export async function getTransporter(): Promise<TransporterContext | null> {
       port: Number(port),
       secure: isPort465,
       auth: { user: cleanUser, pass: cleanPass },
+      tls: { rejectUnauthorized: false },
       connectionTimeout: 8000,
       greetingTimeout: 6000,
       socketTimeout: 12000,
     });
 
-    const from =
-      customFrom ||
-      (cleanUser ? `"SILLHOUETE" <${cleanUser}>` : `"SILLHOUETE" <saleemalbala18@gmail.com>`);
+    // Ensure SPF and DKIM compliance: when sending through Gmail, From must match authenticated account
+    let from = `"SILLHOUETE" <${cleanUser}>`;
+    if (
+      customFrom &&
+      !customFrom.toLowerCase().includes("no-replay@gmail.com") &&
+      !customFrom.toLowerCase().includes("noreply@gmail.com")
+    ) {
+      from = customFrom;
+    }
 
     return { transporter, user: cleanUser, from, host, port: Number(port), pass: cleanPass };
   }
@@ -153,6 +158,7 @@ export async function sendEmail({
   try {
     const info = await transporter.sendMail({
       from,
+      replyTo: "info@sillhouete.com",
       to: cleanTo,
       subject: cleanSubject,
       text: text || html.replace(/<[^>]*>?/gm, " ").trim(),
@@ -176,6 +182,7 @@ export async function sendEmail({
         port: altPort,
         secure: altPort === 465,
         auth: { user: context.user, pass: context.pass },
+        tls: { rejectUnauthorized: false },
         connectionTimeout: 8000,
         greetingTimeout: 6000,
         socketTimeout: 12000,
@@ -183,6 +190,7 @@ export async function sendEmail({
 
       const altInfo = await altTransporter.sendMail({
         from: context.from,
+        replyTo: "info@sillhouete.com",
         to: cleanTo,
         subject: cleanSubject,
         text: text || html.replace(/<[^>]*>?/gm, " ").trim(),

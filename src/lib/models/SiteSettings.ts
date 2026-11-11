@@ -70,7 +70,7 @@ const SiteSettingsSchema = new Schema<ISiteSettings>(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true, strict: false }
 );
 
 export const SiteSettingsModel: Model<ISiteSettings> =

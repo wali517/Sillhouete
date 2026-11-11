@@ -1,6 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getSettings } from "@/lib/db";
 import livePagesData from "@/data/live-pages-content.json";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const livePages = livePagesData as Record<string, { title: string; html: string }>;
 
@@ -98,6 +102,7 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function InfoPage({ params }: Props) {
   const { slug } = await params;
+  const settings = await getSettings();
 
   if (!SLUGS.includes(slug)) {
     notFound();
@@ -155,10 +160,10 @@ export default async function InfoPage({ params }: Props) {
                 <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#9b8065]">Flagship Studio</span>
                 <h2 className="heading text-[18px]">Lahore Flagship Studio</h2>
                 <p className="text-sm text-black/80">
-                  📍 327 B, Street 7, Cavalry Ground, Lahore, Pakistan.
+                  📍 {settings.studioAddress || settings.officeAddress || "327 B, Street 7, Cavalry Ground, Lahore, Pakistan."}
                 </p>
                 <p className="text-xs text-black/60 pt-2">
-                  For appointments &amp; bespoke consultations: <a href="tel:+923310397865" className="underline font-semibold">+92 331 0397865</a>
+                  For appointments &amp; bespoke consultations: <a href={`tel:${(settings.phone || "+92 331 0397865").replace(/\s+/g, "")}`} className="underline font-semibold">{settings.phone || "+92 331 0397865"}</a>
                 </p>
               </div>
 

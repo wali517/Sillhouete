@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 import { getSettings, updateSettings } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -64,6 +65,16 @@ export async function PUT(req: Request) {
     }
 
     const updated = await updateSettings(body);
+
+    // Revalidate live storefront layout and pages so store info updates immediately
+    try {
+      revalidatePath("/", "layout");
+      revalidatePath("/");
+      revalidatePath("/pages/locations");
+      revalidatePath("/pages/contact-us");
+    } catch (e) {
+      console.warn("Settings revalidatePath error:", e);
+    }
 
     const sanitized = {
       ...updated,

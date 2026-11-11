@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getBlogs, saveBlog } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
@@ -18,6 +21,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Title and content are required" }, { status: 400 });
     }
     const blog = await saveBlog(body);
+
+    // Revalidate live storefront paths so new blog post shows immediately
+    try {
+      revalidatePath("/blogs/news");
+      revalidatePath(`/blogs/news/${blog.slug}`);
+      revalidatePath("/", "layout");
+    } catch (e) {
+      console.warn("revalidatePath error:", e);
+    }
+
     return NextResponse.json({ success: true, blog });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to create blog";

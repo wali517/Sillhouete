@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { ABOUT_TEXT, FOOTER_LINKS, SITE } from "@/data/site";
+import { useStore } from "@/components/providers/StoreProvider";
 import Socials from "@/components/ui/Socials";
 import {
   AmexBadge,
@@ -41,8 +42,16 @@ function Column({ title, children }: { title: string; children: ReactNode }) {
 }
 
 export default function Footer() {
+  const { settings } = useStore();
   const [footerEmail, setFooterEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+
+  const officeAddress = settings?.officeAddress || "327-B, Street 7, Lane 15, Cavalry Ground, Lahore";
+  const studioAddress = settings?.studioAddress || "Sillhouete, Almas Tower, MM Alam Rd, Block T, Gulberg 2, Lahore";
+  const usaOfficeAddress = settings?.usaOfficeAddress || "ADVENT BUSINESS CONSULTAX LLC, 18w100 22nd St, Ste 124, Oakbrook Terrace, IL, Zip Code 60181";
+  const phone = settings?.phone || "+92 331 0397865";
+  const email = settings?.email || SITE.email;
+  const description = settings?.description || ABOUT_TEXT;
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +94,7 @@ export default function Footer() {
             />
           </div>
           <p className="text-[12.75px] text-[#222222] leading-relaxed">
-            {ABOUT_TEXT}
+            {description}
           </p>
         </Column>
 
@@ -110,17 +119,15 @@ export default function Footer() {
                 Pakistan (Office &amp; Studio):
               </strong>
               <p>
-                <strong>Office Address: </strong>327-B, Street 7, Lane 15,
-                Cavalry Ground, Lahore
+                <strong>Office Address: </strong>{officeAddress}
               </p>
               <p>
-                <strong>Studio Address: </strong>Sillhouete, Almas Tower, MM
-                Alam Rd, Block T, Gulberg 2, Lahore
+                <strong>Studio Address: </strong>{studioAddress}
               </p>
               <p>
                 <strong>Phone:</strong>{" "}
-                <a href="tel:+923310397865" className="hover:underline">
-                  +92 331 0397865
+                <a href={`tel:${phone.replace(/\s+/g, "")}`} className="hover:underline">
+                  {phone}
                 </a>
               </p>
             </div>
@@ -133,7 +140,7 @@ export default function Footer() {
                 ADVENT BUSINESS CONSULTAX LLC
               </p>
               <p>
-                18w100 22nd St, Ste 124, Oakbrook Terrace, IL, Zip Code 60181
+                {usaOfficeAddress}
               </p>
               <p>
                 <strong>Phone:</strong>{" "}
@@ -146,10 +153,10 @@ export default function Footer() {
             <p className="pt-1">
               <strong>Email:</strong>{" "}
               <a
-                href={`mailto:${SITE.email}`}
+                href={`mailto:${email}`}
                 className="underline hover:text-black"
               >
-                {SITE.email}
+                {email}
               </a>
             </p>
           </div>

@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getBlogBySlug, saveBlog, deleteBlog } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(
   _req: Request,
@@ -27,6 +30,16 @@ export async function PUT(
       return NextResponse.json({ error: "Title and content are required" }, { status: 400 });
     }
     const blog = await saveBlog({ ...body, id });
+
+    // Revalidate live storefront paths so updated blog shows immediately
+    try {
+      revalidatePath("/blogs/news");
+      revalidatePath(`/blogs/news/${blog.slug}`);
+      revalidatePath("/", "layout");
+    } catch (e) {
+      console.warn("revalidatePath error:", e);
+    }
+
     return NextResponse.json({ success: true, blog });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to update blog";
@@ -42,6 +55,15 @@ export async function DELETE(
   try {
     const ok = await deleteBlog(id);
     if (!ok) return NextResponse.json({ error: "Blog not found" }, { status: 404 });
+
+    // Revalidate live storefront paths so deleted blog disappears immediately
+    try {
+      revalidatePath("/blogs/news");
+      revalidatePath("/", "layout");
+    } catch (e) {
+      console.warn("revalidatePath error:", e);
+    }
+
     return NextResponse.json({ success: true });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to delete blog";

@@ -1,15 +1,19 @@
 "use client";
 
 import { SITE } from "@/data/site";
+import { useStore } from "@/components/providers/StoreProvider";
 
 export default function WhatsAppButton() {
+  const { settings } = useStore();
+  const whatsapp = (settings?.whatsapp || SITE.whatsapp).replace(/[^0-9]/g, "");
+
   return (
     <aside aria-label="Customer Support" className="fixed bottom-6 right-5 z-50">
       <a
-        href={`https://wa.me/${SITE.whatsapp}?text=Hi%20Sillhouete%2C%20I%20have%20an%20inquiry%20regarding%20your%20dresses.`}
+        href={`https://wa.me/${whatsapp}?text=Hi%20Sillhouete%2C%20I%20have%20an%20inquiry%20regarding%20your%20dresses.`}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Chat on WhatsApp +92 331 0397865"
+        aria-label="Chat on WhatsApp"
         className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-[#10c379] text-white shadow-xl hover:scale-105 transition-transform"
       >
         {/* Pulse effect rings */}
