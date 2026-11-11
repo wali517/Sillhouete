@@ -116,27 +116,8 @@ async function seedCustomers() {
 }
 
 async function seedMessages() {
-  const count = await ContactMessageModel.countDocuments();
-  if (count > 0) return;
-
-  console.log("🌱 Seeding contact messages...");
-  const messages = [
-    {
-      id: "msg-1", name: "Mahnoor Tariq", email: "mahnoor@example.com",
-      phone: "+92 333 4567890", subject: "Bridal Customization Appointment",
-      message: "Hi, I am interested in customizing the Husan Ara Bridal dress for my wedding in December.",
-      status: "read", replyNotes: "Customer invited to MM Alam studio for consultation.",
-    },
-    {
-      id: "msg-2", name: "Zainab Chaudhry", email: "zainab.c@example.com",
-      phone: "+1 312 555 0192", subject: "International Shipping to Chicago",
-      message: "Hello! I live in Chicago and would like to know if the Maahi II collection can be delivered within 8 days.",
-      status: "unread",
-    },
-  ];
-
-  await ContactMessageModel.insertMany(messages, { ordered: false }).catch(() => {});
-  console.log("✅ Seeded contact messages");
+  // Do not seed dummy contact messages - keep real customer messages only
+  return;
 }
 
 async function seedBlogs() {

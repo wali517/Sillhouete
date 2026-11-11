@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getSettings } from "@/lib/db";
 import livePagesData from "@/data/live-pages-content.json";
+import { ContactInquiryForm } from "@/components/ui/ContactInquiryForm";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -211,7 +212,84 @@ export default async function InfoPage({ params }: Props) {
         </div>
       )}
 
-      {/* 5. Size Chart Page */}
+      {/* 5. Contact Us Page */}
+      {slug === "contact-us" && (
+        <div className="space-y-10">
+          <header className="text-center border-b border-line pb-8">
+            <h1 className="heading text-[30px] md:text-[38px]">Contact Us</h1>
+            <p className="mt-2 text-xs text-black/60 uppercase tracking-widest">
+              Customer Support, Bridal Consultations &amp; Studio Inquiries
+            </p>
+          </header>
+
+          <div className="grid gap-10 lg:grid-cols-12 items-start">
+            {/* Left Column: Direct Info & Addresses */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="border border-line p-6 bg-soft space-y-4 text-sm">
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#9b8065] block">
+                  Studio &amp; Head Office
+                </span>
+
+                <div>
+                  <h4 className="font-semibold text-black text-xs uppercase tracking-wider">Pakistan Office</h4>
+                  <p className="text-xs text-black/75 mt-0.5">
+                    {settings.officeAddress || "327-B, Street 7, Lane 15, Cavalry Ground, Lahore, Pakistan."}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-black text-xs uppercase tracking-wider">Studio Address</h4>
+                  <p className="text-xs text-black/75 mt-0.5">
+                    {settings.studioAddress || "Sillhouete, Almas Tower, MM Alam Rd, Block T, Gulberg 2, Lahore."}
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-line">
+                  <h4 className="font-semibold text-black text-xs uppercase tracking-wider">USA Office</h4>
+                  <p className="text-xs text-black/75 mt-0.5">
+                    18w100 22nd St, Ste 124, Oakbrook Terrace, IL, Zip Code 60181
+                  </p>
+                  <p className="text-xs text-black/60 mt-1">Phone: +1 217 2909383</p>
+                </div>
+
+                <div className="pt-3 border-t border-line space-y-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-black block">Direct Channels</span>
+                  <p className="text-xs flex items-center gap-2">
+                    <span>📞 Phone:</span>
+                    <a href={`tel:${(settings.phone || "+923310397865").replace(/\s+/g, "")}`} className="underline font-medium">
+                      {settings.phone || "+92 331 0397865"}
+                    </a>
+                  </p>
+                  <p className="text-xs flex items-center gap-2">
+                    <span>💬 WhatsApp:</span>
+                    <a
+                      href={`https://wa.me/${(settings.phone || "923310397865").replace(/[^0-9]/g, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline font-medium text-emerald-800"
+                    >
+                      Chat on WhatsApp
+                    </a>
+                  </p>
+                  <p className="text-xs flex items-center gap-2">
+                    <span>📧 Email:</span>
+                    <a href={`mailto:${settings.email || "info@sillhouete.com"}`} className="underline font-medium">
+                      {settings.email || "info@sillhouete.com"}
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Interactive Inquiry Form */}
+            <div className="lg:col-span-7">
+              <ContactInquiryForm />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 6. Size Chart Page */}
       {slug === "size-chart" && (
         <div className="space-y-8">
           <header className="text-center border-b border-line pb-8">
@@ -230,8 +308,8 @@ export default async function InfoPage({ params }: Props) {
         </div>
       )}
 
-      {/* 6. Comprehensive Policies and Other Information Pages */}
-      {normalizedSlug !== "spot" && normalizedSlug !== "locations" && normalizedSlug !== "size-chart" && (
+      {/* 7. Comprehensive Policies and Other Information Pages */}
+      {normalizedSlug !== "spot" && normalizedSlug !== "locations" && normalizedSlug !== "size-chart" && normalizedSlug !== "contact-us" && (
         <div className="space-y-8">
           <header className="text-center border-b border-line pb-8">
             <h1 className="heading text-[30px] md:text-[38px]">

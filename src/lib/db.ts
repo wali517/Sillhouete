@@ -1905,30 +1905,6 @@ async function recordCustomerFromOrder(order: Order) {
 
 /* ──────────────── CONTACT MESSAGES ──────────────── */
 
-const INITIAL_MESSAGES: ContactMessage[] = [
-  {
-    id: "msg-1",
-    name: "Mahnoor Tariq",
-    email: "mahnoor@example.com",
-    phone: "+92 333 4567890",
-    subject: "Bridal Customization Appointment",
-    message: "Hi, I am interested in customizing the Husan Ara Bridal dress for my wedding in December. Can I book a studio appointment at MM Alam Road?",
-    createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-    status: "read",
-    replyNotes: "Customer invited to MM Alam studio for consultation.",
-  },
-  {
-    id: "msg-2",
-    name: "Zainab Chaudhry",
-    email: "zainab.c@example.com",
-    phone: "+1 312 555 0192",
-    subject: "International Shipping to Chicago",
-    message: "Hello! I live in Chicago and would like to know if the Maahi II collection can be delivered within 8 days for an Eid gathering?",
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-    status: "unread",
-  },
-];
-
 export async function getContactMessages(): Promise<ContactMessage[]> {
   try {
     await connectDB();
@@ -1939,7 +1915,7 @@ export async function getContactMessages(): Promise<ContactMessage[]> {
   } catch (err) {
     console.warn("MongoDB getContactMessages fallback:", err);
   }
-  return INITIAL_MESSAGES;
+  return [];
 }
 
 export async function saveContactMessage(data: Omit<ContactMessage, "id" | "createdAt" | "status">): Promise<ContactMessage> {
