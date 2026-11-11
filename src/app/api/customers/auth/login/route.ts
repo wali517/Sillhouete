@@ -24,11 +24,15 @@ export async function POST(req: Request) {
     }
 
     // Trigger login notification via nodemailer
-    sendLoginAlertEmail({
-      email: customer.email,
-      name: customer.name,
-      time: new Date().toLocaleString("en-US", { timeZone: "Asia/Karachi" }) + " (PKT)",
-    }).catch((err) => console.warn("Login email notice:", err));
+    try {
+      await sendLoginAlertEmail({
+        email: customer.email,
+        name: customer.name,
+        time: new Date().toLocaleString("en-US", { timeZone: "Asia/Karachi" }) + " (PKT)",
+      });
+    } catch (err) {
+      console.warn("Login email notice:", err);
+    }
 
     return NextResponse.json({
       success: true,

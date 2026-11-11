@@ -73,11 +73,15 @@ export async function PUT(req: Request) {
 
     // Send notification email via nodemailer if fields were modified
     if (updatedFields.length > 0) {
-      sendProfileUpdatedNotificationEmail({
-        email: newNormalized,
-        name: updated.name,
-        updatedFields,
-      }).catch((err) => console.warn("Profile update email notice:", err));
+      try {
+        await sendProfileUpdatedNotificationEmail({
+          email: newNormalized,
+          name: updated.name,
+          updatedFields,
+        });
+      } catch (err) {
+        console.warn("Profile update email notice:", err);
+      }
     }
 
     return NextResponse.json({

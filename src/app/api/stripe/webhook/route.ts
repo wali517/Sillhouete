@@ -365,9 +365,11 @@ export async function POST(req: Request) {
               }
             );
             console.log(`[Stripe Webhook] Refund failed for Order #${order.orderNumber}`);
-            sendRefundFailedEmail(order, failureReason).catch((err) =>
-              console.warn("[Email Notification Error] Refund failure notice:", err)
-            );
+            try {
+              await sendRefundFailedEmail(order, failureReason);
+            } catch (err) {
+              console.warn("[Email Notification Error] Refund failure notice:", err);
+            }
           }
         }
         break;

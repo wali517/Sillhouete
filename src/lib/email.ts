@@ -64,17 +64,25 @@ export async function getTransporter(): Promise<TransporterContext | null> {
     const cleanPass = pass.replace(/\s+/g, "");
     const cleanUser = user.trim();
     const isPort465 = Number(port) === 465;
+    const isGmail = host === "smtp.gmail.com" || host.includes("gmail") || cleanUser.endsWith("@gmail.com");
 
-    const transporter = nodemailer.createTransport({
-      host,
-      port: Number(port),
-      secure: isPort465,
-      auth: { user: cleanUser, pass: cleanPass },
-      tls: { rejectUnauthorized: false },
-      connectionTimeout: 8000,
-      greetingTimeout: 6000,
-      socketTimeout: 12000,
-    });
+    // For Gmail accounts, nodemailer's built-in service provides optimal connection pooling,
+    // avoiding port 465 firewall timeouts and packet drops.
+    const transporter = isGmail
+      ? nodemailer.createTransport({
+          service: "gmail",
+          auth: { user: cleanUser, pass: cleanPass },
+        })
+      : nodemailer.createTransport({
+          host,
+          port: Number(port),
+          secure: isPort465,
+          auth: { user: cleanUser, pass: cleanPass },
+          tls: { rejectUnauthorized: false },
+          connectionTimeout: 8000,
+          greetingTimeout: 6000,
+          socketTimeout: 12000,
+        });
 
     // Ensure SPF and DKIM compliance: when sending through Gmail, From must match authenticated account
     let from = `"SILLHOUETE" <${cleanUser}>`;

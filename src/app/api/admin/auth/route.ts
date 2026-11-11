@@ -105,25 +105,29 @@ export async function PATCH(req: Request) {
 
     // Send confirmation email to the new admin email
     const recipient = updates.adminEmail || currentAdminEmail;
-    sendEmail({
-      to: recipient,
-      subject: `[Security Alert] ${SITE.name} Admin Credentials Updated`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; color: #111;">
-          <h2 style="font-size: 20px; text-transform: uppercase; letter-spacing: 2px;">Administrator Security Alert</h2>
-          <p style="font-size: 14px; line-height: 1.6;">
-            Your ${SITE.name} store administrator credentials were successfully updated on <strong>${new Date().toLocaleString("en-US", { timeZone: "Asia/Karachi" })} PKT</strong>.
-          </p>
-          <p style="font-size: 14px; line-height: 1.6;"><strong>Updated fields:</strong></p>
-          <ul>
-            ${updatedFields.map((f) => `<li>${f}</li>`).join("")}
-          </ul>
-          <p style="font-size: 13px; color: #666; margin-top: 16px;">
-            If you did not perform this change, please contact technical support or reset your password immediately.
-          </p>
-        </div>
-      `,
-    }).catch((err) => console.warn("Admin credential update email notice:", err));
+    try {
+      await sendEmail({
+        to: recipient,
+        subject: `[Security Alert] ${SITE.name} Admin Credentials Updated`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; color: #111;">
+            <h2 style="font-size: 20px; text-transform: uppercase; letter-spacing: 2px;">Administrator Security Alert</h2>
+            <p style="font-size: 14px; line-height: 1.6;">
+              Your ${SITE.name} store administrator credentials were successfully updated on <strong>${new Date().toLocaleString("en-US", { timeZone: "Asia/Karachi" })} PKT</strong>.
+            </p>
+            <p style="font-size: 14px; line-height: 1.6;"><strong>Updated fields:</strong></p>
+            <ul>
+              ${updatedFields.map((f) => `<li>${f}</li>`).join("")}
+            </ul>
+            <p style="font-size: 13px; color: #666; margin-top: 16px;">
+              If you did not perform this change, please contact technical support or reset your password immediately.
+            </p>
+          </div>
+        `,
+      });
+    } catch (err) {
+      console.warn("Admin credential update email notice:", err);
+    }
 
     return NextResponse.json({
       success: true,

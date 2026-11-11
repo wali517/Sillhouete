@@ -26,11 +26,15 @@ export async function POST(req: Request) {
     // Otherwise, generate 6-digit reset code and send via nodemailer
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-    sendPasswordResetCodeEmail({
-      email: normalized,
-      name: customer?.name || "Customer",
-      resetCode,
-    }).catch((err) => console.warn("Reset email notice:", err));
+    try {
+      await sendPasswordResetCodeEmail({
+        email: normalized,
+        name: customer?.name || "Customer",
+        resetCode,
+      });
+    } catch (err) {
+      console.warn("Reset email notice:", err);
+    }
 
     return NextResponse.json({
       success: true,

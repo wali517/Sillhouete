@@ -1265,9 +1265,11 @@ export async function createOrder(
     newOrder.paymentMethod === "bank_deposit" ||
     newOrder.paymentMethod === "cod"
   ) {
-    sendOrderConfirmationEmail(newOrder, newOrder.paymentMethod === "cod").catch((err) =>
-      console.warn("[Email Notification Error] Order confirmation dispatch:", err)
-    );
+    try {
+      await sendOrderConfirmationEmail(newOrder, newOrder.paymentMethod === "cod");
+    } catch (err) {
+      console.warn("[Email Notification Error] Order confirmation dispatch:", err);
+    }
   }
 
   return newOrder;
@@ -1368,9 +1370,11 @@ export async function markOrderPaidByStripe(params: {
 
   // Send confirmation email upon first verified successful payment
   if (!alreadyPaid) {
-    sendOrderConfirmationEmail(plain).catch((err) =>
-      console.warn("Nodemailer payment confirmation email notice:", err)
-    );
+    try {
+      await sendOrderConfirmationEmail(plain);
+    } catch (err) {
+      console.warn("Nodemailer payment confirmation email notice:", err);
+    }
   }
 
   return plain;
@@ -1410,9 +1414,11 @@ export async function markOrderPaymentFailed(params: {
   await order.save();
   const plain = toPlain<Order>(order.toObject()) || null;
   if (plain) {
-    sendPaymentFailureEmail(plain, params.reason).catch((err) =>
-      console.warn("[Email Notification Error] Payment failure notice:", err)
-    );
+    try {
+      await sendPaymentFailureEmail(plain, params.reason);
+    } catch (err) {
+      console.warn("[Email Notification Error] Payment failure notice:", err);
+    }
   }
   return plain;
 }
@@ -1525,13 +1531,17 @@ export async function cancelOrderAndProcessRefund(params: {
   await order.save();
   const plain = toPlain<Order>(order.toObject()) || null;
   if (plain) {
-    sendOrderCancellationEmail(plain, reasonText).catch((err) =>
-      console.warn("[Email Notification Error] Order cancellation notice:", err)
-    );
+    try {
+      await sendOrderCancellationEmail(plain, reasonText);
+    } catch (err) {
+      console.warn("[Email Notification Error] Order cancellation notice:", err);
+    }
     if (order.refundAmount && order.refundAmount > 0) {
-      sendRefundInitiatedEmail(plain, order.refundAmount, true, order.refundId).catch((err) =>
-        console.warn("[Email Notification Error] Refund initiated notice:", err)
-      );
+      try {
+        await sendRefundInitiatedEmail(plain, order.refundAmount, true, order.refundId);
+      } catch (err) {
+        console.warn("[Email Notification Error] Refund initiated notice:", err);
+      }
     }
   }
   return plain;
@@ -1607,9 +1617,11 @@ export async function processPartialRefund(params: {
   await order.save();
   const plain = toPlain<Order>(order.toObject()) || null;
   if (plain) {
-    sendRefundInitiatedEmail(plain, params.amount, isFull, refund.id).catch((err) =>
-      console.warn("[Email Notification Error] Partial refund notice:", err)
-    );
+    try {
+      await sendRefundInitiatedEmail(plain, params.amount, isFull, refund.id);
+    } catch (err) {
+      console.warn("[Email Notification Error] Partial refund notice:", err);
+    }
   }
   return plain;
 }
@@ -1663,9 +1675,11 @@ export async function recordOrderRefund(params: {
   await order.save();
   const plain = toPlain<Order>(order.toObject()) || null;
   if (plain) {
-    sendRefundSuccessfulEmail(plain, params.refundAmount, params.isFullRefund, params.refundId).catch((err) =>
-      console.warn("[Email Notification Error] Refund confirmation notice:", err)
-    );
+    try {
+      await sendRefundSuccessfulEmail(plain, params.refundAmount, params.isFullRefund, params.refundId);
+    } catch (err) {
+      console.warn("[Email Notification Error] Refund confirmation notice:", err);
+    }
   }
   return plain;
 }
@@ -1709,9 +1723,11 @@ export async function updateOrderStatus(
       const plainOrder = toPlain<Order>(doc)!;
       // Send shipping / tracking update email via nodemailer
       if (updates.status || updates.trackingNumber || updates.trackingUrl) {
-        sendShippingUpdateEmail(plainOrder).catch((err) =>
-          console.warn("[Email Notification Error] Shipping update notice:", err)
-        );
+        try {
+          await sendShippingUpdateEmail(plainOrder);
+        } catch (err) {
+          console.warn("[Email Notification Error] Shipping update notice:", err);
+        }
       }
       return plainOrder;
     }
@@ -1942,13 +1958,17 @@ export async function saveContactMessage(data: Omit<ContactMessage, "id" | "crea
     await connectDB();
     await ContactMessageModel.create(newMessage);
     // Send email notification via nodemailer
-    sendContactFormNotification({
-      name: newMessage.name,
-      email: newMessage.email,
-      phone: newMessage.phone,
-      subject: newMessage.subject,
-      message: newMessage.message,
-    }).catch((err) => console.warn("Nodemailer contact notification notice:", err));
+    try {
+      await sendContactFormNotification({
+        name: newMessage.name,
+        email: newMessage.email,
+        phone: newMessage.phone,
+        subject: newMessage.subject,
+        message: newMessage.message,
+      });
+    } catch (err) {
+      console.warn("Nodemailer contact notification notice:", err);
+    }
   } catch (err) {
     console.warn("MongoDB saveContactMessage error:", err);
   }
