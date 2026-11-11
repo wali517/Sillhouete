@@ -179,11 +179,11 @@ export default function AdminMessagesPage() {
       {/* Messages List */}
       <div className="space-y-3">
         {loading ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400 text-sm">
+          <div className="bg-white rounded-xl p-8 text-center text-gray-400 text-sm shadow-xs">
             Loading...
           </div>
         ) : filtered.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400 text-sm">
+          <div className="bg-white rounded-xl p-8 text-center text-gray-400 text-sm shadow-xs">
             No messages found
           </div>
         ) : (
@@ -191,13 +191,13 @@ export default function AdminMessagesPage() {
             {paginatedMessages.map((msg) => (
               <div
                 key={msg.id}
-                className={`bg-white rounded-xl border shadow-sm transition-all ${
-                  msg.status === "unread" ? "border-red-200 bg-red-50/20" : "border-gray-200"
+                className={`bg-white rounded-xl shadow-xs hover:shadow-sm transition-all overflow-hidden ${
+                  msg.status === "unread" ? "ring-1 ring-amber-400/30" : ""
                 }`}
               >
                 {/* Header row */}
                 <div
-                  className="px-5 py-4 flex items-start justify-between gap-4 cursor-pointer"
+                  className="px-5 py-4 flex items-start justify-between gap-4 cursor-pointer hover:bg-gray-50/50 transition-colors"
                   onClick={() => setExpandedId(expandedId === msg.id ? null : msg.id)}
                 >
                   <div className="flex-1 min-w-0">
@@ -240,13 +240,13 @@ export default function AdminMessagesPage() {
 
                 {/* Expanded panel */}
                 {expandedId === msg.id && (
-                  <div className="border-t border-gray-100 px-5 py-4 bg-gray-50 space-y-4">
+                  <div className="px-5 py-4 bg-gray-50/70 space-y-4">
                     {/* Full customer message */}
                     <div>
                       <p className="text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">
                         Full Customer Message
                       </p>
-                      <div className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed bg-white border border-gray-200 rounded-lg p-3">
+                      <div className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed bg-white rounded-lg p-3.5 shadow-xs">
                         {msg.message}
                       </div>
                     </div>
@@ -268,7 +268,7 @@ export default function AdminMessagesPage() {
                           setReplyNotes((prev) => ({ ...prev, [msg.id]: e.target.value }))
                         }
                         placeholder={`Type your reply to send directly to ${msg.email}...`}
-                        className="w-full text-sm border border-gray-300 rounded-lg p-3 outline-none focus:border-black focus:ring-1 focus:ring-black resize-none bg-white shadow-xs"
+                        className="w-full text-sm bg-white rounded-lg p-3.5 outline-none focus:ring-1 focus:ring-black resize-none shadow-xs border-0 text-gray-800"
                       />
                     </div>
 

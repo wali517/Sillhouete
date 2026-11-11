@@ -50,7 +50,7 @@ export default function AdminCustomersPage() {
         <button
           type="button"
           onClick={() => { setSearch(""); setPage(1); }}
-          className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:border-gray-300 hover:shadow-md transition-all text-left cursor-pointer"
+          className="bg-white rounded-xl p-5 shadow-xs hover:shadow-sm transition-all text-left cursor-pointer"
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">Total Customers</span>
@@ -63,7 +63,7 @@ export default function AdminCustomersPage() {
 
         <Link
           href="/admin/payments"
-          className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:border-gray-300 hover:shadow-md transition-all text-left cursor-pointer block"
+          className="bg-white rounded-xl p-5 shadow-xs hover:shadow-sm transition-all text-left cursor-pointer block"
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">Total Revenue</span>
@@ -76,7 +76,7 @@ export default function AdminCustomersPage() {
 
         <Link
           href="/admin/orders"
-          className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:border-gray-300 hover:shadow-md transition-all text-left cursor-pointer block"
+          className="bg-white rounded-xl p-5 shadow-xs hover:shadow-sm transition-all text-left cursor-pointer block"
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">Avg Order Value</span>
@@ -93,13 +93,13 @@ export default function AdminCustomersPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+      <div className="bg-white rounded-xl shadow-xs overflow-hidden">
         <div className="p-4 border-b border-gray-100">
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input type="text" placeholder="Search by name, email or phone..."
               value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-gray-400 bg-gray-50" />
+              className="w-full pl-9 pr-4 py-2.5 rounded-lg text-sm outline-none bg-gray-50 focus:bg-white focus:ring-1 focus:ring-gray-300 transition" />
           </div>
         </div>
 

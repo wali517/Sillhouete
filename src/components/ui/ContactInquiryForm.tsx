@@ -47,7 +47,7 @@ export function ContactInquiryForm() {
   };
 
   return (
-    <div className="border border-line bg-soft p-6 md:p-8 rounded-sm shadow-sm">
+    <div className="bg-soft p-6 md:p-8 rounded-lg">
       <div className="mb-6">
         <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#9b8065] block mb-1">
           Direct Customer Service

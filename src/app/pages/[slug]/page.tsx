@@ -225,7 +225,7 @@ export default async function InfoPage({ params }: Props) {
           <div className="grid gap-10 lg:grid-cols-12 items-start">
             {/* Left Column: Direct Info & Addresses */}
             <div className="lg:col-span-5 space-y-6">
-              <div className="border border-line p-6 bg-soft space-y-4 text-sm">
+              <div className="p-6 bg-soft space-y-4 text-sm rounded-lg">
                 <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#9b8065] block">
                   Studio &amp; Head Office
                 </span>
