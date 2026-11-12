@@ -77,7 +77,29 @@ export default function AdminPaymentDetailPage() {
   };
 
   useEffect(() => {
-    fetchPayment();
+    if (!id) return;
+
+    let active = true;
+    fetch(`/api/orders/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!active) return;
+        if (data.order) {
+          setOrder(data.order);
+        } else {
+          setError("Payment or order not found.");
+        }
+      })
+      .catch(() => {
+        if (active) setError("Failed to load payment details.");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [id]);
 
   const showToast = (msg: string) => {
@@ -150,7 +172,7 @@ export default function AdminPaymentDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px] text-gray-500 text-sm">
+      <div className="flex items-center justify-center min-h-100 text-gray-500 text-sm">
         <RefreshCw className="w-5 h-5 animate-spin mr-2 text-black" />
         Loading payment record...
       </div>
@@ -348,7 +370,7 @@ export default function AdminPaymentDetailPage() {
 
             <div className="flex justify-between py-1 border-b border-gray-50">
               <span className="text-gray-500">PaymentIntent ID</span>
-              <span className="font-mono text-xs text-gray-700 truncate max-w-[200px]" title={order.stripePaymentIntentId}>
+              <span className="font-mono text-xs text-gray-700 truncate max-w-50" title={order.stripePaymentIntentId}>
                 {order.stripePaymentIntentId || "None"}
               </span>
             </div>
@@ -356,7 +378,7 @@ export default function AdminPaymentDetailPage() {
             {order.refundId && (
               <div className="flex justify-between py-1 border-b border-gray-50">
                 <span className="text-gray-500">Latest Refund ID</span>
-                <span className="font-mono text-xs text-purple-700 truncate max-w-[200px]" title={order.refundId}>
+                <span className="font-mono text-xs text-purple-700 truncate max-w-50" title={order.refundId}>
                   {order.refundId}
                 </span>
               </div>
@@ -422,7 +444,7 @@ export default function AdminPaymentDetailPage() {
             {order.paymentTimeline && order.paymentTimeline.length > 0 ? (
               order.paymentTimeline.map((item, idx) => (
                 <div key={idx} className="relative pl-6 border-l-2 border-emerald-500 pb-2">
-                  <div className="absolute -left-[7px] top-0 w-3 h-3 rounded-full bg-emerald-500" />
+                  <div className="absolute -left-1.75 top-0 w-3 h-3 rounded-full bg-emerald-500" />
                   <div className="text-xs font-semibold text-gray-900">{item.title}</div>
                   <div className="text-[11px] text-gray-400 mt-0.5">
                     {new Date(item.date).toLocaleString()}
@@ -450,7 +472,7 @@ export default function AdminPaymentDetailPage() {
             {order.refundTimeline && order.refundTimeline.length > 0 ? (
               order.refundTimeline.map((item, idx) => (
                 <div key={idx} className="relative pl-6 border-l-2 border-purple-500 pb-2">
-                  <div className="absolute -left-[7px] top-0 w-3 h-3 rounded-full bg-purple-500" />
+                  <div className="absolute -left-1.75 top-0 w-3 h-3 rounded-full bg-purple-500" />
                   <div className="text-xs font-semibold text-gray-900">{item.title}</div>
                   <div className="text-[11px] text-gray-400 mt-0.5">
                     {new Date(item.date).toLocaleString()}

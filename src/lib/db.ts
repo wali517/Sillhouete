@@ -1,3 +1,4 @@
+import { cache } from "react";
 import mongoose from "mongoose";
 import connectDB from "./mongodb";
 import { ProductModel } from "./models/Product";
@@ -135,7 +136,10 @@ function escapeRegex(str: string): string {
 }
 
 /** Fetch products by collection handle dynamically from MongoDB */
-export async function getProductsByCollection(collectionSlug: string): Promise<Product[]> {
+export async function getProductsByCollection(
+  collectionSlug: string,
+  options?: { limit?: number; lightweight?: boolean }
+): Promise<Product[]> {
   try {
     await connectDB();
     if (collectionSlug === "all" || collectionSlug === "1") {
@@ -246,7 +250,14 @@ export async function getProductsByCollection(collectionSlug: string): Promise<P
       }
     }
 
-    const docs = await ProductModel.find({ $or: orConditions }).sort({ createdAt: -1 }).lean();
+    const projection = options?.lightweight
+      ? "id handle title price originalPrice images category collections isNew isBestSeller isSale sizes createdAt"
+      : undefined;
+
+    const docs = await ProductModel.find({ $or: orConditions }, projection)
+      .sort({ createdAt: -1 })
+      .limit(options?.limit && options.limit > 0 ? options.limit : 0)
+      .lean();
     if (docs && docs.length > 0) {
       return toPlainArray<Product>(docs);
     }
@@ -270,8 +281,10 @@ export async function getCollections(): Promise<CategoryItem[]> {
   return [];
 }
 
-/** Fetch a single collection by handle or ID from MongoDB */
-export async function getCollectionByHandle(handleOrId: string): Promise<CategoryItem | undefined> {
+/** Fetch a single collection by handle or ID from MongoDB (deduplicated per request) */
+export const getCollectionByHandle = cache(async function getCollectionByHandle(
+  handleOrId: string
+): Promise<CategoryItem | undefined> {
   try {
     await connectDB();
     const isObjectId = mongoose.isValidObjectId(handleOrId);
@@ -284,7 +297,7 @@ export async function getCollectionByHandle(handleOrId: string): Promise<Categor
     console.warn(`MongoDB getCollectionByHandle(${handleOrId}) error:`, err);
   }
   return undefined;
-}
+});
 
 /**
  * Get all Main Categories
@@ -2086,7 +2099,7 @@ const INITIAL_SETTINGS: SiteSettings = {
   defaultProductVideoUrl: "https://cdn.shopify.com/videos/c/o/v/061ca40eef70464293b2a672d62f7b0a.mp4",
 };
 
-export async function getSettings(): Promise<SiteSettings> {
+export const getSettings = cache(async function getSettings(): Promise<SiteSettings> {
   let settings: SiteSettings = {
     ...INITIAL_SETTINGS,
     stripePublishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "",
@@ -2116,7 +2129,7 @@ export async function getSettings(): Promise<SiteSettings> {
   }
 
   return settings;
-}
+});
 
 export async function updateSettings(updates: Partial<SiteSettings>): Promise<SiteSettings> {
   try {

@@ -236,7 +236,7 @@ export default function Footer() {
                 width={50}
                 height={30}
                 unoptimized
-                className="h-[26px] w-auto rounded-[5px] border border-[#dddddd94] object-contain p-[2px]"
+                className="h-[26px] w-auto rounded-[5px] border border-[#dddddd94] object-contain p-0.5"
               />
             </div>
             <div className="img-pay">
@@ -246,7 +246,7 @@ export default function Footer() {
                 width={50}
                 height={30}
                 unoptimized
-                className="h-[26px] w-auto rounded-[5px] border border-[#dddddd94] object-contain p-[2px]"
+                className="h-[26px] w-auto rounded-[5px] border border-[#dddddd94] object-contain p-0.5"
               />
             </div>
           </div>

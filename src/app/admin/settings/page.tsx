@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Save, Plus, Trash2, Settings, CreditCard, Truck, Bell, Store, Lock, ShieldCheck, Mail, CheckCircle2, AlertCircle, Eye, EyeOff, Send, RefreshCw } from "lucide-react";
+import { Save, Plus, Trash2, Settings, CreditCard, Truck, Bell, Store, ShieldCheck, Mail, CheckCircle2, AlertCircle, Eye, EyeOff, Send, RefreshCw } from "lucide-react";
 import type { SiteSettings } from "@/types";
 
 type Tab = "store" | "shipping" | "announcements" | "payment" | "discounts" | "security" | "email";

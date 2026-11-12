@@ -378,7 +378,7 @@ export default function AccountView({ initialTab = "login" }: { initialTab?: "lo
   /* ─── Logged-In Customer Dashboard ─── */
   if (loggedInUser) {
     return (
-      <div className="mx-auto max-w-[1100px] px-4 py-12 md:px-8">
+      <div className="mx-auto max-w-275 px-4 py-12 md:px-8">
         {/* Dashboard Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-6">
           <div>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Package, Mail, Phone, MapPin } from "lucide-react";
+import { ArrowLeft, Package, Mail } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import type { Customer, Order } from "@/types";
 

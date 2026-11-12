@@ -35,23 +35,27 @@ export default function AdminPaymentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
 
-  const fetchPayments = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/orders");
-      const data = await res.json();
-      if (Array.isArray(data.orders)) {
-        setOrders(data.orders);
-      }
-    } catch (err) {
-      console.error("Failed to fetch payments:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchPayments();
+    let active = true;
+
+    const loadPayments = async () => {
+      try {
+        const res = await fetch("/api/orders");
+        const data = await res.json();
+        if (active && Array.isArray(data.orders)) {
+          setOrders(data.orders);
+        }
+      } catch (err) {
+        console.error("Failed to fetch payments:", err);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    void loadPayments();
+    return () => {
+      active = false;
+    };
   }, []);
 
   const filteredOrders = useMemo(() => {
@@ -105,6 +109,28 @@ export default function AdminPaymentsPage() {
     return filteredOrders.slice(start, start + itemsPerPage);
   }, [filteredOrders, currentPage, itemsPerPage]);
 
+  function fetchPayments() {
+    void (async () => {
+      try {
+        const res = await fetch("/api/orders");
+        if (!res.ok) {
+          throw new Error(`Failed to fetch payments (${res.status})`);
+        }
+
+        const data = await res.json();
+        if (!Array.isArray(data.orders)) {
+          throw new Error("Invalid payments response");
+        }
+
+        setOrders(data.orders);
+      } catch (err) {
+        console.error("Failed to fetch payments:", err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -116,7 +142,10 @@ export default function AdminPaymentsPage() {
           </p>
         </div>
         <button
-          onClick={fetchPayments}
+          onClick={() => {
+            setLoading(true);
+            fetchPayments();
+          }}
           disabled={loading}
           className="inline-flex items-center gap-2 px-3.5 py-2 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors shadow-xs"
         >
@@ -272,7 +301,7 @@ export default function AdminPaymentsPage() {
                           </span>
                         </div>
                         <div className="text-xs text-gray-600 font-medium">{order.customer.name}</div>
-                        <div className="text-[11px] text-gray-400 truncate max-w-[220px]">
+                        <div className="text-[11px] text-gray-400 truncate max-w-55">
                           {order.customer.email}
                         </div>
                       </td>

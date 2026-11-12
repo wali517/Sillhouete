@@ -33,7 +33,7 @@ export default async function BlogPage({ params }: Props) {
     <div className="bg-white min-h-screen">
       {/* Top Breadcrumb Navigation */}
       <div className="border-b border-[#f0eee9] bg-white">
-        <div className="mx-auto max-w-[1200px] px-4 py-3.5 sm:px-6">
+        <div className="mx-auto max-w-300 px-4 py-3.5 sm:px-6">
           <nav className="flex items-center gap-2 text-[11px] uppercase tracking-[1.5px] text-[#888]">
             <Link href="/" className="transition-colors hover:text-black">
               Home
@@ -47,11 +47,11 @@ export default async function BlogPage({ params }: Props) {
       {/* Featured Editorial Banner */}
       {featured && (
         <section className="featured-blog-editorial py-12 md:py-20 border-b border-[#eee] bg-[#fbf9f6]">
-          <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+          <div className="max-w-300 mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-14 items-center">
               <Link
                 href={`/blogs/news/${featured.slug}`}
-                className="relative block w-full h-[360px] sm:h-[440px] md:h-[520px] overflow-hidden rounded-[3px] bg-[#f2efe9] group"
+                className="relative block w-full h-90 sm:h-110 md:h-130 overflow-hidden rounded-[3px] bg-[#f2efe9] group"
               >
                 <Image
                   src={featured.coverImage}
@@ -63,7 +63,7 @@ export default async function BlogPage({ params }: Props) {
                 />
               </Link>
 
-              <div className="max-w-[460px] space-y-4">
+              <div className="max-w-115 space-y-4">
                 <span className="text-[11px] tracking-[2px] uppercase text-[#9b8065] block font-medium">
                   {featured.category || "EDITORIAL FEATURE"}
                 </span>
@@ -81,7 +81,7 @@ export default async function BlogPage({ params }: Props) {
                 <div className="pt-2">
                   <Link
                     href={`/blogs/news/${featured.slug}`}
-                    className="text-[11px] tracking-[2px] uppercase text-[#2b2521] border-b border-[#2b2521] pb-[8px] inline-block hover:opacity-75 transition-opacity font-medium"
+                    className="text-[11px] tracking-[2px] uppercase text-[#2b2521] border-b border-[#2b2521] pb-2 inline-block hover:opacity-75 transition-opacity font-medium"
                   >
                     READ MORE
                   </Link>
@@ -94,7 +94,7 @@ export default async function BlogPage({ params }: Props) {
 
       {/* Blog Archive Section */}
       <section className="py-14 md:py-20">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+        <div className="max-w-300 mx-auto px-4 sm:px-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 pb-4 border-b border-[#eee] gap-3">
             <div>
               <span className="text-[11px] tracking-[2px] uppercase text-[#9a8065] font-medium block">
@@ -114,7 +114,7 @@ export default async function BlogPage({ params }: Props) {
               <article key={article.id} className="group flex flex-col">
                 <Link
                   href={`/blogs/news/${article.slug}`}
-                  className="relative block w-full aspect-[4/3] sm:h-[350px] overflow-hidden bg-[#f8f6f3]"
+                  className="relative block w-full aspect-4/3 sm:h-87.5 overflow-hidden bg-[#f8f6f3]"
                 >
                   <Image
                     src={article.coverImage}
@@ -125,7 +125,7 @@ export default async function BlogPage({ params }: Props) {
                   />
                 </Link>
 
-                <span className="text-[10px] tracking-[1.5px] uppercase text-[#9a8065] mt-[18px] block font-medium">
+                <span className="text-[10px] tracking-[1.5px] uppercase text-[#9a8065] mt-4.5 block font-medium">
                   {article.category}
                 </span>
 
@@ -142,7 +142,7 @@ export default async function BlogPage({ params }: Props) {
                 <div className="mt-auto">
                   <Link
                     href={`/blogs/news/${article.slug}`}
-                    className="text-[10px] tracking-[2px] uppercase text-[#24201d] border-b border-[#24201d] pb-[7px] inline-block hover:opacity-75 transition-opacity font-medium"
+                    className="text-[10px] tracking-[2px] uppercase text-[#24201d] border-b border-[#24201d] pb-1.75 inline-block hover:opacity-75 transition-opacity font-medium"
                   >
                     READ MORE
                   </Link>

@@ -192,7 +192,7 @@ export default async function ProductPage({ params }: Props) {
           ) : !subCatSlug ? (
             <>
               <span className="text-neutral-400">&gt;</span>
-              <Link href={`/collections/${fallbackCollectionSlug}`} className="hover:text-black truncate max-w-[200px] sm:max-w-none">
+              <Link href={`/collections/${fallbackCollectionSlug}`} className="hover:text-black truncate max-w-50 sm:max-w-none">
                 {fallbackCollectionName}
               </Link>
             </>
@@ -515,7 +515,7 @@ export default async function ProductPage({ params }: Props) {
               Similar Products
             </h2>
           </div>
-          <div className="grid grid-cols-2 gap-[10px] md:grid-cols-4 md:gap-[17px]">
+          <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-[17px]">
             {related.map((p, i) => (
               <ProductCard key={p.id} product={p} index={i} isNew={true} />
             ))}

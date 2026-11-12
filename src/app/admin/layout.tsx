@@ -44,7 +44,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (isLoginPage) {
-      setAuthenticated(true);
       return;
     }
 

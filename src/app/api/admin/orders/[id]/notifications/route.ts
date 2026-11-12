@@ -78,7 +78,10 @@ export async function POST(
     }
 
     await connectDB();
-    const notif = await NotificationModel.findOne({ id: notificationId });
+    const notif = await NotificationModel.findOne({
+      id: notificationId,
+      $or: [{ orderId: id }, { orderNumber: id }],
+    });
     if (!notif) {
       return NextResponse.json(
         { error: "Notification record not found." },

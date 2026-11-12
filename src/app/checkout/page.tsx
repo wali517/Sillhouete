@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useState, useMemo, type FormEvent, type ChangeEvent } from "react";
+import {
+  useEffect,
+  useState,
+  useMemo,
+  type FormEvent,
+  type ChangeEvent,
+} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -80,7 +86,8 @@ function getCardBrandBadge(brand: string) {
   if (b === "amex" || b === "american_express") return <AmexBadge />;
   if (b === "unionpay") return <UnionPayBadge />;
   if (b === "discover") return <SharedDiscover className={BADGE_CLASS} />;
-  if (b === "diners" || b === "diners_club") return <SharedDiners className={BADGE_CLASS} />;
+  if (b === "diners" || b === "diners_club")
+    return <SharedDiners className={BADGE_CLASS} />;
   if (b === "jcb") return <SharedJcb className={BADGE_CLASS} />;
   return null;
 }
@@ -244,12 +251,12 @@ function StripeFloatingField({
   const [focused, setFocused] = useState(false);
   return (
     <div
-      className={`relative w-full min-w-0 border rounded-[6px] bg-white transition-all ${
+      className={`relative w-full min-w-0 border rounded-md bg-white transition-all ${
         hasError
           ? "border-[#e74c3c] ring-1 ring-[#e74c3c]"
           : focused
-          ? "border-[#005bd3] ring-1 ring-[#005bd3] shadow-[0_0_0_1px_#005bd3]"
-          : "border-[#d9d9d9] hover:border-[#707070]"
+            ? "border-[#005bd3] ring-1 ring-[#005bd3] shadow-[0_0_0_1px_#005bd3]"
+            : "border-[#d9d9d9] hover:border-[#707070]"
       }`}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
@@ -257,7 +264,9 @@ function StripeFloatingField({
       <label className="absolute left-3.5 top-1.5 text-[10.5px] text-[#707070] pointer-events-none select-none">
         {label}
       </label>
-      <div className={`pt-5 pb-1.5 px-3.5 ${endIcon ? "pr-14" : "pr-3.5"}`}>{children}</div>
+      <div className={`pt-5 pb-1.5 px-3.5 ${endIcon ? "pr-14" : "pr-3.5"}`}>
+        {children}
+      </div>
       {endIcon && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
           {endIcon}
@@ -287,8 +296,6 @@ function CheckoutForm() {
     country: "Pakistan",
   });
 
-  type PayMethod = "credit_card";
-  const [paymentMethod] = useState<PayMethod>("credit_card");
   const [emailOffers, setEmailOffers] = useState(true);
   const [saveInfo, setSaveInfo] = useState(false);
   const [useShippingAsBilling, setUseShippingAsBilling] = useState(true);
@@ -309,9 +316,14 @@ function CheckoutForm() {
 
   // Discount
   const [discountCode, setDiscountCode] = useState("");
-  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; percent: number } | null>(null);
+  const [appliedDiscount, setAppliedDiscount] = useState<{
+    code: string;
+    percent: number;
+  } | null>(null);
   const [discountError, setDiscountError] = useState("");
-  const [availableCodes, setAvailableCodes] = useState<Array<{ code: string; percent: number }>>([]);
+  const [availableCodes, setAvailableCodes] = useState<
+    Array<{ code: string; percent: number }>
+  >([]);
 
   // Mobile order summary accordion
   const [mobileSummaryOpen, setMobileSummaryOpen] = useState(false);
@@ -327,7 +339,9 @@ function CheckoutForm() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isGatewayConfigError, setIsGatewayConfigError] = useState(false);
-  const [configErrorType, setConfigErrorType] = useState<"secret" | "publishable" | null>(null);
+  const [configErrorType, setConfigErrorType] = useState<
+    "secret" | "publishable" | null
+  >(null);
 
   const discountAmount = appliedDiscount
     ? Math.round((subtotal * appliedDiscount.percent) / 100)
@@ -342,7 +356,11 @@ function CheckoutForm() {
       .then((r) => r.json())
       .then((d) => {
         if (d.settings?.discountCodes) {
-          setAvailableCodes(d.settings.discountCodes.filter((c: { active: boolean }) => c.active));
+          setAvailableCodes(
+            d.settings.discountCodes.filter(
+              (c: { active: boolean }) => c.active,
+            ),
+          );
         }
       })
       .catch(() => {});
@@ -376,7 +394,14 @@ function CheckoutForm() {
     setIsGatewayConfigError(false);
     setConfigErrorType(null);
 
-    if (!form.email || !form.firstName || !form.lastName || !form.address || !form.city || !form.phone) {
+    if (
+      !form.email ||
+      !form.firstName ||
+      !form.lastName ||
+      !form.address ||
+      !form.city ||
+      !form.phone
+    ) {
       setErrorMessage("Please complete all required fields.");
       return;
     }
@@ -397,7 +422,11 @@ function CheckoutForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           shippingAddress: form,
-          billingAddress: useShippingAsBilling ? form : (billingSame ? form : billingForm),
+          billingAddress: useShippingAsBilling
+            ? form
+            : billingSame
+              ? form
+              : billingForm,
           items: items.map((i) => ({
             id: i.product.id,
             handle: i.product.handle,
@@ -422,7 +451,9 @@ function CheckoutForm() {
 
       // 2. Credit Card Payment via Stripe Elements
       if (!stripe || !elements) {
-        throw new Error("Stripe payment components are not ready. Please refresh the page.");
+        throw new Error(
+          "Stripe payment components are not ready. Please refresh the page.",
+        );
       }
 
       const cardEl = elements.getElement(CardNumberElement);
@@ -443,7 +474,7 @@ function CheckoutForm() {
           setIsGatewayConfigError(true);
           setConfigErrorType("secret");
           setErrorMessage(
-            "Card payment service is temporarily unavailable due to a server payment gateway check. Please contact store support."
+            "Card payment service is temporarily unavailable due to a server payment gateway check. Please contact store support.",
           );
           setIsProcessing(false);
           return;
@@ -453,44 +484,59 @@ function CheckoutForm() {
 
       const { clientSecret } = piData;
       if (!clientSecret) {
-        throw new Error("Did not receive a valid client secret from payment processor.");
+        throw new Error(
+          "Did not receive a valid client secret from payment processor.",
+        );
       }
 
       // 5. Confirm card payment securely directly on the page via Stripe.js
-      const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: cardEl,
-          billing_details: {
-            name: cardName.trim() || `${form.firstName} ${form.lastName}`.trim(),
-            email: form.email.trim(),
-            phone: form.phone.trim(),
-            address: {
-              line1: (useShippingAsBilling ? form.address : billingForm.address) || "",
-              line2: (useShippingAsBilling ? form.apartment : billingForm.apartment) || "",
-              city: (useShippingAsBilling ? form.city : billingForm.city) || "",
-              postal_code: (useShippingAsBilling ? form.postalCode : billingForm.postalCode) || "",
-              country: "PK",
+      const { error: stripeError, paymentIntent } =
+        await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: cardEl,
+            billing_details: {
+              name:
+                cardName.trim() || `${form.firstName} ${form.lastName}`.trim(),
+              email: form.email.trim(),
+              phone: form.phone.trim(),
+              address: {
+                line1:
+                  (useShippingAsBilling ? form.address : billingForm.address) ||
+                  "",
+                line2:
+                  (useShippingAsBilling
+                    ? form.apartment
+                    : billingForm.apartment) || "",
+                city:
+                  (useShippingAsBilling ? form.city : billingForm.city) || "",
+                postal_code:
+                  (useShippingAsBilling
+                    ? form.postalCode
+                    : billingForm.postalCode) || "",
+                country: "PK",
+              },
             },
           },
-        },
-      });
+        });
 
       if (stripeError) {
-        const rawMsg = stripeError.message || "Card payment could not be completed.";
+        const rawMsg =
+          stripeError.message || "Card payment could not be completed.";
         const isAuthError =
           rawMsg.toLowerCase().includes("invalid api key") ||
           rawMsg.toLowerCase().includes("unauthorized") ||
-          (stripeError.type === "invalid_request_error" && rawMsg.toLowerCase().includes("key"));
+          (stripeError.type === "invalid_request_error" &&
+            rawMsg.toLowerCase().includes("key"));
 
         if (isAuthError) {
           console.error(
             "[Stripe Setup Error] Your Stripe Publishable Key is invalid or expired in Stripe Dashboard:",
-            rawMsg
+            rawMsg,
           );
           setIsGatewayConfigError(true);
           setConfigErrorType("publishable");
           setErrorMessage(
-            "Card payment service is temporarily unavailable due to a gateway configuration check. Please contact store support."
+            "Card payment service is temporarily unavailable due to a gateway configuration check. Please contact store support.",
           );
         } else {
           setIsGatewayConfigError(false);
@@ -500,7 +546,11 @@ function CheckoutForm() {
         return;
       }
 
-      if (paymentIntent && (paymentIntent.status === "succeeded" || paymentIntent.status === "processing")) {
+      if (
+        paymentIntent &&
+        (paymentIntent.status === "succeeded" ||
+          paymentIntent.status === "processing")
+      ) {
         // Immediately sync verified payment status with backend before redirecting
         // so MongoDB marks the order PAID and order-confirmation immediately shows "Paid" (Green)
         try {
@@ -521,9 +571,14 @@ function CheckoutForm() {
         return;
       }
 
-      throw new Error("Payment status unconfirmed. Please check your bank or contact support.");
+      throw new Error(
+        "Payment status unconfirmed. Please check your bank or contact support.",
+      );
     } catch (err: unknown) {
-      const rawMsg = err instanceof Error ? err.message : "An error occurred during checkout.";
+      const rawMsg =
+        err instanceof Error
+          ? err.message
+          : "An error occurred during checkout.";
       const isSecretKeyError =
         rawMsg.includes("sk_live_") ||
         rawMsg.includes("sk_test_") ||
@@ -544,10 +599,10 @@ function CheckoutForm() {
         setConfigErrorType(isSecretKeyError ? "secret" : "publishable");
         console.error(
           `[Stripe Setup Error] Stripe credentials rejected (${isSecretKeyError ? "STRIPE_SECRET_KEY" : "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"}):`,
-          rawMsg
+          rawMsg,
         );
         setErrorMessage(
-          "Card payment service is temporarily unavailable due to a gateway configuration check. Please contact store support."
+          "Card payment service is temporarily unavailable due to a gateway configuration check. Please contact store support.",
         );
       } else {
         setIsGatewayConfigError(false);
@@ -571,8 +626,12 @@ function CheckoutForm() {
         }}
       >
         <header className="border-b border-[#e1e1e1] px-4 py-6">
-          <div className="max-w-[1140px] mx-auto relative flex items-center justify-center">
-            <Link href="/" className="inline-block" aria-label="Sillhouete Home">
+          <div className="max-w-285 mx-auto relative flex items-center justify-center">
+            <Link
+              href="/"
+              className="inline-block"
+              aria-label="Sillhouete Home"
+            >
               <Image
                 src={SITE.logo}
                 alt={SITE.name}
@@ -580,7 +639,7 @@ function CheckoutForm() {
                 height={62}
                 priority
                 unoptimized
-                className="h-[46px] md:h-[56px] w-auto object-contain"
+                className="h-11.5 md:h-14 w-auto object-contain"
               />
             </Link>
             <Link
@@ -597,13 +656,15 @@ function CheckoutForm() {
           <div className="w-16 h-16 rounded-full bg-[#f4f8ff] text-[#005bd3] flex items-center justify-center mb-4">
             <ShoppingBag className="w-8 h-8" />
           </div>
-          <h1 className="text-[22px] font-semibold text-[#1a1a1a] mb-2">Your cart is empty</h1>
+          <h1 className="text-[22px] font-semibold text-[#1a1a1a] mb-2">
+            Your cart is empty
+          </h1>
           <p className="text-[14px] text-[#707070] mb-6 max-w-sm">
             Looks like you haven&apos;t added any items to your cart yet.
           </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 bg-[#005bd3] hover:bg-[#0051ba] text-white font-medium text-[14px] px-6 py-3 rounded-[6px] transition-colors"
+            className="inline-flex items-center gap-2 bg-[#005bd3] hover:bg-[#0051ba] text-white font-medium text-[14px] px-6 py-3 rounded-md transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Continue shopping
@@ -611,7 +672,10 @@ function CheckoutForm() {
         </div>
 
         <footer className="border-t border-[#e1e1e1] py-4 px-4 text-center text-[12px] text-[#707070]">
-          <Link href="/pages/policies" className="text-[#005bd3] underline hover:no-underline">
+          <Link
+            href="/pages/policies"
+            className="text-[#005bd3] underline hover:no-underline"
+          >
             Terms and policies
           </Link>
         </footer>
@@ -628,8 +692,8 @@ function CheckoutForm() {
       }}
     >
       {/* ──────── TOP HEADER: Exactly matching sillhouete.com screenshot ──────── */}
-      <header className="w-full bg-white border-b border-[#e1e1e1] py-5 md:py-[19px] px-4 sm:px-6">
-        <div className="max-w-[932px] mx-auto relative flex items-center justify-center">
+      <header className="w-full bg-white border-b border-[#e1e1e1] py-5 md:py-4.75 px-4 sm:px-6">
+        <div className="max-w-233 mx-auto relative flex items-center justify-center">
           {/* Centered Brand Logo */}
           <Link
             href="/"
@@ -643,7 +707,7 @@ function CheckoutForm() {
               height={70}
               priority
               unoptimized
-              className="h-[46px] md:h-[66px] w-auto object-contain"
+              className="h-11.5 md:h-16.5 w-auto object-contain"
             />
           </Link>
 
@@ -667,7 +731,9 @@ function CheckoutForm() {
         >
           <div className="flex items-center gap-2 text-[#005bd3] font-normal">
             <ShoppingBag className="w-4 h-4 stroke-[1.8]" />
-            <span>{mobileSummaryOpen ? "Hide order summary" : "Show order summary"}</span>
+            <span>
+              {mobileSummaryOpen ? "Hide order summary" : "Show order summary"}
+            </span>
             {mobileSummaryOpen ? (
               <ChevronUp className="w-4 h-4" />
             ) : (
@@ -686,10 +752,13 @@ function CheckoutForm() {
               {displayItems.map((item) => {
                 const itemPrice = item.unitPrice ?? item.product.price;
                 return (
-                  <div key={item.key} className="flex items-center justify-between gap-3">
+                  <div
+                    key={item.key}
+                    className="flex items-center justify-between gap-3"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="relative w-16 h-16 shrink-0">
-                        <div className="w-16 h-16 rounded-[8px] border border-[#d9d9d9] bg-white overflow-hidden relative">
+                        <div className="w-16 h-16 rounded-lg border border-[#d9d9d9] bg-white overflow-hidden relative">
                           <Image
                             src={item.product.image}
                             alt={item.product.title}
@@ -721,7 +790,7 @@ function CheckoutForm() {
             </div>
 
             {/* Discount code in mobile accordion */}
-            <div className="flex items-center bg-white border border-[#d9d9d9] focus-within:border-[#005bd3] focus-within:ring-1 focus-within:ring-[#005bd3] rounded-[8px] pr-2 mt-2">
+            <div className="flex items-center bg-white border border-[#d9d9d9] focus-within:border-[#005bd3] focus-within:ring-1 focus-within:ring-[#005bd3] rounded-lg pr-2 mt-2">
               <input
                 type="text"
                 placeholder="Discount code"
@@ -733,7 +802,7 @@ function CheckoutForm() {
                 type="button"
                 onClick={handleApplyDiscount}
                 disabled={!discountCode.trim()}
-                className={`px-3.5 py-2 rounded-[6px] text-[13px] font-medium transition-colors ${
+                className={`px-3.5 py-2 rounded-md text-[13px] font-medium transition-colors ${
                   discountCode.trim()
                     ? "bg-[#005bd3] text-white hover:bg-[#0051ba] cursor-pointer"
                     : "bg-[#efefef] text-[#8a8a8a] cursor-not-allowed"
@@ -742,10 +811,13 @@ function CheckoutForm() {
                 Apply
               </button>
             </div>
-            {discountError && <p className="text-[12px] text-red-600">{discountError}</p>}
+            {discountError && (
+              <p className="text-[12px] text-red-600">{discountError}</p>
+            )}
             {appliedDiscount && (
               <p className="text-[12px] text-green-700 font-medium">
-                Code &ldquo;{appliedDiscount.code}&rdquo; applied ({appliedDiscount.percent}% off)
+                Code &ldquo;{appliedDiscount.code}&rdquo; applied (
+                {appliedDiscount.percent}% off)
               </p>
             )}
 
@@ -753,7 +825,9 @@ function CheckoutForm() {
             <div className="space-y-2.5 pt-3 border-t border-[#e1e1e1] text-[13.5px]">
               <div className="flex justify-between">
                 <span className="text-[#707070]">Subtotal</span>
-                <span className="font-medium text-[#1a1a1a]">{formatPricePkr(subtotal)}</span>
+                <span className="font-medium text-[#1a1a1a]">
+                  {formatPricePkr(subtotal)}
+                </span>
               </div>
               {discountAmount > 0 && (
                 <div className="flex justify-between text-green-700">
@@ -770,9 +844,13 @@ function CheckoutForm() {
                 </span>
               </div>
               <div className="flex justify-between items-baseline pt-3 border-t border-[#e1e1e1]">
-                <span className="text-[15px] font-medium text-[#1a1a1a]">Total</span>
+                <span className="text-[15px] font-medium text-[#1a1a1a]">
+                  Total
+                </span>
                 <div className="text-right flex items-baseline gap-1.5">
-                  <span className="text-[11px] text-[#707070] font-normal">PKR</span>
+                  <span className="text-[11px] text-[#707070] font-normal">
+                    PKR
+                  </span>
                   <span className="text-[20px] font-bold text-[#1a1a1a]">
                     {formatPricePkr(totalAmount)}
                   </span>
@@ -792,14 +870,16 @@ function CheckoutForm() {
         />
 
         {/* Centered layout container */}
-        <div className="relative w-full max-w-[1140px] mx-auto min-w-0 lg:max-w-[932px] lg:grid lg:grid-cols-[minmax(0,514px)_minmax(0,418px)] lg:items-stretch">
+        <div className="relative w-full max-w-285 mx-auto min-w-0 lg:max-w-233 lg:grid lg:grid-cols-[minmax(0,514px)_minmax(0,418px)] lg:items-stretch">
           {/* ──────── LEFT COLUMN: Checkout Form ──────── */}
-          <div className="w-full min-w-0 px-4 sm:px-6 lg:pl-0 lg:pr-[39px] pt-7 lg:pt-10 pb-16 bg-white flex flex-col justify-between overflow-x-clip">
+          <div className="w-full min-w-0 px-4 sm:px-6 lg:pl-0 lg:pr-9.75 pt-7 lg:pt-10 pb-16 bg-white flex flex-col justify-between overflow-x-clip">
             <form onSubmit={handleSubmit} noValidate className="w-full min-w-0">
               {/* ── Contact ── */}
-              <section className="mb-[30px]">
+              <section className="mb-7.5">
                 <div className="flex items-center justify-between mb-2.5">
-                  <h2 className="text-[18px] font-semibold text-[#1a1a1a]">Contact</h2>
+                  <h2 className="text-[18px] font-semibold text-[#1a1a1a]">
+                    Contact
+                  </h2>
                   <Link
                     href="/account"
                     className="text-[13.5px] text-[#005bd3] hover:underline font-normal"
@@ -813,22 +893,28 @@ function CheckoutForm() {
                   label="Email or mobile phone number"
                   type="email"
                   value={form.email}
-                  onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, email: e.target.value }))
+                  }
                   required
                   autoComplete="email"
-                  endIcon={<HelpCircle className="w-4.5 h-4.5 text-[#737373]" />}
+                  endIcon={
+                    <HelpCircle className="w-4.5 h-4.5 text-[#737373]" />
+                  }
                 />
 
                 <label className="mt-3 flex items-center gap-2.5 cursor-pointer select-none">
                   <div
                     onClick={() => setEmailOffers(!emailOffers)}
-                    className={`w-[18px] h-[18px] rounded-[4px] flex items-center justify-center shrink-0 transition-all ${
+                    className={`w-4.5 h-4.5 rounded-sm flex items-center justify-center shrink-0 transition-all ${
                       emailOffers
                         ? "bg-[#005bd3] text-white"
                         : "border border-[#b5b5b5] bg-white hover:border-[#707070]"
                     }`}
                   >
-                    {emailOffers && <Check className="w-3.5 h-3.5 text-white stroke-[3]" />}
+                    {emailOffers && (
+                      <Check className="w-3.5 h-3.5 text-white stroke-3" />
+                    )}
                   </div>
                   <span className="text-[13.5px] text-[#333333]">
                     Email me with news and offers
@@ -838,14 +924,18 @@ function CheckoutForm() {
 
               {/* ── Delivery ── */}
               <section className="mb-5">
-                <h2 className="text-[18px] font-semibold text-[#1a1a1a] mb-3">Delivery</h2>
+                <h2 className="text-[18px] font-semibold text-[#1a1a1a] mb-3">
+                  Delivery
+                </h2>
 
-                <div className="space-y-[10px]">
+                <div className="space-y-2.5">
                   <FloatingSelect
                     id="country"
                     label="Country/Region"
                     value={form.country}
-                    onChange={(e) => setForm((p) => ({ ...p, country: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, country: e.target.value }))
+                    }
                     autoComplete="shipping country"
                   >
                     {COUNTRIES.map((c) => (
@@ -855,7 +945,7 @@ function CheckoutForm() {
                     ))}
                   </FloatingSelect>
 
-                  <div className="grid grid-cols-2 gap-[10px]">
+                  <div className="grid grid-cols-2 gap-2.5">
                     <FloatingInput
                       id="firstName"
                       label="First name"
@@ -884,11 +974,13 @@ function CheckoutForm() {
                     id="apartment"
                     label="Apartment, suite, etc. (optional)"
                     value={form.apartment || ""}
-                    onChange={(e) => setForm((p) => ({ ...p, apartment: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, apartment: e.target.value }))
+                    }
                     autoComplete="address-line2"
                   />
 
-                  <div className="grid grid-cols-2 gap-[10px]">
+                  <div className="grid grid-cols-2 gap-2.5">
                     <FloatingInput
                       id="city"
                       label="City"
@@ -900,7 +992,9 @@ function CheckoutForm() {
                       id="postalCode"
                       label="Postal code (optional)"
                       value={form.postalCode}
-                      onChange={(e) => setForm((p) => ({ ...p, postalCode: e.target.value }))}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, postalCode: e.target.value }))
+                      }
                       inputMode="numeric"
                       autoComplete="postal-code"
                     />
@@ -913,19 +1007,23 @@ function CheckoutForm() {
                     {...field("phone")}
                     required
                     autoComplete="tel"
-                    endIcon={<HelpCircle className="w-4.5 h-4.5 text-[#737373]" />}
+                    endIcon={
+                      <HelpCircle className="w-4.5 h-4.5 text-[#737373]" />
+                    }
                   />
 
                   <label className="flex items-center gap-2.5 cursor-pointer select-none pt-1">
                     <div
                       onClick={() => setSaveInfo(!saveInfo)}
-                      className={`w-[18px] h-[18px] rounded-[4px] flex items-center justify-center shrink-0 transition-all ${
+                      className={`w-4.5 h-4.5 rounded-sm flex items-center justify-center shrink-0 transition-all ${
                         saveInfo
                           ? "bg-[#005bd3] text-white"
                           : "border border-[#d9d9d9] bg-white hover:border-[#707070]"
                       }`}
                     >
-                      {saveInfo && <Check className="w-3.5 h-3.5 text-white stroke-[3]" />}
+                      {saveInfo && (
+                        <Check className="w-3.5 h-3.5 text-white stroke-3" />
+                      )}
                     </div>
                     <span className="text-[13.5px] text-[#333333]">
                       Save this information for next time
@@ -935,14 +1033,14 @@ function CheckoutForm() {
               </section>
 
               {/* ── Shipping method ── */}
-              <section className="mb-[30px]">
+              <section className="mb-7.5">
                 <h2 className="text-[18px] font-semibold text-[#1a1a1a] mb-2.5">
                   Shipping method
                 </h2>
-                <div className="border border-[#005bd3] bg-[#f4f8ff] rounded-[6px] px-4 py-3.5 flex items-center justify-between">
+                <div className="border border-[#005bd3] bg-[#f4f8ff] rounded-md px-4 py-3.5 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-[18px] h-[18px] rounded-full border-2 border-[#005bd3] flex items-center justify-center shrink-0">
-                      <div className="w-2 h-[8px] rounded-full bg-[#005bd3]" />
+                    <div className="w-4.5 h-4.5 rounded-full border-2 border-[#005bd3] flex items-center justify-center shrink-0">
+                      <div className="w-2 h-2 rounded-full bg-[#005bd3]" />
                     </div>
                     <span className="text-[14px] text-[#1a1a1a]">Standard</span>
                   </div>
@@ -954,17 +1052,19 @@ function CheckoutForm() {
 
               {/* ── Payment ── */}
               <section className="mb-8">
-                <h2 className="text-[18px] font-semibold text-[#1a1a1a] mb-0.5">Payment</h2>
+                <h2 className="text-[18px] font-semibold text-[#1a1a1a] mb-0.5">
+                  Payment
+                </h2>
                 <p className="text-[13px] text-[#707070] mb-3">
                   All transactions are secure and encrypted.
                 </p>
 
-                <div className="border border-[#005bd3] rounded-[8px] overflow-hidden bg-white">
+                <div className="border border-[#005bd3] rounded-lg overflow-hidden bg-white">
                   {/* Credit card header */}
                   <div className="flex items-center justify-between px-4 py-3.5 bg-[#f4f8ff] border-b border-[#d9d9d9]">
                     <div className="flex items-center gap-3">
-                      <div className="w-[18px] h-[18px] rounded-full border-2 border-[#005bd3] flex items-center justify-center shrink-0">
-                        <div className="w-2 h-[8px] rounded-full bg-[#005bd3]" />
+                      <div className="w-4.5 h-4.5 rounded-full border-2 border-[#005bd3] flex items-center justify-center shrink-0">
+                        <div className="w-2 h-2 rounded-full bg-[#005bd3]" />
                       </div>
                       <span className="text-[14px] font-medium text-[#1a1a1a]">
                         Credit card
@@ -1006,7 +1106,9 @@ function CheckoutForm() {
                         />
                       </StripeFloatingField>
                       {cardFieldError && (
-                        <p className="text-[12px] text-[#e74c3c] mt-1 pl-1 font-medium">{cardFieldError}</p>
+                        <p className="text-[12px] text-[#e74c3c] mt-1 pl-1 font-medium">
+                          {cardFieldError}
+                        </p>
                       )}
                     </div>
 
@@ -1020,19 +1122,25 @@ function CheckoutForm() {
                           <CardExpiryElement
                             options={STRIPE_CARD_EXPIRY_OPTIONS}
                             onChange={(e) => {
-                              setExpiryFieldError(e.error ? e.error.message : "");
+                              setExpiryFieldError(
+                                e.error ? e.error.message : "",
+                              );
                             }}
                           />
                         </StripeFloatingField>
                         {expiryFieldError && (
-                          <p className="text-[12px] text-[#e74c3c] mt-1 pl-1 font-medium">{expiryFieldError}</p>
+                          <p className="text-[12px] text-[#e74c3c] mt-1 pl-1 font-medium">
+                            {expiryFieldError}
+                          </p>
                         )}
                       </div>
                       <div>
                         <StripeFloatingField
                           label="CVC"
                           hasError={Boolean(cvcFieldError)}
-                          endIcon={<HelpCircle className="w-4 h-4 text-[#707070]" />}
+                          endIcon={
+                            <HelpCircle className="w-4 h-4 text-[#707070]" />
+                          }
                         >
                           <CardCvcElement
                             options={STRIPE_CARD_CVC_OPTIONS}
@@ -1042,7 +1150,9 @@ function CheckoutForm() {
                           />
                         </StripeFloatingField>
                         {cvcFieldError && (
-                          <p className="text-[12px] text-[#e74c3c] mt-1 pl-1 font-medium">{cvcFieldError}</p>
+                          <p className="text-[12px] text-[#e74c3c] mt-1 pl-1 font-medium">
+                            {cvcFieldError}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -1061,15 +1171,17 @@ function CheckoutForm() {
                     {/* Use shipping address as billing address checkbox */}
                     <label className="flex items-center gap-2.5 cursor-pointer select-none pt-1">
                       <div
-                        onClick={() => setUseShippingAsBilling(!useShippingAsBilling)}
-                        className={`w-[18px] h-[18px] rounded-[4px] flex items-center justify-center shrink-0 transition-all ${
+                        onClick={() =>
+                          setUseShippingAsBilling(!useShippingAsBilling)
+                        }
+                        className={`w-4.5 h-4.5 rounded-sm flex items-center justify-center shrink-0 transition-all ${
                           useShippingAsBilling
                             ? "bg-[#005bd3] text-white"
                             : "border border-[#d9d9d9] bg-white hover:border-[#707070]"
                         }`}
                       >
                         {useShippingAsBilling && (
-                          <Check className="w-3.5 h-3.5 text-white stroke-[3]" />
+                          <Check className="w-3.5 h-3.5 text-white stroke-3" />
                         )}
                       </div>
                       <span className="text-[13.5px] text-[#333333]">
@@ -1086,28 +1198,32 @@ function CheckoutForm() {
                   <h2 className="text-[18px] font-semibold text-[#1a1a1a] mb-2.5">
                     Billing address
                   </h2>
-                  <div className="border border-[#d9d9d9] rounded-[8px] overflow-hidden">
+                  <div className="border border-[#d9d9d9] rounded-lg overflow-hidden">
                     {/* Same as shipping */}
                     <div
                       className={`${
                         billingSame
-                          ? "border-2 border-[#005bd3] -m-[1px] rounded-[8px] relative z-10"
+                          ? "border-2 border-[#005bd3] -m-px rounded-lg relative z-10"
                           : "border-b border-[#d9d9d9]"
                       }`}
                     >
                       <div
                         onClick={() => setBillingSame(true)}
                         className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer transition-colors ${
-                          billingSame ? "bg-[#f4f8ff]" : "bg-white hover:bg-[#fafafa]"
+                          billingSame
+                            ? "bg-[#f4f8ff]"
+                            : "bg-white hover:bg-[#fafafa]"
                         }`}
                       >
                         <div
-                          className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center shrink-0 ${
-                            billingSame ? "border-[#005bd3]" : "border-[#b5b5b5]"
+                          className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                            billingSame
+                              ? "border-[#005bd3]"
+                              : "border-[#b5b5b5]"
                           }`}
                         >
                           {billingSame && (
-                            <div className="w-2 h-[8px] rounded-full bg-[#005bd3]" />
+                            <div className="w-2 h-2 rounded-full bg-[#005bd3]" />
                           )}
                         </div>
                         <span className="text-[14px] font-medium text-[#1a1a1a]">
@@ -1120,23 +1236,27 @@ function CheckoutForm() {
                     <div
                       className={`${
                         !billingSame
-                          ? "border-2 border-[#005bd3] -m-[1px] rounded-[8px] relative z-10"
+                          ? "border-2 border-[#005bd3] -m-px rounded-lg relative z-10"
                           : ""
                       }`}
                     >
                       <div
                         onClick={() => setBillingSame(false)}
                         className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer transition-colors ${
-                          !billingSame ? "bg-[#f4f8ff]" : "bg-white hover:bg-[#fafafa]"
+                          !billingSame
+                            ? "bg-[#f4f8ff]"
+                            : "bg-white hover:bg-[#fafafa]"
                         }`}
                       >
                         <div
-                          className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center shrink-0 ${
-                            !billingSame ? "border-[#005bd3]" : "border-[#b5b5b5]"
+                          className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                            !billingSame
+                              ? "border-[#005bd3]"
+                              : "border-[#b5b5b5]"
                           }`}
                         >
                           {!billingSame && (
-                            <div className="w-2 h-[8px] rounded-full bg-[#005bd3]" />
+                            <div className="w-2 h-2 rounded-full bg-[#005bd3]" />
                           )}
                         </div>
                         <span className="text-[14px] font-medium text-[#1a1a1a]">
@@ -1151,7 +1271,10 @@ function CheckoutForm() {
                             label="Country/Region"
                             value={billingForm.country}
                             onChange={(e) =>
-                              setBillingForm((p) => ({ ...p, country: e.target.value }))
+                              setBillingForm((p) => ({
+                                ...p,
+                                country: e.target.value,
+                              }))
                             }
                           >
                             {COUNTRIES.map((c) => (
@@ -1166,7 +1289,10 @@ function CheckoutForm() {
                               label="First name"
                               value={billingForm.firstName}
                               onChange={(e) =>
-                                setBillingForm((p) => ({ ...p, firstName: e.target.value }))
+                                setBillingForm((p) => ({
+                                  ...p,
+                                  firstName: e.target.value,
+                                }))
                               }
                             />
                             <FloatingInput
@@ -1174,7 +1300,10 @@ function CheckoutForm() {
                               label="Last name"
                               value={billingForm.lastName}
                               onChange={(e) =>
-                                setBillingForm((p) => ({ ...p, lastName: e.target.value }))
+                                setBillingForm((p) => ({
+                                  ...p,
+                                  lastName: e.target.value,
+                                }))
                               }
                             />
                           </div>
@@ -1183,7 +1312,10 @@ function CheckoutForm() {
                             label="Address"
                             value={billingForm.address}
                             onChange={(e) =>
-                              setBillingForm((p) => ({ ...p, address: e.target.value }))
+                              setBillingForm((p) => ({
+                                ...p,
+                                address: e.target.value,
+                              }))
                             }
                           />
                           <FloatingInput
@@ -1191,7 +1323,10 @@ function CheckoutForm() {
                             label="Apartment, suite, etc. (optional)"
                             value={billingForm.apartment || ""}
                             onChange={(e) =>
-                              setBillingForm((p) => ({ ...p, apartment: e.target.value }))
+                              setBillingForm((p) => ({
+                                ...p,
+                                apartment: e.target.value,
+                              }))
                             }
                           />
                           <div className="grid grid-cols-[1fr_140px] gap-3">
@@ -1200,7 +1335,10 @@ function CheckoutForm() {
                               label="City"
                               value={billingForm.city}
                               onChange={(e) =>
-                                setBillingForm((p) => ({ ...p, city: e.target.value }))
+                                setBillingForm((p) => ({
+                                  ...p,
+                                  city: e.target.value,
+                                }))
                               }
                             />
                             <FloatingInput
@@ -1208,7 +1346,10 @@ function CheckoutForm() {
                               label="Postal code (optional)"
                               value={billingForm.postalCode}
                               onChange={(e) =>
-                                setBillingForm((p) => ({ ...p, postalCode: e.target.value }))
+                                setBillingForm((p) => ({
+                                  ...p,
+                                  postalCode: e.target.value,
+                                }))
                               }
                             />
                           </div>
@@ -1218,9 +1359,14 @@ function CheckoutForm() {
                             type="tel"
                             value={billingForm.phone}
                             onChange={(e) =>
-                              setBillingForm((p) => ({ ...p, phone: e.target.value }))
+                              setBillingForm((p) => ({
+                                ...p,
+                                phone: e.target.value,
+                              }))
                             }
-                            endIcon={<HelpCircle className="w-4.5 h-4.5 text-[#737373]" />}
+                            endIcon={
+                              <HelpCircle className="w-4.5 h-4.5 text-[#737373]" />
+                            }
                           />
                         </div>
                       )}
@@ -1231,34 +1377,60 @@ function CheckoutForm() {
 
               {/* ── Error message banner with rock-solid responsive wrapping ── */}
               {errorMessage && (
-                <div className="mb-5 p-3.5 sm:p-4 bg-red-50 border border-red-200 rounded-[8px] text-[13px] sm:text-[13.5px] text-red-800 flex items-start gap-2.5 sm:gap-3 w-full min-w-0 overflow-hidden shadow-xs">
+                <div className="mb-5 p-3.5 sm:p-4 bg-red-50 border border-red-200 rounded-lg text-[13px] sm:text-[13.5px] text-red-800 flex items-start gap-2.5 sm:gap-3 w-full min-w-0 overflow-hidden shadow-xs">
                   <AlertCircle className="w-4.5 h-4.5 text-red-600 shrink-0 mt-0.5" />
-                  <div className="min-w-0 flex-1 break-words [overflow-wrap:anywhere] leading-snug">
+                  <div className="min-w-0 flex-1 wrap-anywhere leading-snug">
                     <p className="font-semibold text-red-900 mb-0.5">
-                      {isGatewayConfigError ? "Payment Gateway Configuration Notice" : "Payment Notice"}
+                      {isGatewayConfigError
+                        ? "Payment Gateway Configuration Notice"
+                        : "Payment Notice"}
                     </p>
-                    <p className="text-red-700 break-words [overflow-wrap:anywhere]">{errorMessage}</p>
+                    <p className="text-red-700 wrap-anywhere">
+                      {errorMessage}
+                    </p>
                     {isGatewayConfigError && (
                       <div className="mt-2.5 pt-2 border-t border-red-200/80 text-[11.5px] sm:text-[12px] text-red-800 space-y-1.5">
-                        <p className="font-semibold text-red-900">Store Administrator Note:</p>
+                        <p className="font-semibold text-red-900">
+                          Store Administrator Note:
+                        </p>
                         {configErrorType === "secret" ? (
                           <>
-                            <p className="break-words [overflow-wrap:anywhere] font-mono text-[11px] bg-white/70 p-1.5 rounded border border-red-200 text-red-900">
-                              Server Error: STRIPE_SECRET_KEY is invalid, expired, or missing in Vercel Environment Variables (or .env.local locally).
+                            <p className="wrap-anywhere font-mono text-[11px] bg-white/70 p-1.5 rounded border border-red-200 text-red-900">
+                              Server Error: STRIPE_SECRET_KEY is invalid,
+                              expired, or missing in Vercel Environment
+                              Variables (or .env.local locally).
                             </p>
                             <p>
-                              If running on <strong>Vercel (Live)</strong>: go to <strong>Vercel Dashboard &rarr; Settings &rarr; Environment Variables</strong>, add <strong>STRIPE_SECRET_KEY</strong> and <strong>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</strong>, then redeploy.
+                              If running on <strong>Vercel (Live)</strong>: go
+                              to{" "}
+                              <strong>
+                                Vercel Dashboard &rarr; Settings &rarr;
+                                Environment Variables
+                              </strong>
+                              , add <strong>STRIPE_SECRET_KEY</strong> and{" "}
+                              <strong>
+                                NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+                              </strong>
+                              , then redeploy.
                               <br />
-                              If running <strong>locally</strong>: update <strong>STRIPE_SECRET_KEY</strong> in <strong>.env.local</strong>.
+                              If running <strong>locally</strong>: update{" "}
+                              <strong>STRIPE_SECRET_KEY</strong> in{" "}
+                              <strong>.env.local</strong>.
                             </p>
                           </>
                         ) : (
                           <>
-                            <p className="break-words [overflow-wrap:anywhere] font-mono text-[11px] bg-white/70 p-1.5 rounded border border-red-200 text-red-900">
-                              Client Error: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is invalid or missing.
+                            <p className="wrap-break-word font-mono text-[11px] bg-white/70 p-1.5 rounded border border-red-200 text-red-900">
+                              Client Error: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+                              is invalid or missing.
                             </p>
                             <p>
-                              Please ensure <strong>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</strong> is set in Vercel Environment Variables (live) or .env.local (locally).
+                              Please ensure{" "}
+                              <strong>
+                                NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+                              </strong>{" "}
+                              is set in Vercel Environment Variables (live) or
+                              .env.local (locally).
                             </p>
                           </>
                         )}
@@ -1273,11 +1445,15 @@ function CheckoutForm() {
                 type="submit"
                 disabled={isProcessing}
                 id="checkout-pay-button"
-                className="w-full bg-[#005bd3] hover:bg-[#0051ba] active:bg-[#0047a4] text-white font-medium text-[16px] py-4 px-6 rounded-[8px] transition-colors shadow-xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full bg-[#005bd3] hover:bg-[#0051ba] active:bg-[#0047a4] text-white font-medium text-[16px] py-4 px-6 rounded-lg transition-colors shadow-xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isProcessing ? (
                   <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin w-4 h-4 text-white" viewBox="0 0 24 24" fill="none">
+                    <svg
+                      className="animate-spin w-4 h-4 text-white"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
                       <circle
                         className="opacity-25"
                         cx="12"
@@ -1302,25 +1478,31 @@ function CheckoutForm() {
 
             {/* ── Policy Links at the bottom of left column ── */}
             <footer className="mt-12 pt-6 border-t border-[#e1e1e1] text-[12px]">
-              <Link href="/pages/policies" className="text-[#005bd3] underline hover:no-underline">
+              <Link
+                href="/pages/policies"
+                className="text-[#005bd3] underline hover:no-underline"
+              >
                 Terms and policies
               </Link>
             </footer>
           </div>
 
           {/* ──────── RIGHT COLUMN: Order Summary (desktop) ──────── */}
-          <aside className="hidden lg:block lg:pl-[38px] lg:pr-0 lg:pt-10 pb-16 bg-[#f5f5f5] min-h-screen">
+          <aside className="hidden lg:block lg:pl-9.5 lg:pr-0 lg:pt-10 pb-16 bg-[#f5f5f5] min-h-screen">
             <div className="sticky top-10">
               {/* Items list */}
               <div className="space-y-4 mb-6">
                 {displayItems.map((item) => {
                   const itemPrice = item.unitPrice ?? item.product.price;
                   return (
-                    <div key={item.key} className="flex items-start justify-between gap-3">
+                    <div
+                      key={item.key}
+                      className="flex items-start justify-between gap-3"
+                    >
                       <div className="flex items-start gap-3.5">
                         {/* Thumbnail with rounded corners and authentic black badge */}
                         <div className="relative w-16 h-16 shrink-0 mt-0.5">
-                          <div className="w-16 h-16 rounded-[8px] border border-[#d9d9d9] bg-white overflow-hidden relative">
+                          <div className="w-16 h-16 rounded-lg border border-[#d9d9d9] bg-white overflow-hidden relative">
                             <Image
                               src={item.product.image}
                               alt={item.product.title}
@@ -1357,7 +1539,7 @@ function CheckoutForm() {
               </div>
 
               {/* Discount Code Input + Apply Button (single rounded box) */}
-              <div className="flex items-center bg-white border border-[#d9d9d9] hover:border-[#707070] focus-within:border-[#005bd3] focus-within:ring-1 focus-within:ring-[#005bd3] rounded-[8px] pr-2 mb-8">
+              <div className="flex items-center bg-white border border-[#d9d9d9] hover:border-[#707070] focus-within:border-[#005bd3] focus-within:ring-1 focus-within:ring-[#005bd3] rounded-lg pr-2 mb-8">
                 <input
                   type="text"
                   placeholder="Discount code"
@@ -1369,7 +1551,7 @@ function CheckoutForm() {
                   type="button"
                   onClick={handleApplyDiscount}
                   disabled={!discountCode.trim()}
-                  className={`px-3.5 py-2 rounded-[6px] text-[14px] font-medium transition-colors ${
+                  className={`px-3.5 py-2 rounded-md text-[14px] font-medium transition-colors ${
                     discountCode.trim()
                       ? "bg-[#005bd3] text-white hover:bg-[#0051ba] cursor-pointer"
                       : "bg-[#efefef] text-[#8a8a8a] cursor-not-allowed"
@@ -1384,7 +1566,8 @@ function CheckoutForm() {
               )}
               {appliedDiscount && (
                 <p className="text-[12px] text-green-700 font-medium mb-4">
-                  Discount &ldquo;{appliedDiscount.code}&rdquo; applied ({appliedDiscount.percent}% off)
+                  Discount &ldquo;{appliedDiscount.code}&rdquo; applied (
+                  {appliedDiscount.percent}% off)
                 </p>
               )}
 
@@ -1414,7 +1597,9 @@ function CheckoutForm() {
                 </div>
 
                 <div className="flex justify-between items-baseline pt-2.5">
-                  <span className="text-[16px] font-medium text-[#1a1a1a]">Total</span>
+                  <span className="text-[16px] font-medium text-[#1a1a1a]">
+                    Total
+                  </span>
                   <div className="text-right flex items-baseline gap-1.5">
                     <span className="text-[12px] text-[#707070] font-normal tracking-wide">
                       PKR
@@ -1447,7 +1632,7 @@ function CheckoutPageInner() {
 
     if (forceTestMode && trimmed.startsWith("pk_live_")) {
       console.warn(
-        "[Stripe Safety Warning]: Live key (pk_live_) detected while NEXT_PUBLIC_STRIPE_TEST_MODE=true is enforced. Only pk_test_ keys are permitted."
+        "[Stripe Safety Warning]: Live key (pk_live_) detected while NEXT_PUBLIC_STRIPE_TEST_MODE=true is enforced. Only pk_test_ keys are permitted.",
       );
       return Promise.resolve(null);
     }

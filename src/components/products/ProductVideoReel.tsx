@@ -184,7 +184,7 @@ export default function ProductVideoReel({
           {/* Bottom Bar: YouTube White Pill on Left + Expand Button on Right (Matching live site) */}
           <div className="absolute bottom-0 inset-x-0 z-20 flex items-center justify-between p-1.5 sm:p-2 bg-gradient-to-t from-black/85 via-black/40 to-transparent">
             {/* White YouTube Pill Button */}
-            <div className="flex items-center gap-0.5 sm:gap-1 bg-white text-black px-1.5 py-0.5 sm:px-2 rounded-[3px] sm:rounded-[4px] shadow-sm">
+            <div className="flex items-center gap-0.5 sm:gap-1 bg-white text-black px-1.5 py-0.5 sm:px-2 rounded-[3px] sm:rounded-sm shadow-sm">
               <svg className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-black" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z" />
               </svg>
@@ -200,7 +200,7 @@ export default function ProductVideoReel({
                 e.stopPropagation();
                 setIsModalOpen(true);
               }}
-              className="grid h-6 w-6 sm:h-7 sm:w-7 place-items-center rounded-[6px] bg-[#111]/75 text-white hover:bg-black transition-colors cursor-pointer border border-white/20 shadow-xs"
+              className="grid h-6 w-6 sm:h-7 sm:w-7 place-items-center rounded-md bg-[#111]/75 text-white hover:bg-black transition-colors cursor-pointer border border-white/20 shadow-xs"
               aria-label={`Expand ${productTitle} video`}
             >
               <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
@@ -236,7 +236,7 @@ export default function ProductVideoReel({
                   />
                 </div>
                 <div className="text-white">
-                  <h3 className="font-serif text-sm tracking-wide font-medium truncate max-w-[200px]">
+                  <h3 className="font-serif text-sm tracking-wide font-medium truncate max-w-50">
                     {productTitle}
                   </h3>
                   <p className="text-[10px] text-neutral-400 leading-none">

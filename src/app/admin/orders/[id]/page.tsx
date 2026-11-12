@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -16,7 +16,6 @@ import {
   RotateCcw,
   AlertCircle,
   Mail,
-  Send,
   RefreshCw,
 } from "lucide-react";
 import { formatPrice } from "@/lib/format";
@@ -76,7 +75,7 @@ export default function AdminOrderDetailPage() {
   const [refunding, setRefunding] = useState(false);
   const [showRefundConfirm, setShowRefundConfirm] = useState(false);
 
-  const fetchOrder = async () => {
+  const fetchOrder = useCallback(async () => {
     if (!id) return;
     try {
       const res = await fetch(`/api/orders/${id}`);
@@ -109,11 +108,11 @@ export default function AdminOrderDetailPage() {
     } catch {
       // ignore
     }
-  };
+  }, [id]);
 
   useEffect(() => {
-    fetchOrder();
-  }, [id]);
+    void Promise.resolve().then(fetchOrder);
+  }, [fetchOrder]);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -789,7 +788,7 @@ export default function AdminOrderDetailPage() {
                       {n.type.replace(/_/g, " ")}
                     </td>
                     <td className="py-3 px-3 text-gray-600">{n.recipient}</td>
-                    <td className="py-3 px-3 text-gray-800 max-w-[220px] truncate" title={n.subject}>
+                    <td className="py-3 px-3 text-gray-800 max-w-55 truncate" title={n.subject}>
                       {n.subject}
                     </td>
                     <td className="py-3 px-3">
@@ -807,7 +806,7 @@ export default function AdminOrderDetailPage() {
                         {n.status}
                       </span>
                       {n.lastError && (
-                        <p className="text-[10px] text-red-600 mt-0.5 max-w-[180px] truncate" title={n.lastError}>
+                        <p className="text-[10px] text-red-600 mt-0.5 max-w-45 truncate" title={n.lastError}>
                           {n.lastError}
                         </p>
                       )}

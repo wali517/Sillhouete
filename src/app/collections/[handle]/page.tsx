@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -6,6 +7,7 @@ import {
   getCollectionByHandle,
 } from "@/lib/db";
 import CollectionViewer from "./CollectionViewer";
+import { CollectionPageSkeleton } from "@/components/ui/Skeletons";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -28,6 +30,21 @@ export default async function CollectionPage({ params, searchParams }: Props) {
   const { handle } = await params;
   const sParams = await searchParams;
   const initialPage = Number(sParams?.page) || 1;
+
+  return (
+    <Suspense fallback={<CollectionPageSkeleton />}>
+      <CollectionContent handle={handle} initialPage={initialPage} />
+    </Suspense>
+  );
+}
+
+async function CollectionContent({
+  handle,
+  initialPage,
+}: {
+  handle: string;
+  initialPage: number;
+}) {
   const isSale = handle === "sale-1" || handle === "sale";
 
   // Fetch collection document and products concurrently for optimal speed
@@ -54,7 +71,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
   const descriptionHtml = colDoc?.description || "";
 
   return (
-    <section className="mx-auto w-full max-w-[1520px] px-3.5 py-6 sm:px-6 md:px-8 lg:px-10 md:py-8">
+    <section className="mx-auto w-full max-w-380 px-3.5 py-6 sm:px-6 md:px-8 lg:px-10 md:py-8">
       {/* Header section matching Sillhouete aesthetic */}
       {isSale ? (
         <header className="mb-8 text-center">
@@ -127,7 +144,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
 
       {descriptionHtml ? (
         <div
-          className="mx-auto mt-14 max-w-[1100px] text-[14px] leading-[1.7] text-[#222222] collection-seo-content"
+          className="mx-auto mt-14 max-w-275 text-[14px] leading-[1.7] text-[#222222] collection-seo-content"
           dangerouslySetInnerHTML={{ __html: descriptionHtml }}
         />
       ) : null}

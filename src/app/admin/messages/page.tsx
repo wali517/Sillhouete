@@ -39,7 +39,24 @@ export default function AdminMessagesPage() {
   };
 
   useEffect(() => {
-    fetchMessages();
+    let active = true;
+
+    const loadMessages = async () => {
+      try {
+        const res = await fetch("/api/contact");
+        const data = await res.json();
+        if (active) setMessages(data.messages || []);
+      } catch {
+        if (active) setMessages([]);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    void loadMessages();
+    return () => {
+      active = false;
+    };
   }, []);
 
   const showToast = (text: string, isError = false) => {

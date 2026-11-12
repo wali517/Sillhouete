@@ -161,7 +161,7 @@ export default async function AdminDashboardPage() {
                 <Link
                   key={order.id}
                   href={`/admin/orders/${order.id}`}
-                  className="flex items-center justify-between p-4 hover:bg-neutral-50 text-xs transition-colors cursor-pointer group block"
+                  className="flex items-center justify-between p-4 hover:bg-neutral-50 text-xs transition-colors cursor-pointer group"
                 >
                   <div>
                     <div className="flex items-center gap-2">

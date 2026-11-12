@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import ProductCard from "@/components/products/ProductCard";
 import type { Product } from "@/types";
 import { SlidersHorizontal, X, ChevronDown, RotateCcw } from "lucide-react";
-import { formatPrice } from "@/lib/format";
 
 type SortOption =
   | "relevant"
@@ -51,7 +50,6 @@ const DRESS_STYLE_OPTIONS = [
 ];
 
 export default function CollectionViewer({
-  title,
   initialProducts,
   isSalePage = false,
   initialPage = 1,
@@ -89,24 +87,28 @@ export default function CollectionViewer({
   };
 
   const toggleColor = (color: string) => {
+    setCurrentPage(1);
     setSelectedColors((prev) =>
       prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color]
     );
   };
 
   const toggleSize = (sizeKey: string) => {
+    setCurrentPage(1);
     setSelectedSizes((prev) =>
       prev.includes(sizeKey) ? prev.filter((s) => s !== sizeKey) : [...prev, sizeKey]
     );
   };
 
   const toggleStyle = (styleKey: string) => {
+    setCurrentPage(1);
     setSelectedStyles((prev) =>
       prev.includes(styleKey) ? prev.filter((s) => s !== styleKey) : [...prev, styleKey]
     );
   };
 
   const clearAllFilters = () => {
+    setCurrentPage(1);
     setMaxPrice(464165);
     setSelectedColors([]);
     setSelectedSizes([]);
@@ -118,11 +120,6 @@ export default function CollectionViewer({
     selectedColors.length > 0 ||
     selectedSizes.length > 0 ||
     selectedStyles.length > 0;
-
-  // Reset to page 1 whenever filters or sorting change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [sort, maxPrice, selectedColors, selectedSizes, selectedStyles]);
 
   // Lock body scroll when drawer is open
   useEffect(() => {
@@ -297,7 +294,10 @@ export default function CollectionViewer({
                 max={464165}
                 step={2500}
                 value={maxPrice}
-                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                onChange={(e) => {
+                  setCurrentPage(1);
+                  setMaxPrice(Number(e.target.value));
+                }}
                 className="w-full accent-black cursor-pointer h-1.5 bg-neutral-200"
               />
             </div>
@@ -372,7 +372,7 @@ export default function CollectionViewer({
                   className="flex items-center gap-2.5 cursor-pointer group select-none py-0.5"
                 >
                   <div
-                    className={`w-5 h-5 rounded-full p-[2px] flex items-center justify-center transition-all ${
+                    className={`w-5 h-5 rounded-full p-0.5 flex items-center justify-center transition-all ${
                       isSelected
                         ? "border border-black"
                         : "border border-neutral-300 group-hover:border-neutral-500"
@@ -463,11 +463,11 @@ export default function CollectionViewer({
 
   // Pagination Controls matching Image 1 & Image 2 and live Shopify site exactly
   const PaginationControls = totalPages > 1 ? (
-    <div className="py-[60px] text-center select-none flex items-center justify-center">
+    <div className="py-15 text-center select-none flex items-center justify-center">
       <div className="flex items-center justify-center">
         {/* Prev button: square black box with white chevron (hidden on page 1) */}
         {activePage > 1 ? (
-          <span className="inline-block align-middle mx-[10px] w-[35px] md:w-[43px] h-[35px] md:h-[43px] bg-black text-white">
+          <span className="inline-block align-middle mx-2.5 w-8.75 md:w-10.75 h-8.75 md:h-10.75 bg-black text-white">
             <button
               type="button"
               onClick={() => handlePageChange(activePage - 1)}
@@ -478,7 +478,7 @@ export default function CollectionViewer({
                 aria-hidden="true"
                 focusable="false"
                 role="presentation"
-                className="w-[12px] md:w-[13px] h-[12px] md:h-[14px] fill-current"
+                className="w-3 md:w-3.25 h-3 md:h-3.5 fill-current"
                 viewBox="0 0 284.49 498.98"
               >
                 <path d="M249.49 0a35 35 0 0 1 24.75 59.75L84.5 249.49l189.74 189.74a35.002 35.002 0 0 1-49.5 49.5L10.25 274.24a35 35 0 0 1 0-49.5L224.74 10.25A34.89 34.89 0 0 1 249.49 0Z" />
@@ -493,7 +493,7 @@ export default function CollectionViewer({
           return isCurrent ? (
             <span
               key={p}
-              className="inline-block align-middle px-[12px] py-[8px] font-serif text-[16px] md:text-[18px] opacity-30 cursor-default select-none text-black"
+              className="inline-block align-middle px-3 py-2 font-serif text-[16px] md:text-[18px] opacity-30 cursor-default select-none text-black"
               aria-current="page"
             >
               {p}
@@ -503,7 +503,7 @@ export default function CollectionViewer({
               <button
                 type="button"
                 onClick={() => handlePageChange(p)}
-                className="inline-block px-[12px] py-[8px] font-serif text-[16px] md:text-[18px] text-[#111111] hover:text-[#0056b3] transition-colors cursor-pointer"
+                className="inline-block px-3 py-2 font-serif text-[16px] md:text-[18px] text-[#111111] hover:text-[#0056b3] transition-colors cursor-pointer"
               >
                 {p}
               </button>
@@ -513,7 +513,7 @@ export default function CollectionViewer({
 
         {/* Next button: square black box with white chevron (hidden on last page) */}
         {activePage < totalPages ? (
-          <span className="inline-block align-middle mx-[10px] w-[35px] md:w-[43px] h-[35px] md:h-[43px] bg-black text-white">
+          <span className="inline-block align-middle mx-2.5 w-8.75 md:w-10.75 h-8.75 md:h-10.75 bg-black text-white">
             <button
               type="button"
               onClick={() => handlePageChange(activePage + 1)}
@@ -524,7 +524,7 @@ export default function CollectionViewer({
                 aria-hidden="true"
                 focusable="false"
                 role="presentation"
-                className="w-[12px] md:w-[13px] h-[12px] md:h-[14px] fill-current"
+                className="w-3 md:w-3.25 h-3 md:h-3.5 fill-current"
                 viewBox="0 0 284.49 498.98"
               >
                 <path d="M35 498.98a35 35 0 0 1-24.75-59.75l189.74-189.74L10.25 59.75a35.002 35.002 0 0 1 49.5-49.5l214.49 214.49a35 35 0 0 1 0 49.5L59.75 488.73A34.89 34.89 0 0 1 35 498.98Z" />
@@ -546,7 +546,7 @@ export default function CollectionViewer({
           {/* Main Sale Layout: Persistent Left Sidebar + Right Products Grid */}
           <div className="flex items-start gap-6 lg:gap-10">
             {/* Desktop Persistent Left Sidebar matching Image 3 */}
-            <aside className="hidden md:block w-[205px] lg:w-[225px] shrink-0 sticky top-24 self-start pr-2">
+            <aside className="hidden md:block w-51.25 lg:w-56.25 shrink-0 sticky top-24 self-start pr-2">
               {FilterAccordionContent}
             </aside>
 
@@ -574,7 +574,10 @@ export default function CollectionViewer({
                 <div className="relative">
                   <select
                     value={sort}
-                    onChange={(e) => setSort(e.target.value as SortOption)}
+                    onChange={(e) => {
+                      setCurrentPage(1);
+                      setSort(e.target.value as SortOption);
+                    }}
                     className="appearance-none border border-[#e8e8e1] bg-white pl-3.5 pr-8 py-1.5 text-xs font-serif tracking-wider text-[#111111] outline-none cursor-pointer focus:border-black"
                   >
                     <option value="featured">Featured</option>
@@ -644,7 +647,10 @@ export default function CollectionViewer({
             <div className="relative">
               <select
                 value={sort}
-                onChange={(e) => setSort(e.target.value as SortOption)}
+                onChange={(e) => {
+                  setCurrentPage(1);
+                  setSort(e.target.value as SortOption);
+                }}
                 className="appearance-none border border-[#e8e8e1] bg-white pl-4 pr-8 py-2 text-xs font-serif tracking-wider text-[#111111] outline-none cursor-pointer focus:border-black"
               >
                 <option value="featured">Featured</option>
@@ -701,7 +707,7 @@ export default function CollectionViewer({
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-[120] flex bg-black/50 backdrop-blur-xs transition-opacity duration-300"
+          className="fixed inset-0 z-120 flex bg-black/50 backdrop-blur-xs transition-opacity duration-300"
           onClick={() => setFilterDrawerOpen(false)}
         >
           {/* Drawer Panel Sliding from Left */}

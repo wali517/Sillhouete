@@ -34,7 +34,7 @@ export default function EventSection() {
       <h2 className="mb-6 text-center text-[16px] font-semibold uppercase leading-none tracking-wider text-[#111111] sm:text-[17px] md:mb-8 md:text-[20px]">
         SHOP BY EVENT
       </h2>
-      <div className="grid grid-cols-2 gap-[10px] md:grid-cols-5 md:gap-[1.8vw]">
+      <div className="grid grid-cols-2 gap-2.5 md:grid-cols-5 md:gap-[1.8vw]">
         {EVENTS.map((e) => (
           <Link
             key={e.label}

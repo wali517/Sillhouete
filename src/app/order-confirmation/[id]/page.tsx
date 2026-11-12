@@ -207,7 +207,7 @@ export default function OrderConfirmationPage() {
           </h1>
 
           {order.status === "cancelled" ? (
-            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-[8px] text-left max-w-[520px]">
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-left max-w-[520px]">
               <p className="text-[14px] font-semibold text-red-800 mb-1 flex items-center gap-1.5">
                 <span>✕</span> Order Cancelled
               </p>
@@ -244,7 +244,7 @@ export default function OrderConfirmationPage() {
               <span>Stripe Payment Confirmed · Verified by Card Network</span>
             </div>
           ) : order.paymentStatus === "failed" ? (
-            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-[6px] text-red-700 text-[13px]">
+            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-[13px]">
               <p className="font-medium">Payment could not be completed.</p>
               <p className="text-[12px] mt-0.5">{order.failureReason || "Card was declined."}</p>
               <Link
@@ -263,7 +263,7 @@ export default function OrderConfirmationPage() {
         </div>
 
         {/* ── Customer info card ── */}
-        <div className="border border-[#e1e1e1] rounded-[8px] overflow-hidden mb-6">
+        <div className="border border-[#e1e1e1] rounded-lg overflow-hidden mb-6">
           {/* Order items */}
           <div className="p-4 border-b border-[#e1e1e1]">
             <h2 className="text-[13px] font-semibold text-[#636363] uppercase tracking-wide mb-3">
@@ -273,7 +273,7 @@ export default function OrderConfirmationPage() {
               {order.items?.map((item, idx) => (
                 <div key={idx} className="flex items-center gap-3">
                   <div className="relative w-14 h-14 shrink-0">
-                    <div className="w-14 h-14 rounded-[6px] border border-[#e1e1e1] overflow-hidden bg-neutral-50">
+                    <div className="w-14 h-14 rounded-md border border-[#e1e1e1] overflow-hidden bg-neutral-50">
                       {item.image && (
                         <Image
                           src={item.image}
@@ -391,7 +391,7 @@ export default function OrderConfirmationPage() {
 
         {/* Customer Self-Service Cancellation Option */}
         {order.status !== "cancelled" && order.status !== "shipped" && order.status !== "delivered" && (
-          <div className="mb-6 p-4 rounded-[8px] border border-neutral-200 bg-neutral-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="mb-6 p-4 rounded-lg border border-neutral-200 bg-neutral-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <p className="text-[13px] font-medium text-neutral-800">Need to cancel this order?</p>
               <p className="text-[12px] text-neutral-500">

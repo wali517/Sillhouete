@@ -325,7 +325,7 @@ export default function AddToCart({ product, children }: { product: Product; chi
           role="dialog"
           aria-modal="true"
           aria-label="Size Chart"
-          className="fixed inset-0 z-[120] grid place-items-center bg-black/60 backdrop-blur-[2px] p-4 animate-fade-in"
+          className="fixed inset-0 z-120 grid place-items-center bg-black/60 backdrop-blur-[2px] p-4 animate-fade-in"
           onClick={() => setShowSizeChart(false)}
         >
           <div

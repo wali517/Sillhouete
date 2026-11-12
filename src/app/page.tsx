@@ -1,9 +1,14 @@
+import { Suspense } from "react";
 import HeroSlider from "@/components/home/HeroSlider";
 import CollectionSection from "@/components/home/CollectionSection";
 import MediaGrid from "@/components/home/MediaGrid";
 import EventSection from "@/components/home/EventSection";
 import InstagramFeed from "@/components/home/InstagramFeed";
 import NewsletterSection from "@/components/home/NewsletterSection";
+import {
+  CollectionSectionSkeleton,
+  MediaGridSkeleton,
+} from "@/components/ui/Skeletons";
 import { HERO_SLIDES } from "@/data/campaigns";
 import { getProductsByCollection, getSettings } from "@/lib/db";
 
@@ -49,41 +54,54 @@ const HOMEPAGE_SECTIONS = [
   },
 ];
 
-export default async function HomePage() {
-  // Fetch site settings (for dynamic campaign video) and products concurrently from MongoDB
-  const [settings, sections] = await Promise.all([
-    getSettings(),
-    Promise.all(
-      HOMEPAGE_SECTIONS.map(async (sec) => {
-        const products = await getProductsByCollection(sec.handle);
-        return {
-          ...sec,
-          products,
-        };
-      })
-    ),
-  ]);
+async function AsyncCollectionSection({
+  sec,
+}: {
+  sec: (typeof HOMEPAGE_SECTIONS)[number];
+}) {
+  const products = await getProductsByCollection(sec.handle, {
+    limit: 8,
+    lightweight: true,
+  });
 
+  return (
+    <CollectionSection
+      title={sec.title}
+      products={products}
+      href={`/collections/${sec.handle}`}
+      totalCount={products.length}
+      showNewBadge={sec.showNewBadge}
+      hideViewAll={sec.hideViewAll}
+      showViewAll={!sec.hideViewAll}
+      viewAllRed={sec.viewAllRed}
+    />
+  );
+}
+
+async function AsyncMediaGrid() {
+  const settings = await getSettings();
+  return <MediaGrid videoSrc={settings.campaignVideoUrl} />;
+}
+
+export default function HomePage() {
   return (
     <>
       <HeroSlider slides={HERO_SLIDES} />
 
-      {/* Only the original 5 homepage category sections */}
-      {sections.map((sec) => (
-        <CollectionSection
+      {/* Progressive Streaming: Each section streams in independently as soon as its 8 lightweight items resolve */}
+      {HOMEPAGE_SECTIONS.map((sec) => (
+        <Suspense
           key={sec.handle}
-          title={sec.title}
-          products={sec.products}
-          href={`/collections/${sec.handle}`}
-          totalCount={sec.products.length}
-          showNewBadge={sec.showNewBadge}
-          hideViewAll={sec.hideViewAll}
-          showViewAll={!sec.hideViewAll}
-          viewAllRed={sec.viewAllRed}
-        />
+          fallback={<CollectionSectionSkeleton title={sec.title} count={8} />}
+        >
+          <AsyncCollectionSection sec={sec} />
+        </Suspense>
       ))}
 
-      <MediaGrid videoSrc={settings.campaignVideoUrl} />
+      <Suspense fallback={<MediaGridSkeleton />}>
+        <AsyncMediaGrid />
+      </Suspense>
+
       <EventSection />
       <InstagramFeed />
       <NewsletterSection />

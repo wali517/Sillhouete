@@ -115,7 +115,7 @@ export default async function InfoPage({ params }: Props) {
   return (
     <article
       className={`mx-auto w-full ${
-        normalizedSlug === "spot" ? "max-w-[1240px]" : "max-w-[1050px]"
+        normalizedSlug === "spot" ? "max-w-310" : "max-w-[1050px]"
       } px-4 py-8 md:px-8 md:py-14`}
     >
       {/* 3. Spotted Page */}

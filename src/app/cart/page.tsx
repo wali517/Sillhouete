@@ -40,7 +40,7 @@ export default function CartPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[1240px] px-4 sm:px-6 md:px-8 py-10 md:py-14">
+    <div className="mx-auto max-w-310 px-4 sm:px-6 md:px-8 py-10 md:py-14">
       {/* ─── Centered Title & Continue Shopping Link (Matching sillhouete.com) ─── */}
       <div className="text-center mb-10 md:mb-14">
         <h1 className="font-serif text-[26px] md:text-[32px] uppercase tracking-[0.15em] text-[#111111]">
@@ -87,7 +87,7 @@ export default function CartPage() {
                     {/* Product Thumbnail (vertical dress framing) */}
                     <Link
                       href={`/products/${item.product.handle}`}
-                      className="relative w-[78px] sm:w-[92px] aspect-3/4 shrink-0 overflow-hidden bg-[#f4f4f4]"
+                      className="relative w-19.5 sm:w-23 aspect-3/4 shrink-0 overflow-hidden bg-[#f4f4f4]"
                     >
                       <Image
                         src={item.product.image}
@@ -215,7 +215,7 @@ export default function CartPage() {
                   setAgree(e.target.checked);
                   setError("");
                 }}
-                className="w-4 h-4 rounded-[2px] border-[#b5b5b5] text-black focus:ring-0 cursor-pointer"
+                className="w-4 h-4 rounded-xs border-[#b5b5b5] text-black focus:ring-0 cursor-pointer"
               />
               <span className="font-serif uppercase tracking-[0.14em] text-[10.5px] sm:text-[11px] text-[#333333] leading-tight">
                 I AGREE WITH THE TERMS AND CONDITIONS

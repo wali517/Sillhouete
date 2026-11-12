@@ -3,8 +3,8 @@
 import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  Search, Package, ChevronDown, Filter, Printer,
-  TrendingUp, Clock, CheckCircle, XCircle, Truck,
+  Search, Package, ChevronDown,
+  Clock, CheckCircle, Truck,
 } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import type { Order } from "@/types";
@@ -56,7 +56,9 @@ export default function AdminOrdersPage() {
     }
   };
 
-  useEffect(() => { fetchOrders(); }, []);
+  useEffect(() => {
+    void Promise.resolve().then(fetchOrders);
+  }, []);
 
   const showToast = (msg: string) => {
     setToast(msg);

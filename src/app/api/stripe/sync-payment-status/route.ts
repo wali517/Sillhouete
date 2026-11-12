@@ -2,16 +2,6 @@ import { NextResponse } from "next/server";
 import { getOrderById, markOrderPaidByStripe } from "@/lib/db";
 import { getStripeServer, fromStripeAmount, toStripeAmount, resolveStripeSecretKey } from "@/lib/stripe";
 
-/**
- * POST /api/stripe/sync-payment-status
- *
- * Called by the order-confirmation page immediately after redirect.
- * Directly queries Stripe API for the PaymentIntent status and if succeeded,
- * marks the order as paid — without waiting for a webhook.
- *
- * This ensures the order shows "Paid" even when running locally without
- * the Stripe CLI webhook forwarder.
- */
 export async function POST(req: Request) {
   try {
     await resolveStripeSecretKey();

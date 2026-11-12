@@ -65,8 +65,6 @@ export async function POST(req: Request) {
     const currency = (order.currency || "PKR").toLowerCase();
     const stripeAmount = toStripeAmount(order.total, currency);
 
-    // Guard: Stripe requires a minimum charge amount (≥ 50 cents USD equivalent)
-    // For PKR, minimum is ~140 PKR (14000 paisas). Our products are well above this.
     if (stripeAmount < 14000 && currency === "pkr") {
       return NextResponse.json(
         { error: `Order total Rs. ${order.total} is below the minimum charge amount for Stripe (Rs. 140). Please contact store support.` },

@@ -12,13 +12,11 @@ import {
   ExternalLink,
   UploadCloud,
   Loader2,
-  Check,
   X,
   AlertCircle,
   ArrowLeft,
   ChevronRight,
   Layers,
-  Eye,
   CheckCircle2,
   XCircle,
 } from "lucide-react";
@@ -75,7 +73,6 @@ export default function AdminCategoriesPage() {
   // 1. Fetch Main Categories
   const fetchMainCategories = async () => {
     try {
-      setLoadingMains(true);
       const res = await fetch("/api/categories?type=main");
       const data = await res.json();
       if (data.categories) {
@@ -88,33 +85,57 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  // 2. Fetch Subcategories for selected main category
-  const fetchSubcategories = async (mainCat: CategoryItem) => {
-    try {
-      setLoadingSubs(true);
-      const parentParam = mainCat.handle;
-      const res = await fetch(`/api/categories?parent=${encodeURIComponent(parentParam)}`);
-      const data = await res.json();
-      if (data.categories) {
-        setSubcategories(data.categories);
-      }
-    } catch (err) {
-      console.error("Failed to load subcategories:", err);
-    } finally {
-      setLoadingSubs(false);
-    }
-  };
-
   useEffect(() => {
-    fetchMainCategories();
+    let cancelled = false;
+
+    const loadMainCategories = async () => {
+      try {
+        const res = await fetch("/api/categories?type=main");
+        const data = await res.json();
+        if (!cancelled && data.categories) {
+          setMainCategories(data.categories);
+        }
+      } catch (err) {
+        console.error("Failed to load main categories:", err);
+      } finally {
+        if (!cancelled) setLoadingMains(false);
+      }
+    };
+
+    void loadMainCategories();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // When selectedMainCategory changes, fetch its subcategories
   useEffect(() => {
-    if (selectedMainCategory) {
-      fetchSubcategories(selectedMainCategory);
-      setSearch("");
-    }
+    if (!selectedMainCategory) return;
+
+    let cancelled = false;
+    const loadSubcategories = async () => {
+      try {
+        const parentParam = selectedMainCategory.handle;
+        const res = await fetch(`/api/categories?parent=${encodeURIComponent(parentParam)}`);
+        const data = await res.json();
+        if (!cancelled && data.categories) {
+          setSubcategories(data.categories);
+        }
+      } catch (err) {
+        console.error("Failed to load subcategories:", err);
+      } finally {
+        if (!cancelled) setLoadingSubs(false);
+      }
+    };
+
+    void Promise.resolve().then(() => {
+      if (cancelled) return;
+      setLoadingSubs(true);
+      return loadSubcategories();
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [selectedMainCategory]);
 
   // Open modal for Main Category

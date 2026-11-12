@@ -164,7 +164,7 @@ export default function ProductReviews({ productTitle }: { productTitle: string 
             <button
               type="button"
               onClick={() => setShowForm((prev) => !prev)}
-              className="w-full sm:w-auto text-center bg-[#108474] hover:bg-[#0c6b5e] text-white px-8 py-2.5 text-[13px] font-medium tracking-wide transition-colors rounded-[2px] cursor-pointer font-sans shadow-xs shrink-0"
+              className="w-full sm:w-auto text-center bg-[#108474] hover:bg-[#0c6b5e] text-white px-8 py-2.5 text-[13px] font-medium tracking-wide transition-colors rounded-xs cursor-pointer font-sans shadow-xs shrink-0"
             >
               {showForm ? "Cancel review" : "Write a review"}
             </button>
@@ -340,13 +340,13 @@ export default function ProductReviews({ productTitle }: { productTitle: string 
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="border border-[#108474] text-[#108474] hover:bg-[#108474]/5 px-8 py-2.5 text-[13px] font-medium tracking-wide transition-colors rounded-[2px] cursor-pointer font-sans bg-white"
+                className="border border-[#108474] text-[#108474] hover:bg-[#108474]/5 px-8 py-2.5 text-[13px] font-medium tracking-wide transition-colors rounded-xs cursor-pointer font-sans bg-white"
               >
                 Cancel review
               </button>
               <button
                 type="submit"
-                className="bg-[#108474] hover:bg-[#0c6b5e] text-white px-8 py-2.5 text-[13px] font-medium tracking-wide transition-colors rounded-[2px] cursor-pointer font-sans shadow-xs"
+                className="bg-[#108474] hover:bg-[#0c6b5e] text-white px-8 py-2.5 text-[13px] font-medium tracking-wide transition-colors rounded-xs cursor-pointer font-sans shadow-xs"
               >
                 Submit Review
               </button>
@@ -412,7 +412,7 @@ export default function ProductReviews({ productTitle }: { productTitle: string 
                   </strong>
 
                   {rev.verified && (
-                    <span className="rounded-[2px] bg-[#108474] px-1.5 py-0.5 text-[10.5px] font-bold text-white uppercase tracking-wider font-sans">
+                    <span className="rounded-xs bg-[#108474] px-1.5 py-0.5 text-[10.5px] font-bold text-white uppercase tracking-wider font-sans">
                       Verified
                     </span>
                   )}

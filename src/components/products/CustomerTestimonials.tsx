@@ -152,7 +152,7 @@ export default function CustomerTestimonials() {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="mx-auto max-w-[1240px] px-4">
+      <div className="mx-auto max-w-310 px-4">
         {/* Title & Overall Rating matching Screenshot 1 */}
         <div className="text-center mb-10">
           <h2 className="font-serif text-[20px] md:text-[24px] uppercase tracking-[0.2em] font-bold text-[#111111]">

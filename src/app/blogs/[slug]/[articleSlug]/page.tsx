@@ -85,7 +85,7 @@ export default async function BlogPostPage({ params }: Props) {
     <div className="bg-[#f8f6f3] min-h-screen">
       {/* Top Breadcrumb */}
       <div className="border-b border-[#ece8e1] bg-white">
-        <div className="mx-auto max-w-[1200px] px-4 py-3.5 sm:px-6">
+        <div className="mx-auto max-w-300 px-4 py-3.5 sm:px-6">
           <nav className="flex items-center gap-2 text-[11px] uppercase tracking-[1.5px] text-[#888]">
             <Link href="/" className="hover:text-black transition-colors">
               Home
@@ -126,7 +126,7 @@ export default async function BlogPostPage({ params }: Props) {
         {/* Featured Image */}
         {article.coverImage && (
           <div className="editorial-featured-image max-w-[760px] mx-auto mb-12 sm:mb-16">
-            <div className="relative aspect-[16/10] sm:aspect-[16/11] w-full overflow-hidden rounded-[2px] bg-[#eae6de]">
+            <div className="relative aspect-[16/10] sm:aspect-[16/11] w-full overflow-hidden rounded-xs bg-[#eae6de]">
               <Image
                 src={article.coverImage}
                 alt={article.title}
@@ -248,7 +248,7 @@ export default async function BlogPostPage({ params }: Props) {
       {/* Featured in this story products */}
       {featuredProducts.length > 0 && (
         <section className="bg-white py-16 border-t border-b border-[#eee]">
-          <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+          <div className="max-w-300 mx-auto px-4 sm:px-6">
             <div className="text-center mb-10">
               <span className="text-[11px] tracking-[2px] uppercase text-[#9a8065] font-medium block">
                 SHOP THE LOOK
@@ -269,7 +269,7 @@ export default async function BlogPostPage({ params }: Props) {
       {/* Editorial Related Section */}
       {related.length > 0 && (
         <section className="editorial-related bg-[#f8f6f3] py-16 md:py-24">
-          <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+          <div className="max-w-300 mx-auto px-4 sm:px-6">
             <h2 className="font-serif text-center text-[32px] sm:text-[38px] md:text-[42px] text-[#24201d] font-normal mb-12">
               Related Stories
             </h2>

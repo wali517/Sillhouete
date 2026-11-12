@@ -250,7 +250,7 @@ export default function AdminProductsPage() {
     setVideoUrl("");
     setVideoId("");
     setDescription("");
-    setFabric("Pure Raw Silk / Chiffon");
+    setFabric("");
     setSizes(["XS", "S", "M", "L", "XL"]);
     setInStock(true);
     setIsNew(true);
@@ -603,7 +603,7 @@ export default function AdminProductsPage() {
       {/* Filters & Search Header */}
       <div className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-3.5 shadow-xs sm:flex-row sm:items-center sm:justify-between">
         {/* Spacious Search Bar */}
-        <div className="relative flex-1 min-w-[240px] sm:max-w-md lg:max-w-lg">
+        <div className="relative flex-1 min-w-60 sm:max-w-md lg:max-w-lg">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="search"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { Plus, Edit, Trash2, FileText, Search, ExternalLink } from "lucide-react";
 import type { BlogPost } from "@/types";
@@ -39,7 +39,7 @@ export default function AdminBlogsPage() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
 
-  const fetchBlogs = async () => {
+  const fetchBlogs = useCallback(async () => {
     try {
       const res = await fetch("/api/blogs");
       const data = await res.json();
@@ -49,9 +49,27 @@ export default function AdminBlogsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { fetchBlogs(); }, []);
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch("/api/blogs")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled) setBlogs(data.blogs || []);
+      })
+      .catch(() => {
+        if (!cancelled) setBlogs([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
 

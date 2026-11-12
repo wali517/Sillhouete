@@ -11,7 +11,6 @@ export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const type = searchParams.get("type");
     const parent = searchParams.get("parent");
     const activeOnly = searchParams.get("active") === "true";
     const all = searchParams.get("all") === "true";

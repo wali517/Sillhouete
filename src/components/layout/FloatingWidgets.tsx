@@ -75,7 +75,7 @@ export default function FloatingWidgets() {
             <div
               role="listbox"
               aria-label="Currency"
-              className="currency-list absolute bottom-full left-0 mb-2.5 max-h-[238px] w-[205px] overflow-y-auto rounded-md bg-white shadow-[0_4px_22px_rgba(0,0,0,0.2)]"
+              className="currency-list absolute bottom-full left-0 mb-2.5 max-h-[238px] w-51.25 overflow-y-auto rounded-md bg-white shadow-[0_4px_22px_rgba(0,0,0,0.2)]"
             >
               <ul>
                 {CURRENCY_LIST.map((c) => (
@@ -88,7 +88,7 @@ export default function FloatingWidgets() {
                         setCurrency(c.code);
                         setCurrencyOpen(false);
                       }}
-                      className="flex h-[46px] w-full items-center gap-3 px-3.5 text-left text-[12.5px] tracking-wide text-neutral-700 transition-colors hover:bg-neutral-50"
+                      className="flex h-11.5 w-full items-center gap-3 px-3.5 text-left text-[12.5px] tracking-wide text-neutral-700 transition-colors hover:bg-neutral-50"
                     >
                       <Flag code={c.flag} size={24} />
                       <span>{c.label}</span>
