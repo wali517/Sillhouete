@@ -1,14 +1,9 @@
-import { Suspense } from "react";
 import HeroSlider from "@/components/home/HeroSlider";
 import CollectionSection from "@/components/home/CollectionSection";
 import MediaGrid from "@/components/home/MediaGrid";
 import EventSection from "@/components/home/EventSection";
 import InstagramFeed from "@/components/home/InstagramFeed";
 import NewsletterSection from "@/components/home/NewsletterSection";
-import {
-  CollectionSectionSkeleton,
-  MediaGridSkeleton,
-} from "@/components/ui/Skeletons";
 import { HERO_SLIDES } from "@/data/campaigns";
 import { getProductsByCollection, getSettings } from "@/lib/db";
 
@@ -54,54 +49,44 @@ const HOMEPAGE_SECTIONS = [
   },
 ];
 
-async function AsyncCollectionSection({
-  sec,
-}: {
-  sec: (typeof HOMEPAGE_SECTIONS)[number];
-}) {
-  const products = await getProductsByCollection(sec.handle, {
-    limit: 8,
-    lightweight: true,
-  });
+export default async function HomePage() {
+  // Fetch all required homepage data concurrently on the server before rendering
+  const [settings, sections] = await Promise.all([
+    getSettings(),
+    Promise.all(
+      HOMEPAGE_SECTIONS.map(async (sec) => {
+        const products = await getProductsByCollection(sec.handle, {
+          limit: 8,
+          lightweight: true,
+        });
+        return {
+          ...sec,
+          products,
+        };
+      })
+    ),
+  ]);
 
-  return (
-    <CollectionSection
-      title={sec.title}
-      products={products}
-      href={`/collections/${sec.handle}`}
-      totalCount={products.length}
-      showNewBadge={sec.showNewBadge}
-      hideViewAll={sec.hideViewAll}
-      showViewAll={!sec.hideViewAll}
-      viewAllRed={sec.viewAllRed}
-    />
-  );
-}
-
-async function AsyncMediaGrid() {
-  const settings = await getSettings();
-  return <MediaGrid videoSrc={settings.campaignVideoUrl} />;
-}
-
-export default function HomePage() {
   return (
     <>
       <HeroSlider slides={HERO_SLIDES} />
 
-      {/* Progressive Streaming: Each section streams in independently as soon as its 8 lightweight items resolve */}
-      {HOMEPAGE_SECTIONS.map((sec) => (
-        <Suspense
+      {/* All 5 homepage category sections pre-rendered completely from server */}
+      {sections.map((sec) => (
+        <CollectionSection
           key={sec.handle}
-          fallback={<CollectionSectionSkeleton title={sec.title} count={8} />}
-        >
-          <AsyncCollectionSection sec={sec} />
-        </Suspense>
+          title={sec.title}
+          products={sec.products}
+          href={`/collections/${sec.handle}`}
+          totalCount={sec.products.length}
+          showNewBadge={sec.showNewBadge}
+          hideViewAll={sec.hideViewAll}
+          showViewAll={!sec.hideViewAll}
+          viewAllRed={sec.viewAllRed}
+        />
       ))}
 
-      <Suspense fallback={<MediaGridSkeleton />}>
-        <AsyncMediaGrid />
-      </Suspense>
-
+      <MediaGrid videoSrc={settings.campaignVideoUrl} />
       <EventSection />
       <InstagramFeed />
       <NewsletterSection />

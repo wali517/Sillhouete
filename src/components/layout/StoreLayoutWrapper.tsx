@@ -9,10 +9,14 @@ import NewsletterPopup from "@/components/layout/NewsletterPopup";
 import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import FloatingWidgets from "@/components/layout/FloatingWidgets";
 
+import type { NavLink } from "@/types";
+
 export default function StoreLayoutWrapper({
   children,
+  initialNav,
 }: {
   children: React.ReactNode;
+  initialNav?: NavLink[];
 }) {
   const pathname = usePathname();
   const isIsolatedPage =
@@ -27,7 +31,7 @@ export default function StoreLayoutWrapper({
   return (
     <>
       <AnnouncementBar />
-      <Header />
+      <Header initialNav={initialNav} />
       <main id="main">{children}</main>
       <Footer />
       <CartDrawer />

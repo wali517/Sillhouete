@@ -10,15 +10,18 @@ import { useStore } from "@/components/providers/StoreProvider";
 import MobileMenu from "./MobileMenu";
 import PredictivePanel, { preloadSearchCatalog } from "@/components/search/PredictivePanel";
 
-export default function Header() {
+export default function Header({ initialNav }: { initialNav?: NavLink[] }) {
   const router = useRouter();
   const { count, setCartOpen } = useStore();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [navItems, setNavItems] = useState<NavLink[]>(NAV);
+  const [navItems, setNavItems] = useState<NavLink[]>(
+    initialNav && initialNav.length > 0 ? initialNav : NAV
+  );
 
   useEffect(() => {
+    if (initialNav && initialNav.length > 0) return;
     fetch("/api/categories/nav")
       .then((res) => res.json())
       .then((data) => {
@@ -27,7 +30,7 @@ export default function Header() {
         }
       })
       .catch(() => { });
-  }, []);
+  }, [initialNav]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

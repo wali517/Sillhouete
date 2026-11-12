@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -7,7 +6,6 @@ import {
   getCollectionByHandle,
 } from "@/lib/db";
 import CollectionViewer from "./CollectionViewer";
-import { CollectionPageSkeleton } from "@/components/ui/Skeletons";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -30,21 +28,6 @@ export default async function CollectionPage({ params, searchParams }: Props) {
   const { handle } = await params;
   const sParams = await searchParams;
   const initialPage = Number(sParams?.page) || 1;
-
-  return (
-    <Suspense fallback={<CollectionPageSkeleton />}>
-      <CollectionContent handle={handle} initialPage={initialPage} />
-    </Suspense>
-  );
-}
-
-async function CollectionContent({
-  handle,
-  initialPage,
-}: {
-  handle: string;
-  initialPage: number;
-}) {
   const isSale = handle === "sale-1" || handle === "sale";
 
   // Fetch collection document and products concurrently for optimal speed

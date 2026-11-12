@@ -251,7 +251,7 @@ export async function getProductsByCollection(
     }
 
     const projection = options?.lightweight
-      ? "id handle title price originalPrice images category collections isNew isBestSeller isSale sizes createdAt"
+      ? "id handle title price originalPrice priceFrom image hoverImage images alt ratio category collections isNew isBestSeller isSale sizes createdAt"
       : undefined;
 
     const docs = await ProductModel.find({ $or: orConditions }, projection)

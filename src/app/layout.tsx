@@ -3,6 +3,7 @@ import "./globals.css";
 import { SITE } from "@/data/site";
 import { StoreProvider } from "@/components/providers/StoreProvider";
 import StoreLayoutWrapper from "@/components/layout/StoreLayoutWrapper";
+import { getSettings, getNavigationMenu } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: `${SITE.title} – ${SITE.name}`,
@@ -20,7 +21,28 @@ export const viewport: Viewport = {
   themeColor: "#111111",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  let publicSettings = null;
+  let initialNav = undefined;
+
+  try {
+    const [settings, nav] = await Promise.all([
+      getSettings(),
+      getNavigationMenu(),
+    ]);
+    // Strip sensitive secrets before passing settings to client StoreProvider
+    const {
+      stripeSecretKey: _sk,
+      adminPassword: _ap,
+      smtpPass: _sp,
+      ...safeSettings
+    } = settings as typeof settings & { adminPassword?: string; smtpPass?: string };
+    publicSettings = safeSettings;
+    initialNav = nav;
+  } catch {
+    // Fallback to defaults if DB is temporarily unavailable
+  }
+
   return (
     <html lang="en">
       <head>
@@ -32,8 +54,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="font-serif antialiased">
-        <StoreProvider>
-          <StoreLayoutWrapper>{children}</StoreLayoutWrapper>
+        <StoreProvider initialSettings={publicSettings}>
+          <StoreLayoutWrapper initialNav={initialNav}>{children}</StoreLayoutWrapper>
         </StoreProvider>
       </body>
     </html>

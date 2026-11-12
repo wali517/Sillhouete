@@ -66,7 +66,13 @@ const CART_STORAGE_KEY = "sillhouete_cart_v1";
 const WISHLIST_STORAGE_KEY = "sillhouete_wishlist_v1";
 const CURRENCY_STORAGE_KEY = "sillhouete_currency_v1";
 
-export function StoreProvider({ children }: { children: ReactNode }) {
+export function StoreProvider({
+  children,
+  initialSettings,
+}: {
+  children: ReactNode;
+  initialSettings?: Partial<SiteSettings> | null;
+}) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [wishlist, setWishlist] = useState<string[]>([]);
@@ -75,11 +81,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const [tick, setTick] = useState(0);
   const [tickEpoch, setTickEpoch] = useState(0);
-  const [siteSettings, setSiteSettings] = useState<Partial<SiteSettings> | null>(null);
-  const [announcements, setAnnouncements] = useState<string[]>(DEFAULT_ANNOUNCEMENTS);
+  const [siteSettings, setSiteSettings] = useState<Partial<SiteSettings> | null>(
+    initialSettings || null
+  );
+  const [announcements, setAnnouncements] = useState<string[]>(
+    initialSettings?.announcements && initialSettings.announcements.length > 0
+      ? initialSettings.announcements
+      : DEFAULT_ANNOUNCEMENTS
+  );
 
-  // Fetch dynamic settings from database on mount
+  // Fetch dynamic settings only if not pre-loaded on the server
   useEffect(() => {
+    if (initialSettings) return;
     fetch("/api/settings")
       .then((r) => r.json())
       .then((d) => {
@@ -91,7 +104,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [initialSettings]);
 
   // One timer for the announcement bar and the hero slider so they always change together (every 5s).
   useEffect(() => {
