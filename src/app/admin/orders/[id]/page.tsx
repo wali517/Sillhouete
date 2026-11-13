@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import type { Order, NotificationRecord } from "@/types";
+import { AdminDetailSkeleton } from "@/components/admin/AdminSkeletons";
 
 const STATUS_OPTIONS = ["pending", "processing", "shipped", "delivered", "cancelled"];
 const PAYMENT_OPTIONS = [
@@ -208,11 +209,7 @@ export default function AdminOrderDetailPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh] text-gray-400">
-        Loading order details...
-      </div>
-    );
+    return <AdminDetailSkeleton />;
   }
 
   if (!order) {

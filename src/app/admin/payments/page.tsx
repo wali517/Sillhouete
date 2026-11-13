@@ -15,6 +15,7 @@ import {
 import { formatPrice } from "@/lib/format";
 import type { Order } from "@/types";
 import AdminPagination from "@/components/admin/AdminPagination";
+import { AdminMetricsCardsSkeleton } from "@/components/admin/AdminSkeletons";
 
 const PAYMENT_STATUS_COLORS: Record<string, string> = {
   pending: "bg-amber-100 text-amber-800 border-amber-200",
@@ -155,7 +156,10 @@ export default function AdminPaymentsPage() {
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {loading ? (
+        <AdminMetricsCardsSkeleton count={4} />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <button
           type="button"
           onClick={() => {
@@ -220,6 +224,7 @@ export default function AdminPaymentsPage() {
           <p className="text-xs text-gray-500 mt-1">Awaiting customer payment or webhook</p>
         </button>
       </div>
+      )}
 
       {/* Filters & Search */}
       <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
@@ -273,11 +278,27 @@ export default function AdminPaymentsPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {loading ? (
-                <tr>
-                  <td colSpan={5} className="py-12 text-center text-gray-400">
-                    Loading payments...
-                  </td>
-                </tr>
+                Array.from({ length: 6 }).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="py-4 px-4">
+                      <div className="h-4 w-28 bg-gray-200 rounded mb-1" />
+                      <div className="h-3 w-36 bg-gray-100 rounded" />
+                    </td>
+                    <td className="py-4 px-4">
+                      <div className="h-4 w-20 bg-gray-200 rounded mb-1" />
+                      <div className="h-3 w-16 bg-gray-100 rounded" />
+                    </td>
+                    <td className="py-4 px-4">
+                      <div className="h-3.5 w-44 bg-gray-100 rounded font-mono" />
+                    </td>
+                    <td className="py-4 px-4">
+                      <div className="h-5 w-20 bg-gray-200 rounded-full" />
+                    </td>
+                    <td className="py-4 px-4 text-right">
+                      <div className="h-8 w-20 bg-gray-200 rounded inline-block" />
+                    </td>
+                  </tr>
+                ))
               ) : filteredOrders.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-12 text-center text-gray-500">

@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import type { ContactMessage } from "@/types";
 import AdminPagination from "@/components/admin/AdminPagination";
+import { AdminMessagesSkeleton } from "@/components/admin/AdminSkeletons";
 
 const STATUS_COLORS: Record<string, string> = {
   unread: "bg-red-100 text-red-700",
@@ -196,9 +197,7 @@ export default function AdminMessagesPage() {
       {/* Messages List */}
       <div className="space-y-3">
         {loading ? (
-          <div className="bg-white rounded-xl p-8 text-center text-gray-400 text-sm shadow-xs">
-            Loading...
-          </div>
+          <AdminMessagesSkeleton count={4} />
         ) : filtered.length === 0 ? (
           <div className="bg-white rounded-xl p-8 text-center text-gray-400 text-sm shadow-xs">
             No messages found

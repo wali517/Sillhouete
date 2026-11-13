@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import type { Order } from "@/types";
+import { AdminDetailSkeleton } from "@/components/admin/AdminSkeletons";
 
 const PAYMENT_STATUS_COLORS: Record<string, string> = {
   pending: "bg-amber-100 text-amber-800 border-amber-300",
@@ -171,12 +172,7 @@ export default function AdminPaymentDetailPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-100 text-gray-500 text-sm">
-        <RefreshCw className="w-5 h-5 animate-spin mr-2 text-black" />
-        Loading payment record...
-      </div>
-    );
+    return <AdminDetailSkeleton />;
   }
 
   if (error || !order) {

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Plus, Edit, Trash2, FileText, Search, ExternalLink } from "lucide-react";
 import type { BlogPost } from "@/types";
 import AdminPagination from "@/components/admin/AdminPagination";
+import { AdminTableSkeleton } from "@/components/admin/AdminSkeletons";
 
 const CATEGORIES = [
   "Fashion & Style",
@@ -164,7 +165,10 @@ export default function AdminBlogsPage() {
         </div>
 
         {loading ? (
-          <div className="p-8 text-center text-gray-400 text-sm">Loading...</div>
+          <AdminTableSkeleton
+            columns={["Article", "Category", "Author", "Date", "Status", "Actions"]}
+            rows={5}
+          />
         ) : filtered.length === 0 ? (
           <div className="p-8 text-center text-gray-400 text-sm">No blog posts yet. Create your first one!</div>
         ) : (

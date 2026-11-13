@@ -6,6 +6,7 @@ import { Search, Users, TrendingUp, ShoppingBag } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import type { Customer } from "@/types";
 import AdminPagination from "@/components/admin/AdminPagination";
+import { AdminTableSkeleton } from "@/components/admin/AdminSkeletons";
 
 export default function AdminCustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -103,12 +104,15 @@ export default function AdminCustomersPage() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          {loading ? (
-            <div className="p-8 text-center text-gray-400 text-sm">Loading customers...</div>
-          ) : paginated.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 text-sm">No customers found</div>
-          ) : (
+        {loading ? (
+          <AdminTableSkeleton
+            columns={["Customer", "Phone", "Orders", "Total Spent", "Joined", "Actions"]}
+            rows={8}
+          />
+        ) : paginated.length === 0 ? (
+          <div className="p-8 text-center text-gray-400 text-sm">No customers found</div>
+        ) : (
+          <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wider">
@@ -149,8 +153,8 @@ export default function AdminCustomersPage() {
                 ))}
               </tbody>
             </table>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Pagination */}
         <AdminPagination

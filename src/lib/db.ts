@@ -53,12 +53,19 @@ function toPlainArray<T>(docs: unknown[]): T[] {
 
 /* ──────────────── PRODUCTS ──────────────── */
 
+let cachedAllProducts: { data: Product[]; expiresAt: number } | null = null;
+
 export async function getProducts(): Promise<Product[]> {
+  if (cachedAllProducts && Date.now() < cachedAllProducts.expiresAt) {
+    return cachedAllProducts.data;
+  }
   try {
     await connectDB();
     const docs = await ProductModel.find({}).sort({ createdAt: -1 }).lean();
     if (docs && docs.length > 0) {
-      return toPlainArray<Product>(docs);
+      const plain = toPlainArray<Product>(docs);
+      cachedAllProducts = { data: plain, expiresAt: Date.now() + 60_000 };
+      return plain;
     }
   } catch (err) {
     console.warn("MongoDB getProducts error:", err);
@@ -996,6 +1003,7 @@ export async function saveProduct(product: Partial<Product> & { title: string; p
       { $set: fullProduct },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
+    cachedAllProducts = null;
   } catch (err) {
     console.warn("MongoDB saveProduct fallback:", err);
   }
@@ -1007,6 +1015,7 @@ export async function deleteProduct(id: string): Promise<boolean> {
   try {
     await connectDB();
     const res = await ProductModel.deleteOne({ $or: [{ id }, { handle: id }] });
+    cachedAllProducts = null;
     return res.deletedCount > 0;
   } catch (err) {
     console.warn("MongoDB deleteProduct error:", err);

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, Package, Mail } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import type { Customer, Order } from "@/types";
+import { AdminDetailSkeleton } from "@/components/admin/AdminSkeletons";
 
 export default function AdminCustomerDetailPage() {
   const params = useParams();
@@ -26,7 +27,7 @@ export default function AdminCustomerDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <div className="flex items-center justify-center min-h-[60vh] text-gray-400">Loading...</div>;
+  if (loading) return <AdminDetailSkeleton />;
   if (!customer) return (
     <div className="text-center py-16">
       <p className="text-gray-500 mb-4">Customer not found</p>

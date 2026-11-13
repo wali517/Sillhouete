@@ -9,6 +9,7 @@ import {
 import { formatPrice } from "@/lib/format";
 import type { Order } from "@/types";
 import AdminPagination from "@/components/admin/AdminPagination";
+import { AdminTableSkeleton } from "@/components/admin/AdminSkeletons";
 
 const STATUS_OPTIONS = ["pending", "processing", "shipped", "delivered", "cancelled"];
 const PAYMENT_OPTIONS = ["pending", "processing", "paid", "failed", "partially_refunded", "refunded"];
@@ -182,12 +183,15 @@ export default function AdminOrdersPage() {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          {loading ? (
-            <div className="p-8 text-center text-gray-400 text-sm">Loading orders...</div>
-          ) : filtered.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 text-sm">No orders found</div>
-          ) : (
+        {loading ? (
+          <AdminTableSkeleton
+            columns={["Order", "Customer", "Date", "Items", "Total", "Payment", "Status", "Actions"]}
+            rows={8}
+          />
+        ) : filtered.length === 0 ? (
+          <div className="p-8 text-center text-gray-400 text-sm">No orders found</div>
+        ) : (
+          <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wider">
@@ -306,8 +310,8 @@ export default function AdminOrdersPage() {
 ))}
               </tbody>
             </table>
-          )}
-        </div>
+          </div>
+        )}
 
         <AdminPagination
           currentPage={currentPage}

@@ -23,6 +23,7 @@ import {
 import type { CategoryItem } from "@/types";
 import { uploadFileWithChunks } from "@/lib/upload-client";
 import AdminPagination from "@/components/admin/AdminPagination";
+import { AdminTableSkeleton } from "@/components/admin/AdminSkeletons";
 
 export default function AdminCategoriesPage() {
   // Navigation State: null = Level 1 (Main Categories list), CategoryItem = Level 2 (Subcategories of that Main Category)
@@ -495,12 +496,15 @@ export default function AdminCategoriesPage() {
 
       {/* ──────────────── LEVEL 1: MAIN CATEGORIES TABLE ──────────────── */}
       {!selectedMainCategory && (
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
+        <>
           {loadingMains ? (
-            <div className="flex h-64 items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-            </div>
-          ) : filteredMainCategories.length === 0 ? (
+            <AdminTableSkeleton
+              columns={["Order", "Category", "Slug", "Direct Products", "Subcategories", "Status", "Actions"]}
+              rows={6}
+            />
+          ) : (
+            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
+              {filteredMainCategories.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-12 text-center">
               <FolderTree className="h-12 w-12 text-gray-300 mb-3" />
               <h3 className="text-base font-medium text-gray-900">No Main Categories found</h3>
@@ -677,17 +681,21 @@ export default function AdminCategoriesPage() {
             onItemsPerPageChange={setItemsPerPage}
           />
         </div>
+        )}
+      </>
       )}
 
       {/* ──────────────── LEVEL 2: SUBCATEGORIES TABLE (INSIDE MAIN CATEGORY) ──────────────── */}
       {selectedMainCategory && (
         <div className="space-y-4">
-          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
-            {loadingSubs ? (
-              <div className="flex h-64 items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-              </div>
-            ) : filteredSubcategories.length === 0 ? (
+          {loadingSubs ? (
+            <AdminTableSkeleton
+              columns={["Subcategory", "Slug", "Products", "Status", "Actions"]}
+              rows={5}
+            />
+          ) : (
+            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
+              {filteredSubcategories.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-12 text-center">
                 <Layers className="h-12 w-12 text-gray-300 mb-3" />
                 <h3 className="text-base font-medium text-gray-900">
@@ -842,6 +850,7 @@ export default function AdminCategoriesPage() {
               onItemsPerPageChange={setItemsPerPage}
             />
           </div>
+          )}
         </div>
       )}
 

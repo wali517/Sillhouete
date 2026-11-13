@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Save, Plus, Trash2, Settings, CreditCard, Truck, Bell, Store, ShieldCheck, Mail, CheckCircle2, AlertCircle, Eye, EyeOff, Send, RefreshCw } from "lucide-react";
 import type { SiteSettings } from "@/types";
+import { AdminSettingsSkeleton } from "@/components/admin/AdminSkeletons";
 
 type Tab = "store" | "shipping" | "announcements" | "payment" | "discounts" | "security" | "email";
 
@@ -183,7 +184,7 @@ export default function AdminSettingsPage() {
     { key: "security", label: "Admin Account & Security", icon: ShieldCheck },
   ];
 
-  if (loading) return <div className="flex items-center justify-center min-h-[60vh] text-gray-400">Loading settings...</div>;
+  if (loading) return <AdminSettingsSkeleton />;
 
   return (
     <div className="space-y-6 max-w-3xl">

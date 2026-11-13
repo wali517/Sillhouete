@@ -23,6 +23,7 @@ import type { Product, CategoryItem } from "@/types";
 import { formatPrice } from "@/lib/format";
 import { uploadFileWithChunks } from "@/lib/upload-client";
 import AdminPagination from "@/components/admin/AdminPagination";
+import { AdminTableSkeleton } from "@/components/admin/AdminSkeletons";
 
 const ALL_SIZES = ["XS", "S", "M", "L", "XL", "Custom Size"];
 
@@ -668,14 +669,18 @@ export default function AdminProductsPage() {
       </div>
 
       {/* Products Table */}
-      <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-        {loading ? (
-          <div className="p-12 text-center text-sm text-gray-500">Loading catalog...</div>
-        ) : filteredProducts.length === 0 ? (
-          <div className="p-12 text-center text-sm text-gray-500">
-            No products found matching your filters.
-          </div>
-        ) : (
+      {loading ? (
+        <AdminTableSkeleton
+          columns={["Item", "Category", "Price (PKR)", "Gallery", "Stock", "Actions"]}
+          rows={8}
+        />
+      ) : (
+        <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          {filteredProducts.length === 0 ? (
+            <div className="p-12 text-center text-sm text-gray-500">
+              No products found matching your filters.
+            </div>
+          ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="border-b border-gray-200 bg-gray-50 uppercase tracking-wider text-gray-500 font-semibold">
@@ -807,6 +812,7 @@ export default function AdminProductsPage() {
           onItemsPerPageChange={setItemsPerPage}
         />
       </div>
+      )}
 
       {/* ===================== ADD / EDIT PRODUCT MODAL ===================== */}
       {isModalOpen && (

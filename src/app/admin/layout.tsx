@@ -20,6 +20,7 @@ import {
   CreditCard,
   FolderTree,
 } from "lucide-react";
+import { AdminShellSkeleton } from "@/components/admin/AdminSkeletons";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -37,7 +38,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+  const [authenticated, setAuthenticated] = useState<boolean | null>(() => {
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("slh_admin_authed") === "true" ? true : null;
+    }
+    return null;
+  });
 
   // Skip auth check if already on login page
   const isLoginPage = pathname === "/admin/login";
@@ -47,26 +53,44 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       return;
     }
 
+    let active = true;
     const checkAuth = async () => {
       try {
         const res = await fetch("/api/admin/auth");
         const data = await res.json();
+        if (!active) return;
         if (data.authenticated) {
           setAuthenticated(true);
+          try {
+            sessionStorage.setItem("slh_admin_authed", "true");
+          } catch {}
         } else {
           setAuthenticated(false);
+          try {
+            sessionStorage.removeItem("slh_admin_authed");
+          } catch {}
           router.push("/admin/login");
         }
       } catch {
+        if (!active) return;
         setAuthenticated(false);
+        try {
+          sessionStorage.removeItem("slh_admin_authed");
+        } catch {}
         router.push("/admin/login");
       }
     };
 
     checkAuth();
+    return () => {
+      active = false;
+    };
   }, [isLoginPage, router]);
 
   const handleLogout = async () => {
+    try {
+      sessionStorage.removeItem("slh_admin_authed");
+    } catch {}
     try {
       await fetch("/api/admin/auth", { method: "DELETE" });
       router.push("/admin/login");
@@ -80,11 +104,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   if (authenticated === null) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 text-sm text-gray-500">
-        Verifying administrator session...
-      </div>
-    );
+    return <AdminShellSkeleton />;
   }
 
   return (
