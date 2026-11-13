@@ -49,7 +49,7 @@ export default function NewsletterForm({ id, className = "" }: { id: string; cla
       <label htmlFor={id} className="sr-only">
         Enter your email
       </label>
-      <div className="flex h-11.5">
+      <div className="flex h-[46px] w-full">
         <input
           id={id}
           type="email"
@@ -63,12 +63,12 @@ export default function NewsletterForm({ id, className = "" }: { id: string; cla
           autoComplete="email"
           disabled={status === "loading" || status === "done"}
           aria-invalid={status === "error"}
-          className="min-w-0 flex-1 h-11.5 bg-transparent border border-[#1c1d1d] border-r-0 px-4 text-sm text-[#1c1d1d] placeholder:text-[#1c1d1d] placeholder:opacity-75 rounded-none outline-none focus:outline-none shadow-none"
+          className="min-w-0 flex-1 h-[46px] bg-transparent border border-[#1c1d1d] border-r-0 px-4 text-sm font-serif text-[#1c1d1d] placeholder:text-[#1c1d1d] placeholder:opacity-100 rounded-none outline-none focus:outline-none shadow-none"
         />
         <button
           type="submit"
           disabled={status === "loading"}
-          className="h-11.5 bg-black text-white px-5 md:px-6 rounded-none text-[13px] font-bold uppercase tracking-[0.3em] border border-black hover:bg-[#222222] transition-colors shrink-0 shadow-none flex items-center justify-center cursor-pointer"
+          className="h-[46px] bg-[#111111] text-white px-5 md:px-7 rounded-none text-[12px] md:text-[13px] font-bold uppercase tracking-[0.3em] border border-[#111111] hover:bg-[#2b2b2b] transition-colors shrink-0 shadow-none flex items-center justify-center cursor-pointer"
         >
           <span className="hidden md:inline">
             {status === "loading" ? "Subscribing..." : "Subscribe"}
