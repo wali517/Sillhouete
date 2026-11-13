@@ -45,5 +45,13 @@ const ProductSchema = new Schema(
   { timestamps: true, suppressReservedKeysWarning: true }
 );
 
+ProductSchema.index({ createdAt: -1 });
+ProductSchema.index({ collections: 1, createdAt: -1 });
+ProductSchema.index({ mainCategorySlug: 1, createdAt: -1 });
+ProductSchema.index({ subcategorySlug: 1, createdAt: -1 });
+ProductSchema.index({ isBestSeller: 1, createdAt: -1 });
+ProductSchema.index({ isNew: 1, createdAt: -1 });
+ProductSchema.index({ isSale: 1, createdAt: -1 });
+
 export const ProductModel: Model<mongoose.Document> =
   mongoose.models.Product || mongoose.model("Product", ProductSchema);

@@ -472,6 +472,7 @@ export async function saveCollection(col: {
     ).lean();
   }
 
+  cachedNav = null;
   return toPlain(doc) as CategoryItem;
 }
 
@@ -532,6 +533,7 @@ export async function deleteCategorySafely(handleOrId: string): Promise<{ succes
   }
 
   await CollectionModel.deleteOne({ _id: cat._id });
+  cachedNav = null;
   return { success: true };
 }
 
@@ -547,7 +549,14 @@ export async function deleteCollection(handle: string): Promise<boolean> {
 }
 
 /** Build dynamic Header navigation tree with Parent Categories and Child Category dropdowns */
-export async function getNavigationMenu(): Promise<NavLink[]> {
+let cachedNav: { data: NavLink[]; expiresAt: number } | null = null;
+let cachedSettings: { data: SiteSettings; expiresAt: number } | null = null;
+
+export const getNavigationMenu = cache(async function getNavigationMenu(): Promise<NavLink[]> {
+  if (cachedNav && Date.now() < cachedNav.expiresAt) {
+    return cachedNav.data;
+  }
+
   try {
     await connectDB();
 
@@ -567,31 +576,49 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       "accessories",
     ];
 
-    // 1. Fetch only verified active main categories from MongoDB
-    const mainDocs = await CollectionModel.find({
-      isMainCategory: true,
+    // 1. Fetch ALL verified active categories from MongoDB in ONE single fast query
+    const allDocs = await CollectionModel.find({
       isActive: { $ne: false },
-    }).lean();
+    })
+      .sort({ order: 1, createdAt: 1 })
+      .lean();
 
+    const mainDocs: any[] = [];
     const mainMap = new Map<string, any>();
-    for (const d of mainDocs) {
-      mainMap.set(d.handle, d);
+    const childrenByParent = new Map<string, any[]>();
+    const childrenByMainId = new Map<string, any[]>();
+
+    for (const d of allDocs) {
+      if (d.isMainCategory) {
+        mainDocs.push(d);
+        mainMap.set(d.handle, d);
+      } else {
+        if (d.parentHandle) {
+          const list = childrenByParent.get(d.parentHandle) || [];
+          list.push(d);
+          childrenByParent.set(d.parentHandle, list);
+        }
+        if (d.mainCategoryId) {
+          const list = childrenByMainId.get(String(d.mainCategoryId)) || [];
+          list.push(d);
+          childrenByMainId.set(String(d.mainCategoryId), list);
+        }
+      }
     }
 
-    const navItems: NavLink[] = [];
+    // Fast in-memory resolution (0ms, no extra database round-trips)
+    const getChildrenFor = (handle: string, id: string): NavLink[] => {
+      const byParent = childrenByParent.get(handle) || [];
+      const byId = childrenByMainId.get(id) || [];
+      const mergedMap = new Map<string, any>();
+      for (const item of [...byParent, ...byId]) {
+        if (item.isMainCategory) continue;
+        mergedMap.set(String(item._id), item);
+      }
 
-    // Helper to get active children of a main category (strictly no "View All", exclude main categories)
-    const getChildrenFor = async (handle: string, id: string): Promise<NavLink[]> => {
-      const subDocs = await CollectionModel.find({
-        $or: [{ parentHandle: handle }, { mainCategoryId: id }],
-        isMainCategory: { $ne: true },
-        isActive: { $ne: false },
-      })
-        .sort({ order: 1, createdAt: 1 })
-        .lean();
-
-      return subDocs
-        .filter((sub) => sub.title.toLowerCase().trim() !== "view all" && sub.handle !== "view-all")
+      const list = Array.from(mergedMap.values());
+      return list
+        .filter((sub) => sub.title && sub.title.toLowerCase().trim() !== "view all" && sub.handle !== "view-all")
         .map((sub) => ({
           label: sub.title,
           href: `/collections/${sub.handle}`,
@@ -600,11 +627,13 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
         }));
     };
 
+    const navItems: NavLink[] = [];
+
     // 1. Sale
     const saleDoc = mainMap.get("sale-1") || mainMap.get("sale");
     let saleChildren: NavLink[] | undefined = undefined;
     if (saleDoc) {
-      const dynamicChildren = await getChildrenFor(saleDoc.handle, String(saleDoc._id));
+      const dynamicChildren = getChildrenFor(saleDoc.handle, String(saleDoc._id));
       if (dynamicChildren.length > 0) saleChildren = dynamicChildren;
     }
     navItems.push({
@@ -619,7 +648,7 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
     const maahiDoc = mainMap.get("maahi-ii-luxury-eid-pret");
     let maahiChildren: NavLink[] | undefined = undefined;
     if (maahiDoc) {
-      const dynamicChildren = await getChildrenFor("maahi-ii-luxury-eid-pret", String(maahiDoc._id));
+      const dynamicChildren = getChildrenFor("maahi-ii-luxury-eid-pret", String(maahiDoc._id));
       if (dynamicChildren.length > 0) maahiChildren = dynamicChildren;
     }
     navItems.push({
@@ -637,7 +666,7 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       { label: "Lumiere Luxury Formals'26", href: "/collections/lumiere-luxury-formals26" },
     ];
     if (newArrivalsDoc) {
-      const dynamicChildren = await getChildrenFor("new-arrivals", String(newArrivalsDoc._id));
+      const dynamicChildren = getChildrenFor("new-arrivals", String(newArrivalsDoc._id));
       if (dynamicChildren.length > 0) {
         newArrivalsChildren = dynamicChildren;
       }
@@ -657,7 +686,7 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       { label: "Roshanara Bridal '22", href: "/collections/roshanara-bridal-22" },
     ];
     if (bridalDoc) {
-      const dynamicChildren = await getChildrenFor("bridal-dresses", String(bridalDoc._id));
+      const dynamicChildren = getChildrenFor("bridal-dresses", String(bridalDoc._id));
       if (dynamicChildren.length > 0) {
         bridalChildren = dynamicChildren;
       }
@@ -680,7 +709,7 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       { label: "Shawl Collection", href: "/collections/luxury-shawl" },
     ];
     if (formalDoc) {
-      const dynamicChildren = await getChildrenFor("formal-dresses", String(formalDoc._id));
+      const dynamicChildren = getChildrenFor("formal-dresses", String(formalDoc._id));
       if (dynamicChildren.length > 0) {
         formalChildren = dynamicChildren;
       }
@@ -702,7 +731,7 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       { label: "Riwaj Luxury Pret", href: "/collections/riwaj-luxury-pret" },
     ];
     if (luxPretDoc) {
-      const dynamicChildren = await getChildrenFor("luxury-pret", String(luxPretDoc._id));
+      const dynamicChildren = getChildrenFor("luxury-pret", String(luxPretDoc._id));
       if (dynamicChildren.length > 0) {
         // Prepend Maahi II Luxury Eid Pret if not already included
         const hasMaahi = dynamicChildren.some((c) => c.href.includes("maahi-ii"));
@@ -726,7 +755,7 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       { label: "Raha Eid Pret'26", href: "/collections/raha-eid-pret26", highlight: true },
     ];
     if (pretDoc) {
-      const dynamicChildren = await getChildrenFor("pret", String(pretDoc._id));
+      const dynamicChildren = getChildrenFor("pret", String(pretDoc._id));
       if (dynamicChildren.length > 0) {
         pretChildren = dynamicChildren;
       }
@@ -747,7 +776,7 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       { label: "Walima", href: "/collections/walima-dresses" },
     ];
     if (sbeDoc) {
-      const dynamicChildren = await getChildrenFor("shop-by-events", String(sbeDoc._id));
+      const dynamicChildren = getChildrenFor("shop-by-events", String(sbeDoc._id));
       if (dynamicChildren.length > 0) {
         sbeChildren = dynamicChildren;
       }
@@ -762,7 +791,7 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
     const bsDoc = mainMap.get("best-sellers");
     let bsChildren: NavLink[] | undefined = undefined;
     if (bsDoc) {
-      const dynamicChildren = await getChildrenFor("best-sellers", String(bsDoc._id));
+      const dynamicChildren = getChildrenFor("best-sellers", String(bsDoc._id));
       if (dynamicChildren.length > 0) bsChildren = dynamicChildren;
     }
     navItems.push({
@@ -775,7 +804,7 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
     const spottedDoc = mainMap.get("spotted");
     let spottedChildren: NavLink[] | undefined = undefined;
     if (spottedDoc) {
-      const dynamicChildren = await getChildrenFor("spotted", String(spottedDoc._id));
+      const dynamicChildren = getChildrenFor("spotted", String(spottedDoc._id));
       if (dynamicChildren.length > 0) spottedChildren = dynamicChildren;
     }
     navItems.push({
@@ -790,7 +819,7 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       { label: "Pouches & Clutches", href: "/collections/pouches-clutches" },
     ];
     if (accDoc) {
-      const dynamicChildren = await getChildrenFor("accessories", String(accDoc._id));
+      const dynamicChildren = getChildrenFor("accessories", String(accDoc._id));
       if (dynamicChildren.length > 0) {
         accChildren = dynamicChildren;
       }
@@ -804,7 +833,7 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
     // 12. Add any additional custom Main Categories created in Admin Panel
     for (const main of mainDocs) {
       if (OFFICIAL_ORDER.includes(main.handle)) continue;
-      const children = await getChildrenFor(main.handle, String(main._id));
+      const children = getChildrenFor(main.handle, String(main._id));
       navItems.push({
         label: main.title,
         href: `/collections/${main.handle}`,
@@ -812,12 +841,13 @@ export async function getNavigationMenu(): Promise<NavLink[]> {
       });
     }
 
+    cachedNav = { data: navItems, expiresAt: Date.now() + 60_000 };
     return navItems;
   } catch (err) {
     console.warn("getNavigationMenu error:", err);
     return NAV;
   }
-}
+});
 
 /** Exact / full match search filter for main search (when Enter is pressed). */
 export function matchExactProducts(query: string, catalog: Product[]): Product[] {
@@ -2100,6 +2130,10 @@ const INITIAL_SETTINGS: SiteSettings = {
 };
 
 export const getSettings = cache(async function getSettings(): Promise<SiteSettings> {
+  if (cachedSettings && Date.now() < cachedSettings.expiresAt) {
+    return cachedSettings.data;
+  }
+
   let settings: SiteSettings = {
     ...INITIAL_SETTINGS,
     stripePublishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "",
@@ -2128,10 +2162,12 @@ export const getSettings = cache(async function getSettings(): Promise<SiteSetti
     settings.stripeSecretKey = process.env.STRIPE_SECRET_KEY;
   }
 
+  cachedSettings = { data: settings, expiresAt: Date.now() + 60_000 };
   return settings;
 });
 
 export async function updateSettings(updates: Partial<SiteSettings>): Promise<SiteSettings> {
+  cachedSettings = null;
   try {
     await connectDB();
     const cleanUpdates = { ...updates };
