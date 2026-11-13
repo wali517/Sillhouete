@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getProducts, saveProduct } from "@/lib/db";
 
 export async function GET(req: Request) {
@@ -39,6 +40,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Title and price are required" }, { status: 400 });
     }
     const newProduct = await saveProduct(body);
+    try {
+      revalidatePath("/");
+      revalidatePath("/collections/[handle]");
+    } catch {}
     return NextResponse.json({ success: true, product: newProduct });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to create product";

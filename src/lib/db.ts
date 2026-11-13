@@ -135,6 +135,18 @@ function escapeRegex(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+let cachedAllCollections: { data: any[]; expiresAt: number } | null = null;
+
+async function getAllCollectionsCached(): Promise<any[]> {
+  if (cachedAllCollections && Date.now() < cachedAllCollections.expiresAt) {
+    return cachedAllCollections.data;
+  }
+  await connectDB();
+  const docs = await CollectionModel.find({ isActive: { $ne: false } }).lean();
+  cachedAllCollections = { data: docs, expiresAt: Date.now() + 60_000 };
+  return docs;
+}
+
 /** Fetch products by collection handle dynamically from MongoDB */
 export async function getProductsByCollection(
   collectionSlug: string,
@@ -155,14 +167,12 @@ export async function getProductsByCollection(
       { subcategoryId: slug },
     ];
 
-    // Look up the collection document to get title, handle, _id, and any children/parent
+    // Look up the collection in memory cache (0ms, no network round-trips)
     try {
-      const colDoc = await CollectionModel.findOne({
-        $or: [
-          { handle: slug },
-          { handle: { $regex: new RegExp(`^${escapeRegex(slug)}$`, "i") } },
-        ],
-      }).lean();
+      const allCols = await getAllCollectionsCached();
+      const colDoc = allCols.find(
+        (c) => c.handle === slug || c.handle?.toLowerCase() === slug
+      );
 
       if (colDoc) {
         const colIdStr = String(colDoc._id);
@@ -182,26 +192,22 @@ export async function getProductsByCollection(
         // If this is a main category, also include products from any of its subcategories
         const isMain = colDoc.isMainCategory || !colDoc.parentHandle;
         if (isMain) {
-          const subcats = await CollectionModel.find({
-            $or: [{ parentHandle: colDoc.handle }, { mainCategoryId: colIdStr }],
-          })
-            .select("handle title _id")
-            .lean();
+          const subcats = allCols.filter(
+            (c) => c.parentHandle === colDoc.handle || String(c.mainCategoryId) === colIdStr
+          );
 
-          if (subcats && subcats.length > 0) {
-            for (const sub of subcats) {
-              if (sub.handle) {
-                orConditions.push({ collections: sub.handle });
-                orConditions.push({ subcategorySlug: sub.handle });
-              }
-              if (sub._id) {
-                orConditions.push({ subcategoryId: String(sub._id) });
-              }
-              if (sub.title) {
-                const escSubTitle = escapeRegex(sub.title.trim());
-                orConditions.push({ category: { $regex: new RegExp(`^${escSubTitle}$`, "i") } });
-                orConditions.push({ subcategoryName: { $regex: new RegExp(`^${escSubTitle}$`, "i") } });
-              }
+          for (const sub of subcats) {
+            if (sub.handle) {
+              orConditions.push({ collections: sub.handle });
+              orConditions.push({ subcategorySlug: sub.handle });
+            }
+            if (sub._id) {
+              orConditions.push({ subcategoryId: String(sub._id) });
+            }
+            if (sub.title) {
+              const escSubTitle = escapeRegex(sub.title.trim());
+              orConditions.push({ category: { $regex: new RegExp(`^${escSubTitle}$`, "i") } });
+              orConditions.push({ subcategoryName: { $regex: new RegExp(`^${escSubTitle}$`, "i") } });
             }
           }
         }
@@ -473,6 +479,7 @@ export async function saveCollection(col: {
   }
 
   cachedNav = null;
+  cachedAllCollections = null;
   return toPlain(doc) as CategoryItem;
 }
 
@@ -534,6 +541,7 @@ export async function deleteCategorySafely(handleOrId: string): Promise<{ succes
 
   await CollectionModel.deleteOne({ _id: cat._id });
   cachedNav = null;
+  cachedAllCollections = null;
   return { success: true };
 }
 

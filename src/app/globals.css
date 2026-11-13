@@ -210,80 +210,17 @@ a[href*="/collections/raha-eid-pret26"] {
   animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* ---- In-view image entrance animation: full image reveals one after the other (Shopify Impulse effect) ---- */
+/* ---- Direct image display (No opacity:0 delay or blinking) ---- */
 .image-reveal-mask {
-  opacity: 0;
-  transform: translateY(12px) scale(0.99);
-  transition:
-    opacity 0.55s cubic-bezier(0.26, 0.54, 0.32, 1),
-    transform 0.55s cubic-bezier(0.26, 0.54, 0.32, 1);
-  will-change: opacity, transform;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
 }
 
 .image-reveal-mask.is-revealed {
-  opacity: 1;
-  transform: translateY(0) scale(1);
+  opacity: 1 !important;
+  transform: none !important;
 }
-
-/* Stagger delay across 4-column product grid: full image comes after the other */
-[data-aos="row-of-4"]:nth-child(4n + 1) .image-reveal-mask {
-  transition-delay: 0ms;
-}
-
-[data-aos="row-of-4"]:nth-child(4n + 2) .image-reveal-mask {
-  transition-delay: 130ms;
-}
-
-[data-aos="row-of-4"]:nth-child(4n + 3) .image-reveal-mask {
-  transition-delay: 260ms;
-}
-
-[data-aos="row-of-4"]:nth-child(4n + 4) .image-reveal-mask {
-  transition-delay: 390ms;
-}
-
-/* Stagger delay across 5-column event grid: full image comes after the other */
-[data-aos="row-of-5"]:nth-child(5n + 1) .image-reveal-mask {
-  transition-delay: 0ms;
-}
-
-[data-aos="row-of-5"]:nth-child(5n + 2) .image-reveal-mask {
-  transition-delay: 80ms;
-}
-
-[data-aos="row-of-5"]:nth-child(5n + 3) .image-reveal-mask {
-  transition-delay: 160ms;
-}
-
-[data-aos="row-of-5"]:nth-child(5n + 4) .image-reveal-mask {
-  transition-delay: 240ms;
-}
-
-[data-aos="row-of-5"]:nth-child(5n + 5) .image-reveal-mask {
-  transition-delay: 320ms;
-}
-
-/* Mobile 2-column view */
-@media (max-width: 639px) {
-
-  [data-aos="row-of-4"]:nth-child(2n + 1) .image-reveal-mask,
-  [data-aos="row-of-5"]:nth-child(2n + 1) .image-reveal-mask {
-    transition-delay: 0ms;
-  }
-
-  [data-aos="row-of-4"]:nth-child(2n + 2) .image-reveal-mask,
-  [data-aos="row-of-5"]:nth-child(2n + 2) .image-reveal-mask {
-    transition-delay: 140ms;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .image-reveal-mask {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-    transition-delay: 0ms !important;
-  }
 }
 
 @keyframes shine {

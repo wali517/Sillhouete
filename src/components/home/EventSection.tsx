@@ -1,36 +1,10 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { EVENTS } from "@/data/campaigns";
 
 export default function EventSection() {
-  const [inView, setInView] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    if (typeof IntersectionObserver === "undefined") {
-      setInView(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-          observer.unobserve(el);
-        }
-      },
-      { rootMargin: "60px 0px 0px 0px", threshold: 0.05 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <section ref={sectionRef} className="mx-auto w-full max-w-355 px-3.5 py-8 md:px-10 md:py-12">
+    <section className="mx-auto w-full max-w-355 px-3.5 py-8 md:px-10 md:py-12">
       <h2 className="mb-6 text-center text-[16px] font-semibold uppercase leading-none tracking-wider text-[#111111] sm:text-[17px] md:mb-8 md:text-[20px]">
         SHOP BY EVENT
       </h2>
@@ -43,7 +17,7 @@ export default function EventSection() {
             className="group relative block overflow-hidden"
           >
             <div className="relative aspect-[2/3] w-full overflow-hidden bg-[#f7f6f3]">
-              <div className={`image-reveal-mask h-full w-full ${inView ? "is-revealed" : ""}`}>
+              <div className="h-full w-full">
                 <Image
                   src={e.image}
                   alt={e.alt}

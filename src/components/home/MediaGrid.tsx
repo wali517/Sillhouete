@@ -84,12 +84,7 @@ export default function MediaGrid({ videoSrc }: { videoSrc?: string } = {}) {
           {renderVideo(0)}
         </div>
         <div className="relative w-full aspect-9/16 lg:aspect-auto lg:min-h-140 overflow-hidden">
-          <div
-            className={`image-reveal-mask h-full w-full ${
-              inView ? "is-revealed" : ""
-            }`}
-            style={{ transitionDelay: "120ms" }}
-          >
+          <div className="h-full w-full">
             <Image
               src={MEDIA_IMAGE}
               alt="Blush pink bridal lehenga with heavy silver embroidery"

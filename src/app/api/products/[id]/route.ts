@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { deleteProduct, getProductById, saveProduct } from "@/lib/db";
 
 type Props = { params: Promise<{ id: string }> };
@@ -20,6 +21,11 @@ export async function PUT(req: Request, { params }: Props) {
     const { id } = await params;
     const body = await req.json();
     const updated = await saveProduct({ ...body, id });
+    try {
+      revalidatePath("/");
+      revalidatePath(`/products/${updated.handle}`);
+      revalidatePath("/collections/[handle]");
+    } catch {}
     return NextResponse.json({ success: true, product: updated });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to update product";
@@ -32,6 +38,10 @@ export async function DELETE(req: Request, { params }: Props) {
     const { id } = await params;
     const deleted = await deleteProduct(id);
     if (!deleted) return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    try {
+      revalidatePath("/");
+      revalidatePath("/collections/[handle]");
+    } catch {}
     return NextResponse.json({ success: true });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to delete product";

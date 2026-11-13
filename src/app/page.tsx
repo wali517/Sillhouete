@@ -7,8 +7,7 @@ import NewsletterSection from "@/components/home/NewsletterSection";
 import { HERO_SLIDES } from "@/data/campaigns";
 import { getProductsByCollection, getSettings } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 // The exact original 5 homepage collections
 const HOMEPAGE_SECTIONS = [

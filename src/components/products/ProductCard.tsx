@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/types";
@@ -25,56 +24,22 @@ export default function ProductCard({
   index?: number;
   className?: string;
 }) {
-  const [inView, setInView] = useState(false);
-  const cardRef = useRef<HTMLElement>(null);
-
-  // Stagger reveal delay across columns
-  const colModulo = isThreeColumn ? 3 : 4;
-  const colIndex = index % colModulo;
-  const delayMs = colIndex * 120;
-
-  useEffect(() => {
-    const el = cardRef.current;
-    if (!el) return;
-
-    if (typeof IntersectionObserver === "undefined") {
-      setInView(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-          observer.unobserve(el);
-        }
-      },
-      { rootMargin: "60px 0px 0px 0px", threshold: 0.05 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
   const showSaleBadge = isSale || product.isSale || !!product.originalPrice;
   // In collection pages matching reference storefront, products display NEW badge unless on sale
   const showNewBadge = !showSaleBadge && (isNew || product.isNew !== false);
 
   // Aspect ratio: exactly 2/3 (150% height matching Shopify collection grid)
-  const imageAspect = isThreeColumn ? "aspect-[2/3]" : "aspect-[2/3]";
+  const imageAspect = "aspect-[2/3]";
 
   return (
     <article
-      ref={cardRef}
       data-aos={isThreeColumn ? "row-of-3" : "row-of-4"}
       className={`group relative ${className}`}
     >
       <div className="relative">
         <Link href={`/products/${product.handle}`} className="block" aria-label={product.title}>
           <div
-            className={`relative w-full overflow-hidden bg-[#f7f6f3] ${imageAspect} image-reveal-mask ${
-              inView ? "is-revealed" : ""
-            }`}
+            className={`relative w-full overflow-hidden bg-[#f7f6f3] ${imageAspect}`}
           >
             <Image
               src={product.image}
