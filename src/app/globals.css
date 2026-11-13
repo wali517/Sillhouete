@@ -210,16 +210,65 @@ a[href*="/collections/raha-eid-pret26"] {
   animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* ---- Direct image display (No opacity:0 delay or blinking) ---- */
+/* ---- In-view image entrance animation: smooth reveal as images scroll into viewport ---- */
 .image-reveal-mask {
-  opacity: 1 !important;
-  transform: none !important;
-  transition: none !important;
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
 }
 
 .image-reveal-mask.is-revealed {
   opacity: 1 !important;
-  transform: none !important;
+  transform: translateY(0) !important;
+}
+
+/* Stagger delay across 4-column product grid: full image comes after the other */
+[data-aos="row-of-4"]:nth-child(4n + 1) .image-reveal-mask {
+  transition-delay: 0ms;
+}
+
+[data-aos="row-of-4"]:nth-child(4n + 2) .image-reveal-mask {
+  transition-delay: 110ms;
+}
+
+[data-aos="row-of-4"]:nth-child(4n + 3) .image-reveal-mask {
+  transition-delay: 220ms;
+}
+
+[data-aos="row-of-4"]:nth-child(4n + 4) .image-reveal-mask {
+  transition-delay: 330ms;
+}
+
+/* Stagger delay across 5-column event grid: full image comes after the other */
+[data-aos="row-of-5"]:nth-child(5n + 1) .image-reveal-mask {
+  transition-delay: 0ms;
+}
+
+[data-aos="row-of-5"]:nth-child(5n + 2) .image-reveal-mask {
+  transition-delay: 80ms;
+}
+
+[data-aos="row-of-5"]:nth-child(5n + 3) .image-reveal-mask {
+  transition-delay: 160ms;
+}
+
+[data-aos="row-of-5"]:nth-child(5n + 4) .image-reveal-mask {
+  transition-delay: 240ms;
+}
+
+[data-aos="row-of-5"]:nth-child(5n + 5) .image-reveal-mask {
+  transition-delay: 320ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image-reveal-mask {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
 
 @keyframes shine {

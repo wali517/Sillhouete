@@ -14,8 +14,7 @@ import { getProductByHandle, getProducts, getSettings } from "@/lib/db";
 import type { Product } from "@/types";
 import { ChevronRight, Globe, ShieldCheck, Truck, RotateCcw, Share2 } from "lucide-react";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 type Props = { params: Promise<{ handle: string }> };
 

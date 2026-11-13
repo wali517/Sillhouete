@@ -2,8 +2,7 @@ import { getProducts } from "@/lib/db";
 import CartView from "@/components/cart/CartView";
 import type { Product } from "@/types";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 export const metadata = {
   title: "Your Shopping Cart – Sillhouete",

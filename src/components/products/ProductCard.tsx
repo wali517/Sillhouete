@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/types";
@@ -24,6 +25,36 @@ export default function ProductCard({
   index?: number;
   className?: string;
 }) {
+  // Reveal top row immediately (no initial page load blink); animate rows below the fold as they scroll into view
+  const isInitialAboveFold = priority || index < 4;
+  const [inView, setInView] = useState(isInitialAboveFold);
+  const cardRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (isInitialAboveFold) return;
+
+    const el = cardRef.current;
+    if (!el) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.unobserve(el);
+        }
+      },
+      { rootMargin: "100px 0px 0px 0px", threshold: 0.05 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isInitialAboveFold]);
+
   const showSaleBadge = isSale || product.isSale || !!product.originalPrice;
   // In collection pages matching reference storefront, products display NEW badge unless on sale
   const showNewBadge = !showSaleBadge && (isNew || product.isNew !== false);
@@ -33,13 +64,16 @@ export default function ProductCard({
 
   return (
     <article
+      ref={cardRef}
       data-aos={isThreeColumn ? "row-of-3" : "row-of-4"}
       className={`group relative ${className}`}
     >
       <div className="relative">
         <Link href={`/products/${product.handle}`} className="block" aria-label={product.title}>
           <div
-            className={`relative w-full overflow-hidden bg-[#f7f6f3] ${imageAspect}`}
+            className={`relative w-full overflow-hidden bg-[#f7f6f3] ${imageAspect} image-reveal-mask ${
+              inView ? "is-revealed" : ""
+            }`}
           >
             <Image
               src={product.image}

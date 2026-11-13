@@ -4,8 +4,7 @@ import { notFound } from "next/navigation";
 import { getBlogBySlug, getBlogs, getProducts } from "@/lib/db";
 import ProductCard from "@/components/products/ProductCard";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 type Props = { params: Promise<{ slug: string; articleSlug: string }> };
 

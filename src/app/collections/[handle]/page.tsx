@@ -7,8 +7,7 @@ import {
 } from "@/lib/db";
 import CollectionViewer from "./CollectionViewer";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 type Props = {
   params: Promise<{ handle: string }>;

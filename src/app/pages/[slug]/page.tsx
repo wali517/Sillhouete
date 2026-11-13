@@ -4,8 +4,7 @@ import { getSettings } from "@/lib/db";
 import livePagesData from "@/data/live-pages-content.json";
 import { ContactInquiryForm } from "@/components/ui/ContactInquiryForm";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 const livePages = livePagesData as Record<string, { title: string; html: string }>;
 
