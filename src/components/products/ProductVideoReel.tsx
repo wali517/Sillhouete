@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { Play } from "lucide-react";
 import { SITE } from "@/data/site";
+import { parseVideoSource } from "@/lib/video";
 
 interface ProductVideoReelProps {
   videoId?: string;
@@ -28,16 +29,11 @@ export default function ProductVideoReel({
   const modalVideoRef = useRef<HTMLVideoElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // If YouTube ID is SK1-CnWBQpo (which was removed from YouTube and causes black screen),
-  // we use the real Shopify MP4 video so it plays fluidly and never breaks.
-  const hasValidYouTube = Boolean(
-    videoId &&
-    videoId.length > 5 &&
-    videoId !== "SK1-CnWBQpo" &&
-    !videoUrl
-  );
-
-  const effectiveVideoSrc = videoUrl || defaultVideoUrl || DEFAULT_VIDEO_URL;
+  const parsed = parseVideoSource(videoUrl, videoId);
+  const fallbackSrc = defaultVideoUrl || DEFAULT_VIDEO_URL;
+  const isYouTube = parsed?.type === "youtube";
+  const resolvedYoutubeId = parsed?.type === "youtube" ? parsed.youtubeId : null;
+  const mp4Src = parsed?.type === "mp4" ? parsed.src : fallbackSrc;
 
   // Close modal on Escape key
   const handleKeyDown = useCallback(
@@ -98,10 +94,10 @@ export default function ProductVideoReel({
         >
           {/* Fluid Video Background */}
           <div className="h-full w-full overflow-hidden bg-black pointer-events-none">
-            {hasValidYouTube ? (
+            {isYouTube && resolvedYoutubeId ? (
               <iframe
                 ref={iframeRef}
-                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&playsinline=1&rel=0&modestbranding=1&loop=1&playlist=${videoId}&disablekb=1&enablejsapi=1`}
+                src={`https://www.youtube-nocookie.com/embed/${resolvedYoutubeId}?autoplay=1&mute=1&controls=0&playsinline=1&rel=0&modestbranding=1&loop=1&playlist=${resolvedYoutubeId}&disablekb=1&enablejsapi=1`}
                 title={`${productTitle} video reel`}
                 allow="autoplay; encrypted-media; picture-in-picture"
                 referrerPolicy="strict-origin-when-cross-origin"
@@ -111,7 +107,7 @@ export default function ProductVideoReel({
             ) : (
               <video
                 ref={videoRef}
-                src={effectiveVideoSrc}
+                src={mp4Src}
                 autoPlay
                 muted
                 loop
@@ -260,9 +256,9 @@ export default function ProductVideoReel({
 
             {/* Main Video View in 9/16 aspect ratio */}
             <div className="relative h-full w-full overflow-hidden bg-black">
-              {hasValidYouTube ? (
+              {isYouTube && resolvedYoutubeId ? (
                 <iframe
-                  src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=1&playsinline=1&rel=0&modestbranding=1&loop=1&playlist=${videoId}`}
+                  src={`https://www.youtube-nocookie.com/embed/${resolvedYoutubeId}?autoplay=1&mute=0&controls=1&playsinline=1&rel=0&modestbranding=1&loop=1&playlist=${resolvedYoutubeId}`}
                   title={`${productTitle} video modal`}
                   allow="autoplay; encrypted-media; picture-in-picture"
                   allowFullScreen
@@ -271,7 +267,7 @@ export default function ProductVideoReel({
               ) : (
                 <video
                   ref={modalVideoRef}
-                  src={effectiveVideoSrc}
+                  src={mp4Src}
                   autoPlay
                   controls
                   playsInline

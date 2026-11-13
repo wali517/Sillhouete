@@ -741,22 +741,24 @@ footer input[type="email"]:focus-visible {
 
 .igf {
   width: 100%;
-  max-width: 100%;
-  padding: 40px 22px 52px;
+  max-width: 1420px;
+  margin: 0 auto;
+  padding: 32px 14px 48px;
   background: #fff;
   overflow-x: clip;
 }
 
 .igf-title {
-  margin: 0 0 38px;
+  margin: 0 0 24px;
   padding: 0;
   text-align: center;
-  font-size: 21px;
-  line-height: 1.35;
+  font-family: var(--font-halant, "Halant", Georgia, serif);
+  font-size: 17px;
+  line-height: 1.2;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #000;
+  color: #111111;
 }
 
 .igf-grid {
@@ -821,11 +823,11 @@ footer input[type="email"]:focus-visible {
 
 @media (min-width: 640px) {
   .igf {
-    padding: 40px 54px 100px;
+    padding: 40px 32px 64px;
   }
   .igf-title {
-    margin-bottom: 40px;
-    font-size: 26px;
+    margin-bottom: 28px;
+    font-size: 19px;
   }
   .igf-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -837,6 +839,13 @@ footer input[type="email"]:focus-visible {
   }
   .igf-tile:nth-child(n + 7) {
     display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .igf-title {
+    margin-bottom: 32px;
+    font-size: 20px;
   }
 }
 

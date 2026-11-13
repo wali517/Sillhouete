@@ -24,6 +24,7 @@ import { formatPrice } from "@/lib/format";
 import { uploadFileWithChunks } from "@/lib/upload-client";
 import AdminPagination from "@/components/admin/AdminPagination";
 import { AdminTableSkeleton } from "@/components/admin/AdminSkeletons";
+import { parseVideoSource } from "@/lib/video";
 
 const ALL_SIZES = ["XS", "S", "M", "L", "XL", "Custom Size"];
 
@@ -486,8 +487,14 @@ export default function AdminProductsPage() {
       hoverImage: hoverImage.trim() || image.trim(),
       images: cleanGallery,
       customSizeImage: customSizeImage.trim() || undefined,
-      videoUrl: videoUrl.trim() || undefined,
-      videoId: videoId.trim() || undefined,
+      videoUrl: (() => {
+        const p = parseVideoSource(videoUrl, videoId);
+        return p?.type === "mp4" ? p.src : (p?.type === "youtube" ? p.watchUrl : (videoUrl.trim() || undefined));
+      })(),
+      videoId: (() => {
+        const p = parseVideoSource(videoUrl, videoId);
+        return p?.type === "youtube" ? p.youtubeId : (videoId.trim() || undefined);
+      })(),
       description: description.trim(),
       fabric: fabric.trim(),
       sizes,
@@ -1443,21 +1450,43 @@ export default function AdminProductsPage() {
                   </label>
                 </div>
 
-                {videoUrl && (
-                  <div className="rounded-lg border border-gray-200 p-2.5 bg-white flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-emerald-700">✓ Video Attached</span>
-                      <button
-                        type="button"
-                        onClick={() => setVideoUrl("")}
-                        className="text-xs text-red-600 hover:underline cursor-pointer"
-                      >
-                        Remove Video
-                      </button>
+                {(() => {
+                  const p = parseVideoSource(videoUrl, videoId);
+                  if (!p) return null;
+                  return (
+                    <div className="rounded-lg border border-gray-200 p-2.5 bg-white flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-emerald-700 flex items-center gap-1.5">
+                          <Check className="h-3.5 w-3.5" />
+                          {p.type === "youtube"
+                            ? `YouTube Video Attached (${p.youtubeId})`
+                            : "MP4 Video Attached"}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setVideoUrl("");
+                            setVideoId("");
+                          }}
+                          className="text-xs text-red-600 hover:underline cursor-pointer"
+                        >
+                          Remove Video
+                        </button>
+                      </div>
+                      {p.type === "youtube" ? (
+                        <iframe
+                          src={p.embedUrl}
+                          title="Video preview"
+                          allow="autoplay; encrypted-media; picture-in-picture"
+                          allowFullScreen
+                          className="h-48 w-full rounded bg-black border-0"
+                        />
+                      ) : (
+                        <video src={p.src} controls className="max-h-48 w-full rounded bg-black" />
+                      )}
                     </div>
-                    <video src={videoUrl} controls className="max-h-48 w-full rounded bg-black" />
-                  </div>
-                )}
+                  );
+                })()}
 
                 <div className="text-right">
                   {!showVideoUrlInput ? (
@@ -1472,10 +1501,17 @@ export default function AdminProductsPage() {
                     <div className="flex flex-col gap-2 pt-1 text-left">
                       <div className="flex items-center gap-2">
                         <input
-                          type="url"
+                          type="text"
                           value={videoUrl}
-                          onChange={(e) => setVideoUrl(e.target.value)}
-                          placeholder="Or enter direct video URL (.mp4)"
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setVideoUrl(val);
+                            const p = parseVideoSource(val, "");
+                            if (p && p.type === "youtube") {
+                              setVideoId(p.youtubeId);
+                            }
+                          }}
+                          placeholder="Paste YouTube link (https://www.youtube.com/watch?v=...) or MP4 URL"
                           className="flex-1 rounded-md border border-gray-300 p-2 text-xs outline-none focus:border-black bg-white"
                         />
                         <button
@@ -1489,7 +1525,14 @@ export default function AdminProductsPage() {
                       <input
                         type="text"
                         value={videoId}
-                        onChange={(e) => setVideoId(e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setVideoId(val);
+                          const p = parseVideoSource(val, val);
+                          if (p && p.type === "youtube" && !videoUrl) {
+                            setVideoUrl(p.watchUrl);
+                          }
+                        }}
                         placeholder="Or YouTube Video ID (e.g. 4mWBAj2s6yU)"
                         className="w-full rounded-md border border-gray-300 p-2 text-xs outline-none focus:border-black bg-white"
                       />
