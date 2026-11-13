@@ -14,10 +14,12 @@ export default async function SearchPage({ searchParams }: Props) {
   let catalog: Product[] = [];
 
   try {
-    if (term) {
-      results = await searchProducts(term);
-    }
-    catalog = await getProducts();
+    const [searchRes, allProds] = await Promise.all([
+      term ? searchProducts(term) : Promise.resolve([]),
+      getProducts(),
+    ]);
+    results = searchRes;
+    catalog = allProds;
   } catch (err) {
     console.warn("MongoDB search error:", err);
   }

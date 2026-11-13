@@ -69,10 +69,19 @@ export default async function ProductPage({ params }: Props) {
   const { handle } = await params;
   let product: Product | undefined = undefined;
   let settings = null;
+  let related: Product[] = [];
+
   try {
-    const [p, s] = await Promise.all([getProductByHandle(handle), getSettings()]);
+    const [p, s, allProds] = await Promise.all([
+      getProductByHandle(handle),
+      getSettings(),
+      getProducts(),
+    ]);
     product = p;
     settings = s;
+    if (product) {
+      related = allProds.filter((item) => item.handle !== handle).slice(0, 4);
+    }
   } catch {
     // ignore
   }
@@ -82,15 +91,6 @@ export default async function ProductPage({ params }: Props) {
   if (handle === "camilla") {
     if (!product.videoId) product.videoId = "4mWBAj2s6yU";
     if (!product.sku) product.sku = "RM-2-XS";
-  }
-
-  // Related products dynamically loaded from MongoDB
-  let related: Product[] = [];
-  try {
-    const allProds = await getProducts();
-    related = allProds.filter((p) => p.handle !== handle).slice(0, 4);
-  } catch {
-    related = [];
   }
 
   // Exact JSON-LD structured data as on the real Sillhouete website
