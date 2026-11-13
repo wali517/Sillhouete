@@ -25,20 +25,17 @@ export default function ProductCard({
   index?: number;
   className?: string;
 }) {
-  // Reveal top row immediately (no initial page load blink); animate rows below the fold as they scroll into view
-  const isInitialAboveFold = priority || index < 4;
-  const [inView, setInView] = useState(isInitialAboveFold);
+  // Animate all product cards smoothly as they enter viewport with staggered column delays
+  const [inView, setInView] = useState(false);
   const cardRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (isInitialAboveFold) return;
-
     const el = cardRef.current;
     if (!el) return;
 
     if (typeof IntersectionObserver === "undefined") {
-      setInView(true);
-      return;
+      const frame = window.requestAnimationFrame(() => setInView(true));
+      return () => window.cancelAnimationFrame(frame);
     }
 
     const observer = new IntersectionObserver(
@@ -48,12 +45,12 @@ export default function ProductCard({
           observer.unobserve(el);
         }
       },
-      { rootMargin: "100px 0px 0px 0px", threshold: 0.05 }
+      { rootMargin: "60px 0px 0px 0px", threshold: 0.05 }
     );
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [isInitialAboveFold]);
+  }, []);
 
   const showSaleBadge = isSale || product.isSale || !!product.originalPrice;
   // In collection pages matching reference storefront, products display NEW badge unless on sale

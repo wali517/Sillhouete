@@ -242,6 +242,30 @@ a[href*="/collections/raha-eid-pret26"] {
   transition-delay: 330ms;
 }
 
+/* Stagger delay across 3-column product grid */
+[data-aos="row-of-3"]:nth-child(3n + 1) .image-reveal-mask {
+  transition-delay: 0ms;
+}
+
+[data-aos="row-of-3"]:nth-child(3n + 2) .image-reveal-mask {
+  transition-delay: 110ms;
+}
+
+[data-aos="row-of-3"]:nth-child(3n + 3) .image-reveal-mask {
+  transition-delay: 220ms;
+}
+
+@media (max-width: 767px) {
+  [data-aos="row-of-4"]:nth-child(2n + 1) .image-reveal-mask,
+  [data-aos="row-of-3"]:nth-child(2n + 1) .image-reveal-mask {
+    transition-delay: 0ms;
+  }
+  [data-aos="row-of-4"]:nth-child(2n + 2) .image-reveal-mask,
+  [data-aos="row-of-3"]:nth-child(2n + 2) .image-reveal-mask {
+    transition-delay: 90ms;
+  }
+}
+
 /* Stagger delay across 5-column event grid: full image comes after the other */
 [data-aos="row-of-5"]:nth-child(5n + 1) .image-reveal-mask {
   transition-delay: 0ms;
