@@ -44,6 +44,8 @@ export interface IOrder extends Document {
     image: string;
     dupatta?: string;
     adOn?: string;
+    slip?: string;
+    choiceGroupSelections?: Record<string, string>;
     customSizeNote?: string;
   }>;
   subtotal: number;
@@ -142,6 +144,8 @@ const OrderSchema = new Schema<IOrder>(
         image: { type: String, default: "" },
         dupatta: String,
         adOn: String,
+        slip: String,
+        choiceGroupSelections: { type: Schema.Types.Mixed, default: undefined },
         customSizeNote: { type: String, default: "" },
       },
     ],

@@ -597,14 +597,13 @@ export default function AdminProductsPage() {
             <FolderTree className="h-4 w-4 text-black" />
             Manage Categories
           </Link>
-          <button
-            type="button"
-            onClick={openAddModal}
+          <Link
+            href="/admin/products/new"
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-black px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-white shadow-sm hover:bg-neutral-800 transition-colors cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             Add Product
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -786,14 +785,13 @@ export default function AdminProductsPage() {
                         >
                           <ExternalLink className="h-4 w-4" />
                         </Link>
-                        <button
-                          type="button"
-                          onClick={() => openEditModal(p)}
+                        <Link
+                          href={`/admin/products/${p.id}`}
                           className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-black transition-colors"
                           title="Edit Product"
                         >
                           <Edit className="h-4 w-4" />
-                        </button>
+                        </Link>
                         <button
                           type="button"
                           onClick={() => handleDelete(p.id, p.title)}

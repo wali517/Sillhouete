@@ -67,8 +67,24 @@ export default function CollectionViewer({
   // Sort state (default to "relevant" matching live site and screenshot)
   const [sort, setSort] = useState<SortOption>("relevant");
 
-  // Filters state
-  const [maxPrice, setMaxPrice] = useState<number>(464165);
+  // Dynamic upper price bound: highest product price in current collection or at least 500,000
+  const absoluteMaxPrice = useMemo(() => {
+    if (!initialProducts || initialProducts.length === 0) return 500000;
+    const highest = Math.max(...initialProducts.map((p) => Number(p.price) || 0));
+    return Math.max(highest, 500000);
+  }, [initialProducts]);
+
+  // Filters state (defaults to absoluteMaxPrice so NO product is ever filtered out on page load)
+  const [maxPrice, setMaxPrice] = useState<number>(() => {
+    if (!initialProducts || initialProducts.length === 0) return 500000;
+    const highest = Math.max(...initialProducts.map((p) => Number(p.price) || 0));
+    return Math.max(highest, 500000);
+  });
+
+  useEffect(() => {
+    setMaxPrice(absoluteMaxPrice);
+  }, [absoluteMaxPrice]);
+
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
@@ -109,14 +125,14 @@ export default function CollectionViewer({
 
   const clearAllFilters = () => {
     setCurrentPage(1);
-    setMaxPrice(464165);
+    setMaxPrice(absoluteMaxPrice);
     setSelectedColors([]);
     setSelectedSizes([]);
     setSelectedStyles([]);
   };
 
   const hasActiveFilters =
-    maxPrice < 464165 ||
+    maxPrice < absoluteMaxPrice ||
     selectedColors.length > 0 ||
     selectedSizes.length > 0 ||
     selectedStyles.length > 0;
@@ -291,8 +307,8 @@ export default function CollectionViewer({
               <input
                 type="range"
                 min={0}
-                max={464165}
-                step={2500}
+                max={absoluteMaxPrice}
+                step={Math.max(1000, Math.floor(absoluteMaxPrice / 100))}
                 value={maxPrice}
                 onChange={(e) => {
                   setCurrentPage(1);

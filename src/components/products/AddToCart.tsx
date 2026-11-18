@@ -3,12 +3,12 @@
 import { useMemo, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Minus, Plus, Ruler, X } from "lucide-react";
+import { Minus, Plus, Ruler, X, Check } from "lucide-react";
 import type { Product } from "@/types";
 import { useStore } from "@/components/providers/StoreProvider";
 import { SITE } from "@/data/site";
 
-const SIZES = ["XS", "S", "M", "L", "XL"];
+const DEFAULT_SIZES = ["XS", "S", "M", "L", "XL"];
 const EXPEDITE_FEE = 8000;
 const SAME_AS_SAMPLE = "Same as sample";
 const WITH_SLEEVES = "With sleeves";
@@ -28,43 +28,144 @@ export default function AddToCart({ product, children }: { product: Product; chi
   const router = useRouter();
   const { addToCart, setCartOpen, formatPrice } = useStore();
 
+  const hasCustomOptions = Boolean(product.options && product.options.length > 0);
+  const hasChoiceGroups = Boolean(product.choiceGroups && product.choiceGroups.length > 0);
+
+  // 1. Dynamic Options State (Size, Dupatta, AD ONS, Color, etc.)
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {};
+    if (product.options && product.options.length > 0) {
+      product.options.forEach((opt) => {
+        if (opt.values && opt.values.length > 0) {
+          initial[opt.name] = opt.values[0];
+        }
+      });
+    }
+    return initial;
+  });
+
+  // 2. Dynamic Customer Add-on Choice Groups State ("You may also add:")
+  const [choiceGroupSelections, setChoiceGroupSelections] = useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {};
+    if (product.choiceGroups && product.choiceGroups.length > 0) {
+      product.choiceGroups.forEach((cg, idx) => {
+        if (cg.choices && cg.choices.length > 0) {
+          const key = `${cg.title}__${idx}`;
+          initial[key] = cg.choices[0]; // e.g. "Select One" or "Same as sample"
+        }
+      });
+    }
+    return initial;
+  });
+
+  // Legacy fallback options
   const dupattaValues = useMemo(() => optionValues(product, "option2", product.dupattaOptions), [product]);
   const adOnValues = useMemo(() => optionValues(product, "option3", product.adOnOptions), [product]);
-
   const availableSizes = useMemo(() => {
-    return product.sizes?.length ? product.sizes : SIZES;
+    const list = product.sizes?.length ? [...product.sizes] : [...DEFAULT_SIZES];
+    if (!list.some((s) => s.toLowerCase().includes("custom"))) {
+      list.push("Custom Size");
+    }
+    return list;
   }, [product.sizes]);
 
-  const [size, setSize] = useState(() => (product.sizes?.length ? product.sizes[0] : "XS"));
-  const [dupatta, setDupatta] = useState("None");
-  const [adOn, setAdOn] = useState("None");
+  const [legacySize, setLegacySize] = useState(() => (product.sizes?.length ? product.sizes[0] : "XS"));
+  const [legacyDupatta, setLegacyDupatta] = useState("None");
+  const [legacyAdOn, setLegacyAdOn] = useState("None");
   const [expedite, setExpedite] = useState(false);
-  const [extra, setExtra] = useState(SAME_AS_SAMPLE);
+  const [legacyExtra, setLegacyExtra] = useState(SAME_AS_SAMPLE);
   const [qty, setQty] = useState(1);
   const [addedNotice, setAddedNotice] = useState(false);
   const [showSizeChart, setShowSizeChart] = useState(false);
   const [customSizeNote, setCustomSizeNote] = useState("");
 
-  const variantPrice = (sz: string, d: string, a: string) => {
-    const match = product.variants?.find(
-      (v) =>
-        (!v.option1 || v.option1.toLowerCase() === sz.toLowerCase()) &&
-        (isNone(v.option2) ? isNone(d) : (v.option2 ?? "").toLowerCase() === d.toLowerCase()) &&
-        (isNone(v.option3) ? isNone(a) : (v.option3 ?? "").toLowerCase() === a.toLowerCase()),
-    );
-    return match?.price ?? product.price;
-  };
+  // Current active size identifier
+  const activeSize = hasCustomOptions
+    ? selectedOptions["Size"] || selectedOptions["size"] || legacySize
+    : legacySize;
 
-  const unitPrice = variantPrice(size, dupatta, adOn) + (expedite ? EXPEDITE_FEE : 0);
-  const priceDiff = (d: string, a: string) => variantPrice(size, d, a) - variantPrice(size, "None", "None");
+  const activeDupatta = hasCustomOptions
+    ? selectedOptions["Dupatta"] || selectedOptions["dupatta"] || legacyDupatta
+    : legacyDupatta;
+
+  const activeAdOn = hasCustomOptions
+    ? selectedOptions["AD ONS"] || selectedOptions["Ad Ons"] || selectedOptions["ad on"] || legacyAdOn
+    : legacyAdOn;
+
+  // 3. Variant Matcher
+  const matchedVariant = useMemo(() => {
+    if (!product.variants || product.variants.length === 0) return null;
+
+    if (hasCustomOptions) {
+      // Find matching variant based on attributes
+      const found = product.variants.find((v) => {
+        if (v.attributes && v.attributes.length > 0) {
+          return v.attributes.every(
+            (attr) => (selectedOptions[attr.name] || "").toLowerCase() === attr.value.toLowerCase()
+          );
+        }
+        // Match by option1, option2, option3
+        const s = selectedOptions["Size"] || selectedOptions["size"] || legacySize;
+        const d = selectedOptions["Dupatta"] || selectedOptions["dupatta"] || legacyDupatta;
+        const a = selectedOptions["AD ONS"] || selectedOptions["Ad Ons"] || legacyAdOn;
+        return (
+          (!v.option1 || v.option1.toLowerCase() === s.toLowerCase()) &&
+          (isNone(v.option2) ? isNone(d) : (v.option2 ?? "").toLowerCase() === d.toLowerCase()) &&
+          (isNone(v.option3) ? isNone(a) : (v.option3 ?? "").toLowerCase() === a.toLowerCase())
+        );
+      });
+      if (found) return found;
+    }
+
+    // Legacy matching
+    return (
+      product.variants.find(
+        (v) =>
+          (!v.option1 || v.option1.toLowerCase() === legacySize.toLowerCase()) &&
+          (isNone(v.option2) ? isNone(legacyDupatta) : (v.option2 ?? "").toLowerCase() === legacyDupatta.toLowerCase()) &&
+          (isNone(v.option3) ? isNone(legacyAdOn) : (v.option3 ?? "").toLowerCase() === legacyAdOn.toLowerCase())
+      ) || null
+    );
+  }, [product.variants, hasCustomOptions, selectedOptions, legacySize, legacyDupatta, legacyAdOn]);
+
+  // Pricing Calculation
+  const basePrice = matchedVariant?.salePrice || matchedVariant?.price || product.price;
+  const originalComparePrice = matchedVariant?.salePrice
+    ? matchedVariant.price
+    : product.originalPrice || undefined;
+
+  const unitPrice = basePrice + (expedite ? EXPEDITE_FEE : 0);
+
+  // Dynamic SKU
+  const currentSku = matchedVariant?.sku || `${product.sku || product.handle.toUpperCase()}-${activeSize}`;
+
+  // In Stock check
+  const isItemInStock =
+    matchedVariant?.stock !== undefined ? matchedVariant.stock > 0 : product.inStock !== false;
+
+  // Derive slip choice from choiceGroups or legacy extra
+  const derivedSlipChoice = useMemo(() => {
+    if (hasChoiceGroups) {
+      const keys = Object.keys(choiceGroupSelections);
+      const values = Object.values(choiceGroupSelections).filter(
+        (v) => v && v.toLowerCase() !== "select one" && v.toLowerCase() !== "none"
+      );
+      return values.join(" | ");
+    }
+    return legacyExtra === WITH_SLEEVES ? WITH_SLEEVES : undefined;
+  }, [hasChoiceGroups, choiceGroupSelections, legacyExtra]);
 
   const payload = () => ({
-    size,
-    dupatta: !isNone(dupatta) ? dupatta : undefined,
-    adOn: !isNone(adOn) ? adOn : undefined,
+    size: activeSize,
+    dupatta: !isNone(activeDupatta) ? activeDupatta : undefined,
+    adOn: !isNone(activeAdOn) ? activeAdOn : undefined,
     expedite,
-    slip: extra === WITH_SLEEVES ? WITH_SLEEVES : undefined,
-    customSizeNote: size.toLowerCase().includes("custom") && customSizeNote.trim() ? customSizeNote.trim() : undefined,
+    slip: derivedSlipChoice || undefined,
+    choiceGroupSelections: hasChoiceGroups ? choiceGroupSelections : undefined,
+    customSizeNote:
+      activeSize.toLowerCase().includes("custom") && customSizeNote.trim()
+        ? customSizeNote.trim()
+        : undefined,
     unitPrice,
     quantity: qty,
   });
@@ -81,169 +182,283 @@ export default function AddToCart({ product, children }: { product: Product; chi
     router.push("/checkout");
   };
 
-  const dynamicSku = `${product.sku || product.handle.toUpperCase()}-${size}`;
-
   const optionButton = (selected: boolean) =>
-    `h-[36px] min-w-[48px] px-3.5 text-[13px] transition-colors cursor-pointer flex items-center justify-center border ${
-      selected ? "border-black text-black font-bold" : "border-neutral-300 text-neutral-600 hover:border-black"
+    `min-w-[52px] border px-4 py-2.5 text-[13px] font-semibold uppercase tracking-[0.1em] transition cursor-pointer flex items-center justify-center select-none ${
+      selected
+        ? "border-2 border-black text-black font-bold shadow-2xs"
+        : "border-neutral-300 text-neutral-700 hover:border-black"
     }`;
 
-  const isSleeveless = product.description?.toLowerCase().includes("sleeveless") || product.handle === "camilla";
+  const isSleeveless =
+    product.description?.toLowerCase().includes("sleeveless");
 
   return (
     <div className="space-y-4">
-      {/* Price matching live site */}
+      {/* Price matching live luxury store */}
       <div className="flex items-baseline gap-3">
-        <span className="text-[20px] font-bold text-black font-sans">{formatPrice(unitPrice)}</span>
-        {product.originalPrice && (
-          <span className="text-sm text-neutral-400 line-through font-sans">{formatPrice(product.originalPrice)}</span>
+        <span className="text-[22px] font-bold text-black font-sans">{formatPrice(unitPrice)}</span>
+        {originalComparePrice && originalComparePrice > unitPrice && (
+          <span className="text-sm text-neutral-400 line-through font-sans">
+            {formatPrice(originalComparePrice)}
+          </span>
+        )}
+        {!isItemInStock && (
+          <span className="text-xs font-bold text-red-600 uppercase tracking-wider bg-red-50 px-2 py-0.5 rounded">
+            Sold Out
+          </span>
         )}
       </div>
 
       {children}
 
-      {/* SIZE */}
-      <div>
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-black font-sans">
-            S I Z E
-          </span>
-          <button
-            type="button"
-            onClick={() => setShowSizeChart(true)}
-            className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wider text-neutral-600 hover:text-black underline cursor-pointer"
-          >
-            <Ruler className="h-3.5 w-3.5" />
-            Size Guide
-          </button>
+      {/* ──────────────── DYNAMIC VARIANT OPTIONS (Size, Dupatta, AD ONS, Color, etc.) ──────────────── */}
+      {hasCustomOptions ? (
+        <div className="space-y-4">
+          {product.options!.map((opt, optIdx) => {
+            const isSize = opt.name.toLowerCase() === "size";
+            const currentSelected = selectedOptions[opt.name] || opt.values[0];
+
+            return (
+              <div key={`${opt.name}-${optIdx}`} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[12px] font-bold uppercase tracking-[0.2em] text-black font-sans">
+                    {opt.name}
+                  </span>
+                  {isSize && (
+                    <button
+                      type="button"
+                      onClick={() => setShowSizeChart(true)}
+                      className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-wider text-black font-semibold hover:underline cursor-pointer"
+                    >
+                      <Ruler className="h-4 w-4" />
+                      Size Guide
+                    </button>
+                  )}
+                </div>
+
+                {(() => {
+                  const sizeOptionsList = isSize && !opt.values.some((v) => v.toLowerCase().includes("custom"))
+                    ? [...opt.values, "Custom Size"]
+                    : opt.values;
+
+                  return (
+                    <div className="flex flex-wrap gap-2">
+                      {sizeOptionsList.map((val, valIdx) => {
+                        const isSelected = currentSelected === val;
+                        return (
+                          <button
+                            key={`${val}-${valIdx}`}
+                            type="button"
+                            onClick={() =>
+                              setSelectedOptions((prev) => ({ ...prev, [opt.name]: val }))
+                            }
+                            aria-pressed={isSelected}
+                            className={`${optionButton(isSelected)} font-sans`}
+                          >
+                            {val}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+
+                {isSize && currentSelected.toLowerCase().includes("custom") && (
+                  <div className="mt-2.5 p-3 bg-neutral-50 border border-neutral-200 rounded space-y-2 text-xs">
+                    <label className="font-bold uppercase tracking-wider text-black">
+                      Custom Measurements / Sizing Fit
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={customSizeNote}
+                      onChange={(e) => setCustomSizeNote(e.target.value)}
+                      placeholder="Please enter your custom measurements (e.g. Chest, Waist, Hips, Shirt Length, Sleeves, Shoulders)..."
+                      className="w-full text-xs p-2.5 border border-neutral-300 rounded outline-none focus:border-black bg-white"
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
-        <div className="flex flex-wrap gap-2.5">
-          {availableSizes.map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setSize(s)}
-              aria-pressed={size === s}
-              className={`${optionButton(size === s)} font-sans`}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-        {size.toLowerCase().includes("custom") && (
-          <div className="mt-3 p-3 bg-neutral-50 border border-neutral-200 rounded-lg space-y-2">
+      ) : (
+        /* Legacy Size, Dupatta, Ad-Ons fallback */
+        <div className="space-y-4">
+          {/* SIZE */}
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-black">
-                Custom Measurements / Sizing Note
-              </label>
-              <span className="text-[10px] text-neutral-500">Optional or provide your fit</span>
+              <span className="text-[12px] font-bold uppercase tracking-[0.2em] text-black font-sans">
+                Size
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowSizeChart(true)}
+                className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-wider text-black font-semibold hover:underline cursor-pointer"
+              >
+                <Ruler className="h-4 w-4" />
+                Size Guide
+              </button>
             </div>
-            <textarea
-              rows={2}
-              value={customSizeNote}
-              onChange={(e) => setCustomSizeNote(e.target.value)}
-              placeholder="e.g. Chest: 36, Waist: 30, Hips: 40, Shirt Length: 42, Shoulder: 15..."
-              className="w-full text-xs p-2.5 border border-neutral-300 rounded outline-none focus:border-black bg-white resize-none"
-            />
-            <p className="text-[11px] text-neutral-500">
-              Your custom measurements will be attached directly to your order and tailored by our atelier.
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* DUPATTA — only for products that really have the option */}
-      {dupattaValues.length > 0 && (
-        <div>
-          <div className="mb-2 text-[12px] font-bold uppercase tracking-wider text-black font-sans">Dupatta</div>
-          <div className="flex flex-wrap gap-2.5">
-            {["None", ...dupattaValues].map((opt) => {
-              const diff = isNone(opt) ? 0 : priceDiff(opt, adOn) - priceDiff("None", adOn);
-              return (
+            <div className="flex flex-wrap gap-2">
+              {availableSizes.map((s) => (
                 <button
-                  key={opt}
+                  key={s}
                   type="button"
-                  onClick={() => setDupatta(opt)}
-                  aria-pressed={dupatta === opt}
-                  className={`${optionButton(dupatta === opt)} font-sans`}
+                  onClick={() => setLegacySize(s)}
+                  aria-pressed={legacySize === s}
+                  className={`${optionButton(legacySize === s)} font-sans`}
                 >
-                  {opt}
-                  {diff > 0 && <span className="ml-1 font-normal">(+{formatPrice(diff)})</span>}
+                  {s}
                 </button>
-              );
-            })}
+              ))}
+            </div>
+            {legacySize.toLowerCase().includes("custom") && (
+              <div className="mt-2.5 p-3 bg-neutral-50 border border-neutral-200 rounded space-y-2 text-xs">
+                <label className="font-bold uppercase tracking-wider text-black">
+                  Custom Measurements
+                </label>
+                <textarea
+                  rows={2}
+                  value={customSizeNote}
+                  onChange={(e) => setCustomSizeNote(e.target.value)}
+                  placeholder="Chest, Waist, Hips, Shirt Length, Shoulder..."
+                  className="w-full text-xs p-2.5 border border-neutral-300 rounded outline-none focus:border-black bg-white"
+                />
+              </div>
+            )}
           </div>
+
+          {/* DUPATTA */}
+          {dupattaValues.length > 0 && (
+            <div className="space-y-2">
+              <span className="text-[12px] font-bold uppercase tracking-[0.2em] text-black font-sans">
+                Dupatta
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {["None", ...dupattaValues].map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => setLegacyDupatta(opt)}
+                    aria-pressed={legacyDupatta === opt}
+                    className={`${optionButton(legacyDupatta === opt)} font-sans`}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* AD ONS */}
+          {adOnValues.length > 0 && (
+            <div className="space-y-2">
+              <span className="text-[12px] font-bold uppercase tracking-[0.2em] text-black font-sans">
+                Ad Ons
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {["None", ...adOnValues].map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => setLegacyAdOn(opt)}
+                    aria-pressed={legacyAdOn === opt}
+                    className={`${optionButton(legacyAdOn === opt)} font-sans`}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      {/* AD ONS — only for products that really have the option */}
-      {adOnValues.length > 0 && (
-        <div>
-          <div className="mb-2 text-[12px] font-bold uppercase tracking-wider text-black font-sans">Ad Ons</div>
-          <div className="flex flex-wrap gap-2.5">
-            {["None", ...adOnValues].map((opt) => {
-              const diff = isNone(opt) ? 0 : priceDiff(dupatta, opt) - priceDiff(dupatta, "None");
-              return (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => setAdOn(opt)}
-                  aria-pressed={adOn === opt}
-                  className={`${optionButton(adOn === opt)} font-sans`}
-                >
-                  {opt}
-                  {diff > 0 && <span className="ml-1 font-normal">(+{formatPrice(diff)})</span>}
-                </button>
-              );
-            })}
-          </div>
+      {/* ──────────────── CUSTOMER ADD-ON CHOICE GROUPS ("You may also add:") ──────────────── */}
+      {hasChoiceGroups ? (
+        <div className="space-y-4 pt-1">
+          {product.choiceGroups!.map((cg, groupIdx) => {
+            const groupKey = `${cg.title}__${groupIdx}`;
+            const currentSelected =
+              choiceGroupSelections[groupKey] || choiceGroupSelections[cg.title] || cg.choices[0];
+            return (
+              <div key={groupKey} className="space-y-2">
+                <p className="text-[12px] font-bold uppercase tracking-[0.2em] text-black font-sans">
+                  {cg.title}
+                </p>
+                <div className="space-y-2 text-[13.5px] font-sans">
+                  {cg.choices.map((choice, choiceIdx) => (
+                    <label
+                      key={`${choice}-${choiceIdx}`}
+                      className="flex cursor-pointer items-center gap-3 select-none text-neutral-800 hover:text-black"
+                    >
+                      <input
+                        type="radio"
+                        name={`choice-group-${groupIdx}`}
+                        value={choice}
+                        checked={currentSelected === choice}
+                        onChange={() =>
+                          setChoiceGroupSelections((prev) => ({
+                            ...prev,
+                            [groupKey]: choice,
+                          }))
+                        }
+                        className="h-4 w-4 accent-black cursor-pointer"
+                      />
+                      <span className={choice.toLowerCase() === "select one" ? "text-neutral-500 font-normal" : "font-medium"}>
+                        {choice}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
-      )}
-
-      {/* EXPEDITE ORDER - Exactly matching live screenshot */}
-      <div className="pt-1">
-        <div className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.25em] text-black font-sans">
-          E X P E D I T E &nbsp; O R D E R
-        </div>
-        <label className="flex items-center gap-3 border border-neutral-300 bg-white px-3.5 py-3 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={expedite}
-            onChange={(e) => setExpedite(e.target.checked)}
-            className="h-4 w-4 rounded-none accent-black cursor-pointer"
-          />
-          <span className="text-[12px] font-bold uppercase tracking-wide text-black font-sans">
-            EXPRESS - SHIPPING (5 - 6 WORKING DAYS) [+PKR {EXPEDITE_FEE}]
-          </span>
-        </label>
-      </div>
-
-      {/* YOU MAY ALSO ADD - Only for sleeveless dresses like Camilla */}
-      {isSleeveless && (
-        <div className="pt-1">
-          <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-black font-sans">
+      ) : isSleeveless ? (
+        /* Legacy sleeveless slips fallback */
+        <div className="space-y-2 pt-1">
+          <p className="text-[12px] font-bold uppercase tracking-[0.2em] text-black font-sans">
             You may also add:
-          </div>
-          <div className="space-y-2 text-[13px] font-sans">
+          </p>
+          <div className="space-y-2 text-[13.5px] font-sans">
             {[SAME_AS_SAMPLE, WITH_SLEEVES].map((opt) => (
-              <label key={opt} className="flex items-center gap-2.5 cursor-pointer select-none">
+              <label key={opt} className="flex cursor-pointer items-center gap-3 select-none text-neutral-800">
                 <input
                   type="radio"
                   name="extra_option"
-                  checked={extra === opt}
-                  onChange={() => setExtra(opt)}
+                  checked={legacyExtra === opt}
+                  onChange={() => setLegacyExtra(opt)}
                   className="h-4 w-4 accent-black cursor-pointer"
                 />
-                <span className="text-[12.5px] font-bold uppercase tracking-wide text-black font-sans">
-                  {opt}
-                </span>
+                <span className="font-medium">{opt}</span>
               </label>
             ))}
           </div>
         </div>
+      ) : null}
+
+      {/* ──────────────── EXPEDITE ORDER ──────────────── */}
+      {product.expressAllowed !== false && (
+        <div className="space-y-2 pt-1">
+          <p className="text-[12px] font-bold uppercase tracking-[0.2em] text-black font-sans">
+            Expedite Order
+          </p>
+          <label className="flex cursor-pointer items-center gap-3.5 border border-neutral-300 bg-white px-4 py-3.5 select-none hover:border-black transition">
+            <input
+              type="checkbox"
+              checked={expedite}
+              onChange={(e) => setExpedite(e.target.checked)}
+              className="h-4 w-4 accent-black cursor-pointer rounded-none"
+            />
+            <span className="text-[12px] font-bold uppercase tracking-wider text-black font-sans">
+              Express-shipping (5-6 working days) [+Rs.8,000]
+            </span>
+          </label>
+        </div>
       )}
 
-      {/* Quantity matching live_top.png */}
+      {/* Quantity Selector */}
       <div className="flex items-center gap-3 pt-2">
         <div className="inline-flex items-center border border-neutral-300 rounded-full px-2 py-1">
           <button
@@ -268,32 +483,30 @@ export default function AddToCart({ product, children }: { product: Product; chi
         </div>
       </div>
 
-      {/* 3 Full-width CTAs exactly matching Image 3 */}
+      {/* Action Buttons */}
       <div className="space-y-2.5 pt-2">
-        {/* ADD TO CART (Solid Black, White Text) */}
         <button
           type="button"
+          disabled={!isItemInStock}
           onClick={handleAddToCart}
-          className="w-full bg-black hover:bg-neutral-900 py-3.5 text-center font-sans text-[13px] font-bold uppercase tracking-wider text-white transition-colors cursor-pointer"
+          className="w-full bg-black hover:bg-neutral-900 py-3.5 text-center font-sans text-[13px] font-bold uppercase tracking-wider text-white transition-colors cursor-pointer disabled:opacity-40"
         >
-          {addedNotice ? "✓ ADDED TO CART" : "ADD TO CART"}
+          {addedNotice ? "✓ ADDED TO CART" : !isItemInStock ? "SOLD OUT" : "ADD TO CART"}
         </button>
 
-        {/* BUY IT NOW (Solid Light Grey #e8e8e8, Black Text matching Image 3) */}
         <button
           type="button"
+          disabled={!isItemInStock}
           onClick={handleBuyNow}
-          className="w-full bg-[#e8e8e8] hover:bg-[#dedede] py-3.5 text-center font-sans text-[13px] font-bold uppercase tracking-wider text-black border-0 transition-colors cursor-pointer"
+          className="w-full bg-[#e8e8e8] hover:bg-[#dedede] py-3.5 text-center font-sans text-[13px] font-bold uppercase tracking-wider text-black border-0 transition-colors cursor-pointer disabled:opacity-40"
         >
           BUY IT NOW
         </button>
 
-        {/* CHAT WITH FASHION CONSULTANT (Solid Green #0a8f2e with WhatsApp icon matching Image 3) */}
+        {/* WhatsApp Chat button */}
         <a
           href={`https://wa.me/923310397865?text=${encodeURIComponent(
-            `Hi Sillhouete, I am interested in ${product.title} (SKU: ${dynamicSku}, Size: ${size}${
-              !isNone(dupatta) ? `, Dupatta: ${dupatta}` : ""
-            }). Could you please share more details?`,
+            `Hi Sillhouete, I am interested in ${product.title} (${currentSku}, ${activeSize}). Could you please share more details?`
           )}`}
           target="_blank"
           rel="noopener noreferrer"
@@ -305,21 +518,19 @@ export default function AddToCart({ product, children }: { product: Product; chi
           <span>CHAT WITH FASHION CONSULTANT</span>
         </a>
 
-        {/* Payment badges matching Image 3 */}
+        {/* Payment Badges */}
         <div className="flex items-center justify-center gap-2 pt-1 text-[11px] text-neutral-600 font-sans">
           <span>We accept</span>
-          {/* GPay badge */}
           <span className="inline-flex items-center border border-neutral-200 px-1.5 py-0.5 bg-white text-[10px] font-bold text-black">
             GPay
           </span>
-          {/* ApplePay badge */}
           <span className="inline-flex items-center border border-neutral-200 px-1.5 py-0.5 bg-white text-[10px] font-bold text-black">
             ApplePay
           </span>
         </div>
       </div>
 
-      {/* Size Chart Modal */}
+      {/* ──────────────── SIZE CHART MODAL ──────────────── */}
       {showSizeChart && (
         <div
           role="dialog"
@@ -329,7 +540,7 @@ export default function AddToCart({ product, children }: { product: Product; chi
           onClick={() => setShowSizeChart(false)}
         >
           <div
-            className="relative max-h-[90vh] w-full max-w-[680px] overflow-y-auto bg-white p-6 shadow-2xl"
+            className="relative max-h-[90vh] w-full max-w-[680px] overflow-y-auto bg-white p-6 shadow-2xl rounded"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-black/10 pb-3 mb-4">
@@ -338,7 +549,7 @@ export default function AddToCart({ product, children }: { product: Product; chi
                   Sillhouete Size Guide
                 </span>
                 <h3 className="font-serif text-[18px] font-bold uppercase tracking-wider text-black">
-                  Standard Measurement Chart
+                  Measurement Chart
                 </h3>
               </div>
               <button
@@ -351,11 +562,11 @@ export default function AddToCart({ product, children }: { product: Product; chi
               </button>
             </div>
 
-            {product.customSizeImage ? (
+            {product.sizeChartImage || product.customSizeImage ? (
               <div className="py-2 space-y-3">
                 <div className="relative mx-auto max-w-full overflow-hidden rounded border border-neutral-200 bg-neutral-50 p-2">
                   <Image
-                    src={product.customSizeImage}
+                    src={product.sizeChartImage || product.customSizeImage!}
                     alt={`${product.title} Size Chart`}
                     width={800}
                     height={1000}
@@ -363,10 +574,11 @@ export default function AddToCart({ product, children }: { product: Product; chi
                   />
                 </div>
                 <p className="text-center text-xs text-neutral-500">
-                  Custom size chart &amp; guidelines for {product.title}.
+                  Custom size chart for {product.title}.
                 </p>
               </div>
             ) : (
+              /* Standard Sillhouete Chart */
               <div className="space-y-4 text-center font-sans">
                 <div className="flex items-center justify-center py-1">
                   <Image
@@ -379,10 +591,10 @@ export default function AddToCart({ product, children }: { product: Product; chi
                 </div>
 
                 <div className="bg-black text-white py-1.5 text-[14px] font-bold uppercase tracking-wider">
-                  Size Chart
+                  Standard Measurement Chart (Inches)
                 </div>
                 <div className="text-[12px] font-bold uppercase tracking-wider text-neutral-800">
-                  {product.title.toUpperCase()} &bull; {product.sku || "STANDARD SIZE"}
+                  {product.title.toUpperCase()} &bull; {currentSku}
                 </div>
 
                 <div className="overflow-x-auto">
@@ -445,39 +657,39 @@ export default function AddToCart({ product, children }: { product: Product; chi
                 <div className="bg-black text-white py-1.5 text-[14px] font-bold uppercase tracking-wider mt-4">
                   Trouser Size
                 </div>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-neutral-300 text-[12px]">
-                  <thead>
-                    <tr className="bg-neutral-100 text-black font-bold">
-                      <th className="border border-neutral-300 px-3 py-2 text-left">Details</th>
-                      <th className="border border-neutral-300 px-3 py-2">Ex Small</th>
-                      <th className="border border-neutral-300 px-3 py-2">Small</th>
-                      <th className="border border-neutral-300 px-3 py-2">Medium</th>
-                      <th className="border border-neutral-300 px-3 py-2">Large</th>
-                      <th className="border border-neutral-300 px-3 py-2">Ex Large</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Waist</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">14</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">15</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">17</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">19</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">19.5</td>
-                    </tr>
-                    <tr>
-                      <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Sharara Length</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">45</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">45</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">45</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">46</td>
-                      <td className="border border-neutral-300 px-3 py-1.5">46</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border border-neutral-300 text-[12px]">
+                    <thead>
+                      <tr className="bg-neutral-100 text-black font-bold">
+                        <th className="border border-neutral-300 px-3 py-2 text-left">Details</th>
+                        <th className="border border-neutral-300 px-3 py-2">Ex Small</th>
+                        <th className="border border-neutral-300 px-3 py-2">Small</th>
+                        <th className="border border-neutral-300 px-3 py-2">Medium</th>
+                        <th className="border border-neutral-300 px-3 py-2">Large</th>
+                        <th className="border border-neutral-300 px-3 py-2">Ex Large</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Waist</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">14</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">15</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">17</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">19</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">19.5</td>
+                      </tr>
+                      <tr>
+                        <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Sharara Length</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">45</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">45</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">45</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">46</td>
+                        <td className="border border-neutral-300 px-3 py-1.5">46</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
             )}
           </div>
         </div>

@@ -16,6 +16,44 @@ import { ChevronRight, Globe, ShieldCheck, Truck, RotateCcw, Share2 } from "luci
 
 export const revalidate = 60;
 
+function FormattedDetailsSection({ text, title }: { text?: string; title?: string }) {
+  if (!text || !text.trim()) return null;
+
+  const lines = text.split("\n").map((l) => l.trim());
+
+  return (
+    <div className="space-y-3 pt-3 border-t border-black/10 text-[13px] leading-relaxed text-black/85">
+      {title && <h3 className="font-serif font-semibold text-[14px] uppercase tracking-wider text-black">{title}</h3>}
+      <div className="space-y-1">
+        {lines.map((line, idx) => {
+          if (!line) {
+            return <div key={idx} className="h-1.5" />;
+          }
+
+          const colonIdx = line.indexOf(":");
+          if (colonIdx > 0 && colonIdx < line.length - 1) {
+            const key = line.substring(0, colonIdx).trim();
+            const val = line.substring(colonIdx + 1).trim();
+            return (
+              <p key={idx} className="text-black/85">
+                <strong className="text-black font-semibold">{key}:</strong> {val}
+              </p>
+            );
+          } else if (line.endsWith(":")) {
+            return (
+              <h4 key={idx} className="font-semibold text-black text-[13px] pt-1">
+                {line}
+              </h4>
+            );
+          } else {
+            return <p key={idx} className="text-black/80">{line}</p>;
+          }
+        })}
+      </div>
+    </div>
+  );
+}
+
 type Props = { params: Promise<{ handle: string }> };
 
 export async function generateMetadata({ params }: Props) {
@@ -28,9 +66,7 @@ export async function generateMetadata({ params }: Props) {
   }
   if (!p) return { title: "Product – Sillhouete" };
 
-  const pageTitle = p.handle === "iris-rm-03"
-    ? "Iris Royal Blue Shirt & Sharara | Sillhouete"
-    : `${p.title} – Pakistani Designer Outfit | Sillhouete`;
+  const pageTitle = `${p.title} – Pakistani Designer Outfit | Sillhouete`;
 
   return {
     title: pageTitle,
@@ -86,11 +122,6 @@ export default async function ProductPage({ params }: Props) {
   }
 
   if (!product) notFound();
-
-  if (handle === "camilla") {
-    if (!product.videoId) product.videoId = "4mWBAj2s6yU";
-    if (!product.sku) product.sku = "RM-2-XS";
-  }
 
   // Exact JSON-LD structured data as on the real Sillhouete website
   const jsonLd = {
@@ -225,6 +256,18 @@ export default async function ProductPage({ params }: Props) {
           {/* Right Column: Product Info, Options, Description & Size Guide */}
           <div className="space-y-4 text-black">
             <div>
+              {/* Sale Badge & Sale Note Banner */}
+              {(product.onSale || product.isSale) && (
+                <div className="inline-flex items-center gap-2 bg-black text-white px-3 py-1 text-xs font-bold uppercase tracking-widest rounded-sm mb-2">
+                  <span>ON SALE</span>
+                  {product.saleNote && (
+                    <span className="bg-white/20 px-1.5 py-0.5 rounded text-[11px] font-semibold tracking-normal">
+                      {product.saleNote}
+                    </span>
+                  )}
+                </div>
+              )}
+
               {/* Title matching frame_01_3.0s.jpg */}
               <h1 className="font-serif text-[26px] md:text-[32px] tracking-normal text-[#111111] font-semibold leading-tight">
                 {product.title}
@@ -311,132 +354,52 @@ export default async function ProductPage({ params }: Props) {
               dangerouslySetInnerHTML={{ __html: description.bodyHtml }}
             />
 
+            {/* Ready-Made & Garment Details from Admin */}
+            {product.readyMadeDetails && (
+              <FormattedDetailsSection text={product.readyMadeDetails} title="Fabric & Garment Detail" />
+            )}
+
+            {/* Unstitched Fabric Details from Admin */}
+            {product.unstitchedDetails && (
+              <FormattedDetailsSection text={product.unstitchedDetails} title="Unstitched Details" />
+            )}
+
+            {/* Fabric Overview, Color & Garment Style */}
+            {(product.fabric || product.color || product.style) && (
+              <div className="space-y-1.5 pt-3 border-t border-black/10 text-[13px] leading-relaxed text-black/85">
+                <h3 className="font-serif font-semibold text-[14px] uppercase tracking-wider text-black">Product Details</h3>
+                {product.fabric && (
+                  <p className="text-black/85">
+                    <strong className="text-black font-semibold">Fabric:</strong> {product.fabric}
+                  </p>
+                )}
+                {product.color && (
+                  <p className="text-black/85">
+                    <strong className="text-black font-semibold">Color:</strong> {product.color}
+                  </p>
+                )}
+                {product.style && (
+                  <p className="text-black/85">
+                    <strong className="text-black font-semibold">Style:</strong> {product.style}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Official or Custom Size Chart */}
-            {product.customSizeImage ? (
+            {(product.sizeChartImage || product.customSizeImage) ? (
               <div className="pt-6 space-y-3 font-sans text-center">
                 <div className="bg-black text-white py-1.5 text-[14px] font-bold uppercase tracking-wider">
                   Size Chart
                 </div>
                 <div className="overflow-hidden rounded border border-neutral-200 bg-neutral-50 p-2">
                   <Image
-                    src={product.customSizeImage}
+                    src={product.sizeChartImage || product.customSizeImage!}
                     alt={`${product.title} Size Chart`}
                     width={800}
                     height={1000}
                     className="w-full h-auto object-contain mx-auto"
                   />
-                </div>
-              </div>
-            ) : product.handle === "camilla" ? (
-              <div className="pt-6 space-y-4 font-sans text-center">
-                <div className="flex items-center justify-center py-1">
-                  <Image
-                    src={SITE.logo}
-                    alt="Sillhouete"
-                    width={160}
-                    height={50}
-                    className="h-10 w-auto object-contain"
-                  />
-                </div>
-
-                <div className="bg-black text-white py-1.5 text-[14px] font-bold uppercase tracking-wider">
-                  Size Chart
-                </div>
-                <div className="text-[12px] font-bold uppercase tracking-wider text-neutral-800">
-                  {product.title.toUpperCase()} &bull; ARTICLE CODE: (RM-02)
-                </div>
-
-                <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
-                  <table className="w-full min-w-[480px] border-collapse border border-neutral-300 text-[12px]">
-                    <thead>
-                      <tr className="bg-neutral-100 text-black font-bold">
-                        <th className="border border-neutral-300 px-3 py-2 text-left">Details</th>
-                        <th className="border border-neutral-300 px-3 py-2">Ex Small</th>
-                        <th className="border border-neutral-300 px-3 py-2">Small</th>
-                        <th className="border border-neutral-300 px-3 py-2">Medium</th>
-                        <th className="border border-neutral-300 px-3 py-2">Large</th>
-                        <th className="border border-neutral-300 px-3 py-2">Ex Large</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="text-center">
-                        <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Bust</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">18</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">19</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">20.5</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">22</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">23.5</td>
-                      </tr>
-                      <tr className="text-center">
-                        <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Hip</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">18.5</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">19.5</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">22</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">23</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">24.5</td>
-                      </tr>
-                      <tr className="text-center">
-                        <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Arm Hole</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">8</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">8.5</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">9.5</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">10.5</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">12</td>
-                      </tr>
-                      <tr className="text-center">
-                        <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Shirt Length</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">56</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">56</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">56</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">56</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">56</td>
-                      </tr>
-                      <tr className="text-center">
-                        <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">HEM</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">42</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">42</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">42</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">42</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">42</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="bg-black text-white py-1.5 text-[14px] font-bold uppercase tracking-wider mt-4">
-                  Trouser Size
-                </div>
-                <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
-                  <table className="w-full min-w-[480px] border-collapse border border-neutral-300 text-[12px]">
-                    <thead>
-                      <tr className="bg-neutral-100 text-black font-bold">
-                        <th className="border border-neutral-300 px-3 py-2 text-left">Details</th>
-                        <th className="border border-neutral-300 px-3 py-2">Ex Small</th>
-                        <th className="border border-neutral-300 px-3 py-2">Small</th>
-                        <th className="border border-neutral-300 px-3 py-2">Medium</th>
-                        <th className="border border-neutral-300 px-3 py-2">Large</th>
-                        <th className="border border-neutral-300 px-3 py-2">Ex Large</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="text-center">
-                        <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Waist</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">14</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">15</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">17</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">19</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">19.5</td>
-                      </tr>
-                      <tr className="text-center">
-                        <td className="border border-neutral-300 px-3 py-1.5 font-semibold text-left">Sharara Length</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">45</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">45</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">45</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">46</td>
-                        <td className="border border-neutral-300 px-3 py-1.5">46</td>
-                      </tr>
-                    </tbody>
-                  </table>
                 </div>
               </div>
             ) : description.images.length > 0 ? (

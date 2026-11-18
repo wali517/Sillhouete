@@ -1,3 +1,31 @@
+export interface ProductOption {
+  name: string; // e.g. "Size", "Dupatta", "AD ONS", "Color"
+  useInSku?: boolean;
+  values: string[]; // e.g. ["XS", "S", "M", "L", "XL"]
+}
+
+export interface ChoiceGroup {
+  title: string; // e.g. "You may also add:"
+  choices: string[]; // e.g. ["Select One", "Slip With Sleeves (complimentary)", ...]
+}
+
+export interface ProductVariant {
+  id?: string;
+  _id?: string;
+  sku?: string | null;
+  price: number;
+  salePrice?: number | null;
+  stock?: number;
+  title?: string;
+  option1?: string | null;
+  option2?: string | null;
+  option3?: string | null;
+  attributes?: Array<{
+    name: string;
+    value: string;
+  }>;
+}
+
 export interface Product {
   id: string;
   handle: string;
@@ -27,6 +55,7 @@ export interface Product {
   fabric?: string;
   sku?: string;
   color?: string;
+  style?: string;
   fabricDetail?: {
     shirt?: string;
     trousers?: string;
@@ -38,22 +67,25 @@ export interface Product {
     colourCustomization?: string;
   };
   customSizeImage?: string;
+  sizeChartImage?: string;
   rating?: number;
   reviewCount?: number;
   dupattaOptions?: string[];
   adOnOptions?: string[];
+  options?: ProductOption[];
+  choiceGroups?: ChoiceGroup[];
+  readyMadeDetails?: string;
+  unstitchedDetails?: string;
+  expressAllowed?: boolean;
+  onSale?: boolean;
+  saleNote?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minSalePrice?: number | null;
   collections?: string[];
   videoId?: string;
   videoUrl?: string;
-  variants?: Array<{
-    id: string;
-    title: string;
-    price: number;
-    sku?: string | null;
-    option1?: string | null;
-    option2?: string | null;
-    option3?: string | null;
-  }>;
+  variants?: ProductVariant[];
 }
 
 export interface CartItem {
@@ -64,6 +96,7 @@ export interface CartItem {
   adOn?: string;
   expedite?: boolean;
   slip?: string;
+  choiceGroupSelections?: Record<string, string>;
   customSizeNote?: string;
   unitPrice?: number;
   quantity: number;
@@ -113,6 +146,8 @@ export interface OrderItem {
   /** Optional product customization selections saved with the order. */
   dupatta?: string;
   adOn?: string;
+  slip?: string;
+  choiceGroupSelections?: Record<string, string>;
   customSizeNote?: string;
 }
 

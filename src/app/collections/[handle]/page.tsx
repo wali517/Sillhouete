@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
   getProducts,
@@ -7,7 +8,7 @@ import {
 } from "@/lib/db";
 import CollectionViewer from "./CollectionViewer";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ handle: string }>;
@@ -54,6 +55,20 @@ export default async function CollectionPage({ params, searchParams }: Props) {
 
   return (
     <section className="mx-auto w-full max-w-380 px-3.5 py-6 sm:px-6 md:px-8 lg:px-10 md:py-8">
+      {/* Optional Category Banner Image */}
+      {colDoc?.image && (
+        <div className="relative mb-6 sm:mb-8 w-full overflow-hidden rounded-md aspect-[21/9] max-h-72 bg-neutral-100 border border-neutral-200">
+          <Image
+            src={colDoc.image}
+            alt={title}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        </div>
+      )}
+
       {/* Header section matching Sillhouete aesthetic */}
       {isSale ? (
         <header className="mb-8 text-center">

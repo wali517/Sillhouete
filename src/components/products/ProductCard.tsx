@@ -52,7 +52,7 @@ export default function ProductCard({
     return () => observer.disconnect();
   }, []);
 
-  const showSaleBadge = isSale || product.isSale || !!product.originalPrice;
+  const showSaleBadge = isSale || Boolean(product.onSale || product.isSale || (product.originalPrice && product.originalPrice > product.price));
   // In collection pages matching reference storefront, products display NEW badge unless on sale
   const showNewBadge = !showSaleBadge && (isNew || product.isNew !== false);
 
@@ -107,7 +107,7 @@ export default function ProductCard({
         {/* Black Sale badge in top-left corner */}
         {showSaleBadge && (
           <span className="pointer-events-none absolute left-2.5 top-2.5 z-10 bg-black text-white px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider shadow-sm">
-            Sale
+            {product.saleNote ? `SALE ${product.saleNote}` : "Sale"}
           </span>
         )}
 
@@ -128,7 +128,7 @@ export default function ProductCard({
         </h3>
 
         <p className="mt-1.5 flex flex-wrap items-baseline justify-center gap-x-1.5 gap-y-0.5 text-center text-[12px] sm:text-[13px] md:text-[13.5px] font-normal text-[#111111]">
-          {(showFrom || product.priceFrom || product.handle === "bella") && (
+          {(showFrom || product.priceFrom) && (
             <span className="text-black/65 font-serif mr-0.5">from</span>
           )}
 

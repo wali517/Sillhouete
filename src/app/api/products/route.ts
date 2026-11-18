@@ -42,7 +42,19 @@ export async function POST(req: Request) {
     const newProduct = await saveProduct(body);
     try {
       revalidatePath("/");
-      revalidatePath("/collections/[handle]");
+      revalidatePath(`/products/${newProduct.handle}`);
+      revalidatePath("/collections/[handle]", "page");
+      if (newProduct.mainCategorySlug) {
+        revalidatePath(`/collections/${newProduct.mainCategorySlug}`);
+      }
+      if (newProduct.subcategorySlug) {
+        revalidatePath(`/collections/${newProduct.subcategorySlug}`);
+      }
+      if (Array.isArray(newProduct.collections)) {
+        for (const c of newProduct.collections) {
+          revalidatePath(`/collections/${c}`);
+        }
+      }
     } catch {}
     return NextResponse.json({ success: true, product: newProduct });
   } catch (err: unknown) {

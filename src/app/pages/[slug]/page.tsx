@@ -1,12 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getSettings } from "@/lib/db";
-import livePagesData from "@/data/live-pages-content.json";
+import { getSettings, getPageBySlug } from "@/lib/db";
 import { ContactInquiryForm } from "@/components/ui/ContactInquiryForm";
 
-export const revalidate = 60;
-
-const livePages = livePagesData as Record<string, { title: string; html: string }>;
+export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -109,7 +106,7 @@ export default async function InfoPage({ params }: Props) {
   }
 
   const normalizedSlug = slug === "spotted" ? "spot" : slug;
-  const liveData = livePages[normalizedSlug];
+  const liveData = await getPageBySlug(normalizedSlug);
 
   return (
     <article

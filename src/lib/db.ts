@@ -8,6 +8,7 @@ import { ContactMessageModel } from "./models/ContactMessage";
 import { BlogPostModel } from "./models/BlogPost";
 import { SiteSettingsModel } from "./models/SiteSettings";
 import { CollectionModel } from "./models/Collection";
+import { PageModel } from "./models/Page";
 import { executePredictiveSearch, tokenize } from "./predictive-search";
 import { ANNOUNCEMENTS, SITE, NAV } from "@/data/site";
 import {
@@ -953,10 +954,31 @@ export async function saveProduct(product: Partial<Product> & { title: string; p
     product.mainCategoryName ||
     "Luxury Pret";
 
+  const parsedOriginalPrice =
+    product.originalPrice !== undefined &&
+    product.originalPrice !== null &&
+    String(product.originalPrice).trim() !== "" &&
+    Number(product.originalPrice) > 0
+      ? Number(product.originalPrice)
+      : null;
+
+  const isOnSale = Boolean(
+    product.onSale ||
+    product.isSale ||
+    (parsedOriginalPrice && parsedOriginalPrice > Number(product.price))
+  );
+
   const derivedCollections = deriveCollectionsFromCategory(category, product.collections || []);
   const collSet = new Set(derivedCollections);
   if (product.mainCategorySlug) collSet.add(product.mainCategorySlug);
   if (product.subcategorySlug) collSet.add(product.subcategorySlug);
+  if (isOnSale) {
+    collSet.add("sale-1");
+    collSet.add("sale");
+  } else {
+    collSet.delete("sale-1");
+    collSet.delete("sale");
+  }
   const collections = Array.from(collSet);
 
   const fullProduct: Product = {
@@ -964,15 +986,36 @@ export async function saveProduct(product: Partial<Product> & { title: string; p
     handle,
     title: product.title,
     price: Number(product.price),
-    originalPrice: product.originalPrice ? Number(product.originalPrice) : undefined,
+    originalPrice: parsedOriginalPrice,
     priceFrom: !!product.priceFrom,
-    image: product.image || "https://sillhouete.com/cdn/shop/files/sillhouete_logo_1.png",
-    hoverImage: product.hoverImage || product.image || "https://sillhouete.com/cdn/shop/files/sillhouete_logo_1.png",
-    images: product.images && product.images.length ? product.images : [product.image || "", product.hoverImage || ""].filter(Boolean),
+    image: (() => {
+      const m = product.image?.trim() || product.images?.[0]?.trim();
+      return m || "https://sillhouete.com/cdn/shop/files/sillhouete_logo_1.png";
+    })(),
+    hoverImage: (() => {
+      const h = product.hoverImage?.trim() || product.images?.[1]?.trim() || product.image?.trim();
+      return h || "https://sillhouete.com/cdn/shop/files/sillhouete_logo_1.png";
+    })(),
+    images: (() => {
+      const main = product.image?.trim() || product.images?.[0]?.trim();
+      const hover = product.hoverImage?.trim() || product.images?.[1]?.trim();
+      const list: string[] = [];
+      if (main) list.push(main);
+      if (hover && hover !== main) list.push(hover);
+      if (product.images && Array.isArray(product.images)) {
+        for (const g of product.images) {
+          const clean = g ? g.trim() : "";
+          if (clean && !list.includes(clean)) list.push(clean);
+        }
+      }
+      return list.length > 0 ? list : [main || "https://sillhouete.com/cdn/shop/files/sillhouete_logo_1.png"];
+    })(),
     alt: product.alt || product.title,
     ratio: product.ratio || 1.5,
     isNew: product.isNew ?? true,
-    isSale: product.isSale ?? (!!product.originalPrice && product.originalPrice > product.price),
+    isSale: isOnSale,
+    onSale: isOnSale,
+    saleNote: product.saleNote || "",
     isBestSeller: product.isBestSeller ?? false,
     category,
     mainCategoryId: product.mainCategoryId || "",
@@ -982,18 +1025,28 @@ export async function saveProduct(product: Partial<Product> & { title: string; p
     subcategorySlug: product.subcategorySlug || "",
     subcategoryName: product.subcategoryName || "",
     collections,
-    color: product.color,
+    color: product.color || "",
+    style: product.style || "",
     description: product.description || `${product.title} luxury designer dress.`,
     inStock: product.inStock ?? true,
     sizes: product.sizes && product.sizes.length ? product.sizes : ["XS", "S", "M", "L", "XL"],
     fabric: product.fabric || "Pure Silk / Chiffon",
     sku: product.sku || `SLH-${handle.toUpperCase()}`,
     customSizeImage: product.customSizeImage,
+    sizeChartImage: product.sizeChartImage || "",
     videoId: product.videoId,
     videoUrl: product.videoUrl,
-    dupattaOptions: product.dupattaOptions,
-    adOnOptions: product.adOnOptions,
-    variants: product.variants,
+    dupattaOptions: product.dupattaOptions || [],
+    adOnOptions: product.adOnOptions || [],
+    options: product.options || [],
+    choiceGroups: product.choiceGroups || [],
+    readyMadeDetails: product.readyMadeDetails || "",
+    unstitchedDetails: product.unstitchedDetails || "",
+    expressAllowed: product.expressAllowed ?? true,
+    minPrice: product.minPrice,
+    maxPrice: product.maxPrice,
+    minSalePrice: product.minSalePrice,
+    variants: product.variants || [],
   };
 
   try {
@@ -1032,6 +1085,8 @@ export interface CartInputItem {
   quantity?: number;
   dupatta?: string;
   adOn?: string;
+  slip?: string;
+  choiceGroupSelections?: Record<string, string>;
   customSizeNote?: string;
 }
 
@@ -1046,6 +1101,8 @@ export interface ValidatedCartCalculation {
     image: string;
     dupatta?: string;
     adOn?: string;
+    slip?: string;
+    choiceGroupSelections?: Record<string, string>;
     customSizeNote?: string;
   }>;
   subtotal: number;
@@ -1118,6 +1175,8 @@ export async function validateAndCalculateOrder(
       image: product.image || product.images?.[0] || "",
       dupatta: item.dupatta,
       adOn: item.adOn,
+      slip: item.slip,
+      choiceGroupSelections: item.choiceGroupSelections,
       customSizeNote: item.customSizeNote,
     });
   }
@@ -2112,6 +2171,64 @@ export async function deleteBlog(id: string): Promise<boolean> {
     console.warn("MongoDB deleteBlog error:", err);
     return false;
   }
+}
+
+/* ──────────────── STATIC & LEGAL PAGES (MONGODB) ──────────────── */
+
+export interface PageDocument {
+  slug: string;
+  title: string;
+  html: string;
+  updatedAt?: string;
+}
+
+export async function getPageBySlug(slug: string): Promise<PageDocument | null> {
+  try {
+    await connectDB();
+    const doc = await PageModel.findOne({ slug: slug.toLowerCase().trim() }).lean();
+    if (doc) {
+      return {
+        slug: doc.slug,
+        title: doc.title,
+        html: doc.html,
+        updatedAt: doc.updatedAt ? new Date(doc.updatedAt).toISOString() : undefined,
+      };
+    }
+  } catch (err) {
+    console.warn(`MongoDB getPageBySlug(${slug}) error:`, err);
+  }
+  return null;
+}
+
+export async function getAllPages(): Promise<PageDocument[]> {
+  try {
+    await connectDB();
+    const docs = await PageModel.find({}).sort({ slug: 1 }).lean();
+    return docs.map((d) => ({
+      slug: d.slug,
+      title: d.title,
+      html: d.html,
+      updatedAt: d.updatedAt ? new Date(d.updatedAt).toISOString() : undefined,
+    }));
+  } catch (err) {
+    console.warn("MongoDB getAllPages error:", err);
+    return [];
+  }
+}
+
+export async function savePage(page: { slug: string; title: string; html: string }): Promise<PageDocument> {
+  await connectDB();
+  const slug = page.slug.toLowerCase().trim();
+  const doc = await PageModel.findOneAndUpdate(
+    { slug },
+    { $set: { slug, title: page.title.trim(), html: page.html } },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  ).lean();
+  return {
+    slug: doc.slug,
+    title: doc.title,
+    html: doc.html,
+  };
 }
 
 /* ──────────────── SETTINGS ──────────────── */

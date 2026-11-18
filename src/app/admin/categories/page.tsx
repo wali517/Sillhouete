@@ -299,6 +299,7 @@ export default function AdminCategoriesPage() {
     const parentId = isMain ? "" : String(selectedMainCategory?._id || selectedMainCategory?.id || "");
 
     const payload = {
+      _id: editingCategory?._id ? String(editingCategory._id) : (editingCategory?.id ? String(editingCategory.id) : undefined),
       title: title.trim(),
       handle: finalHandle,
       description: description.trim(),
@@ -994,10 +995,10 @@ export default function AdminCategoriesPage() {
 
                     {showUrlInput && (
                       <input
-                        type="url"
+                        type="text"
                         value={image}
                         onChange={(e) => setImage(e.target.value)}
-                        placeholder="https://example.com/image.jpg"
+                        placeholder="https://example.com/image.jpg or /api/uploads/..."
                         className="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-900 focus:border-black focus:outline-none"
                       />
                     )}

@@ -131,6 +131,14 @@ export default function CartDrawer() {
                           {i.adOn && <p>Ad Ons: <span className="text-black font-medium">{i.adOn}</span></p>}
                           {i.expedite && <p className="text-amber-700 font-semibold">Express Shipping (5-6 Days)</p>}
                           {i.slip && <p>Slip: <span className="text-black font-medium">{i.slip}</span></p>}
+                          {i.choiceGroupSelections &&
+                            Object.entries(i.choiceGroupSelections).map(([grp, val]) =>
+                              val && val.toLowerCase() !== "select one" && val.toLowerCase() !== "none" ? (
+                                <p key={grp}>
+                                  {grp.replace(/__\d+$/, "").replace(/:$/, "")}: <span className="text-black font-medium">{val}</span>
+                                </p>
+                              ) : null,
+                            )}
                         </div>
 
                         <div className="mt-auto flex items-center justify-between pt-3">

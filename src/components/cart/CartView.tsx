@@ -127,6 +127,14 @@ export default function CartView({
                             <span className="font-semibold text-[#1a1a1a]">Slip:</span> {item.slip}
                           </p>
                         )}
+                        {item.choiceGroupSelections &&
+                          Object.entries(item.choiceGroupSelections).map(([grp, val]) =>
+                            val && val.toLowerCase() !== "select one" && val.toLowerCase() !== "none" ? (
+                              <p key={grp}>
+                                <span className="font-semibold text-[#1a1a1a]">{grp.replace(/__\d+$/, "").replace(/:$/, "")}:</span> {val}
+                              </p>
+                            ) : null,
+                          )}
                       </div>
 
                       {/* Quantity Selector: [ -  1  + ] */}

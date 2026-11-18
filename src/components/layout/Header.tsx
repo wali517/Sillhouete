@@ -178,7 +178,7 @@ export default function Header({ initialNav }: { initialNav?: NavLink[] }) {
                 <li key={item.label} className="relative group">
                   <Link
                     href={item.href}
-                    className="relative flex items-center py-0.5 text-[13px] xl:text-[15px] uppercase tracking-[0.06em] font-normal text-black hover:text-black transition-colors after:content-[''] after:absolute after:bottom-0 after:left-1 after:right-1 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:ease-out after:origin-left"
+                    className="relative flex items-center py-0.5 text-[14px] xl:text-[15px] uppercase tracking-[0.06em] font-normal text-black hover:text-black transition-colors after:content-[''] after:absolute after:bottom-0 after:left-1 after:right-1 after:h-[1.5px] after:bg-black after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-200 after:ease-out after:origin-left"
                   >
                     <span>{item.label}</span>
                     {hasDropdown && (

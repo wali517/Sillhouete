@@ -30,6 +30,7 @@ export interface AddToCartPayload {
   adOn?: string;
   expedite?: boolean;
   slip?: string;
+  choiceGroupSelections?: Record<string, string>;
   customSizeNote?: string;
   unitPrice?: number;
   quantity?: number;
@@ -167,6 +168,7 @@ export function StoreProvider({
       let adOn: string | undefined;
       let expedite = false;
       let slip: string | undefined;
+      let choiceGroupSelections: Record<string, string> | undefined;
       let customSizeNote: string | undefined;
       let unitPrice = product.price;
       let quantity = qty;
@@ -179,6 +181,7 @@ export function StoreProvider({
         adOn = sizeOrOptions.adOn;
         expedite = !!sizeOrOptions.expedite;
         slip = sizeOrOptions.slip;
+        choiceGroupSelections = sizeOrOptions.choiceGroupSelections;
         customSizeNote = sizeOrOptions.customSizeNote;
         if (sizeOrOptions.unitPrice !== undefined) {
           unitPrice = sizeOrOptions.unitPrice;
@@ -188,7 +191,8 @@ export function StoreProvider({
         }
       }
 
-      const key = `${product.id}:${size}:${dupatta || "none"}:${adOn || "none"}:${slip || "none"}:${expedite ? "exp" : "std"}${customSizeNote ? `:${customSizeNote}` : ""}`;
+      const choiceKey = choiceGroupSelections ? JSON.stringify(choiceGroupSelections) : "";
+      const key = `${product.id}:${size}:${dupatta || "none"}:${adOn || "none"}:${slip || "none"}:${expedite ? "exp" : "std"}${choiceKey ? `:${choiceKey}` : ""}${customSizeNote ? `:${customSizeNote}` : ""}`;
       setItems((prev) =>
         prev.some((i) => i.key === key)
           ? prev.map((i) => (i.key === key ? { ...i, quantity: i.quantity + quantity } : i))
@@ -202,6 +206,7 @@ export function StoreProvider({
                 adOn,
                 expedite,
                 slip,
+                choiceGroupSelections,
                 customSizeNote,
                 unitPrice,
                 quantity,

@@ -6,10 +6,11 @@ import type { Product } from "@/types";
 import { ChevronUp, ChevronDown } from "lucide-react";
 
 export default function ProductGallery({ product }: { product: Product }) {
+  // Main primary image is always strictly first (#1), followed by all gallery shots in exact order
   const rawList = [
-    ...(product.images || []),
     product.image,
     product.hoverImage,
+    ...(product.images || []),
   ].filter(Boolean) as string[];
   const images = Array.from(new Set(rawList));
 

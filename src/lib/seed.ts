@@ -13,51 +13,7 @@ import { SiteSettingsModel } from "./models/SiteSettings";
 async function seedProducts() {
   const count = await ProductModel.countDocuments();
   if (count > 0) return;
-
-  console.log("🌱 Seeding products from static data...");
-  try {
-    // Import large product array lazily to avoid build issues
-    const { allProducts } = await import("@/data/products");
-    const products = allProducts.map((p) => ({
-      id: p.id,
-      handle: p.handle,
-      title: p.title,
-      price: p.price,
-      originalPrice: p.originalPrice,
-      priceFrom: p.priceFrom ?? false,
-      image: p.image,
-      hoverImage: p.hoverImage,
-      images: [p.image, p.hoverImage].filter(Boolean),
-      alt: p.alt,
-      ratio: p.ratio ?? 1.5,
-      isNew: p.isNew ?? false,
-      isSale: false,
-      isBestSeller: false,
-      category:
-        (p as { category?: string }).category ||
-        (p.handle.includes("rm") || p.handle.includes("formal")
-          ? "Formal"
-          : "Luxury Pret"),
-      description: `${p.alt}. Crafted from premium fabrics with bespoke hand embroidery, fine zardozi detailing, and artisanal tailoring.`,
-      inStock: true,
-      sizes: (p as { sizes?: string[] }).sizes || ["XS", "S", "M", "L", "XL"],
-      fabric: (p as { fabric?: string }).fabric || "Pure Silk / Chiffon",
-      sku: `SLH-${p.handle.toUpperCase()}`,
-      dupattaOptions: (p as { dupattaOptions?: string[] }).dupattaOptions,
-      adOnOptions: (p as { adOnOptions?: string[] }).adOnOptions,
-      variants: (p as { variants?: unknown[] }).variants,
-    }));
-
-    // Batch insert in chunks of 100
-    for (let i = 0; i < products.length; i += 100) {
-      await ProductModel.insertMany(products.slice(i, i + 100), {
-        ordered: false,
-      }).catch(() => {}); // ignore duplicate errors
-    }
-    console.log(`✅ Seeded ${products.length} products`);
-  } catch (err) {
-    console.error("⚠️ Product seed error:", err);
-  }
+  console.log("ℹ️ Product collection checked (managed directly in MongoDB Atlas).");
 }
 
 async function seedOrders() {
@@ -123,17 +79,7 @@ async function seedMessages() {
 async function seedBlogs() {
   const count = await BlogPostModel.countDocuments();
   if (count > 0) return;
-
-  try {
-    const { SEED_BLOGS } = await import("@/data/seed-blogs");
-    if (SEED_BLOGS && SEED_BLOGS.length > 0) {
-      console.log("🌱 Seeding blogs from seed data...");
-      await BlogPostModel.insertMany(SEED_BLOGS, { ordered: false }).catch(() => {});
-      console.log(`✅ Seeded ${SEED_BLOGS.length} blog posts`);
-    }
-  } catch (err) {
-    console.error("⚠️ Blog seed error:", err);
-  }
+  console.log("ℹ️ Blog posts collection checked (managed directly in MongoDB Atlas).");
 }
 
 async function seedSettings() {

@@ -309,7 +309,19 @@ export default function AdminOrderDetailPage() {
                       Size: {item.size} · Qty: {item.quantity}
                       {item.dupatta && ` · Dupatta: ${item.dupatta}`}
                       {item.adOn && ` · Add-on: ${item.adOn}`}
+                      {item.slip && ` · Slip: ${item.slip}`}
                     </div>
+                    {item.choiceGroupSelections && Object.keys(item.choiceGroupSelections).length > 0 && (
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {Object.entries(item.choiceGroupSelections).map(([grp, val]) =>
+                          val && val.toLowerCase() !== "select one" && val.toLowerCase() !== "none" ? (
+                            <div key={grp} className="bg-gray-100 border border-gray-200 rounded px-2 py-0.5 text-[11px]">
+                              <span className="font-medium text-gray-800">{grp.replace(/__\d+$/, "").replace(/:$/, "")}:</span> {val}
+                            </div>
+                          ) : null,
+                        )}
+                      </div>
+                    )}
                     {item.customSizeNote && (
                       <div className="text-[11px] text-purple-900 bg-purple-50 border border-purple-200 rounded px-2 py-1 mt-1 font-medium inline-block">
                         ✂️ Custom Measurements: {item.customSizeNote}

@@ -24,7 +24,18 @@ export async function PUT(req: Request, { params }: Props) {
     try {
       revalidatePath("/");
       revalidatePath(`/products/${updated.handle}`);
-      revalidatePath("/collections/[handle]");
+      revalidatePath("/collections/[handle]", "page");
+      if (updated.mainCategorySlug) {
+        revalidatePath(`/collections/${updated.mainCategorySlug}`);
+      }
+      if (updated.subcategorySlug) {
+        revalidatePath(`/collections/${updated.subcategorySlug}`);
+      }
+      if (Array.isArray(updated.collections)) {
+        for (const c of updated.collections) {
+          revalidatePath(`/collections/${c}`);
+        }
+      }
     } catch {}
     return NextResponse.json({ success: true, product: updated });
   } catch (err: unknown) {

@@ -434,6 +434,8 @@ function CheckoutForm() {
             quantity: i.quantity,
             dupatta: i.dupatta,
             adOn: i.adOn,
+            slip: i.slip,
+            choiceGroupSelections: i.choiceGroupSelections,
             customSizeNote: i.customSizeNote,
           })),
           discountCode: appliedDiscount?.code || "",
@@ -779,6 +781,19 @@ function CheckoutForm() {
                         <p className="text-[12px] text-[#707070] mt-0.5 whitespace-pre-line">
                           {`${item.size} / ${item.dupatta || "None"} / ${item.adOn || "None"}`}
                         </p>
+                        {item.slip && (
+                          <p className="text-[11px] text-[#555] mt-0.5">
+                            Slip: {item.slip}
+                          </p>
+                        )}
+                        {item.choiceGroupSelections &&
+                          Object.entries(item.choiceGroupSelections).map(([grp, val]) =>
+                            val && val.toLowerCase() !== "select one" && val.toLowerCase() !== "none" ? (
+                              <p key={grp} className="text-[11px] text-[#555]">
+                                {grp.replace(/__\d+$/, "").replace(/:$/, "")}: {val}
+                              </p>
+                            ) : null,
+                          )}
                       </div>
                     </div>
                     <span className="text-[14px] font-medium text-[#1a1a1a] whitespace-nowrap">
@@ -1523,6 +1538,19 @@ function CheckoutForm() {
                           <p className="text-[12px] text-[#707070] mt-0.5 whitespace-pre-line leading-relaxed">
                             {`${item.size} / ${item.dupatta || "None"} / ${item.adOn || "None"}`}
                           </p>
+                          {item.slip && (
+                            <p className="text-[11px] text-[#555] mt-0.5">
+                              Slip: {item.slip}
+                            </p>
+                          )}
+                          {item.choiceGroupSelections &&
+                            Object.entries(item.choiceGroupSelections).map(([grp, val]) =>
+                              val && val.toLowerCase() !== "select one" && val.toLowerCase() !== "none" ? (
+                                <p key={grp} className="text-[11px] text-[#555]">
+                                  {grp.replace(/__\d+$/, "").replace(/:$/, "")}: {val}
+                                </p>
+                              ) : null,
+                            )}
                           {item.customSizeNote && (
                             <p className="text-[11px] text-purple-900 bg-purple-50 rounded px-1.5 py-0.5 mt-1 border border-purple-200">
                               Custom: {item.customSizeNote}

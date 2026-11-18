@@ -168,10 +168,10 @@ function buildFullEmailHtml({
   <title>${SITE.name}</title>
 </head>
 <body style="margin: 0; padding: 0; width: 100% !important; background-color: #f7f7f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
-  <!-- Hidden Preheader for Inbox Snippets -->
+  ${safePreheader ? `
   <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; color: #f7f7f7; opacity: 0; mso-hide: all;">
-    ${safePreheader} &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
-  </div>
+    ${safePreheader}
+  </div>` : ""}
 
   <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f7f7f7; table-layout: fixed;">
     <tr>
@@ -256,40 +256,17 @@ export async function sendEmail({
         innerHtml: html,
       });
 
-  const domain = isGmail
-    ? "gmail.com"
-    : host.includes(".")
-    ? host.split(".").slice(-2).join(".")
-    : "sillhouete.com";
-
-  const messageId = `<sil-${Date.now()}-${Math.random().toString(36).substring(2, 9)}@${domain}>`;
-
-  // Standard Anti-Spam Headers conforming to RFC 5322, RFC 3834, and 2024 Google/Yahoo guidelines
-  const mailHeaders: Record<string, string> = {
-    "Message-ID": messageId,
-    Date: new Date().toUTCString(),
-    "Auto-Submitted": "auto-generated",
-    "X-Auto-Response-Suppress": "All",
-    Precedence: "bulk",
-    "List-Unsubscribe": `<mailto:${SITE.email}?subject=unsubscribe>`,
-    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-    "X-Mailer": "Sillhouete E-Commerce Concierge Engine",
-    "X-Entity-Ref-ID": `order-msg-${Date.now()}`,
-  };
+  // Ensure replyTo matches authenticated user to prevent anti-phishing/spoofing warnings
+  const replyTo = authUser;
 
   try {
     const info = await transporter.sendMail({
       from,
-      replyTo: "info@sillhouete.com",
+      replyTo,
       to: cleanTo,
       subject: cleanSubject,
       text: plainTextContent,
       html: fullHtml,
-      envelope: {
-        from: authUser,
-        to: cleanTo,
-      },
-      headers: mailHeaders,
     });
 
     console.log(`📧 [EMAIL DELIVERED] To: ${cleanTo} | Subject: ${cleanSubject} | ID: ${info.messageId}`);
@@ -316,16 +293,11 @@ export async function sendEmail({
 
       const altInfo = await altTransporter.sendMail({
         from: context.from,
-        replyTo: "info@sillhouete.com",
+        replyTo,
         to: cleanTo,
         subject: cleanSubject,
         text: plainTextContent,
         html: fullHtml,
-        envelope: {
-          from: authUser,
-          to: cleanTo,
-        },
-        headers: mailHeaders,
       });
 
       console.log(`📧 [EMAIL DELIVERED ON RETRY] To: ${cleanTo} via port ${altPort} | ID: ${altInfo.messageId}`);
