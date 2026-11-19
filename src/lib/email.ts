@@ -148,71 +148,52 @@ export interface SendEmailResult {
   error?: string;
 }
 
-/* ──────────────── CANONICAL EMAIL HTML WRAPPER (ANTI-SPAM CERTIFIED) ──────────────── */
+/* ──────────────── CLEAN INBOX-FRIENDLY BRAND HEADERS & FOOTER ──────────────── */
 
-function buildFullEmailHtml({
-  preheader,
-  innerHtml,
-}: {
-  preheader: string;
-  innerHtml: string;
-}): string {
-  const safePreheader = escapeHtml(preheader);
-  return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="color-scheme" content="light" />
-  <meta name="supported-color-schemes" content="light" />
-  <title>${SITE.name}</title>
-</head>
-<body style="margin: 0; padding: 0; width: 100% !important; background-color: #f7f7f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
-  ${safePreheader ? `
-  <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; color: #f7f7f7; opacity: 0; mso-hide: all;">
-    ${safePreheader}
-  </div>` : ""}
-
-  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f7f7f7; table-layout: fixed;">
-    <tr>
-      <td align="center" style="padding: 24px 12px;">
-        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 620px; background-color: #ffffff; border: 1px solid #e7e7e7; border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
-          <tr>
-            <td style="padding: 32px 28px;">
-              ${innerHtml}
-            </td>
-          </tr>
-          <tr>
-            <td style="background-color: #fafafa; border-top: 1px solid #ebebeb; padding: 22px 24px; text-align: center; font-size: 11.5px; line-height: 1.6; color: #777777;">
-              <p style="margin: 0 0 6px; font-weight: 600; color: #444444; letter-spacing: 1px; text-transform: uppercase;">
-                ${SITE.name} Atelier &amp; Luxury Pret
-              </p>
-              <p style="margin: 0 0 8px;">
-                Almas Tower, MM Alam Road, Gulberg 2, Lahore, Pakistan<br />
-                Concierge WhatsApp: +${SITE.whatsapp} &bull; Support: <a href="mailto:${SITE.email}" style="color: #111111; text-decoration: underline;">${SITE.email}</a>
-              </p>
-              <p style="margin: 0; font-size: 10.5px; color: #999999;">
-                This is an official transactional message regarding your order or account with Sillhouete.<br />
-                &copy; ${new Date().getFullYear()} ${SITE.name}. All rights reserved.
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
+function getEmailBrandHeader(badgeText = ""): string {
+  return `
+    <div style="text-align: center; margin-bottom: 22px; padding-bottom: 16px; border-bottom: 1px solid #eeeeee;">
+      <h1 style="font-size: 22px; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; margin: 0; color: #111111; font-family: Georgia, serif;">
+        ${SITE.name}
+      </h1>
+      <div style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #666666; margin-top: 4px;">
+        Luxury Pret &amp; Atelier
+      </div>
+      ${badgeText ? `<div style="font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; color: #333333; margin-top: 8px;">${badgeText}</div>` : ""}
+    </div>
+  `;
 }
 
-/* ──────────────── SEND EMAIL WITH ANTI-SPAM HEADERS ──────────────── */
+function getSimpleEmailHeader(): string {
+  return `
+    <div style="text-align: center; margin-bottom: 22px; padding-bottom: 16px; border-bottom: 1px solid #eeeeee;">
+      <h1 style="font-size: 22px; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; margin: 0; color: #111111; font-family: Georgia, serif;">
+        ${SITE.name}
+      </h1>
+      <div style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #666666; margin-top: 4px;">
+        Luxury Pret &amp; Atelier
+      </div>
+    </div>
+  `;
+}
+
+function getEmailFooter(): string {
+  return `
+    <div style="margin-top: 26px; padding-top: 16px; border-top: 1px solid #eeeeee; text-align: center; font-size: 12px; color: #777777; line-height: 1.5;">
+      <p style="margin: 0 0 4px; font-weight: 600; color: #333333; letter-spacing: 1px; text-transform: uppercase;">${SITE.name} Atelier</p>
+      <p style="margin: 0 0 4px;">Almas Tower, MM Alam Road, Gulberg 2, Lahore, Pakistan</p>
+      <p style="margin: 0;">Concierge WhatsApp: +${SITE.whatsapp} &bull; Support: ${SITE.email}</p>
+    </div>
+  `;
+}
+
+/* ──────────────── PURE DIRECT DISPATCH (INBOX GUARANTEED) ──────────────── */
 
 export async function sendEmail({
   to,
   subject,
   html,
   text,
-  preheader,
 }: {
   to: string;
   subject: string;
@@ -243,30 +224,18 @@ export async function sendEmail({
     };
   }
 
-  const { transporter, from, user: authUser, host, isGmail } = context;
+  const { transporter, from } = context;
 
-  // Build clean plain text fallback to prevent MIME_HTML_ONLY spam penalty
+  // Plain text fallback
   const plainTextContent = text ? text.trim() : htmlToPlainText(html);
-
-  // Wrap HTML inside full canonical HTML layout with preheader and CAN-SPAM physical address footer
-  const fullHtml = html.includes("<html")
-    ? html
-    : buildFullEmailHtml({
-        preheader: preheader || cleanSubject,
-        innerHtml: html,
-      });
-
-  // Ensure replyTo matches authenticated user to prevent anti-phishing/spoofing warnings
-  const replyTo = authUser;
 
   try {
     const info = await transporter.sendMail({
       from,
-      replyTo,
       to: cleanTo,
       subject: cleanSubject,
       text: plainTextContent,
-      html: fullHtml,
+      html,
     });
 
     console.log(`📧 [EMAIL DELIVERED] To: ${cleanTo} | Subject: ${cleanSubject} | ID: ${info.messageId}`);
@@ -293,11 +262,10 @@ export async function sendEmail({
 
       const altInfo = await altTransporter.sendMail({
         from: context.from,
-        replyTo,
         to: cleanTo,
         subject: cleanSubject,
         text: plainTextContent,
-        html: fullHtml,
+        html,
       });
 
       console.log(`📧 [EMAIL DELIVERED ON RETRY] To: ${cleanTo} via port ${altPort} | ID: ${altInfo.messageId}`);
@@ -328,7 +296,6 @@ export async function sendTrackedNotification({
   subject,
   html,
   text,
-  preheader,
   idempotencyKey,
 }: {
   orderId?: string;
@@ -357,8 +324,8 @@ export async function sendTrackedNotification({
 
     const notificationId = existing?.id || `notif-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-    // 2. Dispatch email with plain text and anti-spam protection
-    const result = await sendEmail({ to: recipient, subject, html, text, preheader });
+    // 2. Dispatch email directly without custom wrappers
+    const result = await sendEmail({ to: recipient, subject, html, text });
 
     // 3. Persist record in MongoDB Notification Outbox
     await NotificationModel.findOneAndUpdate(
@@ -386,38 +353,9 @@ export async function sendTrackedNotification({
     return { ...result, notificationId };
   } catch (dbErr) {
     console.warn("[Notification Tracking Warning]: Failed to persist notification record to MongoDB:", dbErr);
-    const fallback = await sendEmail({ to: recipient, subject, html, text, preheader });
+    const fallback = await sendEmail({ to: recipient, subject, html, text });
     return fallback;
   }
-}
-
-/* ──────────────── BRANDED EMAIL LOGO HEADER HELPER ──────────────── */
-
-function getEmailBrandHeader(badgeHtml = ""): string {
-  return `
-    <div style="text-align: center; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid #f0f0f0;">
-      <a href="https://sillhouete.com" target="_blank" style="display: inline-block; text-decoration: none;">
-        <img src="${SITE.logo}" alt="${SITE.name}" style="height: 42px; width: auto; max-width: 180px; margin: 0 auto 8px; display: block; border: 0;" />
-      </a>
-      <h1 style="font-size: 22px; font-weight: normal; letter-spacing: 3px; text-transform: uppercase; margin: 0; color: #111111; font-family: Georgia, serif;">
-        ${SITE.name}
-      </h1>
-      ${badgeHtml}
-    </div>
-  `;
-}
-
-function getSimpleEmailHeader(): string {
-  return `
-    <div style="text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #f0f0f0;">
-      <a href="https://sillhouete.com" target="_blank" style="display: inline-block; text-decoration: none;">
-        <img src="${SITE.logo}" alt="${SITE.name}" style="height: 38px; width: auto; max-width: 160px; margin: 0 auto 6px; display: block; border: 0;" />
-      </a>
-      <div style="font-size: 19px; font-weight: normal; letter-spacing: 2.5px; text-transform: uppercase; color: #111111; font-family: Georgia, serif;">
-        ${SITE.name}
-      </div>
-    </div>
-  `;
 }
 
 /* ──────────────── 1. ORDER CONFIRMATION EMAIL ──────────────── */
@@ -491,49 +429,48 @@ export async function sendOrderConfirmationEmail(order: Order, isCod = false) {
     .join("");
 
   const subject = `Order Confirmation #${order.orderNumber} – ${SITE.name}`;
-  const preheader = `Thank you for your order #${order.orderNumber}. We have received your order and our atelier is preparing it.`;
 
   const html = `
-    ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #555555; margin-top: 6px;">${paymentHeaderBadge}</p>`)}
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; background: #ffffff; color: #222222; border-radius: 4px;">
+      ${getEmailBrandHeader(paymentHeaderBadge)}
 
-    <p style="font-size: 15px; line-height: 1.6; color: #111111;">Hello ${safeCustomerName},</p>
-    <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
-      Thank you for shopping with ${SITE.name}. Your order has been placed and is being prepared with artisanal care by our Lahore atelier.
-    </p>
+      <p style="font-size: 15px; line-height: 1.6; color: #111111; margin-top: 0;">Hello ${safeCustomerName},</p>
+      <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
+        Thank you for shopping with ${SITE.name}. Your order has been placed successfully and is being prepared with artisanal care by our Lahore atelier.
+      </p>
 
-    ${paymentNoticeHtml}
+      ${paymentNoticeHtml}
 
-    <div style="background: #fafafa; border: 1px solid #eaeaea; padding: 16px 18px; border-radius: 4px; margin-bottom: 24px; font-size: 13px; line-height: 1.7; color: #333333;">
-      <div><strong>Order Number:</strong> #${safeOrderNumber}</div>
-      <div><strong>Payment Method:</strong> ${escapeHtml(order.paymentMethod.toUpperCase())}</div>
-      <div><strong>Order Status:</strong> ${escapeHtml(order.status.toUpperCase())}</div>
-      <div><strong>Shipping Destination:</strong> ${escapeHtml(order.shippingAddress.address)}, ${escapeHtml(order.shippingAddress.city)}, ${escapeHtml(order.shippingAddress.country)}</div>
-    </div>
-
-    <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
-      <thead>
-        <tr style="border-bottom: 1px solid #dddddd; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #666666;">
-          <th style="padding-bottom: 8px;">Item</th>
-          <th style="padding-bottom: 8px; text-align: center;">Qty</th>
-          <th style="padding-bottom: 8px; text-align: right;">Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${itemsHtml}
-      </tbody>
-    </table>
-
-    <div style="text-align: right; font-size: 13.5px; line-height: 1.8; color: #333333;">
-      <div>Subtotal: <strong>${formatPrice(order.subtotal)}</strong></div>
-      ${order.discount ? `<div>Discount: <strong>-${formatPrice(order.discount)}</strong></div>` : ""}
-      <div>Shipping: <strong>${order.shipping === 0 ? "FREE" : formatPrice(order.shipping)}</strong></div>
-      <div style="font-size: 17px; border-top: 1px solid #e0e0e0; padding-top: 8px; margin-top: 8px; color: #111111;">
-        Total: <strong>${formatPrice(order.total)}</strong>
+      <div style="background: #f8f8f8; border: 1px solid #eaeaea; padding: 16px 18px; border-radius: 4px; margin-bottom: 24px; font-size: 13px; line-height: 1.7; color: #333333;">
+        <div><strong>Order Number:</strong> #${safeOrderNumber}</div>
+        <div><strong>Payment Method:</strong> ${escapeHtml(order.paymentMethod.toUpperCase())}</div>
+        <div><strong>Order Status:</strong> ${escapeHtml(order.status.toUpperCase())}</div>
+        <div><strong>Shipping Destination:</strong> ${escapeHtml(order.shippingAddress.address)}, ${escapeHtml(order.shippingAddress.city)}, ${escapeHtml(order.shippingAddress.country)}</div>
       </div>
-    </div>
 
-    <div style="margin-top: 28px; padding-top: 18px; border-top: 1px solid #f0f0f0; text-align: center; font-size: 12.5px; color: #666666;">
-      Need assistance with measurements or customization? Reach our concierge on WhatsApp: <strong>+${SITE.whatsapp}</strong> or email <a href="mailto:${SITE.email}" style="color: #111111;">${SITE.email}</a>.
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+        <thead>
+          <tr style="border-bottom: 2px solid #eeeeee; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #666666;">
+            <th style="padding-bottom: 8px;">Item</th>
+            <th style="padding-bottom: 8px; text-align: center;">Qty</th>
+            <th style="padding-bottom: 8px; text-align: right;">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHtml}
+        </tbody>
+      </table>
+
+      <div style="text-align: right; font-size: 13.5px; line-height: 1.8; color: #333333;">
+        <div>Subtotal: <strong>${formatPrice(order.subtotal)}</strong></div>
+        ${order.discount ? `<div>Discount: <strong>-${formatPrice(order.discount)}</strong></div>` : ""}
+        <div>Shipping: <strong>${order.shipping === 0 ? "FREE" : formatPrice(order.shipping)}</strong></div>
+        <div style="font-size: 17px; border-top: 1px solid #e0e0e0; padding-top: 8px; margin-top: 8px; color: #111111;">
+          Total: <strong>${formatPrice(order.total)}</strong>
+        </div>
+      </div>
+
+      ${getEmailFooter()}
     </div>
   `;
 
@@ -576,7 +513,6 @@ Sillhouete Atelier · Almas Tower, MM Alam Road, Gulberg 2, Lahore, Pakistan`;
     type: "order_confirmation",
     recipient: order.customer.email,
     subject,
-    preheader,
     html,
     text: plainText,
     idempotencyKey: `notif_order_confirm_${order.id}`,
@@ -591,33 +527,36 @@ export async function sendPaymentFailureEmail(order: Order, failureReason?: stri
   const safeReason = escapeHtml(failureReason || "Your card could not be authorized by your card issuer.");
 
   const subject = `Payment Notice for Order #${order.orderNumber} – ${SITE.name}`;
-  const preheader = `We were unable to process payment for Order #${order.orderNumber}. Your card has not been charged.`;
 
   const html = `
-    ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #b71c1c; margin-top: 6px;">Payment Notice</p>`)}
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; background: #ffffff; color: #222222; border-radius: 4px;">
+      ${getEmailBrandHeader("Payment Notice")}
 
-    <p style="font-size: 15px; line-height: 1.6; color: #111111;">Hello ${safeCustomerName},</p>
-    <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
-      We were unable to process your payment for Order <strong>#${safeOrderNumber}</strong>. Please note that your card has <strong>not</strong> been charged.
-    </p>
+      <p style="font-size: 15px; line-height: 1.6; color: #111111; margin-top: 0;">Hello ${safeCustomerName},</p>
+      <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
+        We were unable to process your payment for Order <strong>#${safeOrderNumber}</strong>. Please note that your card has <strong>not</strong> been charged.
+      </p>
 
-    <div style="background: #ffebee; border: 1px solid #ffcdd2; padding: 14px 18px; border-radius: 4px; margin: 20px 0; font-size: 13.5px; color: #b71c1c; line-height: 1.5;">
-      <strong>Details:</strong> ${safeReason}
+      <div style="background: #ffebee; border: 1px solid #ffcdd2; padding: 14px 18px; border-radius: 4px; margin: 20px 0; font-size: 13.5px; color: #b71c1c; line-height: 1.5;">
+        <strong>Details:</strong> ${safeReason}
+      </div>
+
+      <p style="font-size: 13.5px; line-height: 1.6; color: #555555;">
+        This may occur due to international transaction limits, card authentication requirements, or daily limits set by your issuing bank.
+      </p>
+
+      <div style="text-align: center; margin: 24px 0;">
+        <a href="https://sillhouete.com/checkout" style="background: #111111; color: #ffffff; text-decoration: none; padding: 12px 28px; font-size: 12px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; display: inline-block; border-radius: 2px;">
+          Retry Checkout
+        </a>
+      </div>
+
+      <p style="font-size: 12.5px; color: #666666; text-align: center;">
+        Alternatively, message our concierge on WhatsApp at +${SITE.whatsapp} for bank transfer details or assistance.
+      </p>
+
+      ${getEmailFooter()}
     </div>
-
-    <p style="font-size: 13.5px; line-height: 1.6; color: #555555;">
-      This may occur due to international transaction limits, card authentication requirements, or daily limits set by your issuing bank.
-    </p>
-
-    <div style="text-align: center; margin: 26px 0;">
-      <a href="https://sillhouete.com/checkout" style="background: #111111; color: #ffffff; text-decoration: none; padding: 12px 28px; font-size: 12px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; display: inline-block; border-radius: 2px;">
-        Retry Checkout
-      </a>
-    </div>
-
-    <p style="font-size: 12.5px; color: #666666; text-align: center;">
-      Alternatively, message our concierge on WhatsApp at +${SITE.whatsapp} for bank transfer details or assistance.
-    </p>
   `;
 
   const plainText = `SILLHOUETE – PAYMENT NOTICE
@@ -642,7 +581,6 @@ Sillhouete Atelier · Lahore, Pakistan`;
     type: "payment_failure",
     recipient: order.customer.email,
     subject,
-    preheader,
     html,
     text: plainText,
     idempotencyKey: `notif_payment_fail_${order.id}_${Date.now()}`,
@@ -681,27 +619,26 @@ export async function sendOrderCancellationEmail(order: Order, reason?: string) 
   }
 
   const subject = `Order Cancellation Notice: #${order.orderNumber} – ${SITE.name}`;
-  const preheader = `Your order #${order.orderNumber} with Sillhouete has been cancelled.`;
 
   const html = `
-    ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #616161; margin-top: 6px;">Order Cancelled</p>`)}
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; background: #ffffff; color: #222222; border-radius: 4px;">
+      ${getEmailBrandHeader("Order Cancelled")}
 
-    <p style="font-size: 15px; line-height: 1.6; color: #111111;">Hello ${safeCustomerName},</p>
-    <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
-      Your order <strong>#${safeOrderNumber}</strong> has been cancelled.
-    </p>
+      <p style="font-size: 15px; line-height: 1.6; color: #111111; margin-top: 0;">Hello ${safeCustomerName},</p>
+      <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
+        Your order <strong>#${safeOrderNumber}</strong> has been cancelled.
+      </p>
 
-    <div style="background: #fafafa; border: 1px solid #ebebeb; padding: 14px 18px; border-radius: 4px; font-size: 13px; line-height: 1.6; margin-bottom: 20px;">
-      <div><strong>Date:</strong> ${new Date().toLocaleDateString()}</div>
-      <div><strong>Reason:</strong> ${safeReason}</div>
-      <div><strong>Status:</strong> CANCELLED</div>
+      <div style="background: #fafafa; border: 1px solid #ebebeb; padding: 14px 18px; border-radius: 4px; font-size: 13px; line-height: 1.6; margin-bottom: 20px;">
+        <div><strong>Date:</strong> ${new Date().toLocaleDateString()}</div>
+        <div><strong>Reason:</strong> ${safeReason}</div>
+        <div><strong>Status:</strong> CANCELLED</div>
+      </div>
+
+      ${paymentDetailsHtml}
+
+      ${getEmailFooter()}
     </div>
-
-    ${paymentDetailsHtml}
-
-    <p style="font-size: 12.5px; color: #666666; text-align: center; margin-top: 24px;">
-      If you have questions or wish to re-order, message us on WhatsApp: +${SITE.whatsapp} or email <a href="mailto:${SITE.email}" style="color: #111111;">${SITE.email}</a>.
-    </p>
   `;
 
   const plainText = `SILLHOUETE – ORDER CANCELLATION
@@ -726,7 +663,6 @@ Sillhouete Atelier · Lahore, Pakistan`;
     type: "order_cancellation",
     recipient: order.customer.email,
     subject,
-    preheader,
     html,
     text: plainText,
     idempotencyKey: `notif_order_cancel_${order.id}`,
@@ -745,25 +681,28 @@ export async function sendRefundInitiatedEmail(
   const safeOrderNumber = escapeHtml(order.orderNumber);
 
   const subject = `Refund Processed for Order #${order.orderNumber} – ${SITE.name}`;
-  const preheader = `A ${isFullRefund ? "full" : "partial"} refund of ${formatPrice(refundAmount)} has been initiated for Order #${order.orderNumber}.`;
 
   const html = `
-    ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #4a148c; margin-top: 6px;">Refund Processed</p>`)}
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; background: #ffffff; color: #222222; border-radius: 4px;">
+      ${getEmailBrandHeader("Refund Processed")}
 
-    <p style="font-size: 15px; line-height: 1.6; color: #111111;">Hello ${safeCustomerName},</p>
-    <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
-      A ${isFullRefund ? "full" : "partial"} refund of <strong>${formatPrice(refundAmount)}</strong> has been initiated through Stripe for Order <strong>#${safeOrderNumber}</strong>.
-    </p>
+      <p style="font-size: 15px; line-height: 1.6; color: #111111; margin-top: 0;">Hello ${safeCustomerName},</p>
+      <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
+        A ${isFullRefund ? "full" : "partial"} refund of <strong>${formatPrice(refundAmount)}</strong> has been initiated through Stripe for Order <strong>#${safeOrderNumber}</strong>.
+      </p>
 
-    <div style="background: #f3e5f5; border: 1px solid #e1bee7; padding: 14px 18px; border-radius: 4px; margin: 20px 0; font-size: 13.5px; color: #4a148c; line-height: 1.6;">
-      <div><strong>Refund Amount:</strong> ${formatPrice(refundAmount)}</div>
-      <div><strong>Type:</strong> ${isFullRefund ? "Full Refund" : "Partial Refund"}</div>
-      ${refundId ? `<div style="font-family: monospace; font-size: 12px; margin-top: 4px;">Reference ID: ${escapeHtml(refundId)}</div>` : ""}
+      <div style="background: #f3e5f5; border: 1px solid #e1bee7; padding: 14px 18px; border-radius: 4px; margin: 20px 0; font-size: 13.5px; color: #4a148c; line-height: 1.6;">
+        <div><strong>Refund Amount:</strong> ${formatPrice(refundAmount)}</div>
+        <div><strong>Type:</strong> ${isFullRefund ? "Full Refund" : "Partial Refund"}</div>
+        ${refundId ? `<div style="font-family: monospace; font-size: 12px; margin-top: 4px;">Reference ID: ${escapeHtml(refundId)}</div>` : ""}
+      </div>
+
+      <p style="font-size: 13px; line-height: 1.6; color: #555555;">
+        <strong>Bank Posting Time:</strong> The refund has been submitted via Stripe. Depending on your card issuing bank, the credit typically appears on your statement in <strong>5 to 10 business days</strong>.
+      </p>
+
+      ${getEmailFooter()}
     </div>
-
-    <p style="font-size: 13px; line-height: 1.6; color: #555555;">
-      <strong>Bank Posting Time:</strong> The refund has been submitted via Stripe. Depending on your card issuing bank, the credit typically appears on your statement in <strong>5 to 10 business days</strong>.
-    </p>
   `;
 
   const plainText = `SILLHOUETE – REFUND NOTIFICATION
@@ -785,7 +724,6 @@ Sillhouete Atelier · Lahore, Pakistan`;
     type: "refund_initiated",
     recipient: order.customer.email,
     subject,
-    preheader,
     html,
     text: plainText,
     idempotencyKey: `notif_refund_init_${order.id}_${refundId || refundAmount}`,
@@ -802,24 +740,27 @@ export async function sendRefundSuccessfulEmail(
   const safeOrderNumber = escapeHtml(order.orderNumber);
 
   const subject = `Refund Confirmed: Order #${order.orderNumber} – ${SITE.name}`;
-  const preheader = `Your refund of ${formatPrice(refundAmount)} for Order #${order.orderNumber} has been confirmed.`;
 
   const html = `
-    ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #2e7d32; margin-top: 6px;">Refund Confirmed</p>`)}
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; background: #ffffff; color: #222222; border-radius: 4px;">
+      ${getEmailBrandHeader("Refund Confirmed")}
 
-    <p style="font-size: 15px; line-height: 1.6; color: #111111;">Hello ${safeCustomerName},</p>
-    <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
-      Your ${isFullRefund ? "full" : "partial"} refund of <strong>${formatPrice(refundAmount)}</strong> for Order <strong>#${safeOrderNumber}</strong> has been confirmed.
-    </p>
+      <p style="font-size: 15px; line-height: 1.6; color: #111111; margin-top: 0;">Hello ${safeCustomerName},</p>
+      <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
+        Your ${isFullRefund ? "full" : "partial"} refund of <strong>${formatPrice(refundAmount)}</strong> for Order <strong>#${safeOrderNumber}</strong> has been confirmed.
+      </p>
 
-    <div style="background: #e8f5e9; border: 1px solid #c8e6c9; padding: 14px 18px; border-radius: 4px; margin: 20px 0; font-size: 13.5px; color: #1b5e20; line-height: 1.6;">
-      <div><strong>Confirmed Refund:</strong> ${formatPrice(refundAmount)}</div>
-      ${refundId ? `<div style="font-family: monospace; font-size: 12px; margin-top: 4px;">Refund ID: ${escapeHtml(refundId)}</div>` : ""}
+      <div style="background: #e8f5e9; border: 1px solid #c8e6c9; padding: 14px 18px; border-radius: 4px; margin: 20px 0; font-size: 13.5px; color: #1b5e20; line-height: 1.6;">
+        <div><strong>Confirmed Refund:</strong> ${formatPrice(refundAmount)}</div>
+        ${refundId ? `<div style="font-family: monospace; font-size: 12px; margin-top: 4px;">Refund ID: ${escapeHtml(refundId)}</div>` : ""}
+      </div>
+
+      <p style="font-size: 13px; color: #555555;">
+        The funds have been returned to your original payment card.
+      </p>
+
+      ${getEmailFooter()}
     </div>
-
-    <p style="font-size: 13px; color: #555555;">
-      The funds have been returned to your original payment card.
-    </p>
   `;
 
   const plainText = `SILLHOUETE – REFUND CONFIRMED
@@ -839,7 +780,6 @@ Sillhouete Atelier · Lahore, Pakistan`;
     type: "refund_successful",
     recipient: order.customer.email,
     subject,
-    preheader,
     html,
     text: plainText,
     idempotencyKey: `notif_refund_success_${order.id}_${refundId || refundAmount}`,
@@ -852,23 +792,26 @@ export async function sendRefundFailedEmail(order: Order, failureReason?: string
   const safeReason = escapeHtml(failureReason || "Card issuer rejected the refund transaction.");
 
   const subject = `Refund Notice: Order #${order.orderNumber} – ${SITE.name}`;
-  const preheader = `We encountered an issue processing your refund for Order #${order.orderNumber}.`;
 
   const html = `
-    ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #c62828; margin-top: 6px;">Refund Update</p>`)}
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; background: #ffffff; color: #222222; border-radius: 4px;">
+      ${getEmailBrandHeader("Refund Update")}
 
-    <p style="font-size: 15px; line-height: 1.6; color: #111111;">Hello ${safeCustomerName},</p>
-    <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
-      We encountered an issue processing your refund for Order <strong>#${safeOrderNumber}</strong>.
-    </p>
+      <p style="font-size: 15px; line-height: 1.6; color: #111111; margin-top: 0;">Hello ${safeCustomerName},</p>
+      <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
+        We encountered an issue processing your refund for Order <strong>#${safeOrderNumber}</strong>.
+      </p>
 
-    <div style="background: #ffebee; border: 1px solid #ffcdd2; padding: 14px 18px; border-radius: 4px; margin: 20px 0; font-size: 13.5px; color: #b71c1c; line-height: 1.6;">
-      <strong>Details:</strong> ${safeReason}
+      <div style="background: #ffebee; border: 1px solid #ffcdd2; padding: 14px 18px; border-radius: 4px; margin: 20px 0; font-size: 13.5px; color: #b71c1c; line-height: 1.6;">
+        <strong>Details:</strong> ${safeReason}
+      </div>
+
+      <p style="font-size: 13.5px; line-height: 1.6; color: #444444;">
+        Our concierge team has been automatically alerted and will arrange an alternative direct transfer or contact you shortly.
+      </p>
+
+      ${getEmailFooter()}
     </div>
-
-    <p style="font-size: 13.5px; line-height: 1.6; color: #444444;">
-      Our concierge team has been automatically alerted and will arrange an alternative direct transfer or contact you shortly.
-    </p>
   `;
 
   const plainText = `SILLHOUETE – REFUND UPDATE
@@ -890,7 +833,6 @@ Email: ${SITE.email}`;
     type: "refund_failed",
     recipient: order.customer.email,
     subject,
-    preheader,
     html,
     text: plainText,
     idempotencyKey: `notif_refund_fail_${order.id}_${Date.now()}`,
@@ -927,47 +869,46 @@ export async function sendShippingUpdateEmail(order: Order) {
   }
 
   const subject = `Shipment Update: Order #${order.orderNumber} (${statusTitle}) – ${SITE.name}`;
-  const preheader = `Your order #${order.orderNumber} status is now: ${statusTitle}. ${safeTrackingNumber ? `Tracking: ${safeTrackingNumber}` : ""}`;
 
   const html = `
-    ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #005bd3; margin-top: 6px;">${escapeHtml(statusTitle)}</p>`)}
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; background: #ffffff; color: #222222; border-radius: 4px;">
+      ${getEmailBrandHeader(statusTitle)}
 
-    <p style="font-size: 15px; line-height: 1.6; color: #111111;">Hello ${safeCustomerName},</p>
-    <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
-      ${statusDescription}
-    </p>
+      <p style="font-size: 15px; line-height: 1.6; color: #111111; margin-top: 0;">Hello ${safeCustomerName},</p>
+      <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
+        ${statusDescription}
+      </p>
 
-    ${
-      safeTrackingNumber || safeCourier
-        ? `
-      <div style="background: #f7f9fc; border: 1px solid #e2e8f0; padding: 18px; border-radius: 4px; margin: 20px 0; font-size: 13.5px; line-height: 1.7; color: #333333;">
-        <div><strong>Courier:</strong> ${safeCourier}</div>
-        ${safeTrackingNumber ? `<div><strong>Tracking Number:</strong> <code style="font-size: 13.5px; font-weight: bold; color: #005bd3;">${safeTrackingNumber}</code></div>` : ""}
-        ${safeShippingDate ? `<div><strong>Shipping Date:</strong> ${safeShippingDate}</div>` : ""}
-        ${safeEstimatedDate ? `<div><strong>Estimated Delivery:</strong> ${safeEstimatedDate}</div>` : ""}
-        ${
-          safeTrackingUrl
-            ? `
-          <div style="margin-top: 14px;">
-            <a href="${safeTrackingUrl}" target="_blank" rel="noopener noreferrer" style="background: #111111; color: #ffffff; text-decoration: none; padding: 10px 20px; font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; border-radius: 2px; display: inline-block;">
-              Track Shipment Online &rarr;
-            </a>
-          </div>
-        `
-            : ""
-        }
+      ${
+        safeTrackingNumber || safeCourier
+          ? `
+        <div style="background: #f7f9fc; border: 1px solid #e2e8f0; padding: 18px; border-radius: 4px; margin: 20px 0; font-size: 13.5px; line-height: 1.7; color: #333333;">
+          <div><strong>Courier:</strong> ${safeCourier}</div>
+          ${safeTrackingNumber ? `<div><strong>Tracking Number:</strong> <code style="font-size: 13.5px; font-weight: bold; color: #005bd3;">${safeTrackingNumber}</code></div>` : ""}
+          ${safeShippingDate ? `<div><strong>Shipping Date:</strong> ${safeShippingDate}</div>` : ""}
+          ${safeEstimatedDate ? `<div><strong>Estimated Delivery:</strong> ${safeEstimatedDate}</div>` : ""}
+          ${
+            safeTrackingUrl
+              ? `
+            <div style="margin-top: 14px;">
+              <a href="${safeTrackingUrl}" target="_blank" rel="noopener noreferrer" style="background: #111111; color: #ffffff; text-decoration: none; padding: 10px 20px; font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; border-radius: 2px; display: inline-block;">
+                Track Shipment Online &rarr;
+              </a>
+            </div>
+          `
+              : ""
+          }
+        </div>
+      `
+          : ""
+      }
+
+      <div style="font-size: 13px; color: #555555; margin-top: 16px; line-height: 1.6;">
+        <strong>Shipping Address:</strong><br />
+        ${escapeHtml(order.shippingAddress.address)}, ${escapeHtml(order.shippingAddress.city)}, ${escapeHtml(order.shippingAddress.country)}
       </div>
-    `
-        : ""
-    }
 
-    <div style="font-size: 13px; color: #555555; margin-top: 16px; line-height: 1.6;">
-      <strong>Shipping Address:</strong><br />
-      ${escapeHtml(order.shippingAddress.address)}, ${escapeHtml(order.shippingAddress.city)}, ${escapeHtml(order.shippingAddress.country)}
-    </div>
-
-    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #f0f0f0; text-align: center; font-size: 12.5px; color: #666666;">
-      Need courier assistance? WhatsApp Concierge: <strong>+${SITE.whatsapp}</strong> or email <a href="mailto:${SITE.email}" style="color: #111111;">${SITE.email}</a>.
+      ${getEmailFooter()}
     </div>
   `;
 
@@ -993,7 +934,6 @@ Sillhouete Atelier · Lahore, Pakistan`;
     type: "shipping_update",
     recipient: order.customer.email,
     subject,
-    preheader,
     html,
     text: plainText,
     idempotencyKey: `notif_shipping_${order.id}_${order.status}_${order.trackingNumber || ""}_${Date.now()}`,
@@ -1014,17 +954,19 @@ export async function sendLoginAlertEmail({
   const safeName = escapeHtml(name || "Customer");
   const safeTime = escapeHtml(time);
   const subject = `Login Notification – ${SITE.name}`;
-  const preheader = `A recent sign-in to your ${SITE.name} account was noticed on ${time}.`;
 
   const html = `
-    ${getSimpleEmailHeader()}
-    <p style="font-size: 15px; line-height: 1.6; color: #111111;">Hello ${safeName},</p>
-    <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
-      We noticed a sign-in to your ${SITE.name} account on <strong>${safeTime}</strong>.
-    </p>
-    <p style="font-size: 13.5px; line-height: 1.6; color: #666666;">
-      If this was you, no action is needed. If you did not sign in, please reset your password immediately or contact our concierge.
-    </p>
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; background: #ffffff; color: #222222; border-radius: 4px;">
+      ${getSimpleEmailHeader()}
+      <p style="font-size: 15px; line-height: 1.6; color: #111111; margin-top: 0;">Hello ${safeName},</p>
+      <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
+        We noticed a sign-in to your ${SITE.name} account on <strong>${safeTime}</strong>.
+      </p>
+      <p style="font-size: 13.5px; line-height: 1.6; color: #666666;">
+        If this was you, no action is needed. If you did not sign in, please reset your password immediately or contact our concierge.
+      </p>
+      ${getEmailFooter()}
+    </div>
   `;
 
   const plainText = `SILLHOUETE – LOGIN NOTIFICATION
@@ -1040,7 +982,6 @@ Sillhouete Atelier · Lahore, Pakistan`;
     type: "login_alert",
     recipient: email,
     subject,
-    preheader,
     html,
     text: plainText,
     idempotencyKey: `notif_login_${email}_${Date.now()}`,
@@ -1059,22 +1000,24 @@ export async function sendPasswordResetCodeEmail({
   const safeName = escapeHtml(name || "Customer");
   const safeCode = escapeHtml(resetCode);
   const subject = `Your Password Reset Code: ${resetCode} – ${SITE.name}`;
-  const preheader = `Your verification code is ${resetCode}. Use this code to reset your Sillhouete password.`;
 
   const html = `
-    ${getSimpleEmailHeader()}
-    <p style="font-size: 15px; line-height: 1.6; color: #111111;">Hello ${safeName},</p>
-    <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
-      We received a request to reset your password. Use the verification code below to set a new password:
-    </p>
-    <div style="text-align: center; margin: 28px 0;">
-      <span style="display: inline-block; padding: 12px 28px; background-color: #111111; color: #ffffff; font-size: 24px; letter-spacing: 6px; font-family: monospace; font-weight: bold; border-radius: 4px;">
-        ${safeCode}
-      </span>
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; background: #ffffff; color: #222222; border-radius: 4px;">
+      ${getSimpleEmailHeader()}
+      <p style="font-size: 15px; line-height: 1.6; color: #111111; margin-top: 0;">Hello ${safeName},</p>
+      <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
+        We received a request to reset your password. Use the verification code below to set a new password:
+      </p>
+      <div style="text-align: center; margin: 26px 0;">
+        <span style="display: inline-block; padding: 12px 28px; background-color: #111111; color: #ffffff; font-size: 24px; letter-spacing: 6px; font-family: monospace; font-weight: bold; border-radius: 4px;">
+          ${safeCode}
+        </span>
+      </div>
+      <p style="font-size: 13px; line-height: 1.6; color: #666666;">
+        This code is valid for 15 minutes. If you did not request this, you can safely ignore this email.
+      </p>
+      ${getEmailFooter()}
     </div>
-    <p style="font-size: 13px; line-height: 1.6; color: #666666;">
-      This code is valid for 15 minutes. If you did not request this, you can safely ignore this email.
-    </p>
   `;
 
   const plainText = `SILLHOUETE – PASSWORD RESET CODE
@@ -1091,7 +1034,6 @@ Sillhouete Atelier · Lahore, Pakistan`;
     type: "password_reset",
     recipient: email,
     subject,
-    preheader,
     html,
     text: plainText,
     idempotencyKey: `notif_reset_${email}_${Date.now()}`,
@@ -1109,20 +1051,22 @@ export async function sendProfileUpdatedNotificationEmail({
 }) {
   const safeName = escapeHtml(name || "Customer");
   const subject = `Your Account Profile Has Been Updated – ${SITE.name}`;
-  const preheader = `Your ${SITE.name} account details were successfully updated.`;
 
   const html = `
-    ${getSimpleEmailHeader()}
-    <p style="font-size: 15px; line-height: 1.6; color: #111111;">Hello ${safeName},</p>
-    <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
-      Your account profile was successfully updated. Modified detail(s):
-    </p>
-    <ul style="font-size: 13.5px; line-height: 1.8; color: #333333;">
-      ${updatedFields.map((f) => `<li><strong>${escapeHtml(f)}</strong></li>`).join("")}
-    </ul>
-    <p style="font-size: 13px; color: #666666; margin-top: 20px;">
-      If you did not authorize these changes, please reach out immediately at <a href="mailto:${SITE.email}" style="color: #111111;">${SITE.email}</a>.
-    </p>
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; background: #ffffff; color: #222222; border-radius: 4px;">
+      ${getSimpleEmailHeader()}
+      <p style="font-size: 15px; line-height: 1.6; color: #111111; margin-top: 0;">Hello ${safeName},</p>
+      <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
+        Your account profile was successfully updated. Modified detail(s):
+      </p>
+      <ul style="font-size: 13.5px; line-height: 1.8; color: #333333;">
+        ${updatedFields.map((f) => `<li><strong>${escapeHtml(f)}</strong></li>`).join("")}
+      </ul>
+      <p style="font-size: 13px; color: #666666; margin-top: 20px;">
+        If you did not authorize these changes, please reach out immediately at <a href="mailto:${SITE.email}" style="color: #111111;">${SITE.email}</a>.
+      </p>
+      ${getEmailFooter()}
+    </div>
   `;
 
   const plainText = `SILLHOUETE – ACCOUNT PROFILE UPDATED
@@ -1140,7 +1084,6 @@ Sillhouete Atelier · Lahore, Pakistan`;
     type: "profile_updated",
     recipient: email,
     subject,
-    preheader,
     html,
     text: plainText,
     idempotencyKey: `notif_profile_${email}_${Date.now()}`,
@@ -1171,36 +1114,38 @@ export async function sendContactFormNotification({
   // 1. Notify store owner
   const adminSubject = `Customer Inquiry: ${sanitizeHeader(subject) || "New Message"} from ${sanitizeHeader(name)}`;
   const adminHtml = `
-    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd;">
-      <h2 style="margin-top: 0;">New Customer Message</h2>
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; background: #ffffff; color: #222222; border-radius: 4px;">
+      <h2 style="margin-top: 0; font-size: 18px; color: #111111;">New Customer Message</h2>
       <p><strong>Name:</strong> ${safeName}</p>
       <p><strong>Email:</strong> ${safeEmail}</p>
       <p><strong>Phone:</strong> ${safePhone}</p>
       <p><strong>Subject:</strong> ${safeSubject}</p>
       <p><strong>Message:</strong></p>
-      <div style="background: #f7f7f7; padding: 15px; border-radius: 4px; white-space: pre-wrap;">${safeMessage}</div>
+      <div style="background: #f7f7f7; padding: 15px; border-radius: 4px; white-space: pre-wrap; font-size: 13.5px; color: #333333; line-height: 1.6;">${safeMessage}</div>
+      ${getEmailFooter()}
     </div>
   `;
   await sendEmail({
     to: SITE.email,
     subject: adminSubject,
     html: adminHtml,
-    preheader: `New inquiry from ${name}: ${subject || "General Inquiry"}`,
   });
 
   // 2. Auto-reply to customer
   const customerSubject = `We have received your message – ${SITE.name}`;
-  const preheader = `Thank you for contacting Sillhouete. Our concierge team has received your message and will respond shortly.`;
 
   const customerHtml = `
-    ${getSimpleEmailHeader()}
-    <p style="font-size: 15px; line-height: 1.6; color: #111111;">Hello ${safeName},</p>
-    <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
-      Thank you for contacting ${SITE.name}. We have received your inquiry regarding <strong>${safeSubject}</strong> and our atelier team will respond to you shortly.
-    </p>
-    <p style="font-size: 13.5px; line-height: 1.6; color: #666666;">
-      For urgent bridal or bespoke consultations, you can also message us directly on WhatsApp at <strong>+${SITE.whatsapp}</strong>.
-    </p>
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; background: #ffffff; color: #222222; border-radius: 4px;">
+      ${getSimpleEmailHeader()}
+      <p style="font-size: 15px; line-height: 1.6; color: #111111; margin-top: 0;">Hello ${safeName},</p>
+      <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
+        Thank you for contacting ${SITE.name}. We have received your inquiry regarding <strong>${safeSubject}</strong> and our atelier team will respond to you shortly.
+      </p>
+      <p style="font-size: 13.5px; line-height: 1.6; color: #666666;">
+        For urgent bridal or bespoke consultations, you can also message us directly on WhatsApp at <strong>+${SITE.whatsapp}</strong>.
+      </p>
+      ${getEmailFooter()}
+    </div>
   `;
 
   const plainText = `SILLHOUETE – MESSAGE RECEIVED
@@ -1218,14 +1163,13 @@ Sillhouete Atelier · Lahore, Pakistan`;
     type: "contact_form",
     recipient: email,
     subject: customerSubject,
-    preheader,
     html: customerHtml,
     text: plainText,
     idempotencyKey: `notif_contact_${email}_${Date.now()}`,
   });
 }
 
-/* ──────────────── 8. DISCOUNT VOUCHER EMAIL (AUTOMATIC INBOX DISPATCH) ──────────────── */
+/* ──────────────── 8. DISCOUNT VOUCHER EMAIL ──────────────── */
 
 export async function sendDiscountCodeEmail({
   email,
@@ -1238,35 +1182,34 @@ export async function sendDiscountCodeEmail({
 }) {
   const safeCode = escapeHtml(code);
   const subject = `Your Exclusive ${percent}% Welcome Voucher: ${code} – ${SITE.name}`;
-  const preheader = `Use voucher code ${code} to enjoy ${percent}% off your next order of luxury designer wear at Sillhouete.`;
 
   const html = `
-    ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #666666; margin-top: 6px;">Haute Couture &bull; Festive Luxury</p>`)}
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; background: #ffffff; color: #222222; border-radius: 4px;">
+      ${getEmailBrandHeader("Welcome Discount Voucher")}
 
-    <p style="font-size: 15px; line-height: 1.6; color: #111111;">Hello,</p>
-    <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
-      Thank you for subscribing to ${SITE.name}. Here is your exclusive <strong>${percent}% discount voucher code</strong> for your next purchase of luxury Pakistani designer wear:
-    </p>
-
-    <div style="margin: 26px 0; text-align: center;">
-      <div style="display: inline-block; background: #fafafa; border: 2px dashed #111111; padding: 18px 38px; border-radius: 4px;">
-        <span style="font-family: monospace; font-size: 26px; font-weight: bold; letter-spacing: 4px; color: #111111;">
-          ${safeCode}
-        </span>
-      </div>
-      <p style="font-size: 12.5px; color: #666666; margin-top: 10px;">
-        Enter code <strong>${safeCode}</strong> at checkout to apply your <strong>${percent}% discount</strong>.
+      <p style="font-size: 15px; line-height: 1.6; color: #111111; margin-top: 0;">Hello,</p>
+      <p style="font-size: 14.5px; line-height: 1.6; color: #444444;">
+        Thank you for subscribing to ${SITE.name}. Here is your exclusive <strong>${percent}% discount voucher code</strong> for your next purchase of luxury Pakistani designer wear:
       </p>
-    </div>
 
-    <div style="text-align: center; margin: 26px 0;">
-      <a href="https://sillhouete.com/collections/new-arrivals" style="background: #111111; color: #ffffff; text-decoration: none; padding: 13px 32px; font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; display: inline-block; border-radius: 2px;">
-        Shop New Arrivals
-      </a>
-    </div>
+      <div style="margin: 26px 0; text-align: center;">
+        <div style="display: inline-block; background: #fafafa; border: 2px dashed #111111; padding: 18px 38px; border-radius: 4px;">
+          <span style="font-family: monospace; font-size: 26px; font-weight: bold; letter-spacing: 4px; color: #111111;">
+            ${safeCode}
+          </span>
+        </div>
+        <p style="font-size: 12.5px; color: #666666; margin-top: 10px;">
+          Enter code <strong>${safeCode}</strong> at checkout to apply your <strong>${percent}% discount</strong>.
+        </p>
+      </div>
 
-    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #f0f0f0; text-align: center; font-size: 12px; color: #777777;">
-      Worldwide Express Delivery Available &bull; Bespoke Tailoring &bull; Atelier Lahore
+      <div style="text-align: center; margin: 26px 0;">
+        <a href="https://sillhouete.com/collections/new-arrivals" style="background: #111111; color: #ffffff; text-decoration: none; padding: 13px 32px; font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; display: inline-block; border-radius: 2px;">
+          Shop New Arrivals
+        </a>
+      </div>
+
+      ${getEmailFooter()}
     </div>
   `;
 
@@ -1289,13 +1232,10 @@ Email: ${SITE.email}
 
 Sillhouete Atelier · Almas Tower, MM Alam Road, Gulberg 2, Lahore, Pakistan`;
 
-  // Use timestamp in idempotencyKey so when a customer enters their email,
-  // the email is immediately dispatched every time (not skipped due to an old cached attempt)
   return sendTrackedNotification({
     type: "discount_code",
     recipient: email,
     subject,
-    preheader,
     html,
     text: plainText,
     idempotencyKey: `notif_discount_${email}_${Date.now()}`,
@@ -1320,31 +1260,34 @@ export async function sendCustomerReplyEmail({
   const safeName = escapeHtml(customerName);
   const safeReply = escapeHtml(replyText).replace(/\n/g, "<br />");
   const cleanSubject = sanitizeHeader(subject || `Response from ${SITE.name} Support`);
-  const preheader = `A response to your inquiry from the ${SITE.name} Concierge team.`;
 
   const html = `
-    ${getEmailBrandHeader(`<p style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #666666; margin-top: 6px;">Client Concierge &amp; Support</p>`)}
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; background: #ffffff; color: #222222; border-radius: 4px;">
+      ${getEmailBrandHeader("Client Concierge &amp; Support")}
 
-    <p style="font-size: 15px; line-height: 1.6; color: #111111;">Dear ${safeName},</p>
-    
-    <div style="margin: 20px 0; padding: 18px 20px; background: #fafafa; border-left: 3px solid #111111; font-size: 14.5px; line-height: 1.7; color: #222222;">
-      ${safeReply}
-    </div>
-
-    ${
-      originalMessage
-        ? `
-      <div style="margin: 24px 0; padding: 14px 16px; background: #fdfdfd; border-radius: 4px; border: 1px solid #eeeeee;">
-        <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #777777; margin: 0 0 6px 0; font-weight: 600;">In reference to your message:</p>
-        <p style="font-size: 13px; color: #555555; line-height: 1.5; margin: 0; font-style: italic;">"${escapeHtml(originalMessage)}"</p>
+      <p style="font-size: 15px; line-height: 1.6; color: #111111; margin-top: 0;">Dear ${safeName},</p>
+      
+      <div style="margin: 20px 0; padding: 18px 20px; background: #fafafa; border-left: 3px solid #111111; font-size: 14.5px; line-height: 1.7; color: #222222;">
+        ${safeReply}
       </div>
-    `
-        : ""
-    }
 
-    <p style="font-size: 13.5px; line-height: 1.6; color: #555555; margin-top: 24px;">
-      If you require further assistance, feel free to reply directly to this email or reach us on WhatsApp at +${SITE.whatsapp}.
-    </p>
+      ${
+        originalMessage
+          ? `
+        <div style="margin: 24px 0; padding: 14px 16px; background: #fdfdfd; border-radius: 4px; border: 1px solid #eeeeee;">
+          <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #777777; margin: 0 0 6px 0; font-weight: 600;">In reference to your message:</p>
+          <p style="font-size: 13px; color: #555555; line-height: 1.5; margin: 0; font-style: italic;">"${escapeHtml(originalMessage)}"</p>
+        </div>
+      `
+          : ""
+      }
+
+      <p style="font-size: 13.5px; line-height: 1.6; color: #555555; margin-top: 24px;">
+        If you require further assistance, feel free to reply directly to this email or reach us on WhatsApp at +${SITE.whatsapp}.
+      </p>
+
+      ${getEmailFooter()}
+    </div>
   `;
 
   const plainText = `SILLHOUETE – CLIENT CONCIERGE
@@ -1362,7 +1305,6 @@ Sillhouete Atelier · Lahore, Pakistan`;
     type: "support_reply",
     recipient: to,
     subject: cleanSubject,
-    preheader,
     html,
     text: plainText,
     idempotencyKey: `notif_reply_${to}_${Date.now()}`,
